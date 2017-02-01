@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   JAMedia.py por:
+#   JAMediaPlayer.py por:
 #   Flavio Danesse <fdanesse@gmail.com>
 #   Uruguay
 
@@ -61,7 +61,7 @@ Necesita:
 """
 
 
-class JAMedia(gtk.EventBox):
+class JAMediaPlayer(gtk.EventBox):
 
     __gsignals__ = {
     "salir": (gobject.SIGNAL_RUN_LAST,

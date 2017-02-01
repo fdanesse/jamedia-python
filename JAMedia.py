@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   JAMediaTube.py por:
+#   JAMedia.py por:
 #   Flavio Danesse <fdanesse@gmail.com>
 #   Uruguay
 
@@ -34,8 +34,8 @@ from Widgets import Toolbar_Descarga
 from Widgets import Alerta_Busqueda
 from PanelTube import PanelTube
 from Widgets import ToolbarSalir
-from JAMedia.JAMedia import JAMedia
-from JAMedia.JAMedia import check_path
+from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
+from JAMediaPlayer.JAMediaPlayer import check_path
 from JAMediaYoutube import Buscar
 from JAMediaYoutube import FEED
 from Widgets import WidgetVideoItem
@@ -49,15 +49,15 @@ TipDescargas = "Arrastra Hacia La Izquierda para Quitarlo de Descargas."
 TipEncontrados = "Arrastra Hacia La Derecha para Agregarlo a Descargas"
 
 
-class JAMediaTube(gtk.Window):
+class JAMedia(gtk.Window):
 
     def __init__(self):
 
         gtk.Window.__init__(self)
 
-        self.set_title("JAMediaTube")
+        self.set_title("JAMedia")
         self.set_icon_from_file(os.path.join(BASE_PATH,
-            "Iconos", "JAMediaTube.svg"))
+            "Iconos", "JAMedia.svg"))
         self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
         self.set_resizable(True)
         self.set_border_width(2)
@@ -72,7 +72,7 @@ class JAMediaTube(gtk.Window):
         self.alerta_busqueda = None
         self.paneltube = None
 
-        self.jamedia = None
+        self.jamediaplayer = None
 
         self.archivos = []
         self.buscador = Buscar()
@@ -114,10 +114,10 @@ class JAMediaTube(gtk.Window):
         self.box_tube.pack_start(self.alerta_busqueda, False, False, 0)
         self.box_tube.pack_start(self.paneltube, True, True, 0)
 
-        self.jamedia = JAMedia()
+        self.jamediaplayer = JAMediaPlayer()
 
         boxbase.pack_start(self.box_tube, True, True, 0)
-        boxbase.pack_start(self.jamedia, True, True, 0)
+        boxbase.pack_start(self.jamediaplayer, True, True, 0)
         self.add(boxbase)
 
         self.show_all()
@@ -135,7 +135,7 @@ class JAMediaTube(gtk.Window):
         map(self.__ocultar, [self.toolbar_descarga, self.alerta_busqueda])
         if self.archivos:
             self.__switch(None, 'jamedia')
-            self.jamedia.base_panel.set_nueva_lista(self.archivos)
+            self.jamediaplayer.base_panel.set_nueva_lista(self.archivos)
             self.archivos = []
         else:
             self.__switch(None, 'jamediatube')
@@ -156,7 +156,7 @@ class JAMediaTube(gtk.Window):
         self.toolbar.connect('salir', self.__confirmar_salir)
         self.toolbar_salir.connect('salir', self.__salir)
         self.toolbar.connect('switch', self.__switch, 'jamedia')
-        self.jamedia.connect('salir', self.__switch, 'jamediatube')
+        self.jamediaplayer.connect('salir', self.__switch, 'jamediatube')
         self.toolbar_busqueda.connect("comenzar_busqueda",
             self.__comenzar_busqueda)
         self.paneltube.connect('download', self.__run_download)
@@ -312,11 +312,11 @@ class JAMediaTube(gtk.Window):
         Cambia entre la vista de descargas y la de reproduccion.
         """
         if valor == 'jamediatube':
-            map(self.__ocultar, [self.jamedia])
+            map(self.__ocultar, [self.jamediaplayer])
             map(self.__mostrar, [self.box_tube])
         elif valor == 'jamedia':
             map(self.__ocultar, [self.box_tube])
-            map(self.__mostrar, [self.jamedia])
+            map(self.__mostrar, [self.jamediaplayer])
 
     def __ocultar(self, objeto):
         if objeto.get_visible():
@@ -361,10 +361,10 @@ if __name__ == "__main__":
                         if item:
                             items.append(item)
         if items:
-            jamediatube = JAMediaTube()
-            jamediatube.set_archivos(items)
+            jamedia = JAMedia()
+            jamedia.set_archivos(items)
         else:
-            jamediatube = JAMediaTube()
+            jamedia = JAMedia()
     else:
-        jamediatube = JAMediaTube()
+        jamedia = JAMedia()
     gtk.main()
