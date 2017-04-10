@@ -117,7 +117,7 @@ class Help(gtk.Dialog):
 
         self.helps = []
 
-        for x in range(1, 5):
+        for x in range(3, 7):
             try:
                 help = gtk.Image()
                 help.set_from_file(os.path.join(ICONS_PATH, "help-%s.svg" % x))

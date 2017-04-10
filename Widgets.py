@@ -68,12 +68,11 @@ class Toolbar(gtk.Toolbar):
         self.jamedia.connect("clicked", self.__emit_switch)
         self.insert(self.jamedia, -1)
 
-        # FIXME: Reparar
-        #archivo = os.path.join(BASE_PATH, "Iconos", "JAMedia-help.svg")
-        #boton = get_boton(archivo, flip=False, pixels=24)
-        #boton.set_tooltip_text("Ayuda")
-        #boton.connect("clicked", self.__show_help)
-        #self.insert(boton, -1)
+        archivo = os.path.join(BASE_PATH, "Iconos", "JAMedia-help.svg")
+        boton = get_boton(archivo, flip=False, pixels=24)
+        boton.set_tooltip_text("Ayuda")
+        boton.connect("clicked", self.__show_help)
+        self.insert(boton, -1)
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
@@ -93,11 +92,10 @@ class Toolbar(gtk.Toolbar):
     #    dialog.run()
     #    dialog.destroy()
 
-    # FIXME: Reparar
-    #def __show_help(self, widget):
-    #    dialog = Help(parent=self.get_toplevel())
-    #    dialog.run()
-    #    dialog.destroy()
+    def __show_help(self, widget):
+        dialog = Help(parent=self.get_toplevel())
+        dialog.run()
+        dialog.destroy()
 
     def __emit_switch(self, widget):
         """
@@ -701,13 +699,12 @@ class Credits(gtk.Dialog):
 
         imagen = gtk.Image()
         imagen.set_from_file(os.path.join(BASE_PATH,
-            "Iconos", "JAMediaPlayer/Iconos/JAMediaCredits.svg"))
+            "Iconos", "JAMediaCredits.svg"))
 
         self.vbox.pack_start(imagen, True, True, 0)
         self.vbox.show_all()
 
-# FIXME: Reparar
-'''
+
 class Help(gtk.Dialog):
 
     __gtype_name__ = 'TubeHelp'
@@ -789,7 +786,7 @@ class Help(gtk.Dialog):
         for help in self.helps:
             if help.get_visible():
                 return self.helps.index(help)
-'''
+
 
 class ToolbarSalir(gtk.Toolbar):
     """
