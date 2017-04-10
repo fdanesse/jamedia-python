@@ -36,7 +36,7 @@ def insensibilizar(objeto):
         objeto.set_sensitive(False)
 
 
-BASE_PATH = os.path.dirname(os.path.realpath(__file__))
+ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 
 class PlayerControls(gtk.EventBox):
@@ -57,33 +57,33 @@ class PlayerControls(gtk.EventBox):
         vbox = gtk.HBox()
 
         self.pix_play = gtk.gdk.pixbuf_new_from_file_at_size(
-            os.path.join(BASE_PATH, "Iconos", "play.svg"), 24, 24)
+            os.path.join(ICONS_PATH, "play.svg"), 24, 24)
         self.pix_paused = gtk.gdk.pixbuf_new_from_file_at_size(
-            os.path.join(BASE_PATH, "Iconos", "pausa.svg"), 24, 24)
+            os.path.join(ICONS_PATH, "pausa.svg"), 24, 24)
 
         self.atras = JAMediaToolButton(pixels=24)
-        archivo = os.path.join(BASE_PATH, "Iconos", "siguiente.svg")
+        archivo = os.path.join(ICONS_PATH, "siguiente.svg")
         self.atras.set_imagen(archivo=archivo, flip=True, rotacion=False)
         self.atras.set_tooltip_text("Anterior")
         self.atras.connect("clicked", self.__emit_accion, "atras")
         vbox.pack_start(self.atras, False, True, 0)
 
         self.play = JAMediaToolButton(pixels=24)
-        archivo = os.path.join(BASE_PATH, "Iconos", "play.svg")
+        archivo = os.path.join(ICONS_PATH, "play.svg")
         self.play.set_imagen(archivo=archivo, flip=False, rotacion=False)
         self.play.set_tooltip_text("Reproducir")
         self.play.connect("clicked", self.__emit_accion, "pausa-play")
         vbox.pack_start(self.play, False, True, 0)
 
         self.siguiente = JAMediaToolButton(pixels=24)
-        archivo = os.path.join(BASE_PATH, "Iconos", "siguiente.svg")
+        archivo = os.path.join(ICONS_PATH, "siguiente.svg")
         self.siguiente.set_imagen(archivo=archivo, flip=False, rotacion=False)
         self.siguiente.set_tooltip_text("Siguiente")
         self.siguiente.connect("clicked", self.__emit_accion, "siguiente")
         vbox.pack_start(self.siguiente, False, True, 0)
 
         self.stop = JAMediaToolButton(pixels=24)
-        archivo = os.path.join(BASE_PATH, "Iconos", "stop.svg")
+        archivo = os.path.join(ICONS_PATH, "stop.svg")
         self.stop.set_imagen(archivo=archivo, flip=False, rotacion=False)
         self.stop.set_tooltip_text("Detener Reproducción")
         self.stop.connect("clicked", self.__emit_accion, "stop")

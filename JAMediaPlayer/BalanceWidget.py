@@ -48,7 +48,7 @@ import gobject
 
 from Globales import get_colors
 
-BASE_PATH = os.path.dirname(os.path.realpath(__file__))
+ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 
 class BalanceWidget(gtk.EventBox):
@@ -201,7 +201,7 @@ class BalanceBar(gtk.HScale):
 
         self.ancho, self.borde = (7, 10)
 
-        icono = os.path.join(BASE_PATH, "Iconos", "controlslicer.svg")
+        icono = os.path.join(ICONS_PATH, "controlslicer.svg")
         self.pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icono, 16, 16)
 
         self.connect("expose_event", self.__expose)

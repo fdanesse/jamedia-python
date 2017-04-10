@@ -46,7 +46,7 @@ from Globales import describe_archivo
 #gobject.threads_init()
 #commands.getoutput('PATH=%s:$PATH' % (os.path.dirname(__file__)))
 
-BASE_PATH = os.path.dirname(__file__)
+ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 
 """
@@ -79,7 +79,7 @@ class JAMediaPlayer(gtk.EventBox):
         self.grabador = False
         self.mouse_in_visor = False
         self.cursor_root = gtk.gdk.Cursor(gtk.gdk.BLANK_CURSOR)
-        icono = os.path.join(BASE_PATH, "Iconos", "jamedia_cursor.svg")
+        icono = os.path.join(ICONS_PATH, "jamedia_cursor.svg")
         pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icono, -1, 24)
         self.jamedia_cursor = gtk.gdk.Cursor(
             gtk.gdk.display_get_default(), pixbuf, 0, 0)

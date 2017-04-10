@@ -25,7 +25,7 @@ import gtk
 
 from Globales import get_colors
 
-BASE_PATH = os.path.dirname(os.path.realpath(__file__))
+ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 
 class ProgressPlayer(gtk.EventBox):
@@ -128,7 +128,7 @@ class ProgressBar(gtk.HScale):
         self.presed = False
         self.ancho, self.borde = (10, 10)
 
-        icono = os.path.join(BASE_PATH, "Iconos", "controlslicer.svg")
+        icono = os.path.join(ICONS_PATH, "controlslicer.svg")
         self.pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icono, 24, 24)
 
         self.connect("button-press-event", self.__button_press_event)

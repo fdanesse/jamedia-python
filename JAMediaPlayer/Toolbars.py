@@ -35,7 +35,7 @@ from Globales import copiar
 from Globales import borrar
 from Globales import mover
 
-BASE_PATH = os.path.dirname(os.path.realpath(__file__))
+ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 
 class Toolbar(gtk.EventBox):
@@ -58,19 +58,19 @@ class Toolbar(gtk.EventBox):
 
         toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "JAMedia.svg")
+        archivo = os.path.join(ICONS_PATH, "JAMedia.svg")
         boton = get_boton(archivo, flip=False, pixels=35)
         boton.set_tooltip_text("Creditos")
         boton.connect("clicked", self.__show_credits)
         toolbar.insert(boton, -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "JAMedia-help.svg")
+        archivo = os.path.join(ICONS_PATH, "JAMedia-help.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Ayuda")
         boton.connect("clicked", self.__show_help)
         toolbar.insert(boton, -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "configurar.svg")
+        archivo = os.path.join(ICONS_PATH, "configurar.svg")
         self.configurar = get_boton(archivo, flip=False, pixels=24)
         self.configurar.set_tooltip_text("Configuraciones")
         self.configurar.connect("clicked", self.__emit_accion, "show-config")
@@ -78,7 +78,7 @@ class Toolbar(gtk.EventBox):
 
         toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "button-cancel.svg")
+        archivo = os.path.join(ICONS_PATH, "button-cancel.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Salir")
         boton.connect("clicked", self.__emit_accion, "salir")
@@ -132,7 +132,7 @@ class ToolbarAccion(gtk.EventBox):
 
         toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "button-cancel.svg")
+        archivo = os.path.join(ICONS_PATH, "button-cancel.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Cancelar")
         boton.connect("clicked", self.cancelar)
@@ -145,7 +145,7 @@ class ToolbarAccion(gtk.EventBox):
         item.add(self.label)
         toolbar.insert(item, -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "dialog-ok.svg")
+        archivo = os.path.join(ICONS_PATH, "dialog-ok.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Aceptar")
         boton.connect("clicked", self.__realizar_accion)
@@ -260,7 +260,7 @@ class ToolbarSalir(gtk.EventBox):
 
         toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "button-cancel.svg")
+        archivo = os.path.join(ICONS_PATH, "button-cancel.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Cancelar")
         boton.connect("clicked", self.cancelar)
@@ -277,7 +277,7 @@ class ToolbarSalir(gtk.EventBox):
 
         toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "dialog-ok.svg")
+        archivo = os.path.join(ICONS_PATH, "dialog-ok.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Aceptar")
         boton.connect("clicked", self.__emit_salir)
@@ -324,7 +324,7 @@ class ToolbarAddStream(gtk.EventBox):
 
         toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "button-cancel.svg")
+        archivo = os.path.join(ICONS_PATH, "button-cancel.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Cancelar")
         boton.connect("clicked", self.cancelar)
@@ -363,7 +363,7 @@ class ToolbarAddStream(gtk.EventBox):
 
         toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "dialog-ok.svg")
+        archivo = os.path.join(ICONS_PATH, "dialog-ok.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Aceptar")
         boton.connect("clicked", self.__emit_add_stream)

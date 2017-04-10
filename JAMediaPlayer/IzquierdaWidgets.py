@@ -38,7 +38,7 @@ def insensibilizar(objeto):
         objeto.set_sensitive(False)
 
 
-BASE_PATH = os.path.dirname(os.path.realpath(__file__))
+ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 
 class ToolbarGrabar(gtk.EventBox):
@@ -64,7 +64,7 @@ class ToolbarGrabar(gtk.EventBox):
         self.toolbar.insert(get_separador(draw=False,
             ancho=3, expand=False), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "stop.svg")
+        archivo = os.path.join(ICONS_PATH, "stop.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Detener")
         self.toolbar.insert(boton, -1)
@@ -174,13 +174,13 @@ class ToolbarInfo(gtk.EventBox):
 
         toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "rotar.svg")
+        archivo = os.path.join(ICONS_PATH, "rotar.svg")
         self.boton_izquierda = get_boton(archivo, flip=False, pixels=24)
         self.boton_izquierda.set_tooltip_text("Izquierda")
         self.boton_izquierda.connect("clicked", self.__emit_rotar)
         toolbar.insert(self.boton_izquierda, -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "rotar.svg")
+        archivo = os.path.join(ICONS_PATH, "rotar.svg")
         self.boton_derecha = get_boton(archivo, flip=True, pixels=24)
         self.boton_derecha.set_tooltip_text("Derecha")
         self.boton_derecha.connect("clicked", self.__emit_rotar)
@@ -203,7 +203,7 @@ class ToolbarInfo(gtk.EventBox):
         item.add(switch)
         toolbar.insert(item, -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "iconplay.svg")
+        archivo = os.path.join(ICONS_PATH, "iconplay.svg")
         self.descarga = get_boton(archivo, flip=False,
             rotacion=gtk.gdk.PIXBUF_ROTATE_CLOCKWISE, pixels=24)
         self.descarga.set_tooltip_text("Actualizar Streamings")
@@ -291,7 +291,7 @@ class ProgressBar(gtk.HScale):
 
         self.ancho, self.borde = (10, 10)
 
-        #icono = os.path.join(BASE_PATH, "Iconos", "controlslicer.svg")
+        #icono = os.path.join(ICONS_PATH, "controlslicer.svg")
         #self.pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icono, 24, 24)
 
         self.connect("expose_event", self.__expose)

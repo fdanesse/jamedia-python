@@ -29,7 +29,7 @@ from Globales import download_streamings
 from Globales import set_listas_default
 from Globales import get_ip
 
-BASE_PATH = os.path.dirname(os.path.realpath(__file__))
+ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 
 class DialogoDescarga(gtk.Dialog):
@@ -77,8 +77,7 @@ class Credits(gtk.Dialog):
         self.set_border_width(15)
 
         imagen = gtk.Image()
-        imagen.set_from_file(os.path.join(BASE_PATH,
-            "Iconos", "JAMediaCredits.svg"))
+        imagen.set_from_file(os.path.join(ICONS_PATH, "JAMediaCredits.svg"))
 
         self.vbox.pack_start(imagen, True, True, 0)
         self.vbox.show_all()
@@ -98,7 +97,7 @@ class Help(gtk.Dialog):
         tabla1 = gtk.Table(columns=5, rows=2, homogeneous=False)
 
         vbox = gtk.HBox()
-        archivo = os.path.join(BASE_PATH, "Iconos", "play.svg")
+        archivo = os.path.join(ICONS_PATH, "play.svg")
         self.anterior = get_boton(archivo, flip=True,
             pixels=24, tooltip_text="Anterior")
 
@@ -106,7 +105,7 @@ class Help(gtk.Dialog):
         self.anterior.show()
         vbox.pack_start(self.anterior, False, False, 0)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "play.svg")
+        archivo = os.path.join(ICONS_PATH, "play.svg")
         self.siguiente = get_boton(archivo, pixels=24,
             tooltip_text="Siguiente")
 
@@ -121,8 +120,7 @@ class Help(gtk.Dialog):
         for x in range(1, 5):
             try:
                 help = gtk.Image()
-                help.set_from_file(os.path.join(BASE_PATH,
-                    "Iconos", "help-%s.svg" % x))
+                help.set_from_file(os.path.join(ICONS_PATH, "help-%s.svg" % x))
                 tabla1.attach_defaults(help, 0, 5, 1, 2)
                 self.helps.append(help)
             except:

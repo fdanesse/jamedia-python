@@ -40,7 +40,7 @@ from Globales import get_tube_directory
 from Globales import get_audio_directory
 from Globales import get_video_directory
 
-BASE_PATH = os.path.dirname(os.path.realpath(__file__))
+ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 
 def ocultar(objeto):
@@ -343,7 +343,7 @@ class Lista(gtk.TreeView):
 
         texto, path = elementos[0]
         descripcion = describe_uri(path)
-        icono = os.path.join(BASE_PATH, "Iconos", "sonido.svg")
+        icono = os.path.join(ICONS_PATH, "sonido.svg")
         pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icono, 24, -1)
 
         if descripcion:
@@ -351,7 +351,7 @@ class Lista(gtk.TreeView):
                 # Es un Archivo
                 tipo = describe_archivo(path)
                 if 'video' in tipo or 'application/ogg' in tipo:
-                    icono = os.path.join(BASE_PATH, "Iconos", "video.svg")
+                    icono = os.path.join(ICONS_PATH, "video.svg")
                     pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
                         icono, 24, -1)
 
@@ -586,7 +586,7 @@ class JAMediaToolbarList(gtk.EventBox):
         self.modify_bg(gtk.STATE_NORMAL, get_colors("toolbars"))
         toolbar.modify_bg(gtk.STATE_NORMAL, get_colors("toolbars"))
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "lista.svg")
+        archivo = os.path.join(ICONS_PATH, "lista.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Selecciona una Lista")
         boton.connect("clicked", self.__get_menu)
@@ -603,7 +603,7 @@ class JAMediaToolbarList(gtk.EventBox):
 
         toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "agregar.svg")
+        archivo = os.path.join(ICONS_PATH, "agregar.svg")
         self.boton_agregar = get_boton(archivo, flip=False, pixels=24)
         self.boton_agregar.set_tooltip_text("Agregar Streaming")
         self.boton_agregar.connect("clicked", self.__emit_add_stream)
