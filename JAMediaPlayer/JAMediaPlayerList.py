@@ -536,8 +536,8 @@ class MenuList(gtk.Menu):
                 os.path.join(get_data_directory(), "JAMediaRadio.JAMedia"),
                 os.path.join(get_data_directory(), "MisRadios.JAMedia"),
                 ]
-            jr = stream_en_archivo(uri, listas[1])
-            r = stream_en_archivo(uri, listas[2])
+            jr = stream_en_archivo(uri, listas[0])
+            r = stream_en_archivo(uri, listas[1])
 
             if (jr and not r):
                 copiar = gtk.MenuItem("Copiar a JAMedia")
