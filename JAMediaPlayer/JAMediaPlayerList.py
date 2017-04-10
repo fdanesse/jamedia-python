@@ -388,13 +388,12 @@ class Lista(gtk.TreeView):
 
     def seleccionar_anterior(self, widget=None):
         modelo, _iter = self.get_selection().get_selected()
-        try:
-            path = self.get_model().get_path(_iter)
-            path = (path[0] - 1, )
-            if path > -1:
-                self.get_selection().select_iter(
-                    self.get_model().get_iter(path))
-        except:
+        path = self.get_model().get_path(_iter)
+        path = (path[0] - 1, )
+        if path[0] > -1:
+            self.get_selection().select_iter(
+                self.get_model().get_iter(path))
+        else:
             self.seleccionar_ultimo()
         return False
 
