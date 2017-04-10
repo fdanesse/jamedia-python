@@ -23,8 +23,6 @@ import gtk
 import gobject
 
 from BalanceWidget import BalanceWidget
-#from GstWidgets.Widgets import VideoEfectos
-#from GstWidgets.VideoEfectos import get_jamedia_video_efectos
 from JAMediaPlayerList import PlayerList
 from PlayerControls import PlayerControls
 from Globales import get_colors
@@ -56,13 +54,7 @@ class Derecha(gtk.EventBox):
         gobject.TYPE_NONE, (gobject.TYPE_STRING,)),
     'balance-valor': (gobject.SIGNAL_RUN_LAST,
         gobject.TYPE_NONE, (gobject.TYPE_FLOAT,
-        gobject.TYPE_STRING)),
-    "add_remove_efecto": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_STRING,
-        gobject.TYPE_BOOLEAN)),
-    'configurar_efecto': (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_STRING,
-        gobject.TYPE_STRING, gobject.TYPE_PYOBJECT))}
+        gobject.TYPE_STRING))}
 
     def __init__(self):
 
@@ -74,12 +66,10 @@ class Derecha(gtk.EventBox):
         conf_box = gtk.VBox()
 
         self.balance = BalanceWidget()
-        #self.efectos = VideoEfectos()
         self.lista = PlayerList()
         self.player_controls = PlayerControls()
 
         conf_box.pack_start(self.balance, False, False, 0)
-        #conf_box.pack_start(self.efectos, True, True, 0)
 
         scroll = gtk.ScrolledWindow()
         scroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
@@ -95,8 +85,6 @@ class Derecha(gtk.EventBox):
         self.show_all()
 
         self.balance.connect("balance-valor", self.__emit_balance)
-        #self.efectos.connect("click_efecto", self.__emit_add_remove_efecto)
-        #self.efectos.connect("configurar_efecto", self.__emit_config_efecto)
 
         self.lista.connect("nueva-seleccion", self.__emit_cargar_reproducir)
         self.lista.connect("accion-list", self.__emit_accion_list)
@@ -108,14 +96,6 @@ class Derecha(gtk.EventBox):
             self.__emit_accion_controls)
 
         self.set_size_request(150, -1)
-
-    #def __emit_config_efecto(self, widget, efecto, propiedad, valor):
-    #    # Configurar efecto de video.
-    #    self.emit("configurar_efecto", efecto, propiedad, valor)
-
-    #def __emit_add_remove_efecto(self, widget, efecto, valor):
-    #    # Agrega o quita efecto de video.
-    #    self.emit("add_remove_efecto", efecto, valor)
 
     def __items_in_list(self, widget, items):
         self.player_controls.activar(items)
@@ -157,7 +137,6 @@ class Derecha(gtk.EventBox):
         ocultar(self.get_child().get_children()[0])
         self.lista.setup_init()
         self.player_controls.activar(0)
-        #self.efectos.cargar_efectos(list(get_jamedia_video_efectos()))
 
     def set_ip(self, valor):
         self.lista.set_ip(valor)

@@ -238,49 +238,6 @@ class ToolbarInfo(gtk.EventBox):
         self.descarga.set_sensitive(valor)
 
 
-# FIXME: No lo estoy utilizando
-class Efectos_en_Pipe(gtk.EventBox):
-
-    def __init__(self):
-
-        gtk.EventBox.__init__(self)
-
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("drawingplayer"))
-
-        self.box = gtk.HBox()
-
-        self.add(self.box)
-        self.show_all()
-        #self.set_size_request(-1, 15)
-
-    def clear(self):
-        for child in self.box.get_children():
-            self.box.remove(child)
-            child.destroy()
-        self.hide()
-
-    def add_efecto(self, efecto):
-        button = gtk.Button(efecto)
-        button.set_tooltip_text(efecto)
-        self.box.pack_start(button, False, False, 0)
-        self.show_all()
-
-    def remover_efecto(self, efecto):
-        for button in self.box.get_children():
-            if button.get_tooltip_text() == efecto:
-                self.box.remove(button)
-                button.destroy()
-                break
-        if not self.box.get_children():
-            self.hide()
-
-    def get_efectos(self):
-        efectos = []
-        for button in self.box.get_children():
-            efectos.append(button.get_label())
-        return efectos
-
-
 class BufferInfo(gtk.EventBox):
 
     def __init__(self):

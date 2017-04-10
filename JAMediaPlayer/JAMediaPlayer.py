@@ -72,13 +72,8 @@ class JAMediaPlayer(gtk.EventBox):
         gtk.EventBox.__init__(self)
 
         self.set_sensitive(False)
-        #self.set_title("JAMedia")
-        #self.set_icon_from_file(os.path.join(BASE_PATH,
-        #    "Iconos", "JAMedia.svg"))
         self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
-        #self.set_resizable(True)
         self.set_border_width(2)
-        #self.set_position(gtk.WIN_POS_CENTER)
 
         self.archivos = []
         self.grabador = False
@@ -107,7 +102,6 @@ class JAMediaPlayer(gtk.EventBox):
 
         self.add(vbox)
         self.show_all()
-        #self.realize()
 
         # Controlador del mouse.
         #   http://www.pygtk.org/pygtk2reference/class-gdkdisplay.html
@@ -132,12 +126,8 @@ class JAMediaPlayer(gtk.EventBox):
         self.mouse_listener.connect("estado", self.__set_mouse)
         self.connect("hide", self.__hide_show)
         self.connect("show", self.__hide_show)
-        #self.connect("delete-event", self.__salir)
 
-        #self.resize(640, 480)
         gobject.idle_add(self.__setup_init)
-        #print "JAMedia process:", os.getpid()
-        #self.base_panel.checkear_listas()
 
     def __set_video(self, widget, valor):
         self.toolbar.configurar.set_sensitive(valor)
@@ -148,9 +138,7 @@ class JAMediaPlayer(gtk.EventBox):
 
     def __add_stream(self, widget, tipo, nombre, url):
         add_stream(tipo, [nombre, url])
-        if "Tv" in tipo or "TV" in tipo:
-            indice = 3
-        elif "Radio" in tipo:
+        if "Radio" in tipo:
             indice = 2
         else:
             return
@@ -163,19 +151,12 @@ class JAMediaPlayer(gtk.EventBox):
         self.set_sensitive(False)
         self.__detener_grabacion()
 
-        tipo = "video"
-        label = self.base_panel.derecha.lista.toolbar.label.get_text()
-        if label == "JAM-TV" or label == "TVs" or label == "WebCams":
-            tipo = "video"
-        else:
-            tipo = "audio"
-
         hora = time.strftime("%H-%M-%S")
         fecha = str(datetime.date.today())
         archivo = "%s-%s" % (fecha, hora)
         archivo = os.path.join(get_my_files_directory(), archivo)
 
-        self.grabador = JAMediaGrabador(uri, archivo, tipo)
+        self.grabador = JAMediaGrabador(uri, archivo, "audio")
 
         self.grabador.connect('update', self.__update_grabador)
         self.grabador.connect('endfile', self.__detener_grabacion)
@@ -233,7 +214,6 @@ class JAMediaPlayer(gtk.EventBox):
     def __accion_toolbar(self, widget, accion):
         self.__cancel_toolbars()
         if accion == "salir":
-            #self.toolbar_salir.run("JAMedia")
             self.emit('salir')
         elif accion == "show-config":
             self.base_panel.derecha.show_config()
@@ -292,9 +272,6 @@ class JAMediaPlayer(gtk.EventBox):
             self.base_panel.derecha.show()
             self.base_panel.izquierda.toolbar_info.show()
             self.base_panel.izquierda.progress.show()
-            #if not self.hbox_efectos_en_pipe.get_children():
-            #    self.hbox_efectos_en_pipe.get_parent().get_parent(
-            #        ).get_parent().hide()
         elif not zona and not ocultar:
             pass
         elif zona and not ocultar:

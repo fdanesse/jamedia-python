@@ -26,9 +26,7 @@ import shutil
 import json
 import codecs
 
-canales = 'https://sites.google.com/site/sugaractivities/jamediaobjects/jam/lista-de-tv-2014'
 radios = 'https://sites.google.com/site/sugaractivities/jamediaobjects/jam/lista-de-radios-2014'
-webcams = 'https://sites.google.com/site/sugaractivities/jamediaobjects/jam/lista-de-webcams-2014'
 
 
 def convert_shelve_to_json(path):
@@ -318,14 +316,8 @@ def eliminar_streaming(url, lista):
 
     if lista == "Radios":
         path = os.path.join(DIRECTORIO_DATOS, "MisRadios.JAMedia")
-    elif lista == "TVs":
-        path = os.path.join(DIRECTORIO_DATOS, "MisTvs.JAMedia")
     elif lista == "JAM-Radio":
         path = os.path.join(DIRECTORIO_DATOS, "JAMediaRadio.JAMedia")
-    elif lista == "JAM-TV":
-        path = os.path.join(DIRECTORIO_DATOS, "JAMediaTV.JAMedia")
-    elif lista == "WebCams":
-        path = os.path.join(DIRECTORIO_DATOS, "JAMediaWebCams.JAMedia")
     else:
         return
 
@@ -345,9 +337,7 @@ def add_stream(tipo, item):
     Agrega un streaming a la lista correspondiente de jamedia.
     """
     DIRECTORIO_DATOS = get_data_directory()
-    if "TV" in tipo or "Tv" in tipo:
-        path = os.path.join(DIRECTORIO_DATOS, "MisTvs.JAMedia")
-    elif "Radio" in tipo:
+    if "Radio" in tipo:
         path = os.path.join(DIRECTORIO_DATOS, "MisRadios.JAMedia")
     else:
         return
@@ -364,11 +354,8 @@ def set_listas_default():
     DIRECTORIO_DATOS = get_data_directory()
 
     listas = [
-        os.path.join(DIRECTORIO_DATOS, "JAMediaTV.JAMedia"),
         os.path.join(DIRECTORIO_DATOS, "JAMediaRadio.JAMedia"),
         os.path.join(DIRECTORIO_DATOS, "MisRadios.JAMedia"),
-        os.path.join(DIRECTORIO_DATOS, "MisTvs.JAMedia"),
-        os.path.join(DIRECTORIO_DATOS, "JAMediaWebCams.JAMedia")
         ]
 
     for archivo in listas:
@@ -378,45 +365,15 @@ def set_listas_default():
 
     # verificar si las listas están vacías,
     # si lo están se descargan las de JAMedia
-    _dict = get_dict(os.path.join(DIRECTORIO_DATOS, "JAMediaTV.JAMedia"))
-    lista = _dict.items()
-
-    if not lista:
-        try:
-            # Streamings JAMediatv
-            lista_canales = descarga_lista_de_streamings(canales)
-            guarda_lista_de_streamings(os.path.join(DIRECTORIO_DATOS,
-                "JAMediaTV.JAMedia"), lista_canales)
-        except:
-            print "Error al descargar Streamings de TV."
-
-    # verificar si las listas están vacías,
-    # si lo están se descargan las de JAMedia
     _dict = get_dict(os.path.join(DIRECTORIO_DATOS, "JAMediaRadio.JAMedia"))
     lista = _dict.items()
-
     if not lista:
         try:
-            # Streamings JAMediaradio
             lista_radios = descarga_lista_de_streamings(radios)
             guarda_lista_de_streamings(os.path.join(DIRECTORIO_DATOS,
                 "JAMediaRadio.JAMedia"), lista_radios)
         except:
             print "Error al descargar Streamings de Radios."
-
-    # verificar si las listas están vacías,
-    # si lo están se descargan las de JAMedia
-    _dict = get_dict(os.path.join(DIRECTORIO_DATOS, "JAMediaWebCams.JAMedia"))
-    lista = _dict.items()
-
-    if not lista:
-        try:
-            # Streamings JAMediaWebCams
-            lista_webcams = descarga_lista_de_streamings(webcams)
-            guarda_lista_de_streamings(os.path.join(DIRECTORIO_DATOS,
-                "JAMediaWebCams.JAMedia"), lista_webcams)
-        except:
-            print "Error al descargar Streamings de WebCams."
 
 
 def download_streamings():
@@ -426,17 +383,6 @@ def download_streamings():
     DIRECTORIO_DATOS = get_data_directory()
 
     try:
-        # Streamings JAMediatv
-        lista_canales = descarga_lista_de_streamings(canales)
-        clear_lista_de_streamings(os.path.join(DIRECTORIO_DATOS,
-            "JAMediaTV.JAMedia"))
-        guarda_lista_de_streamings(os.path.join(DIRECTORIO_DATOS,
-            "JAMediaTV.JAMedia"), lista_canales)
-    except:
-        print "Error al descargar Streamings de TV."
-
-    try:
-        # Streamings JAMediaradio
         lista_radios = descarga_lista_de_streamings(radios)
         clear_lista_de_streamings(os.path.join(DIRECTORIO_DATOS,
             "JAMediaRadio.JAMedia"))
@@ -444,16 +390,6 @@ def download_streamings():
             "JAMediaRadio.JAMedia"), lista_radios)
     except:
         print "Error al descargar Streamings de Radios."
-
-    try:
-        # Streamings JAMediaWebCams
-        lista_webcams = descarga_lista_de_streamings(webcams)
-        clear_lista_de_streamings(os.path.join(DIRECTORIO_DATOS,
-            "JAMediaWebCams.JAMedia"))
-        guarda_lista_de_streamings(os.path.join(DIRECTORIO_DATOS,
-            "JAMediaWebCams.JAMedia"), lista_webcams)
-    except:
-        print "Error al descargar Streamings de webcams."
 
 
 def descarga_lista_de_streamings(url):

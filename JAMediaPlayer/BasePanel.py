@@ -72,8 +72,6 @@ class BasePanel(gtk.HPaned):
         self.derecha.connect("add_stream", self.__emit_add_stream)
         self.derecha.connect("accion-controls", self.__accion_controls)
         self.derecha.connect("balance-valor", self.__accion_balance)
-        #self.derecha.connect("add_remove_efecto", self.__add_remove_efecto)
-        #self.derecha.connect("configurar_efecto", self.__config_efecto)
 
         self.izquierda.connect("show-controls", self.__emit_show_controls)
         self.izquierda.connect("rotar", self.__rotar)
@@ -95,17 +93,6 @@ class BasePanel(gtk.HPaned):
         dialog.run()
         dialog.destroy()
         # FIXME: Recargar Lista actual
-
-    #def __add_remove_efecto(self, widget, efecto, valor):
-    #    # Agrega o quita efecto de video.
-    #    self.__emit_menu_activo()
-    #    print self.__add_remove_efecto, efecto, valor
-    #    # agregar el efecto en el bin y en el widget
-
-    #def __config_efecto(self, widget, efecto, propiedad, valor):
-    #    # Configurar efecto de video.
-    #    self.__emit_menu_activo()
-    #    print self.__config_efecto, efecto, propiedad, valor
 
     def __accion_balance(self, widget, valor, prop):
         # Setea valores de Balance en el reproductor.

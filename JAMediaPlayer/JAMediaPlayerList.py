@@ -225,10 +225,7 @@ class PlayerList(gtk.Frame):
         data = get_data_directory()
         _dict = {
             0: os.path.join(data, 'JAMediaRadio.JAMedia'),
-            1: os.path.join(data, 'JAMediaTV.JAMedia'),
             2: os.path.join(data, 'MisRadios.JAMedia'),
-            3: os.path.join(data, 'MisTvs.JAMedia'),
-            4: os.path.join(data, 'JAMediaWebCams.JAMedia'),
             5: get_my_files_directory(),
             6: get_tube_directory(),
             7: get_audio_directory(),
@@ -237,16 +234,9 @@ class PlayerList(gtk.Frame):
         ocultar(self.toolbar.boton_agregar)
         if indice == 0:
             self.__seleccionar_lista_de_stream(_dict[0], "JAM-Radio")
-        elif indice == 1:
-            self.__seleccionar_lista_de_stream(_dict[1], "JAM-TV")
         elif indice == 2:
             self.__seleccionar_lista_de_stream(_dict[2], "Radios")
             mostrar(self.toolbar.boton_agregar)
-        elif indice == 3:
-            self.__seleccionar_lista_de_stream(_dict[3], "TVs")
-            mostrar(self.toolbar.boton_agregar)
-        elif indice == 4:
-            self.__seleccionar_lista_de_stream(_dict[4], "WebCams")
         elif indice == 5:
             self.__seleccionar_lista_de_archivos(_dict[indice], "Archivos")
         elif indice == 6:
@@ -364,19 +354,6 @@ class Lista(gtk.TreeView):
                     icono = os.path.join(BASE_PATH, "Iconos", "video.svg")
                     pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
                         icono, 24, -1)
-                elif 'audio' in tipo or 'application/octet-stream' in tipo:
-                    pass
-                else:
-                    if "image" in tipo:
-                        icono = path
-                        try:
-                            pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
-                                icono, 50, -1)
-                        except:
-                            icono = os.path.join(BASE_PATH,
-                                "Iconos", "sonido.svg")
-                            pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
-                                icono, 24, -1)
 
         self.get_model().append([pixbuf, texto, path])
         elementos.remove(elementos[0])
@@ -412,9 +389,6 @@ class Lista(gtk.TreeView):
     def seleccionar_anterior(self, widget=None):
         modelo, _iter = self.get_selection().get_selected()
         try:
-            # HACK porque: model no tiene iter_previous
-            #self.get_selection().select_iter(
-            #    self.get_model().iter_previous(_iter))
             path = self.get_model().get_path(_iter)
             path = (path[0] - 1, )
             if path > -1:
@@ -436,7 +410,6 @@ class Lista(gtk.TreeView):
             item = model.iter_next(item)
         if _iter:
             self.get_selection().select_iter(_iter)
-            #path = model.get_path(iter)
 
     def select_valor(self, path_origen):
         model = self.get_model()
@@ -555,32 +528,19 @@ class MenuList(gtk.Menu):
                 self.append(borrar)
                 borrar.connect_object("activate", self.__emit_accion,
                     widget, path, "Borrar")
-            #tipo = describe_archivo(uri)
-            #if "audio" in tipo or "video" in tipo or
-            # "application/ogg" in tipo:
-            #    editar = gtk.MenuItem("Editar o Convertir Archivo")
-            #    self.append(editar)
-            #    editar.connect_object("activate", self.__emit_accion,
-            #        widget, path, "Editar")
         else:
             borrar = gtk.MenuItem("Borrar Streaming")
             self.append(borrar)
             borrar.connect_object("activate", self.__emit_accion,
                 widget, path, "Borrar")
             listas = [
-                os.path.join(get_data_directory(), "JAMediaTV.JAMedia"),
                 os.path.join(get_data_directory(), "JAMediaRadio.JAMedia"),
                 os.path.join(get_data_directory(), "MisRadios.JAMedia"),
-                os.path.join(get_data_directory(), "MisTvs.JAMedia"),
-                os.path.join(get_data_directory(), "JAMediaWebCams.JAMedia"),
                 ]
-            jtv = stream_en_archivo(uri, listas[0])
             jr = stream_en_archivo(uri, listas[1])
             r = stream_en_archivo(uri, listas[2])
-            tv = stream_en_archivo(uri, listas[3])
-            #webcam = stream_en_archivo(uri, listas[4])
 
-            if (jtv and not tv) or (jr and not r):
+            if (jr and not r):
                 copiar = gtk.MenuItem("Copiar a JAMedia")
                 self.append(copiar)
                 copiar.connect_object("activate", self.__emit_accion,
@@ -662,21 +622,9 @@ class JAMediaToolbarList(gtk.EventBox):
             menu.append(item)
             item.connect_object("activate", self.__emit_load_list, 0)
 
-            item = gtk.MenuItem("JAMedia TV")
-            menu.append(item)
-            item.connect_object("activate", self.__emit_load_list, 1)
-
             item = gtk.MenuItem("Mis Emisoras")
             menu.append(item)
             item.connect_object("activate", self.__emit_load_list, 2)
-
-            item = gtk.MenuItem("Mis Canales")
-            menu.append(item)
-            item.connect_object("activate", self.__emit_load_list, 3)
-
-            item = gtk.MenuItem("Web Cams")
-            menu.append(item)
-            item.connect_object("activate", self.__emit_load_list, 4)
 
         item = gtk.MenuItem("Mis Archivos")
         menu.append(item)

@@ -24,7 +24,6 @@ import gobject
 
 from IzquierdaWidgets import ToolbarGrabar
 from IzquierdaWidgets import VideoVisor
-#from IzquierdaWidgets import Efectos_en_Pipe
 from IzquierdaWidgets import BufferInfo
 from IzquierdaWidgets import ToolbarInfo
 from ProgressPlayer import ProgressPlayer
@@ -67,14 +66,12 @@ class Izquierda(gtk.EventBox):
 
         self.toolbar_record = ToolbarGrabar()
         self.video_visor = VideoVisor()
-        #self.efectos_aplicados = Efectos_en_Pipe()
         self.buffer_info = BufferInfo()
         self.toolbar_info = ToolbarInfo()
         self.progress = ProgressPlayer()
 
         vbox.pack_start(self.toolbar_record, False, False, 0)
         vbox.pack_start(self.video_visor, True, True, 0)
-        #vbox.pack_start(self.efectos_aplicados, False, False, 0)
         vbox.pack_start(self.buffer_info, False, False, 0)
         vbox.pack_start(self.toolbar_info, False, False, 0)
         vbox.pack_start(self.progress, False, False, 0)
@@ -137,7 +134,6 @@ class Izquierda(gtk.EventBox):
 
     def setup_init(self):
         map(ocultar, [self.toolbar_record, self.buffer_info])
-        #, self.efectos_aplicados])
         self.toolbar_info.set_video(False)
         self.progress.set_sensitive(False)
 
