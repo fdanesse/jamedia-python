@@ -78,7 +78,7 @@ class JAMedia(gtk.Window):
         self.buscador = Buscar()
 
         gobject.idle_add(self.__setup_init)
-        print "JAMediaTube process:", os.getpid()
+        print "JAMedia process:", os.getpid()
 
     def __setup_init(self):
         """
