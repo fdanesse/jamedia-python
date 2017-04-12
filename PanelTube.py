@@ -30,8 +30,8 @@ from PanelTubeWidgets import Toolbar_Videos_Izquierda
 from PanelTubeWidgets import Toolbar_Videos_Derecha
 from PanelTubeWidgets import Toolbar_Guardar
 
-from Globales import get_colors
-from Globales import get_data_directory
+from JAMediaPlayer.Globales import get_colors
+from JAMediaPlayer.Globales import get_data_directory
 
 TipDescargas = "Arrastra Hacia La Izquierda para Quitarlo de Descargas."
 TipEncontrados = "Arrastra Hacia La Derecha para Agregarlo a Descargas"
@@ -55,7 +55,7 @@ class PanelTube(gtk.HPaned):
 
         gtk.HPaned.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        self.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
 
         self.toolbar_encontrados = None
         self.encontrados = None
@@ -92,33 +92,33 @@ class PanelTube(gtk.HPaned):
         # Izquierda
         scroll = self.__get_scroll()
         event = gtk.EventBox()
-        event.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        event.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
         event.add(self.encontrados)
         scroll.add_with_viewport(event)
-        scroll.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
-        scroll.get_child().modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        scroll.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
+        scroll.get_child().modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
         #scroll.add_with_viewport(self.encontrados)
         box = gtk.VBox()
 
         event = gtk.EventBox()
-        event.modify_bg(0, get_colors("drawingplayer"))
+        event.modify_bg(0, get_colors("drawingplayer1"))
         event.add(self.toolbar_encontrados)
         box.pack_start(event, False, False, 0)
 
         event = gtk.EventBox()
-        event.modify_bg(0, get_colors("drawingplayer"))
+        event.modify_bg(0, get_colors("drawingplayer1"))
         event.add(self.toolbar_guardar_encontrados)
         box.pack_start(event, False, False, 0)
 
         box.pack_start(scroll, True, True, 0)
 
         event = gtk.EventBox()
-        event.modify_bg(0, get_colors("drawingplayer"))
+        event.modify_bg(0, get_colors("drawingplayer1"))
         event.add(self.toolbar_accion_izquierda)
         box.pack_start(event, False, False, 0)
 
         event = gtk.EventBox()
-        event.modify_bg(0, get_colors("drawingplayer"))
+        event.modify_bg(0, get_colors("drawingplayer1"))
         event.add(self.toolbar_videos_izquierda)
         box.pack_start(event, False, False, 0)
 
@@ -127,33 +127,33 @@ class PanelTube(gtk.HPaned):
         # Derecha
         scroll = self.__get_scroll()
         event = gtk.EventBox()
-        event.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        event.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
         event.add(self.descargar)
         scroll.add_with_viewport(event)
-        scroll.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
-        scroll.get_child().modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        scroll.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
+        scroll.get_child().modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
         #scroll.add_with_viewport(self.descargar)
         box = gtk.VBox()
 
         event = gtk.EventBox()
-        event.modify_bg(0, get_colors("drawingplayer"))
+        event.modify_bg(0, get_colors("drawingplayer1"))
         event.add(self.toolbar_descargar)
         box.pack_start(event, False, False, 0)
 
         event = gtk.EventBox()
-        event.modify_bg(0, get_colors("drawingplayer"))
+        event.modify_bg(0, get_colors("drawingplayer1"))
         event.add(self.toolbar_guardar_descargar)
         box.pack_start(event, False, False, 0)
 
         box.pack_start(scroll, True, True, 0)
 
         event = gtk.EventBox()
-        event.modify_bg(0, get_colors("drawingplayer"))
+        event.modify_bg(0, get_colors("drawingplayer1"))
         event.add(self.toolbar_accion_derecha)
         box.pack_start(event, False, False, 0)
 
         event = gtk.EventBox()
-        event.modify_bg(0, get_colors("drawingplayer"))
+        event.modify_bg(0, get_colors("drawingplayer1"))
         event.add(self.toolbar_videos_derecha)
         box.pack_start(event, False, False, 0)
 
@@ -263,7 +263,7 @@ class PanelTube(gtk.HPaned):
 
                 dialog.set_border_width(15)
                 dialog.set_decorated(False)
-                dialog.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+                dialog.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
 
                 text = "Ya Existe un Album de Búsquedas con Este Nombre.\n"
                 text = "%s%s" % (text, "¿Deseas Suplantarlo?")
@@ -286,7 +286,7 @@ class PanelTube(gtk.HPaned):
 
             dialog.set_border_width(15)
             dialog.set_decorated(False)
-            dialog.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+            dialog.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
 
             label = gtk.Label("Videos Almacenados.")
             dialog.vbox.pack_start(label, True, True, 0)

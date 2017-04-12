@@ -26,10 +26,10 @@ import shelve
 
 from TubeListDialog import TubeListDialog
 
-from Globales import get_data_directory
-from Globales import get_colors
-from Globales import get_separador
-from Globales import get_boton
+from JAMediaPlayer.Globales import get_data_directory
+from JAMediaPlayer.Globales import get_colors
+from JAMediaPlayer.Globales import get_separador
+from JAMediaPlayer.Globales import get_boton
 
 BASE_PATH = os.path.dirname(__file__)
 
@@ -51,7 +51,7 @@ class Mini_Toolbar(gtk.Toolbar):
 
         gtk.Toolbar.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("drawingplayer"))
+        self.modify_bg(gtk.STATE_NORMAL, get_colors("drawingplayer1"))
 
         self.label = None
         self.texto = text
@@ -59,7 +59,7 @@ class Mini_Toolbar(gtk.Toolbar):
 
         item = gtk.ToolItem()
         self.label = gtk.Label("%s: %s" % (text, self.numero))
-        #self.label.modify_fg(gtk.STATE_NORMAL, get_colors("window"))
+        #self.label.modify_fg(gtk.STATE_NORMAL, get_colors("window1"))
         self.label.show()
         item.add(self.label)
         self.insert(item, -1)
@@ -150,7 +150,7 @@ class ToolbarAccionListasVideos(gtk.Toolbar):
 
         gtk.Toolbar.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("drawingplayer"))
+        self.modify_bg(gtk.STATE_NORMAL, get_colors("drawingplayer1"))
 
         self.objetos = None
 
@@ -166,7 +166,7 @@ class ToolbarAccionListasVideos(gtk.Toolbar):
 
         item = gtk.ToolItem()
         self.label = gtk.Label("")
-        #self.label.modify_fg(gtk.STATE_NORMAL, get_colors("window"))
+        #self.label.modify_fg(gtk.STATE_NORMAL, get_colors("window1"))
         self.label.show()
         item.add(self.label)
         self.insert(item, -1)
@@ -226,7 +226,7 @@ class Toolbar_Videos_Izquierda(gtk.Toolbar):
 
         gtk.Toolbar.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("drawingplayer"))
+        self.modify_bg(gtk.STATE_NORMAL, get_colors("drawingplayer1"))
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
@@ -274,7 +274,7 @@ class Toolbar_Videos_Derecha(gtk.Toolbar):
 
         gtk.Toolbar.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("drawingplayer"))
+        self.modify_bg(gtk.STATE_NORMAL, get_colors("drawingplayer1"))
 
         archivo = os.path.join(BASE_PATH, "Iconos", "iconplay.svg")
         boton = get_boton(archivo, flip=True, pixels=24)
@@ -331,11 +331,11 @@ class Toolbar_Guardar(gtk.Toolbar):
 
         gtk.Toolbar.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("drawingplayer"))
+        self.modify_bg(gtk.STATE_NORMAL, get_colors("drawingplayer1"))
 
         item = gtk.ToolItem()
         label = gtk.Label("Nombre: ")
-        #label.modify_fg(gtk.STATE_NORMAL, get_colors("window"))
+        #label.modify_fg(gtk.STATE_NORMAL, get_colors("window1"))
         label.show()
         item.add(label)
         self.insert(item, -1)

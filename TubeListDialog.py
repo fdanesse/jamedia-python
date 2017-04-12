@@ -26,8 +26,8 @@ import shelve
 
 from Widgets import WidgetVideoItem
 
-from Globales import get_data_directory
-from Globales import get_colors
+from JAMediaPlayer.Globales import get_data_directory
+from JAMediaPlayer.Globales import get_colors
 
 BASE_PATH = os.path.dirname(__file__)
 
@@ -41,7 +41,7 @@ class TubeListDialog(gtk.Dialog):
         gtk.Dialog.__init__(self, parent=parent, title="",
             buttons=("Cerrar", gtk.RESPONSE_ACCEPT))
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        self.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
         self.set_decorated(False)
         self.set_border_width(15)
         rect = parent.get_allocation()
@@ -50,7 +50,7 @@ class TubeListDialog(gtk.Dialog):
         self.actualizando = False
 
         self.panel = gtk.HPaned()
-        self.panel.modify_bg(gtk.STATE_NORMAL, get_colors("widgetvideoitem"))
+        self.panel.modify_bg(gtk.STATE_NORMAL, get_colors("widgetvideoitem1"))
 
         self.listas = Lista()
         self.videos = gtk.VBox()
@@ -132,7 +132,7 @@ class TubeListDialog(gtk.Dialog):
 
             dialog.set_border_width(15)
             dialog.set_decorated(False)
-            dialog.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+            dialog.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
 
             label = gtk.Label("Todas las Listas han sido Eliminadas.")
             dialog.vbox.pack_start(label, True, True, 0)

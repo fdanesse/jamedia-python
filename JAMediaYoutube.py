@@ -29,7 +29,7 @@ import time
 import subprocess
 import urllib
 
-from Globales import get_tube_directory
+from JAMediaPlayer.Globales import get_tube_directory
 
 BASE_PATH = os.path.dirname(__file__)
 STDERR = "/dev/null"

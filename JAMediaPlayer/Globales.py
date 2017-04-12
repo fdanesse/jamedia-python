@@ -70,6 +70,11 @@ def set_dict(path, _dict):
 def get_colors(key):
     from gtk import gdk
     _dict = {
+        "window1": "#f0e6aa",
+        "download": "#e9b96e",
+        "widgetvideoitem1": "#ffffff",
+        "drawingplayer1": "#778899",
+
         "window": "#ffffff",
         "toolbars": "#778899",
         "widgetvideoitem": "#f0e6aa",

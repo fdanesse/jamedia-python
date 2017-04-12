@@ -28,9 +28,9 @@ import subprocess
 
 from JAMediaYoutube import JAMediaYoutube
 
-from Globales import get_colors
-from Globales import get_separador
-from Globales import get_boton
+from JAMediaPlayer.Globales import get_colors
+from JAMediaPlayer.Globales import get_separador
+from JAMediaPlayer.Globales import get_boton
 
 BASE_PATH = os.path.dirname(__file__)
 youtubedl = os.path.join(BASE_PATH, "youtube-dl") #"/usr/bin/youtube-dl"
@@ -51,7 +51,7 @@ class Toolbar(gtk.Toolbar):
 
         gtk.Toolbar.__init__(self)
 
-        self.modify_bg(0, get_colors("drawingplayer"))
+        self.modify_bg(0, get_colors("drawingplayer1"))
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
@@ -120,7 +120,7 @@ class Toolbar_Busqueda(gtk.Toolbar):
 
         gtk.Toolbar.__init__(self)
 
-        self.modify_bg(0, get_colors("window"))
+        self.modify_bg(0, get_colors("window1"))
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
@@ -220,7 +220,7 @@ class Alerta_Busqueda(gtk.Toolbar):
 
         gtk.Toolbar.__init__(self)
 
-        self.modify_bg(0, get_colors("window"))
+        self.modify_bg(0, get_colors("window1"))
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
@@ -250,7 +250,7 @@ class WidgetVideoItem(gtk.EventBox):
 
         gtk.EventBox.__init__(self)
 
-        self.modify_bg(0, get_colors("widgetvideoitem"))
+        self.modify_bg(0, get_colors("widgetvideoitem1"))
         self.set_border_width(2)
 
         self._temp_dat = []
@@ -645,7 +645,7 @@ class ProgressBar(gtk.HScale):
 
         gtk.HScale.__init__(self, ajuste)
 
-        self.modify_bg(0, get_colors("widgetvideoitem"))
+        self.modify_bg(0, get_colors("widgetvideoitem1"))
 
         self.ajuste = ajuste
         self.set_digits(0)
@@ -661,7 +661,7 @@ class ProgressBar(gtk.HScale):
         gc = gtk.gdk.Drawable.new_gc(self.window)
 
         # todo el widget
-        gc.set_rgb_fg_color(get_colors("window"))
+        gc.set_rgb_fg_color(get_colors("window1"))
         self.window.draw_rectangle(gc, True, x, y, w, h)
 
         # vacio
@@ -678,7 +678,7 @@ class ProgressBar(gtk.HScale):
         self.window.draw_rectangle(gc, True, xx, yy, ximage, hh)
 
         # borde de progreso
-        gc.set_rgb_fg_color(get_colors("drawingplayer"))
+        gc.set_rgb_fg_color(get_colors("drawingplayer1"))
         self.window.draw_rectangle(gc, False, xx, yy, ww, hh)
 
         return True
@@ -694,7 +694,7 @@ class Credits(gtk.Dialog):
             buttons=("Cerrar", gtk.RESPONSE_OK))
 
         self.set_decorated(False)
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        self.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
         self.set_border_width(15)
 
         imagen = gtk.Image()
@@ -715,7 +715,7 @@ class Help(gtk.Dialog):
             buttons=("Cerrar", gtk.RESPONSE_OK))
 
         self.set_decorated(False)
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        self.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
         self.set_border_width(15)
 
         tabla1 = gtk.Table(columns=5, rows=2, homogeneous=False)

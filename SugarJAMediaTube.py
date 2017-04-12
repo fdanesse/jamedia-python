@@ -36,7 +36,7 @@ from JAMedia.JAMedia import check_path
 from JAMediaYoutube import Buscar
 from JAMediaYoutube import FEED
 from Widgets import WidgetVideoItem
-from Globales import get_colors
+from JAMediaPlayer.Globales import get_colors
 
 from sugar.activity import activity
 
@@ -60,7 +60,7 @@ class SugarJAMediaTube(activity.Activity):
         self.set_title("JAMediaTube")
         self.set_icon_from_file(os.path.join(BASE_PATH,
             "Iconos", "JAMediaTube.svg"))
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        self.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
         self.set_resizable(True)
         self.set_border_width(2)
         self.set_position(gtk.WIN_POS_CENTER)
@@ -97,7 +97,7 @@ class SugarJAMediaTube(activity.Activity):
         self.paneltube = PanelTube()
 
         event = gtk.EventBox()
-        event.modify_bg(0, get_colors("drawingplayer"))
+        event.modify_bg(0, get_colors("drawingplayer1"))
         event.add(self.toolbar)
         self.box_tube.pack_start(event, False, False, 0)
 

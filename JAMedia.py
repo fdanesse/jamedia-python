@@ -39,7 +39,7 @@ from JAMediaPlayer.JAMediaPlayer import check_path
 from JAMediaYoutube import Buscar
 from JAMediaYoutube import FEED
 from Widgets import WidgetVideoItem
-from Globales import get_colors
+from JAMediaPlayer.Globales import get_colors
 
 #FIXME: Agregar en setup.py: python-gst0.10 gstreamer0.10-plugins-base gstreamer0.10-plugins-good gstreamer0.10-plugins-ugly gstreamer0.10-plugins-bad gstreamer0.10-tools python-gst0.10-rtsp
 
@@ -58,7 +58,7 @@ class JAMedia(gtk.Window):
         self.set_title("JAMedia")
         self.set_icon_from_file(os.path.join(BASE_PATH,
             "Iconos", "JAMedia.svg"))
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        self.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
         self.set_resizable(True)
         self.set_border_width(2)
         self.set_position(gtk.WIN_POS_CENTER)
@@ -95,7 +95,7 @@ class JAMedia(gtk.Window):
         self.paneltube = PanelTube()
 
         event = gtk.EventBox()
-        event.modify_bg(0, get_colors("drawingplayer"))
+        event.modify_bg(0, get_colors("drawingplayer1"))
         event.add(self.toolbar)
         self.box_tube.pack_start(event, False, False, 0)
 
