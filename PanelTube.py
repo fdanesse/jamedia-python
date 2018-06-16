@@ -272,8 +272,8 @@ class PanelTube(Gtk.HPaned):
             if key_name in dict_tube.keys():
                 dialog = Gtk.Dialog(parent=self.get_toplevel(), title="",
                 buttons=(
-                    "Suplantar", Gtk.RESPONSE_ACCEPT,
-                    "Cancelar", Gtk.RESPONSE_CANCEL))
+                    "Suplantar", Gtk.ResponseType.ACCEPT,
+                    "Cancelar", Gtk.ResponseType.CANCEL))
 
                 dialog.set_border_width(15)
                 dialog.set_decorated(False)
@@ -288,7 +288,7 @@ class PanelTube(Gtk.HPaned):
                 response = dialog.run()
                 dialog.destroy()
 
-                if response == Gtk.RESPONSE_CANCEL:
+                if response == Gtk.ResponseType.CANCEL:
                     dict_tube.close()
                     return
 
@@ -296,7 +296,7 @@ class PanelTube(Gtk.HPaned):
             dict_tube.close()
 
             dialog = Gtk.Dialog(parent=self.get_toplevel(), title="",
-                buttons=("OK", Gtk.RESPONSE_CANCEL))
+                buttons=("OK", Gtk.ResponseType.CANCEL))
 
             dialog.set_border_width(15)
             dialog.set_decorated(False)

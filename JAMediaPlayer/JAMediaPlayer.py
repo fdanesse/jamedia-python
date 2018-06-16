@@ -20,22 +20,29 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
-import gtk
-import gobject
 import time
 import datetime
 import sys
 import threading
+
+import gi
+gi.require_version("Gtk", "3.0")
+
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GLib
+from gi.repository import GObject
+from gi.repository import GdkPixbuf
 
 from Toolbars import Toolbar
 from Toolbars import ToolbarSalir
 from Toolbars import ToolbarAccion
 from Toolbars import ToolbarAddStream
 
-from Widgets import MouseSpeedDetector
-from BasePanel import BasePanel
+#from Widgets import MouseSpeedDetector
+#from BasePanel import BasePanel
 
-from JAMediaReproductor.JAMediaGrabador import JAMediaGrabador
+#from JAMediaReproductor.JAMediaGrabador import JAMediaGrabador
 
 from Globales import get_colors
 from Globales import eliminar_streaming
@@ -43,60 +50,48 @@ from Globales import add_stream
 from Globales import get_my_files_directory
 from Globales import describe_archivo
 
-#gobject.threads_init()
+#GObject.threads_init()
 #commands.getoutput('PATH=%s:$PATH' % (os.path.dirname(__file__)))
 
 ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 
-"""
-Necesita:
-    python-gst0.10
-    gstreamer0.10-ffmpeg
-    gstreamer0.10-plugins-base
-    gstreamer0.10-plugins-good
-    gstreamer0.10-plugins-ugly
-    gstreamer0.10-plugins-bad
-    gstreamer0.10-tools
-"""
-
-
-class JAMediaPlayer(gtk.EventBox):
+class JAMediaPlayer(Gtk.EventBox):
 
     __gsignals__ = {
-    "salir": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, [])}
+    "salir": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, [])}
 
     def __init__(self):
 
-        gtk.EventBox.__init__(self)
+        Gtk.EventBox.__init__(self)
 
         self.set_sensitive(False)
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
         self.set_border_width(2)
 
         self.archivos = []
         self.grabador = False
         self.mouse_in_visor = False
-        self.cursor_root = gtk.gdk.Cursor(gtk.gdk.BLANK_CURSOR)
+        self.cursor_root = Gdk.Cursor(Gdk.CursorType.BLANK_CURSOR)
         icono = os.path.join(ICONS_PATH, "jamedia_cursor.svg")
-        pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icono, -1, 24)
-        self.jamedia_cursor = gtk.gdk.Cursor(
-            gtk.gdk.display_get_default(), pixbuf, 0, 0)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(icono, -1, 24)
+        self.jamedia_cursor = Gdk.Cursor(
+            Gdk.Display.get_default(), pixbuf, 0, 0)
 
         self.toolbar = Toolbar()
         self.toolbar_salir = ToolbarSalir()
         self.toolbar_accion = ToolbarAccion()
         self.add_stream = ToolbarAddStream()
 
-        self.base_panel = BasePanel()
+        #self.base_panel = BasePanel()
 
-        vbox = gtk.VBox()
+        vbox = Gtk.VBox()
         vbox.pack_start(self.toolbar, False, False, 0)
         vbox.pack_start(self.toolbar_salir, False, False, 0)
         vbox.pack_start(self.toolbar_accion, False, False, 0)
-        vbox.pack_start(self.add_stream, False, False, 0)
-        vbox.pack_start(self.base_panel, True, True, 0)
+        #vbox.pack_start(self.add_stream, False, False, 0)
+        #vbox.pack_start(self.base_panel, True, True, 0)
 
         self.connect("realize", self.__realize)
 
@@ -104,30 +99,30 @@ class JAMediaPlayer(gtk.EventBox):
         self.show_all()
 
         # Controlador del mouse.
-        #   http://www.pygtk.org/pygtk2reference/class-gdkdisplay.html
-        self.mouse_listener = MouseSpeedDetector(self)
-        self.mouse_listener.new_handler(True)
+        #   http://www.pyGtk.org/pyGtk2reference/class-gdkdisplay.html
+        #self.mouse_listener = MouseSpeedDetector(self)
+        #self.mouse_listener.new_handler(True)
 
         self.toolbar.connect("accion", self.__accion_toolbar)
 
-        self.base_panel.connect("show-controls", self.__ocultar_controles)
-        self.base_panel.connect("accion-list", self.__accion_list)
-        self.base_panel.connect("menu_activo", self.__cancel_toolbars)
-        self.base_panel.connect("add_stream", self.__run_add_stream)
-        self.base_panel.connect("stop-record", self.__detener_grabacion)
-        self.base_panel.connect("video", self.__set_video)
+        #self.base_panel.connect("show-controls", self.__ocultar_controles)
+        #self.base_panel.connect("accion-list", self.__accion_list)
+        #self.base_panel.connect("menu_activo", self.__cancel_toolbars)
+        #self.base_panel.connect("add_stream", self.__run_add_stream)
+        #self.base_panel.connect("stop-record", self.__detener_grabacion)
+        #self.base_panel.connect("video", self.__set_video)
 
         self.toolbar_accion.connect("accion-stream", self.__accion_stream)
         self.toolbar_accion.connect("grabar", self.__grabar)
         self.toolbar_salir.connect("salir", self.__salir)
 
-        self.add_stream.connect("add-stream", self.__add_stream)
+        #self.add_stream.connect("add-stream", self.__add_stream)
 
-        self.mouse_listener.connect("estado", self.__set_mouse)
-        self.connect("hide", self.__hide_show)
-        self.connect("show", self.__hide_show)
+        #self.mouse_listener.connect("estado", self.__set_mouse)
+        #self.connect("hide", self.__hide_show)
+        #self.connect("show", self.__hide_show)
 
-        gobject.idle_add(self.__setup_init)
+        GLib.idle_add(self.__setup_init)
 
     def __set_video(self, widget, valor):
         self.toolbar.configurar.set_sensitive(valor)
@@ -204,7 +199,7 @@ class JAMediaPlayer(gtk.EventBox):
     def __setup_init(self):
         self.__cancel_toolbars()
         self.toolbar.configurar.set_sensitive(False)
-        self.base_panel.setup_init()
+        #self.base_panel.setup_init()
         if self.archivos:
             self.base_panel.set_nueva_lista(self.archivos)
             self.archivos = []
@@ -237,8 +232,8 @@ class JAMediaPlayer(gtk.EventBox):
                     win.set_cursor(self.jamedia_cursor)
                     return
             elif estado == "detenido":
-                if win.get_cursor() != gtk.gdk.BLANK_CURSOR:
-                    win.set_cursor(gtk.gdk.Cursor(gtk.gdk.BLANK_CURSOR))
+                if win.get_cursor() != Gdk.CursorType.BLANK_CURSOR:
+                    win.set_cursor(Gdk.Cursor(Gdk.CursorType.BLANK_CURSOR))
                     return
             elif estado == "fuera":
                 if win.get_cursor() != self.cursor_root:
@@ -280,7 +275,7 @@ class JAMediaPlayer(gtk.EventBox):
     def __salir(self, widget=None, senial=None):
         self.__detener_grabacion()
         self.base_panel.salir()
-        gtk.main_quit()
+        Gtk.main_quit()
         sys.exit(0)
 
     def __cancel_toolbars(self, widget=False):
@@ -294,14 +289,3 @@ class JAMediaPlayer(gtk.EventBox):
 
     def set_archivos(self, archivos):
         self.archivos = archivos
-
-
-def check_path(path):
-    if os.path.exists(path):
-        if os.path.isfile(path):
-            datos = describe_archivo(path)
-            if 'audio' in datos or 'video' in datos or \
-                'application/ogg' in datos or \
-                'application/octet-stream' in datos:
-                    return path
-    return False

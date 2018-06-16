@@ -35,14 +35,13 @@ from Widgets import Toolbar_Descarga
 from Widgets import Alerta_Busqueda
 from PanelTube import PanelTube
 from Widgets import ToolbarSalir
-'''
+
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
-'''
+
 from JAMediaYoutube import Buscar
 from JAMediaYoutube import FEED
-'''
 from Widgets import WidgetVideoItem
-'''
+
 from JAMediaPlayer.Globales import get_colors
 
 #FIXME: Agregar en setup.py: python-gst0.10 gstreamer0.10-plugins-base gstreamer0.10-plugins-good gstreamer0.10-plugins-ugly gstreamer0.10-plugins-bad gstreamer0.10-tools python-gst0.10-rtsp
@@ -118,10 +117,10 @@ class JAMedia(Gtk.Window):
         self.box_tube.pack_start(self.alerta_busqueda, False, False, 0)
         self.box_tube.pack_start(self.paneltube, True, True, 0)
 
-        #self.jamediaplayer = JAMediaPlayer()
+        self.jamediaplayer = JAMediaPlayer()
 
         boxbase.pack_start(self.box_tube, True, True, 0)
-        #boxbase.pack_start(self.jamediaplayer, True, True, 0)
+        boxbase.pack_start(self.jamediaplayer, True, True, 0)
         self.add(boxbase)
 
         self.show_all()
@@ -139,7 +138,7 @@ class JAMedia(Gtk.Window):
         map(self.__ocultar, [self.toolbar_descarga, self.alerta_busqueda])
         if self.archivos:
             self.__switch(None, 'jamedia')
-            #self.jamediaplayer.base_panel.set_nueva_lista(self.archivos)
+            self.jamediaplayer.base_panel.set_nueva_lista(self.archivos)
             self.archivos = []
         else:
             self.__switch(None, 'jamediatube')
@@ -164,7 +163,7 @@ class JAMedia(Gtk.Window):
         self.toolbar.connect('salir', self.__confirmar_salir)
         self.toolbar_salir.connect('salir', self.__salir)
         self.toolbar.connect('switch', self.__switch, 'jamedia')
-        #self.jamediaplayer.connect('salir', self.__switch, 'jamediatube')
+        self.jamediaplayer.connect('salir', self.__switch, 'jamediatube')
         self.toolbar_busqueda.connect("comenzar_busqueda",
             self.__comenzar_busqueda)
         self.paneltube.connect('download', self.__run_download)
@@ -321,15 +320,12 @@ class JAMedia(Gtk.Window):
         """
         Cambia entre la vista de descargas y la de reproduccion.
         """
-        pass
-        '''
         if valor == 'jamediatube':
             map(self.__ocultar, [self.jamediaplayer])
             map(self.__mostrar, [self.box_tube])
         elif valor == 'jamedia':
             map(self.__ocultar, [self.box_tube])
             map(self.__mostrar, [self.jamediaplayer])
-        '''
 
     def __ocultar(self, objeto):
         if objeto.get_visible():
@@ -355,6 +351,17 @@ class JAMedia(Gtk.Window):
 
 
 target = [Gtk.TargetEntry.new('Mover', Gtk.TargetFlags.SAME_APP, 0)]
+
+
+def check_path(path):
+    if os.path.exists(path):
+        if os.path.isfile(path):
+            datos = describe_archivo(path)
+            if 'audio' in datos or 'video' in datos or \
+                'application/ogg' in datos or \
+                'application/octet-stream' in datos:
+                    return path
+    return False
 
 
 if __name__ == "__main__":

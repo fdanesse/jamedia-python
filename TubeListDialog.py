@@ -20,8 +20,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
-import gtk
-import gobject
+import gi
+gi.require_version("Gtk", "3.0")
+
+from gi.repository import Gtk
+from gi.repository import GLib
+from gi.repository import GObject
+from gi.repository import GdkPixbuf
+
 import shelve
 
 from Widgets import WidgetVideoItem
@@ -32,16 +38,16 @@ from JAMediaPlayer.Globales import get_colors
 BASE_PATH = os.path.dirname(__file__)
 
 
-class TubeListDialog(gtk.Dialog):
+class TubeListDialog(Gtk.Dialog):
 
-    __gtype_name__ = 'TubeListDialog'
+    #__gtype_name__ = 'TubeListDialog'
 
     def __init__(self, parent=None):
 
-        gtk.Dialog.__init__(self, parent=parent, title="",
-            buttons=("Cerrar", gtk.RESPONSE_ACCEPT))
+        Gtk.Dialog.__init__(self, parent=parent, title="",
+            buttons=("Cerrar", Gtk.ResponseType.ACCEPT))
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
         self.set_decorated(False)
         self.set_border_width(15)
         rect = parent.get_allocation()
@@ -49,24 +55,24 @@ class TubeListDialog(gtk.Dialog):
 
         self.actualizando = False
 
-        self.panel = gtk.HPaned()
-        self.panel.modify_bg(gtk.STATE_NORMAL, get_colors("widgetvideoitem1"))
+        self.panel = Gtk.HPaned()
+        self.panel.modify_bg(Gtk.StateType.NORMAL, get_colors("widgetvideoitem1"))
 
         self.listas = Lista()
-        self.videos = gtk.VBox()
+        self.videos = Gtk.VBox()
 
         scroll = self.__get_scroll()
-        scroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         scroll.add_with_viewport(self.listas)
-        scroll.get_child().modify_bg(gtk.STATE_NORMAL, get_colors("download"))
+        scroll.get_child().modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
         self.panel.pack1(scroll, resize=False, shrink=True)
 
         scroll = self.__get_scroll()
         scroll.add_with_viewport(self.videos)
-        scroll.get_child().modify_bg(gtk.STATE_NORMAL, get_colors("download"))
+        scroll.get_child().modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
         self.panel.pack2(scroll, resize=True, shrink=False)
 
-        self.label = gtk.Label("")
+        self.label = Gtk.Label("")
         self.vbox.pack_start(self.label, False, False, 0)
         self.vbox.pack_start(self.panel, True, True, 0)
         self.vbox.show_all()
@@ -89,13 +95,13 @@ class TubeListDialog(gtk.Dialog):
         if boton == 1:
             return
         elif boton == 3:
-            menu = gtk.Menu()
-            borrar = gtk.MenuItem("Eliminar")
+            menu = Gtk.Menu()
+            borrar = Gtk.MenuItem("Eliminar")
             menu.append(borrar)
             borrar.connect_object("activate", self.__eliminar, widget, path)
             menu.show_all()
             menu.attach_to_widget(widget, self.__null)
-            gtk.Menu.popup(menu, None, None, None, 1, 0)
+            Gtk.Menu.popup(menu, None, None, None, 1, 0)
         elif boton == 2:
             return
 
@@ -112,7 +118,7 @@ class TubeListDialog(gtk.Dialog):
             self.videos.remove(child)
             child.destroy()
 
-        new_box = gtk.VBox()
+        new_box = Gtk.VBox()
         new_box.show_all()
         self.videos.pack_start(new_box, True, True, 0)
 
@@ -127,14 +133,14 @@ class TubeListDialog(gtk.Dialog):
         widget.get_model().remove(_iter)
 
         if not keys:
-            dialog = gtk.Dialog(parent=self.get_toplevel(), title="",
-                buttons=("OK", gtk.RESPONSE_ACCEPT))
+            dialog = Gtk.Dialog(parent=self.get_toplevel(), title="",
+                buttons=("OK", Gtk.ResponseType.ACCEPT))
 
             dialog.set_border_width(15)
             dialog.set_decorated(False)
-            dialog.modify_bg(gtk.STATE_NORMAL, get_colors("window1"))
+            dialog.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
 
-            label = gtk.Label("Todas las Listas han sido Eliminadas.")
+            label = Gtk.Label("Todas las Listas han sido Eliminadas.")
             dialog.vbox.pack_start(label, True, True, 0)
             dialog.vbox.show_all()
 
@@ -152,7 +158,7 @@ class TubeListDialog(gtk.Dialog):
         for child in self.videos.get_children():
             self.videos.remove(child)
             child.destroy()
-        new_box = gtk.VBox()
+        new_box = Gtk.VBox()
         new_box.show_all()
         self.videos.pack_start(new_box, True, True, 0)
         dict_tube = shelve.open(os.path.join(get_data_directory(),
@@ -161,7 +167,7 @@ class TubeListDialog(gtk.Dialog):
         for item in dict_tube[valor].keys():
             videos.append(dict_tube[valor][item])
         dict_tube.close()
-        gobject.idle_add(self.__add_videos, videos)
+        GLib.idle_add(self.__add_videos, videos)
 
     def __add_videos(self, videos):
         """
@@ -185,7 +191,7 @@ class TubeListDialog(gtk.Dialog):
                 videowidget, False, False, 1)
         except:
             return False
-        gobject.idle_add(self.__add_videos, videos)
+        GLib.idle_add(self.__add_videos, videos)
 
     def __clicked_videowidget(self, widget, event):
         """
@@ -194,13 +200,13 @@ class TubeListDialog(gtk.Dialog):
         boton = event.button
         #pos = (event.x, event.y)
         tiempo = event.time
-        menu = gtk.Menu()
-        borrar = gtk.MenuItem("Eliminar")
+        menu = Gtk.Menu()
+        borrar = Gtk.MenuItem("Eliminar")
         menu.append(borrar)
         borrar.connect_object("activate", self.__eliminar_video, widget)
         menu.show_all()
         menu.attach_to_widget(widget, self.__null)
-        gtk.Menu.popup(menu, None, None, None, boton, tiempo)
+        Gtk.Menu.popup(menu, None, None, None, boton, tiempo)
 
     def __eliminar_video(self, widget):
         dict_tube = shelve.open(os.path.join(get_data_directory(),
@@ -234,20 +240,20 @@ class TubeListDialog(gtk.Dialog):
         self.listas.agregar_items(lista)
 
     def __get_scroll(self):
-        scroll = gtk.ScrolledWindow()
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll = Gtk.ScrolledWindow()
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         return scroll
 
 
-class Lista(gtk.TreeView):
+class Lista(Gtk.TreeView):
 
     __gsignals__ = {
-    "nueva-seleccion": (gobject.SIGNAL_RUN_FIRST,
-        gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT, ))}
+    "nueva-seleccion": (GObject.SIGNAL_RUN_FIRST,
+        GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, ))}
 
     def __init__(self):
 
-        gtk.TreeView.__init__(self)
+        Gtk.TreeView.__init__(self)
 
         self.set_property("rules-hint", True)
         self.set_headers_clickable(True)
@@ -256,8 +262,8 @@ class Lista(gtk.TreeView):
         self.permitir_select = True
         self.valor_select = None
 
-        self.modelo = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING,
-            gobject.TYPE_STRING)
+        self.modelo = Gtk.ListStore(GdkPixbuf.Pixbuf, GObject.TYPE_STRING,
+            GObject.TYPE_STRING)
 
         self.__setear_columnas()
 
@@ -289,20 +295,20 @@ class Lista(gtk.TreeView):
         self.append_column(self.__construir_columa('', 2, False))
 
     def __construir_columa(self, text, index, visible):
-        render = gtk.CellRendererText()
-        columna = gtk.TreeViewColumn(text, render, text=index)
+        render = Gtk.CellRendererText()
+        columna = Gtk.TreeViewColumn(text, render, text=index)
         columna.set_sort_column_id(index)
         columna.set_property('visible', visible)
         columna.set_property('resizable', False)
-        columna.set_sizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
+        columna.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
         return columna
 
     def __construir_columa_icono(self, text, index, visible):
-        render = gtk.CellRendererPixbuf()
-        columna = gtk.TreeViewColumn(text, render, pixbuf=index)
+        render = Gtk.CellRendererPixbuf()
+        columna = Gtk.TreeViewColumn(text, render, pixbuf=index)
         columna.set_property('visible', visible)
         columna.set_property('resizable', False)
-        columna.set_sizing(gtk.TREE_VIEW_COLUMN_AUTOSIZE)
+        columna.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
         return columna
 
     def __ejecutar_agregar_elemento(self, elementos):
@@ -317,12 +323,12 @@ class Lista(gtk.TreeView):
         texto, path = elementos[0]
         icono = os.path.join(BASE_PATH, "Iconos", "video.svg")
         try:
-            pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icono, 24, -1)
+            pixbuf = GdkPixbuf.Pixbuf_new_from_file_at_size(icono, 24, -1)
             self.modelo.append([pixbuf, texto, path])
         except:
             pass
         elementos.remove(elementos[0])
-        gobject.idle_add(self.__ejecutar_agregar_elemento, elementos)
+        GLib.idle_add(self.__ejecutar_agregar_elemento, elementos)
         return False
 
     def seleccionar_primero(self, widget=None):
@@ -340,4 +346,4 @@ class Lista(gtk.TreeView):
         """
         self.get_toplevel().set_sensitive(False)
         self.permitir_select = False
-        gobject.idle_add(self.__ejecutar_agregar_elemento, elementos)
+        GLib.idle_add(self.__ejecutar_agregar_elemento, elementos)

@@ -29,7 +29,7 @@ from gi.repository import GObject
 
 import shelve
 
-#from TubeListDialog import TubeListDialog
+from TubeListDialog import TubeListDialog
 
 from JAMediaPlayer.Globales import get_data_directory
 from JAMediaPlayer.Globales import get_colors
@@ -126,7 +126,7 @@ class Mini_Toolbar(Gtk.Toolbar):
                 item.connect_object("activate", self.__emit_abrir, key)
             menu.show_all()
             menu.attach_to_widget(widget, self.__null)
-            Gtk.Menu.popup(menu, None, None, None, 1, 0)
+            menu.popup(None, None, None, None, 1, 0)
 
     def __administrar(self, widget):
         dialogo = TubeListDialog(parent=self.get_toplevel())

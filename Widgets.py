@@ -38,7 +38,7 @@ from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
 
 BASE_PATH = os.path.dirname(__file__)
-#youtubedl = os.path.join(BASE_PATH, "youtube-dl") #"/usr/bin/youtube-dl"
+youtubedl = os.path.join(BASE_PATH, "youtube-dl") #"/usr/bin/youtube-dl"
 
 
 class Toolbar(Gtk.Toolbar):
@@ -198,7 +198,7 @@ class Toolbar_Busqueda(Gtk.Toolbar):
     def __alerta_busqueda_invalida(self):
         # FIXME: Recordar dar estilo a este dialog
         dialog = Gtk.Dialog(parent=self.get_toplevel(),
-            flags=Gtk.DIALOG_MODAL, buttons=("OK", Gtk.ResponseType.OK))
+            flags=Gtk.DialogFlags.MODAL, buttons=["OK", Gtk.ResponseType.OK])
         t = "No se puede realizar esta búsqueda.\n"
         t = "%s%s" % (t, "Revisa la cantidad y el texto para la búsqueda.")
         label = Gtk.Label(t)
@@ -275,7 +275,7 @@ class WidgetVideoItem(Gtk.EventBox):
                 try:
                     # FIXME: Porque Falla si no hay Conexión.
                     fileimage, headers = urllib.urlretrieve(url, archivo)
-                    pixbuf = Gtk.gdk.pixbuf_new_from_file_at_size(
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
                         fileimage, 200, 150)
                     self.imagen.set_from_pixbuf(pixbuf)
                     # Convertir imagen a string por si se quiere guardar.
@@ -331,8 +331,10 @@ class WidgetVideoItem(Gtk.EventBox):
         """
         Lectura del subproceso que obtiene los metadatos del video.
         """
+        
         progress = salida.readline().strip()
         err = error.readline().strip()
+        # FIXME: Signature extraction failed: Traceback (most recent call last)
         if err:
             print "Error al actualizar metadatos de:", self.videodict["url"], err
             process.kill()
@@ -365,7 +367,7 @@ class WidgetVideoItem(Gtk.EventBox):
         """
         Obtenidos todos los metadatos del video, se actualizan los widgets.
         """
-        GObject.timeout_add(100, self.__update)
+        GLib.timeout_add(100, self.__update)
 
     def __update(self):
         """
@@ -382,7 +384,7 @@ class WidgetVideoItem(Gtk.EventBox):
                 fileimage, headers = urllib.urlretrieve(url, archivo)
                 while Gtk.events_pending():
                     Gtk.main_iteration()
-                pixbuf = Gtk.gdk.pixbuf_new_from_file_at_size(
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
                     fileimage, 200, 150)
                 self.imagen.set_from_pixbuf(pixbuf)
                 while Gtk.events_pending():
@@ -414,7 +416,6 @@ class WidgetVideoItem(Gtk.EventBox):
         previews y demás metadatos, utilizando un subproceso para no afectar a
         la interfaz gráfica.
         """
-
         _url = self.videodict["url"]
         STDOUT = "/tmp/jamediatube-dl%s" % self.videodict["id"]
         STERR = "/tmp/jamediatube-dlERR%s" % self.videodict["id"]
@@ -425,9 +426,9 @@ class WidgetVideoItem(Gtk.EventBox):
         salida = open(STDOUT, "r")
         error = open(STERR, "r")
         self.connect("end-update", self.__run_update)
-        GObject.timeout_add(100, self.__get_progress, salida, STDOUT,
+        GLib.timeout_add(100, self.__get_progress, salida, STDOUT,
             process, error, STERR)
-
+        
 
 class Toolbar_Descarga(Gtk.VBox):
 
@@ -565,7 +566,7 @@ class Toolbar_Descarga(Gtk.VBox):
         """
         # FIXME: No funciona correctamente, la descarga continúa.
         if self.actualizador:
-            GObject.source_remove(self.actualizador)
+            GLib.source_remove(self.actualizador)
             self.actualizador = False
         try:
             self.jamediayoutube.reset()
@@ -601,10 +602,10 @@ class Toolbar_Descarga(Gtk.VBox):
         self.jamediayoutube.download(self.url, self.titulo)
 
         if self.actualizador:
-            GObject.source_remove(self.actualizador)
+            GLib.source_remove(self.actualizador)
             self.actualizador = False
 
-        self.actualizador = GObject.timeout_add(1000, self.__handle)
+        self.actualizador = GLib.timeout_add(1000, self.__handle)
         self.show_all()
 
 
