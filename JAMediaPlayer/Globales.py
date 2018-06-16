@@ -26,9 +26,17 @@ import shutil
 import json
 import codecs
 
+import gi
+gi.require_version("Gtk", "3.0")
+
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GdkPixbuf
+
+
 radios = 'https://sites.google.com/site/sugaractivities/jamediaobjects/jam/lista-de-radios-2014'
 
-
+'''
 def convert_shelve_to_json(path):
     print "Convert:", path
     import shelve
@@ -42,7 +50,7 @@ def convert_shelve_to_json(path):
     except:
         pass
     return _dict
-
+'''
 
 def get_dict(path):
     if not os.path.exists(path):
@@ -52,7 +60,7 @@ def get_dict(path):
         _dict = json.JSONDecoder(encoding="utf-8").decode(archivo.read())
         archivo.close()
     except:
-        _dict = convert_shelve_to_json(path)
+        pass  #_dict = convert_shelve_to_json(path)
     return _dict
 
 
@@ -68,7 +76,6 @@ def set_dict(path, _dict):
 
 
 def get_colors(key):
-    from gtk import gdk
     _dict = {
         "window1": "#f0e6aa",
         "download": "#e9b96e",
@@ -81,7 +88,8 @@ def get_colors(key):
         "drawingplayer": "#000000",
         "naranaja": "#ff6600",
         }
-    return gdk.color_parse(_dict.get(key, "#ffffff"))
+    # (True, color=Gdk.Color(red=61680, green=59110, blue=43690))
+    return Gdk.Color.parse(_dict.get(key, "#ffffff")).color
 
 
 def get_ip():
@@ -499,8 +507,7 @@ def get_separador(draw=False, ancho=0, expand=False):
     """
     Devuelve un separador generico.
     """
-    import gtk
-    separador = gtk.SeparatorToolItem()
+    separador = Gtk.SeparatorToolItem()
     separador.props.draw = draw
     separador.set_size_request(ancho, -1)
     separador.set_expand(expand)
@@ -511,21 +518,18 @@ def get_boton(archivo, flip=False, rotacion=None,
     """
     Devuelve un toolbutton generico.
     """
-    import gtk
-    boton = gtk.ToolButton()
-    imagen = gtk.Image()
-    pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(archivo, pixels, pixels)
-
+    boton = Gtk.ToolButton()
+    imagen = Gtk.Image()
+    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
+        archivo, pixels, pixels)
     if flip:
         pixbuf = pixbuf.flip(True)
     if rotacion:
         pixbuf = pixbuf.rotate_simple(rotacion)
-
     imagen.set_from_pixbuf(pixbuf)
     boton.set_icon_widget(imagen)
     imagen.show()
     boton.show()
-
     if tooltip_text:
         boton.set_tooltip_text(tooltip_text)
         boton.TOOLTIP = tooltip_text
