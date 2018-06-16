@@ -56,7 +56,7 @@ class Toolbar(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(0, get_colors("drawingplayer1"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
@@ -125,7 +125,7 @@ class Toolbar_Busqueda(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(0, get_colors("window1"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
@@ -225,7 +225,7 @@ class Alerta_Busqueda(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(0, get_colors("window1"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
@@ -255,7 +255,7 @@ class WidgetVideoItem(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
-        self.modify_bg(0, get_colors("widgetvideoitem1"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("widgetvideoitem1"))
         self.set_border_width(2)
 
         self._temp_dat = []
@@ -321,7 +321,7 @@ class WidgetVideoItem(Gtk.EventBox):
         self.connect("button_press_event", self.__button_press)
 
     def __button_press(self, widget, event):
-        #self.modify_bg(0, self.colorclicked)
+        #self.modify_bg(Gtk.StateType.NORMAL, self.colorclicked)
         #if event.button == 1:
         #   self.emit("clicked", event)
         #elif event.button == 3:
@@ -440,7 +440,7 @@ class Toolbar_Descarga(Gtk.VBox):
         Gtk.VBox.__init__(self)
 
         self.toolbar = Gtk.Toolbar()
-        self.toolbar.modify_bg(0, get_colors("download"))
+        self.toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
 
         self.label_titulo = None
         self.label_progreso = None
@@ -617,7 +617,7 @@ class Progreso_Descarga(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
-        self.modify_bg(0, get_colors("download"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
 
         self.escala = ProgressBar(
             Gtk.Adjustment(0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
@@ -650,7 +650,7 @@ class ProgressBar(Gtk.HScale):
 
         Gtk.HScale.__init__(self, orientation=Gtk.Orientation.HORIZONTAL)
 
-        self.modify_bg(0, get_colors("widgetvideoitem1"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("widgetvideoitem1"))
 
         set_adjustment = ajuste
         self.set_adjustment(ajuste)

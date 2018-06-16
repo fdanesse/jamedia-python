@@ -26,13 +26,14 @@ import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository import GLib
 
 from Widgets import Toolbar
 from Widgets import Toolbar_Busqueda
 from Widgets import Toolbar_Descarga
 from Widgets import Alerta_Busqueda
-#from PanelTube import PanelTube
+from PanelTube import PanelTube
 from Widgets import ToolbarSalir
 '''
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
@@ -95,7 +96,7 @@ class JAMedia(Gtk.Window):
         self.toolbar_descarga = Toolbar_Descarga()
         self.toolbar_salir = ToolbarSalir()
         self.alerta_busqueda = Alerta_Busqueda()
-        #self.paneltube = PanelTube()
+        self.paneltube = PanelTube()
 
         event = Gtk.EventBox()
         event.modify_bg(0, get_colors("drawingplayer1"))
@@ -115,7 +116,7 @@ class JAMedia(Gtk.Window):
         self.box_tube.pack_start(event, False, False, 0)
 
         self.box_tube.pack_start(self.alerta_busqueda, False, False, 0)
-        #self.box_tube.pack_start(self.paneltube, True, True, 0)
+        self.box_tube.pack_start(self.paneltube, True, True, 0)
 
         #self.jamediaplayer = JAMediaPlayer()
 
@@ -126,15 +127,15 @@ class JAMedia(Gtk.Window):
         self.show_all()
         self.realize()
 
-        #self.paneltube.set_vista_inicial()  # oculta las toolbarsaccion
+        self.paneltube.set_vista_inicial()  # oculta las toolbarsaccion
         GLib.idle_add(self.__setup_init2)
 
     def __setup_init2(self):
         """
         Inicializa la aplicación a su estado fundamental.
         """
-        #self.__cancel_toolbar()
-        #self.paneltube.cancel_toolbars_flotantes()
+        self.__cancel_toolbar()
+        self.paneltube.cancel_toolbars_flotantes()
         map(self.__ocultar, [self.toolbar_descarga, self.alerta_busqueda])
         if self.archivos:
             self.__switch(None, 'jamedia')
@@ -143,17 +144,21 @@ class JAMedia(Gtk.Window):
         else:
             self.__switch(None, 'jamediatube')
 
-        #self.paneltube.encontrados.drag_dest_set(Gtk.DEST_DEFAULT_ALL,
-        #    target, Gtk.gdk.ACTION_MOVE)
+        self.paneltube.encontrados.drag_dest_set(
+            Gtk.DestDefaults.ALL,
+            target,
+            Gdk.DragAction.MOVE)
 
-        #self.paneltube.encontrados.connect("drag-drop", self.__drag_drop)
-        #self.paneltube.encontrados.drag_dest_add_uri_targets()
+        self.paneltube.encontrados.connect("drag-drop", self.__drag_drop)
+        self.paneltube.encontrados.drag_dest_add_uri_targets()
 
-        #self.paneltube.descargar.drag_dest_set(Gtk.DEST_DEFAULT_ALL,
-        #    target, Gtk.gdk.ACTION_MOVE)
+        self.paneltube.descargar.drag_dest_set(
+            Gtk.DestDefaults.ALL,
+            target,
+            Gdk.DragAction.MOVE)
 
-        #self.paneltube.descargar.connect("drag-drop", self.__drag_drop)
-        #self.paneltube.descargar.drag_dest_add_uri_targets()
+        self.paneltube.descargar.connect("drag-drop", self.__drag_drop)
+        self.paneltube.descargar.drag_dest_add_uri_targets()
 
         self.connect("delete-event", self.__salir)
         self.toolbar.connect('salir', self.__confirmar_salir)
@@ -162,10 +167,10 @@ class JAMedia(Gtk.Window):
         #self.jamediaplayer.connect('salir', self.__switch, 'jamediatube')
         self.toolbar_busqueda.connect("comenzar_busqueda",
             self.__comenzar_busqueda)
-        #self.paneltube.connect('download', self.__run_download)
-        #self.paneltube.connect('open_shelve_list', self.__open_shelve_list)
+        self.paneltube.connect('download', self.__run_download)
+        self.paneltube.connect('open_shelve_list', self.__open_shelve_list)
         self.toolbar_descarga.connect('end', self.__run_download)
-        #self.paneltube.connect("cancel_toolbar", self.__cancel_toolbar)
+        self.paneltube.connect("cancel_toolbar", self.__cancel_toolbar)
         self.buscador.connect("encontrado", self.__add_video_encontrado)
         self.buscador.connect("end", self.__end_busqueda)
         self.resize(640, 480)
@@ -297,8 +302,10 @@ class JAMedia(Gtk.Window):
 
         videowidget.set_tooltip_text(text)
         videowidget.show_all()
-        videowidget.drag_source_set(Gtk.gdk.BUTTON1_MASK, target,
-            Gtk.gdk.ACTION_MOVE)
+        videowidget.drag_source_set(
+            Gdk.ModifierType.BUTTON1_MASK,
+            target,
+            Gdk.DragAction.MOVE)
         videos.remove(video)
         destino.pack_start(videowidget, False, False, 1)
 
@@ -347,7 +354,7 @@ class JAMedia(Gtk.Window):
         self.archivos = pistas
 
 
-#target = [('Mover', Gtk.TARGET_SAME_APP, 1)]
+target = [Gtk.TargetEntry.new('Mover', Gtk.TargetFlags.SAME_APP, 0)]
 
 
 if __name__ == "__main__":
