@@ -232,7 +232,7 @@ class Alerta_Busqueda(Gtk.Toolbar):
         item = Gtk.ToolItem()
         item.set_expand(True)
         self.label = Gtk.Label("")
-        self.label.set_justify(Gtk.JUSTIFY_LEFT)
+        self.label.set_justify(Gtk.Justification.LEFT)
         #self.label.set_line_wrap(True)
         self.label.show()
         item.add(self.label)

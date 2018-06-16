@@ -31,8 +31,8 @@ from gi.repository import GLib
 from Widgets import Toolbar
 from Widgets import Toolbar_Busqueda
 from Widgets import Toolbar_Descarga
-'''
 from Widgets import Alerta_Busqueda
+'''
 from PanelTube import PanelTube
 from Widgets import ToolbarSalir
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
@@ -93,7 +93,7 @@ class JAMedia(Gtk.Window):
         self.toolbar_busqueda = Toolbar_Busqueda()
         self.toolbar_descarga = Toolbar_Descarga()
         #self.toolbar_salir = ToolbarSalir()
-        #self.alerta_busqueda = Alerta_Busqueda()
+        self.alerta_busqueda = Alerta_Busqueda()
         #self.paneltube = PanelTube()
 
         event = Gtk.EventBox()
@@ -113,7 +113,7 @@ class JAMedia(Gtk.Window):
         event.add(self.toolbar_descarga)
         self.box_tube.pack_start(event, False, False, 0)
 
-        #self.box_tube.pack_start(self.alerta_busqueda, False, False, 0)
+        self.box_tube.pack_start(self.alerta_busqueda, False, False, 0)
         #self.box_tube.pack_start(self.paneltube, True, True, 0)
 
         #self.jamediaplayer = JAMediaPlayer()
