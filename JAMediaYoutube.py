@@ -24,10 +24,13 @@
 # http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
 
 import os
-import gobject
 import time
 import subprocess
 import urllib
+
+import gi
+from gi.repository import GLib
+from gi.repository import GObject
 
 from JAMediaPlayer.Globales import get_tube_directory
 
@@ -53,17 +56,17 @@ CODECS = [
     ]
 
 
-class Buscar(gobject.GObject):
+class Buscar(GObject.GObject):
 
     __gsignals__ = {
-    'encontrado': (gobject.SIGNAL_RUN_FIRST,
-        gobject.TYPE_NONE, (gobject.TYPE_STRING, gobject.TYPE_STRING)),
-    'end': (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, [])}
+    'encontrado': (GObject.SIGNAL_RUN_FIRST,
+        GObject.TYPE_NONE, (GObject.TYPE_STRING, GObject.TYPE_STRING)),
+    'end': (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, [])}
 
     def __init__(self, ):
 
-        gobject.GObject.__init__(self)
+        GObject.GObject.__init__(self)
 
     def __get_videos(self, consulta, limite):
         # Obtener web principal con resultado de busqueda y recorrer todas
@@ -101,15 +104,15 @@ class Buscar(gobject.GObject):
             pass
 
 
-class JAMediaYoutube(gobject.GObject):
+class JAMediaYoutube(GObject.GObject):
 
     __gsignals__ = {
-    'progress_download': (gobject.SIGNAL_RUN_FIRST,
-        gobject.TYPE_NONE, (gobject.TYPE_STRING, ))}
+    'progress_download': (GObject.SIGNAL_RUN_FIRST,
+        GObject.TYPE_NONE, (GObject.TYPE_STRING, ))}
 
     def __init__(self):
 
-        gobject.GObject.__init__(self)
+        GObject.GObject.__init__(self)
 
         self.ultimosdatos = False
         self.contador = 0
@@ -198,10 +201,10 @@ class JAMediaYoutube(gobject.GObject):
         self.salida = open(self.STDOUT, "r")
 
         if self.actualizador:
-            gobject.source_remove(self.actualizador)
+            GLib.source_remove(self.actualizador)
             self.actualizador = False
 
-        self.actualizador = gobject.timeout_add(500, self.__get_progress)
+        self.actualizador = GLib.timeout_add(500, self.__get_progress)
 
     def reset(self):
         self.end()
@@ -209,7 +212,7 @@ class JAMediaYoutube(gobject.GObject):
 
     def end(self):
         if self.actualizador:
-            gobject.source_remove(self.actualizador)
+            GLib.source_remove(self.actualizador)
             self.actualizador = False
         self.youtubedl.kill()
         if self.salida:

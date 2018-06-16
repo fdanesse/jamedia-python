@@ -27,11 +27,11 @@ from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import GObject
 
-#import urllib
-#import base64
-#import subprocess
+import urllib
+import base64
+import subprocess
 
-#from JAMediaYoutube import JAMediaYoutube
+from JAMediaYoutube import JAMediaYoutube
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
@@ -648,17 +648,18 @@ class ProgressBar(Gtk.HScale):
 
     def __init__(self, ajuste):
 
-        Gtk.HScale.__init__(self, ajuste)
+        Gtk.HScale.__init__(self, orientation=Gtk.Orientation.HORIZONTAL)
 
         self.modify_bg(0, get_colors("widgetvideoitem1"))
 
-        self.ajuste = ajuste
+        set_adjustment = ajuste
+        self.set_adjustment(ajuste)
         self.set_digits(0)
         self.set_draw_value(False)
         self.borde, self.ancho = (15, 10)
 
-        self.connect("expose_event", self.__expose)
-
+        #self.connect("expose_event", self.__expose)
+    '''
     def __expose(self, widget, event):
         x, y, w, h = self.get_allocation()
         ancho, borde = (self.ancho, self.borde)
@@ -678,7 +679,7 @@ class ProgressBar(Gtk.HScale):
         self.window.draw_rectangle(gc, True, xx, yy, ww, hh)
 
         # progreso
-        ximage = int(self.ajuste.get_value() * ww / 100)
+        ximage = int(self.get_adjustment.get_value() * ww / 100)
         gc.set_rgb_fg_color(Gtk.gdk.Color(65000, 26000, 0))
         self.window.draw_rectangle(gc, True, xx, yy, ximage, hh)
 
@@ -687,6 +688,7 @@ class ProgressBar(Gtk.HScale):
         self.window.draw_rectangle(gc, False, xx, yy, ww, hh)
 
         return True
+    '''
 
 '''
 class Credits(Gtk.Dialog):

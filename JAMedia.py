@@ -30,8 +30,8 @@ from gi.repository import GLib
 
 from Widgets import Toolbar
 from Widgets import Toolbar_Busqueda
-'''
 from Widgets import Toolbar_Descarga
+'''
 from Widgets import Alerta_Busqueda
 from PanelTube import PanelTube
 from Widgets import ToolbarSalir
@@ -91,7 +91,7 @@ class JAMedia(Gtk.Window):
         self.box_tube = Gtk.VBox()
         self.toolbar = Toolbar()
         self.toolbar_busqueda = Toolbar_Busqueda()
-        #self.toolbar_descarga = Toolbar_Descarga()
+        self.toolbar_descarga = Toolbar_Descarga()
         #self.toolbar_salir = ToolbarSalir()
         #self.alerta_busqueda = Alerta_Busqueda()
         #self.paneltube = PanelTube()
@@ -110,7 +110,7 @@ class JAMedia(Gtk.Window):
 
         event = Gtk.EventBox()
         event.modify_bg(0, get_colors("download"))
-        #event.add(self.toolbar_descarga)
+        event.add(self.toolbar_descarga)
         self.box_tube.pack_start(event, False, False, 0)
 
         #self.box_tube.pack_start(self.alerta_busqueda, False, False, 0)
@@ -134,7 +134,7 @@ class JAMedia(Gtk.Window):
         """
         #self.__cancel_toolbar()
         #self.paneltube.cancel_toolbars_flotantes()
-        #map(self.__ocultar, [self.toolbar_descarga, self.alerta_busqueda])
+        map(self.__ocultar, [self.toolbar_descarga, self.alerta_busqueda])
         if self.archivos:
             self.__switch(None, 'jamedia')
             #self.jamediaplayer.base_panel.set_nueva_lista(self.archivos)
@@ -163,7 +163,7 @@ class JAMedia(Gtk.Window):
             self.__comenzar_busqueda)
         #self.paneltube.connect('download', self.__run_download)
         #self.paneltube.connect('open_shelve_list', self.__open_shelve_list)
-        #self.toolbar_descarga.connect('end', self.__run_download)
+        self.toolbar_descarga.connect('end', self.__run_download)
         #self.paneltube.connect("cancel_toolbar", self.__cancel_toolbar)
         #self.buscador.connect("encontrado", self.__add_video_encontrado)
         #self.buscador.connect("end", self.__end_busqueda)
