@@ -794,13 +794,13 @@ class Help(Gtk.Dialog):
             if help.get_visible():
                 return self.helps.index(help)
 
-'''
+
 class ToolbarSalir(Gtk.Toolbar):
     """
     Toolbar para confirmar salir de la aplicación.
     """
 
-    __gtype_name__ = 'ToolbarSalir'
+    #__gtype_name__ = 'ToolbarSalir'
 
     __gsignals__ = {
     "salir": (GObject.SIGNAL_RUN_FIRST,
@@ -860,4 +860,3 @@ class ToolbarSalir(Gtk.Toolbar):
         """
         self.label.set_text("")
         self.hide()
-'''

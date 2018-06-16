@@ -32,9 +32,9 @@ from Widgets import Toolbar
 from Widgets import Toolbar_Busqueda
 from Widgets import Toolbar_Descarga
 from Widgets import Alerta_Busqueda
-'''
-from PanelTube import PanelTube
+#from PanelTube import PanelTube
 from Widgets import ToolbarSalir
+'''
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
 from JAMediaPlayer.JAMediaPlayer import check_path
 from JAMediaYoutube import Buscar
@@ -92,7 +92,7 @@ class JAMedia(Gtk.Window):
         self.toolbar = Toolbar()
         self.toolbar_busqueda = Toolbar_Busqueda()
         self.toolbar_descarga = Toolbar_Descarga()
-        #self.toolbar_salir = ToolbarSalir()
+        self.toolbar_salir = ToolbarSalir()
         self.alerta_busqueda = Alerta_Busqueda()
         #self.paneltube = PanelTube()
 
@@ -103,7 +103,7 @@ class JAMedia(Gtk.Window):
 
         event = Gtk.EventBox()
         event.modify_bg(0, get_colors("download"))
-        #event.add(self.toolbar_salir)
+        event.add(self.toolbar_salir)
         self.box_tube.pack_start(event, False, False, 0)
 
         self.box_tube.pack_start(self.toolbar_busqueda, False, False, 0)
@@ -156,7 +156,7 @@ class JAMedia(Gtk.Window):
 
         self.connect("delete-event", self.__salir)
         self.toolbar.connect('salir', self.__confirmar_salir)
-        #self.toolbar_salir.connect('salir', self.__salir)
+        self.toolbar_salir.connect('salir', self.__salir)
         self.toolbar.connect('switch', self.__switch, 'jamedia')
         #self.jamediaplayer.connect('salir', self.__switch, 'jamediatube')
         self.toolbar_busqueda.connect("comenzar_busqueda",
@@ -170,7 +170,7 @@ class JAMedia(Gtk.Window):
         self.resize(640, 480)
 
     def __cancel_toolbar(self, widget=None):
-        pass #self.toolbar_salir.cancelar()
+        self.toolbar_salir.cancelar()
 
     def __open_shelve_list(self, widget, shelve_list, toolbarwidget):
         """
