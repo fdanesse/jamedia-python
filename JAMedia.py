@@ -36,9 +36,10 @@ from Widgets import Alerta_Busqueda
 from Widgets import ToolbarSalir
 '''
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
-from JAMediaPlayer.JAMediaPlayer import check_path
+'''
 from JAMediaYoutube import Buscar
 from JAMediaYoutube import FEED
+'''
 from Widgets import WidgetVideoItem
 '''
 from JAMediaPlayer.Globales import get_colors
@@ -77,7 +78,7 @@ class JAMedia(Gtk.Window):
         self.jamediaplayer = None
 
         self.archivos = []
-        #self.buscador = Buscar()
+        self.buscador = Buscar()
 
         GLib.idle_add(self.__setup_init)
         print "JAMedia process:", os.getpid()
@@ -165,8 +166,8 @@ class JAMedia(Gtk.Window):
         #self.paneltube.connect('open_shelve_list', self.__open_shelve_list)
         self.toolbar_descarga.connect('end', self.__run_download)
         #self.paneltube.connect("cancel_toolbar", self.__cancel_toolbar)
-        #self.buscador.connect("encontrado", self.__add_video_encontrado)
-        #self.buscador.connect("end", self.__end_busqueda)
+        self.buscador.connect("encontrado", self.__add_video_encontrado)
+        self.buscador.connect("end", self.__end_busqueda)
         self.resize(640, 480)
 
     def __cancel_toolbar(self, widget=None):
@@ -353,21 +354,21 @@ if __name__ == "__main__":
     items = []
     if len(sys.argv) > 1:
         for campo in sys.argv[1:]:
-            path = os.path.realpath(campo)
+            path = os.path.join(campo)
             if os.path.isfile(path):
-                item = check_path(path)
+                item = get_item_list(path)
                 if item:
                     items.append(item)
             elif os.path.isdir(path):
                 for arch in os.listdir(path):
                     newpath = os.path.join(path, arch)
                     if os.path.isfile(newpath):
-                        item = check_path(newpath)
+                        item = get_item_list(newpath)
                         if item:
                             items.append(item)
         if items:
             jamedia = JAMedia()
-            jamedia.set_archivos(items)
+            jamedia.set_pistas(items)
         else:
             jamedia = JAMedia()
     else:

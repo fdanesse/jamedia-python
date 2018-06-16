@@ -61,7 +61,7 @@ class Buscar(GObject.GObject):
     __gsignals__ = {
     'encontrado': (GObject.SIGNAL_RUN_FIRST,
         GObject.TYPE_NONE, (GObject.TYPE_STRING, GObject.TYPE_STRING)),
-    'end': (GObject.SIGNAL_RUN_LAST,
+    'end': (GObject.SIGNAL_RUN_FIRST,
         GObject.TYPE_NONE, [])}
 
     def __init__(self, ):
