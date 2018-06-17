@@ -19,8 +19,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-import gtk
-import gobject
+import gi
+gi.require_version("Gtk", "3.0")
+
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GLib
+from gi.repository import GObject
+from gi.repository import GdkPixbuf
 
 from BalanceWidget import BalanceWidget
 from JAMediaPlayerList import PlayerList
@@ -38,32 +44,32 @@ def mostrar(objeto):
         objeto.show()
 
 
-class Derecha(gtk.EventBox):
+class Derecha(Gtk.EventBox):
 
     __gsignals__ = {
-    "cargar-reproducir": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_STRING, )),
-    "accion-list": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,
-        gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)),
-    "menu_activo": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, []),
-    "add_stream": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_STRING, )),
-    "accion-controls": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_STRING,)),
-    'balance-valor': (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_FLOAT,
-        gobject.TYPE_STRING))}
+    "cargar-reproducir": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
+    "accion-list": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,
+        GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)),
+    "menu_activo": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, []),
+    "add_stream": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
+    "accion-controls": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
+    'balance-valor': (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_FLOAT,
+        GObject.TYPE_STRING))}
 
     def __init__(self):
 
-        gtk.EventBox.__init__(self)
+        Gtk.EventBox.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
 
-        vbox = gtk.VBox()
-        conf_box = gtk.VBox()
+        vbox = Gtk.VBox()
+        conf_box = Gtk.VBox()
 
         self.balance = BalanceWidget()
         self.lista = PlayerList()
@@ -71,10 +77,10 @@ class Derecha(gtk.EventBox):
 
         conf_box.pack_start(self.balance, False, False, 0)
 
-        scroll = gtk.ScrolledWindow()
-        scroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        scroll = Gtk.ScrolledWindow()
+        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         scroll.add_with_viewport(conf_box)
-        scroll.get_child().modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        scroll.get_child().modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
 
         vbox.pack_start(scroll, True, True, 0)
         vbox.pack_start(self.lista, True, True, 0)

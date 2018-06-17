@@ -58,7 +58,7 @@ class DialogoDescarga(Gtk.Dialog):
         self.connect("realize", self.__do_realize)
 
     def __do_realize(self, widget):
-        Glib.timeout_add(500, self.__descargar)
+        GLib.timeout_add(500, self.__descargar)
 
     def __descargar(self):
         if self.force:
@@ -71,16 +71,16 @@ class DialogoDescarga(Gtk.Dialog):
         self.destroy()
         return False
 
-'''
+
 class Credits(Gtk.Dialog):
 
     def __init__(self, parent=None):
 
         Gtk.Dialog.__init__(self, parent=parent,
-            buttons=("Cerrar", Gtk.RESPONSE_ACCEPT))
+            buttons=("Cerrar", Gtk.ResponseType.ACCEPT))
 
         self.set_decorated(False)
-        self.modify_bg(Gtk.Gtk.StateType.NORMAL, get_colors("widgetvideoitem"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("widgetvideoitem"))
         self.set_border_width(15)
 
         imagen = Gtk.Image()
@@ -88,17 +88,17 @@ class Credits(Gtk.Dialog):
 
         self.vbox.pack_start(imagen, True, True, 0)
         self.vbox.show_all()
-'''
-'''
+
+
 class Help(Gtk.Dialog):
 
     def __init__(self, parent=None):
 
         Gtk.Dialog.__init__(self, parent=parent,
-            buttons=("Cerrar", Gtk.RESPONSE_ACCEPT))
+            buttons=("Cerrar", Gtk.ResponseType.ACCEPT))
 
         self.set_decorated(False)
-        self.modify_bg(Gtk.Gtk.StateType.NORMAL, get_colors("widgetvideoitem"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("widgetvideoitem"))
         self.set_border_width(15)
 
         tabla1 = Gtk.Table(columns=5, rows=2, homogeneous=False)
@@ -177,8 +177,8 @@ class Help(Gtk.Dialog):
         for help in self.helps:
             if help.get_visible():
                 return self.helps.index(help)
-'''
-'''
+
+
 class MouseSpeedDetector(GObject.GObject):
     """
     Verifica posición y movimiento del mouse.
@@ -206,8 +206,7 @@ class MouseSpeedDetector(GObject.GObject):
         Emite la señal de estado cada 60 segundos.
         """
         try:
-            display, posx, posy = Gtk.gdk.display_get_default(
-                ).get_window_at_pointer()
+            display, posx, posy = Gdk.Display.get_default().get_window_at_pointer()
         except:
             return True
         if posx > 0 and posy > 0:
@@ -225,8 +224,7 @@ class MouseSpeedDetector(GObject.GObject):
         Resetea el controlador o lo termina según reset.
         """
         if self.actualizador:
-            Glib.source_remove(self.actualizador)
+            GLib.source_remove(self.actualizador)
             self.actualizador = False
         if reset:
-            self.actualizador = Glib.timeout_add(1000, self.__handler)
-'''
+            self.actualizador = GLib.timeout_add(1000, self.__handler)

@@ -20,8 +20,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
-import gtk
-import gobject
+import gi
+gi.require_version("Gtk", "3.0")
+
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GLib
+from gi.repository import GObject
+from gi.repository import GdkPixbuf
 
 from Globales import get_colors
 
@@ -39,26 +45,26 @@ def insensibilizar(objeto):
 ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 
-class PlayerControls(gtk.EventBox):
+class PlayerControls(Gtk.EventBox):
     """
     Controles de reproduccion: play/pausa, stop, siguiente, atras.
     """
 
     __gsignals__ = {
-    "accion-controls": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_STRING,))}
+    "accion-controls": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_STRING,))}
 
     def __init__(self):
 
-        gtk.EventBox.__init__(self)
+        Gtk.EventBox.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("toolbars"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
 
-        vbox = gtk.HBox()
+        vbox = Gtk.HBox()
 
-        self.pix_play = gtk.gdk.pixbuf_new_from_file_at_size(
+        self.pix_play = GdkPixbuf.Pixbuf.new_from_file_at_size(
             os.path.join(ICONS_PATH, "play.svg"), 24, 24)
-        self.pix_paused = gtk.gdk.pixbuf_new_from_file_at_size(
+        self.pix_paused = GdkPixbuf.Pixbuf.new_from_file_at_size(
             os.path.join(ICONS_PATH, "pausa.svg"), 24, 24)
 
         self.atras = JAMediaToolButton(pixels=24)
@@ -113,17 +119,17 @@ class PlayerControls(gtk.EventBox):
                 self.siguiente, self.stop])
 
 
-class JAMediaToolButton(gtk.ToolButton):
+class JAMediaToolButton(Gtk.ToolButton):
 
     def __init__(self, pixels=34):
 
-        gtk.ToolButton.__init__(self)
+        Gtk.ToolButton.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("toolbars"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
 
         self.estado = False
         self.pixels = pixels
-        self.imagen = gtk.Image()
+        self.imagen = Gtk.Image()
         self.set_icon_widget(self.imagen)
         self.imagen.show()
 
@@ -131,7 +137,7 @@ class JAMediaToolButton(gtk.ToolButton):
         self.show_all()
 
     def set_imagen(self, archivo=None, flip=False, rotacion=False):
-        pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
             os.path.join(archivo), self.pixels, self.pixels)
         if flip:
             pixbuf = pixbuf.flip(True)

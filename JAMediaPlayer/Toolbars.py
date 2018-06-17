@@ -29,8 +29,8 @@ from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
 
-#from Widgets import Credits
-#from Widgets import Help
+from Widgets import Credits
+from Widgets import Help
 
 from Globales import get_colors
 from Globales import get_separador

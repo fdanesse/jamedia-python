@@ -19,8 +19,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-import gtk
-import gobject
+import gi
+gi.require_version("Gtk", "3.0")
+
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GLib
+from gi.repository import GObject
+from gi.repository import GdkPixbuf
 
 from IzquierdaWidgets import ToolbarGrabar
 from IzquierdaWidgets import VideoVisor
@@ -40,29 +46,29 @@ def mostrar(objeto):
         objeto.show()
 
 
-class Izquierda(gtk.EventBox):
+class Izquierda(Gtk.EventBox):
 
     __gsignals__ = {
-    "show-controls": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,)),
-    'rotar': (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_STRING,)),
-    'actualizar_streamings': (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, []),
-    'stop-record': (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, []),
-    "seek": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_FLOAT, )),
-    "volumen": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_FLOAT,))}
+    "show-controls": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
+    'rotar': (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
+    'actualizar_streamings': (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, []),
+    'stop-record': (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, []),
+    "seek": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_FLOAT, )),
+    "volumen": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_FLOAT,))}
 
     def __init__(self):
 
-        gtk.EventBox.__init__(self)
+        Gtk.EventBox.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("drawingplayer"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer"))
 
-        vbox = gtk.VBox()
+        vbox = Gtk.VBox()
 
         self.toolbar_record = ToolbarGrabar()
         self.video_visor = VideoVisor()
@@ -116,10 +122,10 @@ class Izquierda(gtk.EventBox):
             ww, hh = (screen.get_width(), screen.get_height())
             if ww == w and hh == h:
                 win.set_border_width(2)
-                gobject.idle_add(self.__set_full, win, False)
+                GLib.idle_add(self.__set_full, win, False)
             else:
                 win.set_border_width(0)
-                gobject.idle_add(self.__set_full, win, True)
+                GLib.idle_add(self.__set_full, win, True)
             widget.set_sensitive(True)
 
     def __set_full(self, win, valor):

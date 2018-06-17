@@ -20,32 +20,38 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
-import gobject
-import gtk
+import gi
+gi.require_version("Gtk", "3.0")
+
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GLib
+from gi.repository import GObject
+from gi.repository import GdkPixbuf
 
 from Globales import get_colors
 
 ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 
-class ProgressPlayer(gtk.EventBox):
+class ProgressPlayer(Gtk.EventBox):
 
     __gsignals__ = {
-    "seek": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_FLOAT, )),
-    "volumen": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_FLOAT,))}
+    "seek": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_FLOAT, )),
+    "volumen": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_FLOAT,))}
 
     def __init__(self):
 
-        gtk.EventBox.__init__(self)
+        Gtk.EventBox.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("toolbars"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
 
         self.barraprogreso = BarraProgreso()
         self.volumen = ControlVolumen()
 
-        hbox = gtk.HBox()
+        hbox = Gtk.HBox()
         hbox.pack_start(self.barraprogreso, True, True, 0)
         hbox.pack_start(self.volumen, False, False, 0)
 
@@ -66,23 +72,23 @@ class ProgressPlayer(gtk.EventBox):
         self.barraprogreso.set_progress(valor)
 
 
-class BarraProgreso(gtk.EventBox):
+class BarraProgreso(Gtk.EventBox):
     """
     Barra de progreso para mostrar estado de reproduccion.
     """
 
     __gsignals__ = {
-    "user-set-value": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_FLOAT, ))}
+    "user-set-value": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_FLOAT, ))}
 
     def __init__(self):
 
-        gtk.EventBox.__init__(self)
+        Gtk.EventBox.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("toolbars"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
 
         self.escala = ProgressBar(
-            gtk.Adjustment(0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
+            Gtk.Adjustment(0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
 
         self.valor = 0
 
@@ -106,20 +112,20 @@ class BarraProgreso(gtk.EventBox):
             self.escala.queue_draw()
 
 
-class ProgressBar(gtk.HScale):
+class ProgressBar(Gtk.HScale):
     """
     Escala de SlicerBalance.
     """
 
     __gsignals__ = {
-    "user-set-value": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_FLOAT, ))}
+    "user-set-value": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_FLOAT, ))}
 
     def __init__(self, ajuste):
 
-        gtk.HScale.__init__(self)
+        Gtk.HScale.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("toolbars"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
 
         self.ajuste = ajuste
         self.set_digits(0)
@@ -129,12 +135,12 @@ class ProgressBar(gtk.HScale):
         self.ancho, self.borde = (10, 10)
 
         icono = os.path.join(ICONS_PATH, "controlslicer.svg")
-        self.pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icono, 24, 24)
+        self.pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(icono, 24, 24)
 
         self.connect("button-press-event", self.__button_press_event)
         self.connect("button-release-event", self.__button_release_event)
         self.connect("motion-notify-event", self.__motion_notify_event)
-        self.connect("expose_event", self.__expose)
+        #self.connect("expose_event", self.__expose)
 
         self.show_all()
 
@@ -149,14 +155,17 @@ class ProgressBar(gtk.HScale):
         Cuando el usuario se desplaza por la barra de progreso.
         Se emite el valor en % (float).
         """
-        if event.state == gtk.gdk.MOD2_MASK | gtk.gdk.BUTTON1_MASK:
+        print 'FIXME', self.__motion_notify_event
+        '''
+        if event.state == Gtk.gdk.MOD2_MASK | Gtk.gdk.BUTTON1_MASK:
             rect = self.get_allocation()
             valor = float(event.x * 100 / rect.width)
             if valor >= 0.0 and valor <= 100.0:
                 self.ajuste.set_value(valor)
                 self.queue_draw()
                 self.emit("user-set-value", valor)
-
+        '''
+    '''
     def __expose(self, widget, event):
         """
         Dibuja el estado de la barra de progreso.
@@ -164,7 +173,7 @@ class ProgressBar(gtk.HScale):
         x, y, w, h = self.get_allocation()
         ancho, borde = (self.ancho, self.borde)
 
-        gc = gtk.gdk.Drawable.new_gc(self.window)
+        gc = Gtk.gdk.Drawable.new_gc(self.window)
 
         # todo el widget
         gc.set_rgb_fg_color(get_colors("toolbars"))
@@ -192,22 +201,22 @@ class ProgressBar(gtk.HScale):
         yimage = yy + hh / 2 - imgh / 2
 
         self.window.draw_pixbuf(gc, self.pixbuf, 0, 0, ximage, yimage,
-            imgw, imgh, gtk.gdk.RGB_DITHER_NORMAL, 0, 0)
+            imgw, imgh, Gtk.gdk.RGB_DITHER_NORMAL, 0, 0)
 
         return True
+        '''
 
-
-class ControlVolumen(gtk.VolumeButton):
+class ControlVolumen(Gtk.VolumeButton):
 
     __gsignals__ = {
-    "volumen": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_FLOAT,))}
+    "volumen": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_FLOAT,))}
 
     def __init__(self):
 
-        gtk.VolumeButton.__init__(self)
+        Gtk.VolumeButton.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("toolbars"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
 
         self.connect("value-changed", self.__value_changed)
         self.show_all()

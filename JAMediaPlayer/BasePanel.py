@@ -19,8 +19,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-import gtk
-import gobject
+import gi
+gi.require_version("Gtk", "3.0")
+
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GLib
+from gi.repository import GObject
+from gi.repository import GdkPixbuf
+
 import threading
 
 from Widgets import DialogoDescarga
@@ -28,31 +35,31 @@ from Izquierda import Izquierda
 from Derecha import Derecha
 from Globales import get_colors
 from Globales import get_ip
-from JAMediaReproductor.JAMediaReproductor import JAMediaReproductor
+#from JAMediaReproductor.JAMediaReproductor import JAMediaReproductor
 
 
-class BasePanel(gtk.HPaned):
+class BasePanel(Gtk.HPaned):
 
     __gsignals__ = {
-    "show-controls": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT, )),
-    "accion-list": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,
-        gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)),
-    "menu_activo": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, []),
-    "add_stream": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_STRING, )),
-    "video": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_BOOLEAN,)),
-    'stop-record': (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, [])}
+    "show-controls": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, )),
+    "accion-list": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,
+        GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)),
+    "menu_activo": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, []),
+    "add_stream": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
+    "video": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,)),
+    'stop-record': (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, [])}
 
     def __init__(self):
 
-        gtk.HPaned.__init__(self)
+        Gtk.HPaned.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
         self.set_border_width(2)
 
         self._thread = False
@@ -81,7 +88,7 @@ class BasePanel(gtk.HPaned):
         self.izquierda.connect("actualizar_streamings",
             self.__actualizar_streamings)
 
-        gobject.timeout_add(5000, self.__check_ip)
+        GLib.timeout_add(5000, self.__check_ip)
 
     def __stop_record(self, widget):
         self.__emit_menu_activo()
@@ -174,19 +181,20 @@ class BasePanel(gtk.HPaned):
         self.izquierda.progress.set_sensitive(False)
         self.__set_video(False, False)
 
-        xid = self.izquierda.video_visor.get_property('window').xid
-        self.player = JAMediaReproductor(xid)
+        #xid = self.izquierda.video_visor.get_property('window').xid
+        #self.player = JAMediaReproductor(xid)
+        # FIME: AttributeError: 'GdkWaylandWindow' object has no attribute 'xid'
 
-        self.player.connect("endfile", self.__endfile)
-        self.player.connect("estado", self.__state_changed)
-        self.player.connect("newposicion", self.__update_progress)
-        self.player.connect("video", self.__set_video)
-        self.player.connect("loading-buffer", self.__loading_buffer)
+        #self.player.connect("endfile", self.__endfile)
+        #self.player.connect("estado", self.__state_changed)
+        #self.player.connect("newposicion", self.__update_progress)
+        #self.player.connect("video", self.__set_video)
+        #self.player.connect("loading-buffer", self.__loading_buffer)
 
-        self.player.load(path)
-        self._thread = threading.Thread(target=self.player.play)
-        self._thread.start()
-        self.player.set_volumen(volumen)
+        #self.player.load(path)
+        #self._thread = threading.Thread(target=self.player.play)
+        #self._thread.start()
+        #self.player.set_volumen(volumen)
         self.izquierda.progress.volumen.set_value(volumen / 10)
         self.derecha.set_sensitive(True)
 
@@ -209,10 +217,10 @@ class BasePanel(gtk.HPaned):
         if "playing" in valor:
             self.derecha.player_controls.set_playing()
             self.izquierda.progress.set_sensitive(True)
-            gobject.idle_add(self.__update_balance)
+            GLib.idle_add(self.__update_balance)
         elif "paused" in valor or "None" in valor:
             self.derecha.player_controls.set_paused()
-            gobject.idle_add(self.__update_balance)
+            GLib.idle_add(self.__update_balance)
         else:
             print "Estado del Reproductor desconocido:", valor
 

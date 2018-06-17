@@ -36,35 +36,41 @@ Contiene Widgets para controlar:
             para setear los valores en los widgets.
 
     Conéctese a la señal:
-        'balance-valor': gobject.TYPE_FLOAT, gobject.TYPE_STRING
+        'balance-valor': GObject.TYPE_FLOAT, GObject.TYPE_STRING
 
             para obtener los valores del widgets de cada propiedad según
             cambios del usuario sobre el widget.
 """
 
 import os
-import gtk
-import gobject
+import gi
+gi.require_version("Gtk", "3.0")
+
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GLib
+from gi.repository import GObject
+from gi.repository import GdkPixbuf
 
 from Globales import get_colors
 
 ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 
-class BalanceWidget(gtk.EventBox):
+class BalanceWidget(Gtk.EventBox):
 
     __gsignals__ = {
-    'balance-valor': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-        (gobject.TYPE_FLOAT, gobject.TYPE_STRING))}
+    'balance-valor': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+        (GObject.TYPE_FLOAT, GObject.TYPE_STRING))}
 
     def __init__(self):
 
-        gtk.EventBox.__init__(self)
+        Gtk.EventBox.__init__(self)
 
-        tabla = gtk.Table(rows=5, columns=1, homogeneous=True)
+        tabla = Gtk.Table(rows=5, columns=1, homogeneous=True)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
-        tabla.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
+        tabla.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
 
         self.brillo = ToolbarcontrolValores("Brillo")
         self.contraste = ToolbarcontrolValores("Contraste")
@@ -106,34 +112,34 @@ class BalanceWidget(gtk.EventBox):
             self.gamma.set_progress(gamma)
 
 
-class ToolbarcontrolValores(gtk.Toolbar):
+class ToolbarcontrolValores(Gtk.Toolbar):
 
     __gsignals__ = {
-    'valor': (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_FLOAT,))}
+    'valor': (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_FLOAT,))}
 
     def __init__(self, label):
 
-        gtk.Toolbar.__init__(self)
+        Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
 
         self.titulo = label
 
         self.escala = SlicerBalance()
 
-        item = gtk.ToolItem()
+        item = Gtk.ToolItem()
         item.set_expand(True)
 
-        self.frame = gtk.Frame()
+        self.frame = Gtk.Frame()
         self.frame.set_border_width(4)
         self.frame.set_label(self.titulo)
         self.frame.get_property("label-widget").modify_fg(
             0, get_colors("drawingplayer"))
         self.frame.set_label_align(0.5, 1.0)
-        event = gtk.EventBox()
+        event = Gtk.EventBox()
         event.set_border_width(4)
-        event.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        event.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
         event.add(self.escala)
         self.frame.add(event)
         self.frame.show_all()
@@ -155,19 +161,19 @@ class ToolbarcontrolValores(gtk.Toolbar):
         self.frame.set_label("%s: %s%s" % (self.titulo, int(valor), "%"))
 
 
-class SlicerBalance(gtk.EventBox):
+class SlicerBalance(Gtk.EventBox):
 
     __gsignals__ = {
-    "user-set-value": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_FLOAT, ))}
+    "user-set-value": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_FLOAT, ))}
 
     def __init__(self):
 
-        gtk.EventBox.__init__(self)
+        Gtk.EventBox.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
 
-        self.escala = BalanceBar(gtk.Adjustment(0.0, 0.0,
+        self.escala = BalanceBar(Gtk.Adjustment(0.0, 0.0,
             101.0, 0.1, 1.0, 1.0))
 
         self.add(self.escala)
@@ -183,17 +189,17 @@ class SlicerBalance(gtk.EventBox):
         self.escala.queue_draw()
 
 
-class BalanceBar(gtk.HScale):
+class BalanceBar(Gtk.HScale):
 
     __gsignals__ = {
-    "user-set-value": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_FLOAT, ))}
+    "user-set-value": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_FLOAT, ))}
 
     def __init__(self, ajuste):
 
-        gtk.HScale.__init__(self)
+        Gtk.HScale.__init__(self)
 
-        self.modify_bg(gtk.STATE_NORMAL, get_colors("window"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
 
         self.ajuste = ajuste
         self.set_digits(0)
@@ -202,17 +208,17 @@ class BalanceBar(gtk.HScale):
         self.ancho, self.borde = (7, 10)
 
         icono = os.path.join(ICONS_PATH, "controlslicer.svg")
-        self.pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icono, 16, 16)
+        self.pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(icono, 16, 16)
 
-        self.connect("expose_event", self.__expose)
+        #self.connect("expose_event", self.__expose)
 
         self.show_all()
-
+    '''
     def __expose(self, widget, event):
         x, y, w, h = self.get_allocation()
         ancho, borde = (self.ancho, self.borde)
 
-        gc = gtk.gdk.Drawable.new_gc(self.window)
+        gc = Gtk.gdk.Drawable.new_gc(self.window)
 
         gc.set_rgb_fg_color(get_colors("window"))
         self.window.draw_rectangle(gc, True, x, y, w, h)
@@ -233,19 +239,23 @@ class BalanceBar(gtk.HScale):
         yimage = yy + hh / 2 - imgh / 2
 
         self.window.draw_pixbuf(gc, self.pixbuf, 0, 0, ximage, yimage,
-            imgw, imgh, gtk.gdk.RGB_DITHER_NORMAL, 0, 0)
+            imgw, imgh, Gtk.gdk.RGB_DITHER_NORMAL, 0, 0)
 
         return True
+        '''
 
     def do_motion_notify_event(self, event):
         """
         Cuando el usuario se desplaza por la barra de progreso.
         Se emite el valor en % (float).
         """
-        if event.state == gtk.gdk.MOD2_MASK | gtk.gdk.BUTTON1_MASK:
+        print 'FIXME', self.do_motion_notify_event
+        '''
+        if event.state == Gtk.gdk.MOD2_MASK | Gtk.gdk.BUTTON1_MASK:
             rect = self.get_allocation()
             valor = float(event.x * 100 / rect.width)
             if valor >= 0.0 and valor <= 100.0:
                 self.ajuste.set_value(valor)
                 self.queue_draw()
                 self.emit("user-set-value", valor)
+        '''
