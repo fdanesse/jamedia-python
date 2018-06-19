@@ -27,15 +27,17 @@ from gi.repository import Gdk
 from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
+from gi.repository import GdkX11
 
-import threading
+#import threading
 
 from Widgets import DialogoDescarga
 from Izquierda import Izquierda
 from Derecha import Derecha
 from Globales import get_colors
 from Globales import get_ip
-#from JAMediaReproductor.JAMediaReproductor import JAMediaReproductor
+
+from JAMediaReproductor.JAMediaReproductor import JAMediaReproductor
 
 
 class BasePanel(Gtk.HPaned):
@@ -62,7 +64,7 @@ class BasePanel(Gtk.HPaned):
         self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
         self.set_border_width(2)
 
-        self._thread = False
+        #self._thread = False
         self.player = False
 
         self.izquierda = Izquierda()
@@ -175,25 +177,27 @@ class BasePanel(Gtk.HPaned):
             self.player.disconnect_by_func(self.__set_video)
             self.player.disconnect_by_func(self.__loading_buffer)
             self.player.stop()
-            del(self.player)
+            #del(self.player)
             self.player = False
 
         self.izquierda.progress.set_sensitive(False)
         self.__set_video(False, False)
 
-        #xid = self.izquierda.video_visor.get_property('window').xid
-        #self.player = JAMediaReproductor(xid)
-        # FIME: AttributeError: 'GdkWaylandWindow' object has no attribute 'xid'
+        xid = self.izquierda.video_visor.get_property('window').get_xid()
+        self.player = JAMediaReproductor(xid)
 
-        #self.player.connect("endfile", self.__endfile)
-        #self.player.connect("estado", self.__state_changed)
-        #self.player.connect("newposicion", self.__update_progress)
-        #self.player.connect("video", self.__set_video)
-        #self.player.connect("loading-buffer", self.__loading_buffer)
+        self.player.connect("endfile", self.__endfile)
+        self.player.connect("estado", self.__state_changed)
+        self.player.connect("newposicion", self.__update_progress)
+        self.player.connect("video", self.__set_video)
+        self.player.connect("loading-buffer", self.__loading_buffer)
 
-        #self.player.load(path)
+        self.player.load(path)
+        #self.player.play()
+        GLib.idle_add(self.player.play)
         #self._thread = threading.Thread(target=self.player.play)
         #self._thread.start()
+        GLib.idle_add(self.player.set_volumen, volumen)
         #self.player.set_volumen(volumen)
         self.izquierda.progress.volumen.set_value(volumen / 10)
         self.derecha.set_sensitive(True)
@@ -217,10 +221,10 @@ class BasePanel(Gtk.HPaned):
         if "playing" in valor:
             self.derecha.player_controls.set_playing()
             self.izquierda.progress.set_sensitive(True)
-            GLib.idle_add(self.__update_balance)
+            # FIXME: GLib.idle_add(self.__update_balance)
         elif "paused" in valor or "None" in valor:
             self.derecha.player_controls.set_paused()
-            GLib.idle_add(self.__update_balance)
+            # FIXME: GLib.idle_add(self.__update_balance)
         else:
             print "Estado del Reproductor desconocido:", valor
 
@@ -258,7 +262,7 @@ class BasePanel(Gtk.HPaned):
             self.player.disconnect_by_func(self.__set_video)
             self.player.disconnect_by_func(self.__loading_buffer)
             self.player.stop()
-            del(self.player)
+            #del(self.player)
             self.player = False
 
     def set_nueva_lista(self, archivos):

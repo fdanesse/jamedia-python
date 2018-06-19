@@ -22,12 +22,18 @@
 
 import os
 import sys
+
+os.putenv('GDK_BACKEND', 'x11')
+
 import gi
+gi.require_version('Gst', '1.0')
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
+from gi.repository import GObject
 from gi.repository import Gdk
 from gi.repository import GLib
+from gi.repository import Gst
 
 from Widgets import Toolbar
 from Widgets import Toolbar_Busqueda
@@ -51,6 +57,8 @@ BASE_PATH = os.path.dirname(__file__)
 TipDescargas = "Arrastra Hacia La Izquierda para Quitarlo de Descargas."
 TipEncontrados = "Arrastra Hacia La Derecha para Agregarlo a Descargas"
 
+Gst.init([])
+
 
 class JAMedia(Gtk.Window):
 
@@ -59,9 +67,11 @@ class JAMedia(Gtk.Window):
         Gtk.Window.__init__(self)
 
         self.set_title("JAMedia")
-        self.set_icon_from_file(os.path.join(BASE_PATH,
+        self.set_icon_from_file(
+            os.path.join(BASE_PATH,
             "Iconos", "JAMedia.svg"))
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("window1"))
         self.set_resizable(True)
         self.set_border_width(2)
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -98,24 +108,30 @@ class JAMedia(Gtk.Window):
         self.paneltube = PanelTube()
 
         event = Gtk.EventBox()
-        event.modify_bg(0, get_colors("drawingplayer1"))
+        event.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
         event.add(self.toolbar)
         self.box_tube.pack_start(event, False, False, 0)
 
         event = Gtk.EventBox()
-        event.modify_bg(0, get_colors("download"))
+        event.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("download"))
         event.add(self.toolbar_salir)
         self.box_tube.pack_start(event, False, False, 0)
 
-        self.box_tube.pack_start(self.toolbar_busqueda, False, False, 0)
+        self.box_tube.pack_start(
+            self.toolbar_busqueda, False, False, 0)
 
         event = Gtk.EventBox()
-        event.modify_bg(0, get_colors("download"))
+        event.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("download"))
         event.add(self.toolbar_descarga)
         self.box_tube.pack_start(event, False, False, 0)
 
-        self.box_tube.pack_start(self.alerta_busqueda, False, False, 0)
-        self.box_tube.pack_start(self.paneltube, True, True, 0)
+        self.box_tube.pack_start(
+            self.alerta_busqueda, False, False, 0)
+        self.box_tube.pack_start(
+            self.paneltube, True, True, 0)
 
         self.jamediaplayer = JAMediaPlayer()
 
@@ -135,7 +151,8 @@ class JAMedia(Gtk.Window):
         """
         self.__cancel_toolbar()
         self.paneltube.cancel_toolbars_flotantes()
-        map(self.__ocultar, [self.toolbar_descarga, self.alerta_busqueda])
+        map(self.__ocultar,
+            [self.toolbar_descarga, self.alerta_busqueda])
         if self.archivos:
             self.__switch(None, 'jamedia')
             self.jamediaplayer.base_panel.set_nueva_lista(self.archivos)
@@ -160,17 +177,26 @@ class JAMedia(Gtk.Window):
         self.paneltube.descargar.drag_dest_add_uri_targets()
 
         self.connect("delete-event", self.__salir)
-        self.toolbar.connect('salir', self.__confirmar_salir)
+        self.toolbar.connect(
+            'salir', self.__confirmar_salir)
         self.toolbar_salir.connect('salir', self.__salir)
-        self.toolbar.connect('switch', self.__switch, 'jamedia')
-        self.jamediaplayer.connect('salir', self.__switch, 'jamediatube')
-        self.toolbar_busqueda.connect("comenzar_busqueda",
+        self.toolbar.connect(
+            'switch', self.__switch, 'jamedia')
+        self.jamediaplayer.connect(
+            'salir', self.__switch, 'jamediatube')
+        self.toolbar_busqueda.connect(
+            "comenzar_busqueda",
             self.__comenzar_busqueda)
-        self.paneltube.connect('download', self.__run_download)
-        self.paneltube.connect('open_shelve_list', self.__open_shelve_list)
-        self.toolbar_descarga.connect('end', self.__run_download)
-        self.paneltube.connect("cancel_toolbar", self.__cancel_toolbar)
-        self.buscador.connect("encontrado", self.__add_video_encontrado)
+        self.paneltube.connect(
+            'download', self.__run_download)
+        self.paneltube.connect(
+            'open_shelve_list', self.__open_shelve_list)
+        self.toolbar_descarga.connect(
+            'end', self.__run_download)
+        self.paneltube.connect(
+            "cancel_toolbar", self.__cancel_toolbar)
+        self.buscador.connect(
+            "encontrado", self.__add_video_encontrado)
         self.buscador.connect("end", self.__end_busqueda)
         self.resize(640, 480)
 
@@ -242,7 +268,8 @@ class JAMedia(Gtk.Window):
         video["url"] = url
         video["duracion"] = 0
         video["previews"] = ""
-        self.__add_videos([video], self.paneltube.encontrados, sensitive=False)
+        self.__add_videos([video],
+            self.paneltube.encontrados, sensitive=False)
         while Gtk.events_pending():
             Gtk.main_iteration()
         # Para evitar mover videos antes de lanzar actualización de metadatos
@@ -269,7 +296,8 @@ class JAMedia(Gtk.Window):
         for objeto in objetos:
             objeto.get_parent().remove(objeto)
             objeto.destroy()
-        GLib.timeout_add(300, self.__lanzar_busqueda, palabras, cantidad)
+        GLib.timeout_add(300,
+            self.__lanzar_busqueda, palabras, cantidad)
 
     def __lanzar_busqueda(self, palabras, cantidad):
         """
@@ -313,7 +341,8 @@ class JAMedia(Gtk.Window):
             texto = str(texto[0:50]) + " . . . "
 
         self.alerta_busqueda.label.set_text(texto)
-        GLib.idle_add(self.__add_videos, videos, destino, sensitive)
+        GLib.idle_add(self.__add_videos,
+            videos, destino, sensitive)
         return False
 
     def __switch(self, widget, valor):
@@ -353,6 +382,7 @@ class JAMedia(Gtk.Window):
 target = [Gtk.TargetEntry.new('Mover', Gtk.TargetFlags.SAME_APP, 0)]
 
 
+'''
 def check_path(path):
     if os.path.exists(path):
         if os.path.isfile(path):
@@ -362,6 +392,7 @@ def check_path(path):
                 'application/octet-stream' in datos:
                     return path
     return False
+'''
 
 
 if __name__ == "__main__":

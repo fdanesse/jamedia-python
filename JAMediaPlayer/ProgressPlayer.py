@@ -155,7 +155,7 @@ class ProgressBar(Gtk.HScale):
         Cuando el usuario se desplaza por la barra de progreso.
         Se emite el valor en % (float).
         """
-        print 'FIXME', self.__motion_notify_event
+        pass  #print 'FIXME', self.__motion_notify_event
         '''
         if event.state == Gtk.gdk.MOD2_MASK | Gtk.gdk.BUTTON1_MASK:
             rect = self.get_allocation()

@@ -89,7 +89,9 @@ class PlayerList(Gtk.Frame):
         self.lista = Lista()
 
         scroll = Gtk.ScrolledWindow()
-        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scroll.set_policy(
+            Gtk.PolicyType.AUTOMATIC,
+            Gtk.PolicyType.AUTOMATIC)
         scroll.add(self.lista)
 
         vbox.pack_start(self.toolbar, False, False, 0)
@@ -296,9 +298,8 @@ class Lista(Gtk.TreeView):
 
         self.show_all()
 
-    def __selecciones(self, path, column, uno, dos, tres):
-        print self.__selecciones, path, column, uno, dos, tres
-        '''
+    def __selecciones(self, treeselection,
+        model, path, is_selected, listore):
         if not self.permitir_select:
             return True
         self.permitir_select = False
@@ -306,7 +307,6 @@ class Lista(Gtk.TreeView):
         valor = self.get_model().get_value(_iter, 2)
         if self.valor_select != valor:
             GLib.timeout_add(3, self.__select, _iter, valor)
-        '''
         return True
 
     def __select(self, _iter, valor):

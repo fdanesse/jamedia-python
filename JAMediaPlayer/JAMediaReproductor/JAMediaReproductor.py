@@ -20,235 +20,247 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
-import gobject
-import gst
-#import gtk
 
-from JAMediaBins import JAMedia_Audio_Pipeline
-from JAMediaBins import JAMedia_Video_Pipeline
+import gi
+gi.require_version('Gst', '1.0')
+gi.require_version('GstVideo', '1.0')  # FIXME: Necesario => AttributeError: 'GstXvImageSink' object has no attribute 'set_window_handle'
 
-PR = False
-
-gobject.threads_init()
-#gtk.gdk.threads_init()
+from gi.repository import GObject
+from gi.repository import GLib
+from gi.repository import Gst
+from gi.repository import GstVideo
 
 
-class JAMediaReproductor(gobject.GObject):
+class JAMediaReproductor(GObject.GObject):
 
     __gsignals__ = {
-    "endfile": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, []),
-    "estado": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_STRING,)),
-    "newposicion": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_INT,)),
-    "video": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_BOOLEAN,)),
-    "loading-buffer": (gobject.SIGNAL_RUN_LAST,
-        gobject.TYPE_NONE, (gobject.TYPE_INT, )),
+    "endfile": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, []),
+    "estado": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
+    "newposicion": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_INT,)),
+    "video": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,)),
+    "loading-buffer": (GObject.SIGNAL_RUN_LAST,
+        GObject.TYPE_NONE, (GObject.TYPE_INT, )),
         }
 
     # Estados: playing, paused, None
 
-    def __init__(self, ventana_id):
+    def __init__(self, winId):
 
-        gobject.GObject.__init__(self)
+        GObject.GObject.__init__(self)
 
-        self.nombre = "JAMediaReproductor"
+        self.__source = None
+        self.__winId = winId
+        self.__controller = False
+        self.__status = Gst.State.NULL
+        self.__hasVideo = False
+        self.__duration = 0
+        self.__position = 0
+        self.__valVolume = 0.1
 
-        self.video = False
-        self.ventana_id = ventana_id
-        self.progressbar = True
-        self.estado = None
-        self.duracion = 0.0
-        self.posicion = 0.0
-        self.actualizador = False
-        self.player = None
-        self.bus = None
+        self.__pipe = Gst.Pipeline()
+        self.__player = Gst.ElementFactory.make("uridecodebin", "uridecodebin")
+        #self.__player.set_property("buffer-size", 50000)
+        #self.__player.set_property("buffer-duration", 50000)
+        #self.__player.set_property("download", True)
+        #self.__player.set_property("use-buffering", True)
 
-        self.player = gst.element_factory_make("playbin2", "player")
-        self.player.set_property("buffer-size", 50000)
+        audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
+        audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
+        audioresample.set_property('quality', 10)
+        self.__volume = Gst.ElementFactory.make('volume', 'volume')
+        self.__volume.set_property('volume', self.__valVolume)
+        autoaudiosink = Gst.ElementFactory.make("autoaudiosink", "autoaudiosink")
 
-        self.audio_bin = JAMedia_Audio_Pipeline()
-        self.video_bin = JAMedia_Video_Pipeline()
+        videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
+        videorate = Gst.ElementFactory.make('videorate', 'videorate')
+        videorate.set_property('skip-to-first', True)
+        videorate.set_property('drop-only', True)
+        videorate.set_property('max-rate', 30)
+        xvimagesink = Gst.ElementFactory.make('xvimagesink', "xvimagesink")
+        xvimagesink.set_property("force-aspect-ratio", True)
+        xvimagesink.set_window_handle(self.__winId)
 
-        self.player.set_property('video-sink', self.video_bin)
-        self.player.set_property('audio-sink', self.audio_bin)
+        self.__pipe.add(self.__player)
+        self.__pipe.add(audioconvert)
+        self.__pipe.add(audioresample)
+        self.__pipe.add(self.__volume)
+        self.__pipe.add(autoaudiosink)
 
-        self.bus = self.player.get_bus()
-        self.bus.add_signal_watch()
-        self.bus.connect('message', self.__on_mensaje)
-        self.bus.enable_sync_message_emission()
-        self.bus.connect('sync-message', self.__sync_message)
+        self.__pipe.add(videoconvert)
+        self.__pipe.add(videorate)
+        self.__pipe.add(xvimagesink)
 
-    def __sync_message(self, bus, message):
-        if message.type == gst.MESSAGE_ELEMENT:
-            if message.structure.get_name() == 'prepare-xwindow-id':
-                #gtk.gdk.threads_enter()
-                #gtk.gdk.display_get_default().sync()
-                message.src.set_xwindow_id(self.ventana_id)
-                #gtk.gdk.threads_leave()
+        audioconvert.link(audioresample)
+        audioresample.link(self.__volume)
+        self.__volume.link(autoaudiosink)
 
-        elif message.type == gst.MESSAGE_STATE_CHANGED:
-            old, new, pending = message.parse_state_changed()
-            if self.estado != new:
-                self.estado = new
-                if new == gst.STATE_PLAYING:
+        videoconvert.link(videorate)
+        videorate.link(xvimagesink)
+
+        self.__video_sink = videoconvert.get_static_pad('sink')
+        self.__audio_sink = audioconvert.get_static_pad('sink')
+        
+        self.__bus = self.__pipe.get_bus()
+        self.__bus.enable_sync_message_emission()
+        self.__bus.connect('sync-message', self.__sync_message)
+        self.__player.connect('pad-added', self.__on_pad_added)
+        self.__player.connect('no-more-pads', self.__no_more_pads)
+
+    def __sync_message(self, bus, mensaje):
+        if mensaje.type == Gst.MessageType.STATE_CHANGED:
+            old, new, pending = mensaje.parse_state_changed()
+            if old == Gst.State.PAUSED and new == Gst.State.PLAYING:
+                if self.__status != new:
+                    self.__status = new
                     self.emit("estado", "playing")
                     self.__new_handle(True)
-                elif new == gst.STATE_PAUSED:
+                    # Si se llama enseguida falla.
+                    #GLib.idle_add(self.__re_config)
+            elif old == Gst.State.READY and new == Gst.State.PAUSED:
+                if self.__status != new:
+                    self.__status = new
                     self.emit("estado", "paused")
                     self.__new_handle(False)
-                elif new == gst.STATE_NULL:
+            elif old == Gst.State.READY and new == Gst.State.NULL:
+                if self.__status != new:
+                    self.__status = new
                     self.emit("estado", "None")
                     self.__new_handle(False)
-                else:
+            elif old == Gst.State.PLAYING and new == Gst.State.PAUSED:
+                if self.__status != new:
+                    self.__status = new
                     self.emit("estado", "paused")
                     self.__new_handle(False)
-
-        elif message.type == gst.MESSAGE_TAG:
-            taglist = message.parse_tag()
-            datos = taglist.keys()
-            if 'video-codec' in datos:
-                if self.video == False or self.video == None:
-                    self.video = True
-                    self.emit("video", self.video)
-
-        elif message.type == gst.MESSAGE_LATENCY:
-            self.player.recalculate_latency()
-
-        elif message.type == gst.MESSAGE_ERROR:
-            err, debug = message.parse_error()
-            if PR:
-                print "JAMediaReproductor ERROR:"
-                print "\t%s" % err
-                print "\t%s" % debug
-            self.__new_handle(False)
-
-    def __on_mensaje(self, bus, message):
-        if message.type == gst.MESSAGE_EOS:
+        elif mensaje.type == Gst.MessageType.TAG:
+            taglist = mensaje.parse_tag()
+            datos = taglist.to_string()
+            if 'audio-codec' in datos and not 'video-codec' in datos:
+                if self.__hasVideo == True or \
+                    self.__hasVideo == None:
+                    self.__hasVideo = False
+                    self.emit("video", False)
+            elif 'video-codec' in datos:
+                if self.__hasVideo == False or \
+                    self.__hasVideo == None:
+                    self.__hasVideo = True
+                    self.emit("video", True)
+        elif mensaje.type == Gst.MessageType.WARNING:
+            print "\n Gst.MessageType.WARNING:", mensaje.parse_warning()
+        elif mensaje.type == Gst.MessageType.LATENCY:
+            # http://cgit.collabora.com/git/farstream.git/tree/examples/gui/fs-gui.py
+            #print "\n Gst.MessageType.LATENCY"
+            self.__pipe.recalculate_latency()
+        elif mensaje.type == Gst.MessageType.DURATION_CHANGED:
+            bool1, valor1 = self.__pipe.query_duration(Gst.Format.TIME)
+            bool2, valor2 = self.__pipe.query_position(Gst.Format.TIME)
+            self.__duration = valor1
+            self.__position = valor2
+        elif mensaje.type == Gst.MessageType.QOS:
+            pass  #print "\n Gst.MessageType.QOS:"
+        elif mensaje.type == Gst.MessageType.BUFFERING:
+            '''
+            print "\n Gst.MessageType.BUFFERING:"
+            print mensaje.parse_buffering()
+            print mensaje.parse_buffering_stats()
+            '''
+            pass
+        elif mensaje.type == Gst.MessageType.EOS:
+            #self.video_pipeline.seek_simple(Gst.Format.TIME,
+            #Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, 0)
+            print "\n Gst.MessageType.EOS:"
             self.__new_handle(False)
             self.emit("endfile")
-
-        elif message.type == gst.MESSAGE_ERROR:
-            err, debug = message.parse_error()
-            if PR:
-                print "JAMediaReproductor ERROR:"
-                print "\t%s" % err
-                print "\t%s" % debug
+        elif mensaje.type == Gst.MessageType.ERROR:
+            print "\n Gst.MessageType.ERROR:"
+            print mensaje.parse_error()
             self.__new_handle(False)
+            '''
+            Gst.MessageType.WARNING: (gerror=GLib.Error('Se están desechando muchos búferes.', 'gst-core-error-quark', 13), debug='gstbasesink.c(2901): gst_base_sink_is_too_late (): /GstPipeline:pipeline0/GstXvImageSink:xvimagesink:\nThere may be a timestamping problem, or this computer is too slow.')
+            Gst.MessageType.ERROR: (gerror=GLib.Error('Failed to configure the buffer pool', 'gst-resource-error-quark', 13), debug='../../../gst/vaapi/gstvaapipluginbase.c(709): gst_vaapi_plugin_base_create_pool (): /GstPipeline:pipeline2/GstURIDecodeBin:uridecodebin/GstDecodeBin:decodebin2/GstVaapiDecodeBin:vaapidecodebin2/GstVaapiPostproc:vaapipostproc2:\nConfiguration is most likely invalid, please report this issue.')
+            '''
 
-        elif message.type == gst.MESSAGE_BUFFERING:
-            buf = int(message.structure["buffer-percent"])
-            if buf < 100 and self.estado == gst.STATE_PLAYING:
-                self.emit("loading-buffer", buf)
-                self.__pause()
-            elif buf > 99 and self.estado != gst.STATE_PLAYING:
-                self.emit("loading-buffer", buf)
-                self.play()
+    def __on_pad_added(self, uridecodebin, pad):
+        """
+        Agregar elementos en forma dinámica
+        https://wiki.ubuntu.com/Novacut/GStreamer1.0
+        """
+        string = pad.query_caps(None).to_string()
+        if string.startswith('audio/'):
+            pad.link(self.__audio_sink)
+            #self.emit('info', string)
+            print string
+        elif string.startswith('video/'):
+            pad.link(self.__video_sink)
+            #self.emit('info', string)
+            print string
+
+    def __no_more_pads(self, objeto):
+        print objeto
 
     def __pause(self):
-        self.player.set_state(gst.STATE_PAUSED)
+        self.__pipe.set_state(Gst.State.PAUSED)
 
     def __new_handle(self, reset):
-        if self.actualizador:
-            gobject.source_remove(self.actualizador)
-            self.actualizador = False
+        if self.__controller:
+            GLib.source_remove(self.__controller)
+            self.__controller = False
         if reset:
-            self.actualizador = gobject.timeout_add(500, self.__handle)
+            self.__controller = GLib.timeout_add(500, self.__handle)
 
     def __handle(self):
-        if not self.progressbar:
-            return True
-        duracion = self.player.query_duration(gst.FORMAT_TIME)[0] / gst.SECOND
-        posicion = self.player.query_position(gst.FORMAT_TIME)[0] / gst.SECOND
-        pos = posicion * 100 / duracion
-        if self.duracion != duracion:
-            self.duracion = duracion
-        if pos != self.posicion:
-            self.posicion = pos
-            self.emit("newposicion", self.posicion)
+        bool1, valor1 = self.__pipe.query_duration(Gst.Format.TIME)
+        bool2, valor2 = self.__pipe.query_position(Gst.Format.TIME)
+        duracion = float(valor1)
+        posicion = float(valor2)
+        pos = 0
+        try:
+            pos = int(posicion * 100 / duracion)
+        except:
+            pass
+        if self.__duration != duracion:
+            self.__duration = duracion
+        if pos != self.__position:
+            self.__position = pos
+            self.emit("newposicion", self.__position)
         return True
 
+    def __pause(self):
+        self.__pipe.set_state(Gst.State.PAUSED)
+    
     def play(self):
-        self.player.set_state(gst.STATE_PLAYING)
+        self.__pipe.set_state(Gst.State.PLAYING)
 
     def pause_play(self):
-        if self.estado == gst.STATE_PAUSED or self.estado == gst.STATE_NULL \
-            or self.estado == gst.STATE_READY:
+        if self.__status == Gst.State.PAUSED \
+            or self.__status == Gst.State.NULL \
+            or self.__status == Gst.State.READY:
             self.play()
-        elif self.estado == gst.STATE_PLAYING:
+        elif self.__status == Gst.State.PLAYING:
             self.__pause()
 
-    def rotar(self, valor):
-        self.video_bin.rotar(valor)
-
-    def set_balance(self, brillo=False, contraste=False,
-        saturacion=False, hue=False, gamma=False):
-        self.video_bin.set_balance(brillo=brillo, contraste=contraste,
-            saturacion=saturacion, hue=hue, gamma=gamma)
-
-    def get_balance(self):
-        return self.video_bin.get_balance()
-
     def stop(self):
-        self.__new_handle(False)
-        self.player.set_state(gst.STATE_NULL)
-        self.emit("newposicion", 0)
+        #self.__pipe.set_state(Gst.State.PAUSED)
+        self.__pipe.set_state(Gst.State.NULL)
+
+    def set_volumen(self, valor):
+        self.__valVolume = float(valor)  # 0.0 - 10.0
+        print self.__valVolume
+        self.__volume.set_property('volume', self.__valVolume)
 
     def load(self, uri):
+        self.stop()
+        #self.__reset()
         if not uri:
             return False
-        self.duracion = 0.0
-        self.posicion = 0.0
-        self.emit("newposicion", self.posicion)
-        self.emit("loading-buffer", 100)
-        if os.path.exists(uri):
-            #direccion = gst.filename_to_uri(uri)
-            direccion = "file://" + uri
-            self.player.set_property("uri", direccion)
-            self.progressbar = True
+        temp = uri
+        if os.path.exists(temp):
+            temp = Gst.filename_to_uri(uri)
+        if Gst.uri_is_valid(temp):
+            self.__source = temp
+            self.__player.set_property("uri", self.__source)
         else:
-            if gst.uri_is_valid(uri):
-                self.player.set_property("uri", uri)
-                self.progressbar = False
-        return False
-
-    def set_position(self, posicion):
-        if not self.progressbar:
-            return
-        if self.duracion < posicion:
-            return
-        if self.duracion == 0 or posicion == 0:
-            return
-        posicion = self.duracion * posicion / 100
-
-        # http://pygstdocs.berlios.de/pygst-reference/gst-constants.html
-        #self.player.set_state(gst.STATE_PAUSED)
-        # http://nullege.com/codes/show/
-        #   src@d@b@dbr-HEAD@trunk@src@reproductor.py/72/gst.SEEK_TYPE_SET
-        #self.player.seek(
-        #    1.0,
-        #    gst.FORMAT_TIME,
-        #    gst.SEEK_FLAG_FLUSH,
-        #    gst.SEEK_TYPE_SET,
-        #    posicion,
-        #    gst.SEEK_TYPE_SET,
-        #    self.duracion)
-        # http://nullege.com/codes/show/
-        #   src@c@o@congabonga-HEAD@congaplayer@congalib@engines@gstplay.py/
-        #   104/gst.SEEK_FLAG_ACCURATE
-
-        event = gst.event_new_seek(
-            1.0, gst.FORMAT_TIME,
-            gst.SEEK_FLAG_FLUSH | gst.SEEK_FLAG_ACCURATE,
-            gst.SEEK_TYPE_SET, posicion * 1000000000,
-            gst.SEEK_TYPE_NONE, self.duracion * 1000000000)
-        self.player.send_event(event)
-        #self.player.set_state(gst.STATE_PLAYING)
-
-    def set_volumen(self, volumen):
-        self.player.set_property('volume', volumen / 10)
-
-    #def get_volumen(self):
-    #    return self.player.get_property('volume') * 10
+            print "FIXME:", "Dirección no válida", temp

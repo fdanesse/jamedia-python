@@ -47,7 +47,8 @@ class TubeListDialog(Gtk.Dialog):
         Gtk.Dialog.__init__(self, parent=parent, title="",
             buttons=("Cerrar", Gtk.ResponseType.ACCEPT))
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("window1"))
         self.set_decorated(False)
         self.set_border_width(15)
         rect = parent.get_allocation()
@@ -56,20 +57,24 @@ class TubeListDialog(Gtk.Dialog):
         self.actualizando = False
 
         self.panel = Gtk.HPaned()
-        self.panel.modify_bg(Gtk.StateType.NORMAL, get_colors("widgetvideoitem1"))
+        self.panel.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("widgetvideoitem1"))
 
         self.listas = Lista()
         self.videos = Gtk.VBox()
 
         scroll = self.__get_scroll()
-        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll.set_policy(Gtk.PolicyType.NEVER,
+            Gtk.PolicyType.AUTOMATIC)
         scroll.add_with_viewport(self.listas)
-        scroll.get_child().modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
+        scroll.get_child().modify_bg(Gtk.StateType.NORMAL,
+            get_colors("download"))
         self.panel.pack1(scroll, resize=False, shrink=True)
 
         scroll = self.__get_scroll()
         scroll.add_with_viewport(self.videos)
-        scroll.get_child().modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
+        scroll.get_child().modify_bg(Gtk.StateType.NORMAL,
+            get_colors("download"))
         self.panel.pack2(scroll, resize=True, shrink=False)
 
         self.label = Gtk.Label("")
@@ -125,20 +130,22 @@ class TubeListDialog(Gtk.Dialog):
         _iter = widget.get_model().get_iter(path)
         key = widget.get_model().get_value(_iter, 2)
 
-        dict_tube = shelve.open(os.path.join(get_data_directory(),
-            "List.tube"))
+        dict_tube = shelve.open(
+            os.path.join(get_data_directory(), "List.tube"))
         del(dict_tube[key])
         keys = dict_tube.keys()
         dict_tube.close()
         widget.get_model().remove(_iter)
 
         if not keys:
-            dialog = Gtk.Dialog(parent=self.get_toplevel(), title="",
+            dialog = Gtk.Dialog(
+                parent=self.get_toplevel(), title="",
                 buttons=("OK", Gtk.ResponseType.ACCEPT))
 
             dialog.set_border_width(15)
             dialog.set_decorated(False)
-            dialog.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+            dialog.modify_bg(
+                Gtk.StateType.NORMAL, get_colors("window1"))
 
             label = Gtk.Label("Todas las Listas han sido Eliminadas.")
             dialog.vbox.pack_start(label, True, True, 0)
@@ -161,8 +168,8 @@ class TubeListDialog(Gtk.Dialog):
         new_box = Gtk.VBox()
         new_box.show_all()
         self.videos.pack_start(new_box, True, True, 0)
-        dict_tube = shelve.open(os.path.join(get_data_directory(),
-            "List.tube"))
+        dict_tube = shelve.open(
+            os.path.join(get_data_directory(), "List.tube"))
         videos = []
         for item in dict_tube[valor].keys():
             videos.append(dict_tube[valor][item])
@@ -203,14 +210,15 @@ class TubeListDialog(Gtk.Dialog):
         menu = Gtk.Menu()
         borrar = Gtk.MenuItem("Eliminar")
         menu.append(borrar)
-        borrar.connect_object("activate", self.__eliminar_video, widget)
+        borrar.connect_object(
+            "activate", self.__eliminar_video, widget)
         menu.show_all()
         menu.attach_to_widget(widget, self.__null)
         Gtk.Menu.popup(menu, None, None, None, boton, tiempo)
 
     def __eliminar_video(self, widget):
-        dict_tube = shelve.open(os.path.join(get_data_directory(),
-            "List.tube"))
+        dict_tube = shelve.open(
+            os.path.join(get_data_directory(), "List.tube"))
         if len(dict_tube[self.listas.valor_select].keys()) == 1:
             modelo, _iter = self.listas.treeselection.get_selected()
             path = modelo.get_path(_iter)
@@ -230,8 +238,8 @@ class TubeListDialog(Gtk.Dialog):
         """
         Carga la lista de Albums de Descargas en self.listas.
         """
-        dict_tube = shelve.open(os.path.join(get_data_directory(),
-            "List.tube"))
+        dict_tube = shelve.open(
+            os.path.join(get_data_directory(), "List.tube"))
         keys = dict_tube.keys()
         dict_tube.close()
         lista = []
@@ -241,7 +249,8 @@ class TubeListDialog(Gtk.Dialog):
 
     def __get_scroll(self):
         scroll = Gtk.ScrolledWindow()
-        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC,
+            Gtk.PolicyType.AUTOMATIC)
         return scroll
 
 
@@ -262,8 +271,8 @@ class Lista(Gtk.TreeView):
         self.permitir_select = True
         self.valor_select = None
 
-        self.modelo = Gtk.ListStore(GdkPixbuf.Pixbuf, GObject.TYPE_STRING,
-            GObject.TYPE_STRING)
+        self.modelo = Gtk.ListStore(GdkPixbuf.Pixbuf,
+            GObject.TYPE_STRING, GObject.TYPE_STRING)
 
         self.__setear_columnas()
 

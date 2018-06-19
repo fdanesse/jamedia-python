@@ -60,7 +60,8 @@ class PanelTube(Gtk.HPaned):
 
         Gtk.HPaned.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("window1"))
 
         self.toolbar_encontrados = None
         self.encontrados = None
@@ -82,7 +83,6 @@ class PanelTube(Gtk.HPaned):
         """
         Crea y Empaqueta todo.
         """
-        
         self.toolbar_encontrados = Mini_Toolbar("Videos Encontrados")
         self.toolbar_guardar_encontrados = Toolbar_Guardar()
         self.encontrados = Gtk.VBox()
@@ -100,33 +100,40 @@ class PanelTube(Gtk.HPaned):
         # Izquierda
         scroll = self.__get_scroll()
         event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        event.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("window1"))
         event.add(self.encontrados)
         scroll.add_with_viewport(event)
-        scroll.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
-        scroll.get_child().modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        scroll.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("window1"))
+        scroll.get_child().modify_bg(
+            Gtk.StateType.NORMAL, get_colors("window1"))
         #scroll.add_with_viewport(self.encontrados)
         box = Gtk.VBox()
 
         event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        event.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
         event.add(self.toolbar_encontrados)
         box.pack_start(event, False, False, 0)
 
         event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        event.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
         event.add(self.toolbar_guardar_encontrados)
         box.pack_start(event, False, False, 0)
 
         box.pack_start(scroll, True, True, 0)
 
         event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        event.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
         event.add(self.toolbar_accion_izquierda)
         box.pack_start(event, False, False, 0)
 
         event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        event.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
         event.add(self.toolbar_videos_izquierda)
         box.pack_start(event, False, False, 0)
 
@@ -135,33 +142,40 @@ class PanelTube(Gtk.HPaned):
         # Derecha
         scroll = self.__get_scroll()
         event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        event.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("window1"))
         event.add(self.descargar)
         scroll.add_with_viewport(event)
-        scroll.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
-        scroll.get_child().modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        scroll.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("window1"))
+        scroll.get_child().modify_bg(
+            Gtk.StateType.NORMAL, get_colors("window1"))
         #scroll.add_with_viewport(self.descargar)
         box = Gtk.VBox()
 
         event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        event.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
         event.add(self.toolbar_descargar)
         box.pack_start(event, False, False, 0)
 
         event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        event.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
         event.add(self.toolbar_guardar_descargar)
         box.pack_start(event, False, False, 0)
 
         box.pack_start(scroll, True, True, 0)
 
         event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        event.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
         event.add(self.toolbar_accion_derecha)
         box.pack_start(event, False, False, 0)
 
         event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        event.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
         event.add(self.toolbar_videos_derecha)
         box.pack_start(event, False, False, 0)
 

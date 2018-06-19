@@ -28,7 +28,6 @@ import time
 import subprocess
 import urllib
 
-import gi
 from gi.repository import GLib
 from gi.repository import GObject
 

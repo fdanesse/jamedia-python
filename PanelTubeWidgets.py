@@ -56,7 +56,8 @@ class Mini_Toolbar(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
 
         self.label = None
         self.texto = text
@@ -69,7 +70,8 @@ class Mini_Toolbar(Gtk.Toolbar):
         item.add(self.label)
         self.insert(item, -1)
 
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(
+            draw=False, ancho=0, expand=True), -1)
 
         archivo = os.path.join(BASE_PATH, "Iconos", "lista.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
@@ -106,7 +108,8 @@ class Mini_Toolbar(Gtk.Toolbar):
         """
         El menu con las listas de videos almacenadas en archivos shelve.
         """
-        dict_tube = shelve.open(os.path.join(get_data_directory(),
+        dict_tube = shelve.open(os.path.join(
+            get_data_directory(),
             "List.tube"))
         keys = dict_tube.keys()
         dict_tube.close()
@@ -114,7 +117,8 @@ class Mini_Toolbar(Gtk.Toolbar):
             self.emit("menu_activo")
             menu = Gtk.Menu()
             administrar = Gtk.MenuItem('Administrar')
-            administrar.connect_object("activate", self.__administrar, None)
+            administrar.connect_object("activate",
+                self.__administrar, None)
             cargar = Gtk.MenuItem('Cargar')
             menu.append(administrar)
             menu.append(cargar)
@@ -123,7 +127,8 @@ class Mini_Toolbar(Gtk.Toolbar):
             for key in keys:
                 item = Gtk.MenuItem(key)
                 menu_listas.append(item)
-                item.connect_object("activate", self.__emit_abrir, key)
+                item.connect_object("activate",
+                    self.__emit_abrir, key)
             menu.show_all()
             menu.attach_to_widget(widget, self.__null)
             menu.popup(None, None, None, None, 1, 0)
@@ -159,19 +164,23 @@ class ToolbarAccionListasVideos(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
 
         self.objetos = None
 
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(
+            draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "button-cancel.svg")
+        archivo = os.path.join(BASE_PATH,
+            "Iconos", "button-cancel.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Cancelar")
         boton.connect("clicked", self.cancelar)
         self.insert(boton, -1)
 
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(
+            draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         self.label = Gtk.Label("")
@@ -180,15 +189,18 @@ class ToolbarAccionListasVideos(Gtk.Toolbar):
         item.add(self.label)
         self.insert(item, -1)
 
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(
+            draw=False, ancho=3, expand=False), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "dialog-ok.svg")
+        archivo = os.path.join(
+            BASE_PATH, "Iconos", "dialog-ok.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Aceptar")
         boton.connect("clicked", self.__realizar_accion)
         self.insert(boton, -1)
 
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(
+            draw=False, ancho=0, expand=True), -1)
 
         self.show_all()
 
@@ -235,17 +247,21 @@ class Toolbar_Videos_Izquierda(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
 
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(
+            draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "alejar.svg")
+        archivo = os.path.join(
+            BASE_PATH, "Iconos", "alejar.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Borrar Lista")
         boton.connect("clicked", self.__emit_borrar)
         self.insert(boton, -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "iconplay.svg")
+        archivo = os.path.join(
+            BASE_PATH, "Iconos", "iconplay.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Enviar a Descargas")
         boton.connect("clicked", self.__emit_adescargas)
@@ -283,23 +299,28 @@ class Toolbar_Videos_Derecha(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "iconplay.svg")
+        archivo = os.path.join(
+            BASE_PATH, "Iconos", "iconplay.svg")
         boton = get_boton(archivo, flip=True, pixels=24)
         boton.set_tooltip_text("Quitar de Descargas")
         boton.connect("clicked", self.__emit_aencontrados)
         self.insert(boton, -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "alejar.svg")
+        archivo = os.path.join(
+            BASE_PATH, "Iconos", "alejar.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Borrar Lista")
         boton.connect("clicked", self.__emit_borrar)
         self.insert(boton, -1)
 
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(
+            draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "iconplay.svg")
+        archivo = os.path.join(
+            BASE_PATH, "Iconos", "iconplay.svg")
         boton = get_boton(archivo, flip=False, pixels=24,
             rotacion=GdkPixbuf.PixbufRotation.CLOCKWISE)
         boton.set_tooltip_text("Descargar")
@@ -340,7 +361,8 @@ class Toolbar_Guardar(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
 
         item = Gtk.ToolItem()
         label = Gtk.Label("Nombre: ")
@@ -354,21 +376,25 @@ class Toolbar_Guardar(Gtk.Toolbar):
         self.entrytext = Gtk.Entry()
         self.entrytext.set_size_request(50, -1)
         self.entrytext.set_max_length(10)
-        self.entrytext.set_tooltip_text("Nombre para Esta Lista")
+        self.entrytext.set_tooltip_text(
+            "Nombre para Esta Lista")
         self.entrytext.show()
         self.entrytext.connect('activate', self.__emit_ok)
         item.add(self.entrytext)
         self.insert(item, -1)
 
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(
+            draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "button-cancel.svg")
+        archivo = os.path.join(BASE_PATH,
+            "Iconos", "button-cancel.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Cancelar")
         boton.connect("clicked", self.cancelar)
         self.insert(boton, -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "dialog-ok.svg")
+        archivo = os.path.join(BASE_PATH,
+            "Iconos", "dialog-ok.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Guardar")
         boton.connect("clicked", self.__emit_ok)

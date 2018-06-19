@@ -26,6 +26,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import GObject
+from gi.repository import GdkPixbuf
 
 import urllib
 import base64
@@ -38,7 +39,7 @@ from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
 
 BASE_PATH = os.path.dirname(__file__)
-youtubedl = os.path.join(BASE_PATH, "youtube-dl") #"/usr/bin/youtube-dl"
+youtubedl = os.path.join(BASE_PATH, "youtube-dl")  #"/usr/bin/youtube-dl"
 
 
 class Toolbar(Gtk.Toolbar):
@@ -56,46 +57,40 @@ class Toolbar(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer1"))
 
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(
+            draw=False, ancho=3, expand=False), -1)
 
-        # FIXME: Reparar
-        #archivo = os.path.join(BASE_PATH, "Iconos", "JAMedia.svg")
-        #boton = get_boton(archivo, flip=False, pixels=35)
-        #boton.set_tooltip_text("Autor")
-        #boton.connect("clicked", self.__show_credits)
-        #self.insert(boton, -1)
-
-        archivo = os.path.join(BASE_PATH, "Iconos", "JAMedia.svg")
+        archivo = os.path.join(
+            BASE_PATH, "Iconos", "JAMedia.svg")
         self.jamedia = get_boton(archivo, flip=False, pixels=35)
         self.jamedia.set_tooltip_text("Cambiar a JAMedia")
         self.jamedia.connect("clicked", self.__emit_switch)
         self.insert(self.jamedia, -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "JAMedia-help.svg")
+        archivo = os.path.join(
+            BASE_PATH, "Iconos", "JAMedia-help.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Ayuda")
         boton.connect("clicked", self.__show_help)
         self.insert(boton, -1)
 
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(
+            draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "button-cancel.svg")
+        archivo = os.path.join(
+            BASE_PATH, "Iconos", "button-cancel.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Salir")
         boton.connect("clicked", self.__salir)
         self.insert(boton, -1)
 
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(
+            draw=False, ancho=3, expand=False), -1)
 
         self.show_all()
-
-    # FIXME: Reparar
-    #def __show_credits(self, widget):
-    #    dialog = Credits(parent=self.get_toplevel())
-    #    dialog.run()
-    #    dialog.destroy()
 
     def __show_help(self, widget):
         dialog = Help(parent=self.get_toplevel())
@@ -125,9 +120,11 @@ class Toolbar_Busqueda(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+        get_colors("window1"))
 
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(
+            draw=False, ancho=0, expand=True), -1)
 
         item = Gtk.ToolItem()
         label = Gtk.Label("Buscar")
@@ -135,7 +132,8 @@ class Toolbar_Busqueda(Gtk.Toolbar):
         item.add(label)
         self.insert(item, -1)
 
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(
+            draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         self.entrycantidad = Gtk.Entry()
@@ -146,11 +144,13 @@ class Toolbar_Busqueda(Gtk.Toolbar):
         self.entrycantidad.set_tooltip_text(
             "Escribe la cantidad de videos que deseas")
         self.entrycantidad.show()
-        self.entrycantidad.connect('changed', self.__changed_entrycantidad)
+        self.entrycantidad.connect(
+            'changed', self.__changed_entrycantidad)
         item.add(self.entrycantidad)
         self.insert(item, -1)
 
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(
+            draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         label = Gtk.Label("Videos Sobre")
@@ -158,7 +158,8 @@ class Toolbar_Busqueda(Gtk.Toolbar):
         item.add(label)
         self.insert(item, -1)
 
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(
+            draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         self.entrytext = Gtk.Entry()
@@ -171,15 +172,18 @@ class Toolbar_Busqueda(Gtk.Toolbar):
         item.add(self.entrytext)
         self.insert(item, -1)
 
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(
+            draw=False, ancho=3, expand=False), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "dialog-ok.svg")
+        archivo = os.path.join(
+            BASE_PATH, "Iconos", "dialog-ok.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Comenzar Búsqueda")
         boton.connect("clicked", self.__emit_buscar)
         self.insert(boton, -1)
 
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(
+            draw=False, ancho=0, expand=True), -1)
 
         self.show_all()
 
@@ -198,7 +202,8 @@ class Toolbar_Busqueda(Gtk.Toolbar):
     def __alerta_busqueda_invalida(self):
         # FIXME: Recordar dar estilo a este dialog
         dialog = Gtk.Dialog(parent=self.get_toplevel(),
-            flags=Gtk.DialogFlags.MODAL, buttons=["OK", Gtk.ResponseType.OK])
+            flags=Gtk.DialogFlags.MODAL,
+            buttons=["OK", Gtk.ResponseType.OK])
         t = "No se puede realizar esta búsqueda.\n"
         t = "%s%s" % (t, "Revisa la cantidad y el texto para la búsqueda.")
         label = Gtk.Label(t)
@@ -225,9 +230,11 @@ class Alerta_Busqueda(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("window1"))
 
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(
+            draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         item.set_expand(True)
@@ -255,7 +262,8 @@ class WidgetVideoItem(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("widgetvideoitem1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("widgetvideoitem1"))
         self.set_border_width(2)
 
         self._temp_dat = []
@@ -331,7 +339,7 @@ class WidgetVideoItem(Gtk.EventBox):
         """
         Lectura del subproceso que obtiene los metadatos del video.
         """
-        
+
         progress = salida.readline().strip()
         err = error.readline().strip()
         # FIXME: Signature extraction failed: Traceback (most recent call last)
@@ -428,7 +436,7 @@ class WidgetVideoItem(Gtk.EventBox):
         self.connect("end-update", self.__run_update)
         GLib.timeout_add(100, self.__get_progress, salida, STDOUT,
             process, error, STERR)
-        
+
 
 class Toolbar_Descarga(Gtk.VBox):
 
@@ -441,7 +449,8 @@ class Toolbar_Descarga(Gtk.VBox):
         Gtk.VBox.__init__(self)
 
         self.toolbar = Gtk.Toolbar()
-        self.toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
+        self.toolbar.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("download"))
 
         self.label_titulo = None
         self.label_progreso = None
@@ -618,7 +627,8 @@ class Progreso_Descarga(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("download"))
 
         self.escala = ProgressBar(
             Gtk.Adjustment(0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
@@ -649,11 +659,12 @@ class ProgressBar(Gtk.HScale):
 
     def __init__(self, ajuste):
 
-        Gtk.HScale.__init__(self, orientation=Gtk.Orientation.HORIZONTAL)
+        Gtk.HScale.__init__(self,
+            orientation=Gtk.Orientation.HORIZONTAL)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("widgetvideoitem1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("widgetvideoitem1"))
 
-        set_adjustment = ajuste
         self.set_adjustment(ajuste)
         self.set_digits(0)
         self.set_draw_value(False)
@@ -690,28 +701,6 @@ class ProgressBar(Gtk.HScale):
 
         return True
     '''
-
-'''
-class Credits(Gtk.Dialog):
-
-    __gtype_name__ = 'TubeCredits'
-
-    def __init__(self, parent=None):
-
-        Gtk.Dialog.__init__(self, parent=parent, title="",
-            buttons=("Cerrar", Gtk.ResponseType.OK))
-
-        self.set_decorated(False)
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
-        self.set_border_width(15)
-
-        imagen = Gtk.Image()
-        imagen.set_from_file(os.path.join(BASE_PATH,
-            "Iconos", "JAMediaCredits.svg"))
-
-        self.vbox.pack_start(imagen, True, True, 0)
-        self.vbox.show_all()
-'''
 
 class Help(Gtk.Dialog):
 
@@ -811,17 +800,21 @@ class ToolbarSalir(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("download"))
 
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(
+            draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "button-cancel.svg")
+        archivo = os.path.join(
+            BASE_PATH, "Iconos", "button-cancel.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Cancelar")
         boton.connect("clicked", self.cancelar)
         self.insert(boton, -1)
 
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(
+            draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         self.label = Gtk.Label("")
@@ -829,15 +822,18 @@ class ToolbarSalir(Gtk.Toolbar):
         item.add(self.label)
         self.insert(item, -1)
 
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(
+            draw=False, ancho=3, expand=False), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "dialog-ok.svg")
+        archivo = os.path.join(
+            BASE_PATH, "Iconos", "dialog-ok.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Aceptar")
         boton.connect("clicked", self.__emit_salir)
         self.insert(boton, -1)
 
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(
+            draw=False, ancho=0, expand=True), -1)
 
         self.show_all()
 
