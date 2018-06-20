@@ -1,25 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   JAMedia.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-
 import os
 import sys
 
@@ -35,22 +16,19 @@ from gi.repository import Gdk
 from gi.repository import GLib
 from gi.repository import Gst
 
-from Widgets import Toolbar
-from Widgets import Toolbar_Busqueda
-from Widgets import Toolbar_Descarga
-from Widgets import Alerta_Busqueda
-from PanelTube import PanelTube
-from Widgets import ToolbarSalir
+from Widgets.toolbar import Toolbar
+from Widgets.toolbarbusquedas import ToolbarBusquedas
+from Widgets.alertabusquedas import AlertaBusqueda
+from Widgets.toolbardescargas import ToolbarDescargas
+from Widgets.toolbarsalir import ToolbarSalir
+from Widgets.widgetvideoitem import WidgetVideoItem
+
+from PanelTube.paneltube import PanelTube
+from PanelTube.jamediatube import Buscar, FEED
 
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
 
-from JAMediaYoutube import Buscar
-from JAMediaYoutube import FEED
-from Widgets import WidgetVideoItem
-
 from JAMediaPlayer.Globales import get_colors
-
-#FIXME: Agregar en setup.py: python-gst0.10 gstreamer0.10-plugins-base gstreamer0.10-plugins-good gstreamer0.10-plugins-ugly gstreamer0.10-plugins-bad gstreamer0.10-tools python-gst0.10-rtsp
 
 BASE_PATH = os.path.dirname(__file__)
 
@@ -94,17 +72,14 @@ class JAMedia(Gtk.Window):
         print "JAMedia process:", os.getpid()
 
     def __setup_init(self):
-        """
-        Crea y Empaqueta todo.
-        """
         boxbase = Gtk.VBox()
 
         self.box_tube = Gtk.VBox()
         self.toolbar = Toolbar()
-        self.toolbar_busqueda = Toolbar_Busqueda()
-        self.toolbar_descarga = Toolbar_Descarga()
+        self.toolbar_busqueda = ToolbarBusquedas()
+        self.toolbar_descarga = ToolbarDescargas()
         self.toolbar_salir = ToolbarSalir()
-        self.alerta_busqueda = Alerta_Busqueda()
+        self.alerta_busqueda = AlertaBusqueda()
         self.paneltube = PanelTube()
 
         event = Gtk.EventBox()

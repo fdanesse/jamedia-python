@@ -1,24 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   JAMediaPlayer.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 import os
 import time
 import datetime
@@ -34,26 +16,26 @@ from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
 
-from Toolbars import Toolbar
-from Toolbars import ToolbarSalir
-from Toolbars import ToolbarAccion
-from Toolbars import ToolbarAddStream
+from Widgets.Toolbars import Toolbar
+from Widgets.Toolbars import ToolbarSalir
+from Widgets.Toolbars import ToolbarAccion
+#from Widgets.Toolbars import ToolbarAddStream
 
-from Widgets import MouseSpeedDetector
-from BasePanel import BasePanel
+from Widgets.Widgets import MouseSpeedDetector
+from Widgets.BasePanel import BasePanel
 
 #from JAMediaReproductor.JAMediaGrabador import JAMediaGrabador
 
 from Globales import get_colors
 from Globales import eliminar_streaming
-from Globales import add_stream
+#from Globales import add_stream
 from Globales import get_my_files_directory
 from Globales import describe_archivo
 
 #GObject.threads_init()
 #commands.getoutput('PATH=%s:$PATH' % (os.path.dirname(__file__)))
 
-ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
+from Globales import ICONS_PATH
 
 
 class JAMediaPlayer(Gtk.EventBox):
@@ -70,8 +52,8 @@ class JAMediaPlayer(Gtk.EventBox):
         self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
         self.set_border_width(2)
 
-        self.archivos = []
-        self.grabador = False
+        #self.archivos = []
+        #self.grabador = False
         self.mouse_in_visor = False
         self.cursor_root = Gdk.Cursor(Gdk.CursorType.BLANK_CURSOR)
         icono = os.path.join(ICONS_PATH, "jamedia_cursor.svg")
@@ -82,7 +64,7 @@ class JAMediaPlayer(Gtk.EventBox):
         self.toolbar = Toolbar()
         self.toolbar_salir = ToolbarSalir()
         self.toolbar_accion = ToolbarAccion()
-        self.add_stream = ToolbarAddStream()
+        #self.add_stream = ToolbarAddStream()
 
         self.base_panel = BasePanel()
 
@@ -90,7 +72,7 @@ class JAMediaPlayer(Gtk.EventBox):
         vbox.pack_start(self.toolbar, False, False, 0)
         vbox.pack_start(self.toolbar_salir, False, False, 0)
         vbox.pack_start(self.toolbar_accion, False, False, 0)
-        vbox.pack_start(self.add_stream, False, False, 0)
+        #vbox.pack_start(self.add_stream, False, False, 0)
         vbox.pack_start(self.base_panel, True, True, 0)
 
         self.connect("realize", self.__realize)
@@ -108,15 +90,15 @@ class JAMediaPlayer(Gtk.EventBox):
         self.base_panel.connect("show-controls", self.__ocultar_controles)
         self.base_panel.connect("accion-list", self.__accion_list)
         self.base_panel.connect("menu_activo", self.__cancel_toolbars)
-        self.base_panel.connect("add_stream", self.__run_add_stream)
-        self.base_panel.connect("stop-record", self.__detener_grabacion)
+        #self.base_panel.connect("add_stream", self.__run_add_stream)
+        #self.base_panel.connect("stop-record", self.__detener_grabacion)
         self.base_panel.connect("video", self.__set_video)
 
-        self.toolbar_accion.connect("accion-stream", self.__accion_stream)
-        self.toolbar_accion.connect("grabar", self.__grabar)
+        #self.toolbar_accion.connect("accion-stream", self.__accion_stream)
+        #self.toolbar_accion.connect("grabar", self.__grabar)
         self.toolbar_salir.connect("salir", self.__salir)
 
-        self.add_stream.connect("add-stream", self.__add_stream)
+        #self.add_stream.connect("add-stream", self.__add_stream)
 
         self.mouse_listener.connect("estado", self.__set_mouse)
         self.connect("hide", self.__hide_show)
@@ -130,7 +112,7 @@ class JAMediaPlayer(Gtk.EventBox):
     def __realize(self, window):
         self.cursor_root = self.get_property("window").get_cursor()
         self.get_property("window").set_cursor(self.jamedia_cursor)
-
+    '''
     def __add_stream(self, widget, tipo, nombre, url):
         add_stream(tipo, [nombre, url])
         if "Radio" in tipo:
@@ -141,7 +123,9 @@ class JAMediaPlayer(Gtk.EventBox):
 
     def __run_add_stream(self, widget, title):
         self.add_stream.set_accion(title)
+    '''
 
+    '''
     def __grabar(self, widget, uri):
         self.set_sensitive(False)
         self.__detener_grabacion()
@@ -172,7 +156,7 @@ class JAMediaPlayer(Gtk.EventBox):
             del(self.grabador)
             self.grabador = False
         self.base_panel.izquierda.toolbar_record.stop()
-
+    
     def __accion_stream(self, widget, accion, url):
         lista = self.base_panel.derecha.lista.toolbar.label.get_text()
         if accion == "Borrar":
@@ -195,14 +179,14 @@ class JAMediaPlayer(Gtk.EventBox):
             eliminar_streaming(url, lista)
         else:
             print "accion_stream desconocido:", accion
-
+        '''
     def __setup_init(self):
         self.__cancel_toolbars()
         self.toolbar.configurar.set_sensitive(False)
         self.base_panel.setup_init()
-        if self.archivos:
+        '''if self.archivos:
             self.base_panel.set_nueva_lista(self.archivos)
-            self.archivos = []
+            self.archivos = []'''
         self.set_sensitive(True)
         return False
 
@@ -273,7 +257,7 @@ class JAMediaPlayer(Gtk.EventBox):
             pass
 
     def __salir(self, widget=None, senial=None):
-        self.__detener_grabacion()
+        #self.__detener_grabacion()
         self.base_panel.salir()
         Gtk.main_quit()
         sys.exit(0)
@@ -281,11 +265,11 @@ class JAMediaPlayer(Gtk.EventBox):
     def __cancel_toolbars(self, widget=False):
         self.toolbar_salir.cancelar()
         self.toolbar_accion.cancelar()
-        self.add_stream.cancelar()
+        #self.add_stream.cancelar()
 
     def __accion_list(self, widget, lista, accion, _iter):
         # borrar, copiar, mover, grabar, etc . . .
         self.toolbar_accion.set_accion(lista, accion, _iter)
 
-    def set_archivos(self, archivos):
-        self.archivos = archivos
+    #def set_archivos(self, archivos):
+    #    self.archivos = archivos

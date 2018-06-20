@@ -29,14 +29,14 @@ from gi.repository import GObject
 
 import shelve
 
-from TubeListDialog import TubeListDialog
+from tubelistdialog import TubeListDialog
 
 from JAMediaPlayer.Globales import get_data_directory
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
 
-BASE_PATH = os.path.dirname(__file__)
+BASE_PATH = os.path.dirname(os.path.dirname(__file__))
 
 
 class Mini_Toolbar(Gtk.Toolbar):

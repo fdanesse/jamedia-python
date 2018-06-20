@@ -39,7 +39,7 @@ class JAMediaReproductor(GObject.GObject):
     "estado": (GObject.SIGNAL_RUN_LAST,
         GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
     "newposicion": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_INT,)),
+        GObject.TYPE_NONE, (GObject.TYPE_FLOAT,)),
     "video": (GObject.SIGNAL_RUN_LAST,
         GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,)),
     "loading-buffer": (GObject.SIGNAL_RUN_LAST,
@@ -59,56 +59,96 @@ class JAMediaReproductor(GObject.GObject):
         self.__hasVideo = False
         self.__duration = 0
         self.__position = 0
-        self.__valVolume = 0.1
+
+        self.__config_default = {
+            'saturacion': 1.0,
+            'contraste': 1.0,
+            'brillo': 0.0,
+            'hue': 0.0,
+            'gamma': 1.0,
+            'rotacion': 0,
+            'volumen': 1.0
+            }
+        self.__config = self.__config_default.copy()
 
         self.__pipe = Gst.Pipeline()
-        self.__player = Gst.ElementFactory.make("uridecodebin", "uridecodebin")
-        #self.__player.set_property("buffer-size", 50000)
-        #self.__player.set_property("buffer-duration", 50000)
-        #self.__player.set_property("download", True)
-        #self.__player.set_property("use-buffering", True)
+        self.__pipe = Gst.ElementFactory.make("playbin", "player")
 
-        audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
-        audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
-        audioresample.set_property('quality', 10)
+        # AUDIO ...
+        self.__audioBin = Gst.Pipeline()
+        self.__audioBin.set_name('audiobin')
+
+        self.__audioqueue = Gst.ElementFactory.make('queue', 'audioqueue')
+        self.__audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
+        self.__audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
+        self.__audioresample.set_property('quality', 10)
         self.__volume = Gst.ElementFactory.make('volume', 'volume')
-        self.__volume.set_property('volume', self.__valVolume)
-        autoaudiosink = Gst.ElementFactory.make("autoaudiosink", "autoaudiosink")
+        self.__volume.set_property('volume', self.__config['volumen'])
+        self.__autoaudiosink = Gst.ElementFactory.make("autoaudiosink", "autoaudiosink")
 
-        videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
-        videorate = Gst.ElementFactory.make('videorate', 'videorate')
-        videorate.set_property('skip-to-first', True)
-        videorate.set_property('drop-only', True)
-        videorate.set_property('max-rate', 30)
-        xvimagesink = Gst.ElementFactory.make('xvimagesink', "xvimagesink")
-        xvimagesink.set_property("force-aspect-ratio", True)
-        xvimagesink.set_window_handle(self.__winId)
+        self.__audioBin.add(self.__audioqueue)
+        self.__audioBin.add(self.__audioconvert)
+        self.__audioBin.add(self.__audioresample)
+        self.__audioBin.add(self.__volume)
+        self.__audioBin.add(self.__autoaudiosink)
 
-        self.__pipe.add(self.__player)
-        self.__pipe.add(audioconvert)
-        self.__pipe.add(audioresample)
-        self.__pipe.add(self.__volume)
-        self.__pipe.add(autoaudiosink)
+        self.__audioqueue.link(self.__audioconvert)
+        self.__audioconvert.link(self.__audioresample)
+        self.__audioresample.link(self.__volume)
+        self.__volume.link(self.__autoaudiosink)
 
-        self.__pipe.add(videoconvert)
-        self.__pipe.add(videorate)
-        self.__pipe.add(xvimagesink)
+        pad = self.__audioqueue.get_static_pad("sink")
+        self.__audioBin.add_pad(Gst.GhostPad.new("sink", pad))
+        # ... AUDIO
 
-        audioconvert.link(audioresample)
-        audioresample.link(self.__volume)
-        self.__volume.link(autoaudiosink)
+        # VIDEO ...
+        self.__videoBin = Gst.Pipeline()
+        self.__videoBin.set_name('videobin')
 
-        videoconvert.link(videorate)
-        videorate.link(xvimagesink)
+        self.__videoqueue = Gst.ElementFactory.make('queue', 'videoqueue')
+        self.__videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
+        self.__videorate = Gst.ElementFactory.make('videorate', 'videorate')
+        self.__videorate.set_property('skip-to-first', True)
+        self.__videorate.set_property('drop-only', True)
+        self.__videorate.set_property('max-rate', 30)
+        self.__videobalance = Gst.ElementFactory.make('videobalance', "videobalance")
+        self.__videobalance.set_property('saturation', self.__config['saturacion'])
+        self.__videobalance.set_property('contrast', self.__config['contraste'])
+        self.__videobalance.set_property('brightness', self.__config['brillo'])
+        self.__videobalance.set_property('hue', self.__config['hue'])
+        self.__gamma = Gst.ElementFactory.make('gamma', "gamma")
+        self.__gamma.set_property('gamma', self.__config['gamma'])
+        self.__videoflip = Gst.ElementFactory.make('videoflip',"videoflip")
+        self.__videoflip.set_property('method', self.__config['rotacion'])
+        self.__xvimagesink = Gst.ElementFactory.make('xvimagesink', "xvimagesink")
+        self.__xvimagesink.set_property("force-aspect-ratio", True)
+        self.__xvimagesink.set_window_handle(self.__winId)
 
-        self.__video_sink = videoconvert.get_static_pad('sink')
-        self.__audio_sink = audioconvert.get_static_pad('sink')
-        
+        self.__videoBin.add(self.__videoqueue)
+        self.__videoBin.add(self.__videoconvert)
+        self.__videoBin.add(self.__videorate)
+        self.__videoBin.add(self.__videobalance)
+        self.__videoBin.add(self.__gamma)
+        self.__videoBin.add(self.__videoflip)
+        self.__videoBin.add(self.__xvimagesink)
+
+        self.__videoqueue.link(self.__videoconvert)
+        self.__videoconvert.link(self.__videorate)
+        self.__videorate.link(self.__videobalance)
+        self.__videobalance.link(self.__gamma)
+        self.__gamma.link(self.__videoflip)
+        self.__videoflip.link(self.__xvimagesink)
+
+        pad = self.__videoqueue.get_static_pad("sink")
+        self.__videoBin.add_pad(Gst.GhostPad.new("sink", pad))
+        # ... VIDEO
+
+        self.__pipe.set_property('video-sink', self.__videoBin)
+        self.__pipe.set_property('audio-sink', self.__audioBin)
+
         self.__bus = self.__pipe.get_bus()
         self.__bus.enable_sync_message_emission()
         self.__bus.connect('sync-message', self.__sync_message)
-        self.__player.connect('pad-added', self.__on_pad_added)
-        self.__player.connect('no-more-pads', self.__no_more_pads)
 
     def __sync_message(self, bus, mensaje):
         if mensaje.type == Gst.MessageType.STATE_CHANGED:
@@ -139,13 +179,11 @@ class JAMediaReproductor(GObject.GObject):
             taglist = mensaje.parse_tag()
             datos = taglist.to_string()
             if 'audio-codec' in datos and not 'video-codec' in datos:
-                if self.__hasVideo == True or \
-                    self.__hasVideo == None:
+                if self.__hasVideo == True or self.__hasVideo == None:
                     self.__hasVideo = False
                     self.emit("video", False)
             elif 'video-codec' in datos:
-                if self.__hasVideo == False or \
-                    self.__hasVideo == None:
+                if self.__hasVideo == False or self.__hasVideo == None:
                     self.__hasVideo = True
                     self.emit("video", True)
         elif mensaje.type == Gst.MessageType.WARNING:
@@ -178,28 +216,6 @@ class JAMediaReproductor(GObject.GObject):
             print "\n Gst.MessageType.ERROR:"
             print mensaje.parse_error()
             self.__new_handle(False)
-            '''
-            Gst.MessageType.WARNING: (gerror=GLib.Error('Se están desechando muchos búferes.', 'gst-core-error-quark', 13), debug='gstbasesink.c(2901): gst_base_sink_is_too_late (): /GstPipeline:pipeline0/GstXvImageSink:xvimagesink:\nThere may be a timestamping problem, or this computer is too slow.')
-            Gst.MessageType.ERROR: (gerror=GLib.Error('Failed to configure the buffer pool', 'gst-resource-error-quark', 13), debug='../../../gst/vaapi/gstvaapipluginbase.c(709): gst_vaapi_plugin_base_create_pool (): /GstPipeline:pipeline2/GstURIDecodeBin:uridecodebin/GstDecodeBin:decodebin2/GstVaapiDecodeBin:vaapidecodebin2/GstVaapiPostproc:vaapipostproc2:\nConfiguration is most likely invalid, please report this issue.')
-            '''
-
-    def __on_pad_added(self, uridecodebin, pad):
-        """
-        Agregar elementos en forma dinámica
-        https://wiki.ubuntu.com/Novacut/GStreamer1.0
-        """
-        string = pad.query_caps(None).to_string()
-        if string.startswith('audio/'):
-            pad.link(self.__audio_sink)
-            #self.emit('info', string)
-            print string
-        elif string.startswith('video/'):
-            pad.link(self.__video_sink)
-            #self.emit('info', string)
-            print string
-
-    def __no_more_pads(self, objeto):
-        print objeto
 
     def __pause(self):
         self.__pipe.set_state(Gst.State.PAUSED)
@@ -216,15 +232,16 @@ class JAMediaReproductor(GObject.GObject):
         bool2, valor2 = self.__pipe.query_position(Gst.Format.TIME)
         duracion = float(valor1)
         posicion = float(valor2)
-        pos = 0
+        pos = 0.0
         try:
-            pos = int(posicion * 100 / duracion)
+            pos = float(posicion * 100.0 / duracion)
         except:
             pass
         if self.__duration != duracion:
             self.__duration = duracion
         if pos != self.__position:
             self.__position = pos
+            # Se emite un flotante de 0.0 a 100.?
             self.emit("newposicion", self.__position)
         return True
 
@@ -246,14 +263,66 @@ class JAMediaReproductor(GObject.GObject):
         #self.__pipe.set_state(Gst.State.PAUSED)
         self.__pipe.set_state(Gst.State.NULL)
 
+    def set_balance(self, brillo=False, contraste=False,
+        saturacion=False, hue=False, gamma=False):
+        if saturacion:
+            # Double. Range: 0 - 2 Default: 1
+            self.__config['saturacion'] = 2.0 * saturacion / 100.0
+            self.__videobalance.set_property(
+                'saturation', self.__config['saturacion'])
+        if contraste:
+            # Double. Range: 0 - 2 Default: 1
+            self.__config['contraste'] = 2.0 * contraste / 100.0
+            self.__videobalance.set_property(
+                'contrast', self.__config['contraste'])
+        if brillo:
+            # Double. Range: -1 - 1 Default: 0
+            self.__config['brillo'] = (2.0 * brillo / 100.0) - 1.0
+            self.__videobalance.set_property(
+                'brightness', self.__config['brillo'])
+        if hue:
+            # Double. Range: -1 - 1 Default: 0
+            self.__config['hue'] = (2.0 * hue / 100.0) - 1.0
+            self.__videobalance.set_property('hue', self.__config['hue'])
+        if gamma:
+            # Double. Range: 0,01 - 10 Default: 1
+            self.__config['gamma'] = (10.0 * gamma / 100.0)
+            self.__gamma.set_property('gamma', self.__config['gamma'])
+
+    def rotar(self, valor):
+        rot = self.__videoflip.get_property('method')
+        if valor == "Derecha":
+            if rot < 3:
+                rot += 1
+            else:
+                rot = 0
+        elif valor == "Izquierda":
+            if rot > 0:
+                rot -= 1
+            else:
+                rot = 3
+        self.__videoflip.set_property('method', rot)
+        self.__config['rotation'] = rot
+
     def set_volumen(self, valor):
-        self.__valVolume = float(valor)  # 0.0 - 10.0
-        print self.__valVolume
-        self.__volume.set_property('volume', self.__valVolume)
+        self.__config['volumen'] = float(valor)  # 0.0 - 10.0
+        self.__volume.set_property('volume', self.__config['volumen'])
+
+    def set_position(self, posicion):
+        '''
+        if self.duracion < posicion:
+            self.emit("newposicion", self.posicion)
+            return
+        '''
+        posicion = self.__duration * posicion / 100
+        self.__pipe.seek_simple(
+            Gst.Format.TIME,
+            Gst.SeekFlags.FLUSH |
+            Gst.SeekFlags.KEY_UNIT,
+            posicion)
 
     def load(self, uri):
         self.stop()
-        #self.__reset()
         if not uri:
             return False
         temp = uri
@@ -261,6 +330,6 @@ class JAMediaReproductor(GObject.GObject):
             temp = Gst.filename_to_uri(uri)
         if Gst.uri_is_valid(temp):
             self.__source = temp
-            self.__player.set_property("uri", self.__source)
+            self.__pipe.set_property("uri", self.__source)
         else:
             print "FIXME:", "Dirección no válida", temp

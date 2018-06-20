@@ -1,24 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   Globales.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 import socket
 import os
 import commands
@@ -33,6 +15,8 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GdkPixbuf
 
+ICONS_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 radios = 'https://sites.google.com/site/sugaractivities/jamediaobjects/jam/lista-de-radios-2014'
 
@@ -51,6 +35,17 @@ def convert_shelve_to_json(path):
         pass
     return _dict
 '''
+
+
+def sensibilizar(objeto):
+    if not objeto.get_sensitive():
+        objeto.set_sensitive(True)
+
+
+def insensibilizar(objeto):
+    if objeto.get_sensitive():
+        objeto.set_sensitive(False)
+
 
 def get_dict(path):
     if not os.path.exists(path):
@@ -344,7 +339,7 @@ def eliminar_streaming(url, lista):
     if cambios:
         set_dict(path, _dict)
 
-
+'''
 def add_stream(tipo, item):
     """
     Agrega un streaming a la lista correspondiente de jamedia.
@@ -357,7 +352,7 @@ def add_stream(tipo, item):
     _dict = get_dict(path)
     _dict[item[0].strip()] = item[1].strip()
     set_dict(path, _dict)
-
+'''
 
 def set_listas_default():
     """

@@ -1,48 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   PlayerControls.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 import os
 import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 from gi.repository import Gdk
-from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
-
-from Globales import get_colors
-
-
-def sensibilizar(objeto):
-    if not objeto.get_sensitive():
-        objeto.set_sensitive(True)
-
-
-def insensibilizar(objeto):
-    if objeto.get_sensitive():
-        objeto.set_sensitive(False)
-
-
-ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
+from JAMediaPlayer.Globales import get_colors
+from JAMediaPlayer.Globales import ICONS_PATH
+from JAMediaPlayer.Globales import sensibilizar
+from JAMediaPlayer.Globales import insensibilizar
 
 
 class PlayerControls(Gtk.EventBox):

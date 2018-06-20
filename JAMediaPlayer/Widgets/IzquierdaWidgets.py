@@ -1,50 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   IzquierdaWidgets.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 import os
 import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
-from gi.repository import Gdk
-from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
 
-from Globales import get_colors
-from Globales import get_separador
-from Globales import get_boton
-
-
-def sensibilizar(objeto):
-    if not objeto.get_sensitive():
-        objeto.set_sensitive(True)
-
-
-def insensibilizar(objeto):
-    if objeto.get_sensitive():
-        objeto.set_sensitive(False)
-
-
-ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
+from JAMediaPlayer.Globales import get_colors
+from JAMediaPlayer.Globales import get_separador
+from JAMediaPlayer.Globales import get_boton
+from JAMediaPlayer.Globales import ICONS_PATH
+from JAMediaPlayer.Globales import sensibilizar
+from JAMediaPlayer.Globales import insensibilizar
 
 
 class ToolbarGrabar(Gtk.EventBox):
@@ -246,7 +216,7 @@ class ToolbarInfo(Gtk.EventBox):
     def set_ip(self, valor):
         self.descarga.set_sensitive(valor)
 
-
+'''
 class BufferInfo(Gtk.EventBox):
 
     def __init__(self):
@@ -284,8 +254,9 @@ class BufferInfo(Gtk.EventBox):
             self.hide()
         else:
             self.show()
+'''
 
-
+'''
 class ProgressBar(Gtk.HScale):
 
     def __init__(self, ajuste):
@@ -298,49 +269,7 @@ class ProgressBar(Gtk.HScale):
         self.set_digits(0)
         self.set_draw_value(False)
 
-        self.ancho, self.borde = (10, 10)
-
-        #icono = os.path.join(ICONS_PATH, "controlslicer.svg")
-        #self.pixbuf = Gtk.gdk.pixbuf_new_from_file_at_size(icono, 24, 24)
-
-        #self.connect("expose_event", self.__expose)
 
         self.show_all()
         self.set_sensitive(False)
-    '''
-    def __expose(self, widget, event):
-        x, y, w, h = self.get_allocation()
-        ancho, borde = (self.ancho, self.borde)
-
-        gc = Gtk.gdk.Drawable.new_gc(self.window)
-
-        # todo el widget
-        gc.set_rgb_fg_color(get_colors("toolbars"))
-        self.window.draw_rectangle(gc, True, x, y, w, h)
-
-        # vacio
-        gc.set_rgb_fg_color(get_colors("drawingplayer"))
-        ww = w - borde * 2
-        xx = x + w / 2 - ww / 2
-        hh = ancho
-        yy = y + h / 2 - ancho / 2
-        self.window.draw_rectangle(gc, True, xx, yy, ww, hh)
-
-        # progreso
-        ximage = int(self.ajuste.get_value() * ww / 100)
-        gc.set_rgb_fg_color(get_colors("naranaja"))
-        self.window.draw_rectangle(gc, True, xx, yy, ximage, hh)
-
-        # borde de progreso
-        gc.set_rgb_fg_color(get_colors("window"))
-        self.window.draw_rectangle(gc, False, xx, yy, ww, hh)
-
-        # La Imagen
-        #imgw, imgh = (self.pixbuf.get_width(), self.pixbuf.get_height())
-        #yimage = yy + hh / 2 - imgh / 2
-
-        #self.window.draw_pixbuf(gc, self.pixbuf, 0, 0, ximage, yimage,
-        #    imgw, imgh, Gtk.gdk.RGB_DITHER_NORMAL, 0, 0)
-
-        return True
-        '''
+'''

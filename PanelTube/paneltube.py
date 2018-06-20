@@ -29,11 +29,11 @@ from gi.repository import GObject
 
 import shelve
 
-from PanelTubeWidgets import Mini_Toolbar
-from PanelTubeWidgets import ToolbarAccionListasVideos
-from PanelTubeWidgets import Toolbar_Videos_Izquierda
-from PanelTubeWidgets import Toolbar_Videos_Derecha
-from PanelTubeWidgets import Toolbar_Guardar
+from paneltubewidgets import Mini_Toolbar
+from paneltubewidgets import ToolbarAccionListasVideos
+from paneltubewidgets import Toolbar_Videos_Izquierda
+from paneltubewidgets import Toolbar_Videos_Derecha
+from paneltubewidgets import Toolbar_Guardar
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_data_directory

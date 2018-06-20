@@ -29,24 +29,23 @@ from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
 
-from Globales import get_colors
-from Globales import get_separador
-from Globales import get_boton
+from JAMediaPlayer.Globales import get_colors
+from JAMediaPlayer.Globales import get_separador
+from JAMediaPlayer.Globales import get_boton
 
-from Globales import describe_uri
-from Globales import describe_archivo
-from Globales import describe_acceso_uri
-from Globales import get_streamings
-from Globales import stream_en_archivo
+from JAMediaPlayer.Globales import describe_uri
+from JAMediaPlayer.Globales import describe_archivo
+from JAMediaPlayer.Globales import describe_acceso_uri
+from JAMediaPlayer.Globales import get_streamings
+from JAMediaPlayer.Globales import stream_en_archivo
 
-from Globales import get_JAMedia_Directory
-from Globales import get_data_directory
-from Globales import get_my_files_directory
-from Globales import get_tube_directory
-from Globales import get_audio_directory
-from Globales import get_video_directory
-
-ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
+from JAMediaPlayer.Globales import get_JAMedia_Directory
+from JAMediaPlayer.Globales import get_data_directory
+from JAMediaPlayer.Globales import get_my_files_directory
+from JAMediaPlayer.Globales import get_tube_directory
+from JAMediaPlayer.Globales import get_audio_directory
+from JAMediaPlayer.Globales import get_video_directory
+from JAMediaPlayer.Globales import ICONS_PATH
 
 
 def ocultar(objeto):

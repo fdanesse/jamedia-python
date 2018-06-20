@@ -30,7 +30,7 @@ from gi.repository import GdkPixbuf
 
 import shelve
 
-from Widgets import WidgetVideoItem
+from Widgets.widgetvideoitem import WidgetVideoItem
 
 from JAMediaPlayer.Globales import get_data_directory
 from JAMediaPlayer.Globales import get_colors

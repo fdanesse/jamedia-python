@@ -47,14 +47,11 @@ import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
-from gi.repository import Gdk
-from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
 
-from Globales import get_colors
-
-ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
+from JAMediaPlayer.Globales import get_colors
+from JAMediaPlayer.Globales import ICONS_PATH
 
 
 class BalanceWidget(Gtk.EventBox):

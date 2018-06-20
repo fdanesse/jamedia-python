@@ -24,24 +24,21 @@ import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
-from gi.repository import Gdk
-from gi.repository import GLib
 from gi.repository import GObject
-from gi.repository import GdkPixbuf
 
 from Widgets import Credits
 from Widgets import Help
 
-from Globales import get_colors
-from Globales import get_separador
-from Globales import get_boton
-from Globales import get_my_files_directory
-from Globales import describe_acceso_uri
-from Globales import copiar
-from Globales import borrar
-from Globales import mover
+from JAMediaPlayer.Globales import get_colors
+from JAMediaPlayer.Globales import get_separador
+from JAMediaPlayer.Globales import get_boton
+from JAMediaPlayer.Globales import get_my_files_directory
+from JAMediaPlayer.Globales import describe_acceso_uri
+from JAMediaPlayer.Globales import copiar
+from JAMediaPlayer.Globales import borrar
+from JAMediaPlayer.Globales import mover
 
-ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
+from JAMediaPlayer.Globales import ICONS_PATH
 
 
 class Toolbar(Gtk.EventBox):

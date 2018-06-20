@@ -28,14 +28,13 @@ from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import GObject
 
-from Globales import get_colors
-from Globales import get_boton
-from Globales import download_streamings
-from Globales import set_listas_default
-from Globales import get_ip
+from JAMediaPlayer.Globales import get_colors
+from JAMediaPlayer.Globales import get_boton
+from JAMediaPlayer.Globales import download_streamings
+from JAMediaPlayer.Globales import set_listas_default
+from JAMediaPlayer.Globales import get_ip
 
-
-ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
+from JAMediaPlayer.Globales import ICONS_PATH
 
 
 class DialogoDescarga(Gtk.Dialog):

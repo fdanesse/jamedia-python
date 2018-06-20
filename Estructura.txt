@@ -1,0 +1,21 @@
+./JAMediaPlayer/ProgressPlayer.py:      class ProgressBar(Gtk.HScale):
+./JAMediaPlayer/IzquierdaWidgets.py:    class ProgressBar(Gtk.HScale):
+./Widgets/progressbar.py:               class ProgressBar(Gtk.HScale):
+
+
+JAMedia
+    Toolbar
+    ToolbarBusquedas
+    ToolbarDescargas
+    ToolbarSalir
+    AlertaBusqueda
+    Buscar
+    PanelTube
+    JAMediaPlayer
+        Toolbar
+        ToolbarSalir
+        ToolbarAccion
+        ToolbarAddStream
+        MouseSpeedDetector
+        BasePanel
+            JAMediaReproductor
