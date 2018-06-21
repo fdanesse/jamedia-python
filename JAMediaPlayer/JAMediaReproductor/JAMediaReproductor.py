@@ -16,6 +16,9 @@ from gi.repository import GLib
 from gi.repository import Gst
 from gi.repository import GstVideo
 
+GObject.threads_init()
+Gst.init([])
+
 
 class JAMediaReproductor(GObject.GObject):
 
@@ -246,8 +249,11 @@ class JAMediaReproductor(GObject.GObject):
             self.__pause()
 
     def stop(self):
-        #self.__pipe.set_state(Gst.State.PAUSED)
         self.__pipe.set_state(Gst.State.NULL)
+
+    def kill(self):
+        self.__pipe.set_state(Gst.State.NULL)
+        self.__pipe.unref()
 
     def get_balance(self):
         # Valores por defecto para una escala gtk

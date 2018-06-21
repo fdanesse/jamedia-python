@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import threading
 import gi
 gi.require_version("Gtk", "3.0")
 
@@ -23,18 +22,18 @@ from JAMediaReproductor.JAMediaReproductor import JAMediaReproductor
 class BasePanel(Gtk.HPaned):
 
     __gsignals__ = {
-    "show-controls": (GObject.SIGNAL_RUN_LAST,
+    "show-controls": (GObject.SIGNAL_RUN_FIRST,
         GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, )),
-    "accion-list": (GObject.SIGNAL_RUN_LAST,
+    "accion-list": (GObject.SIGNAL_RUN_FIRST,
         GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,
         GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)),
-    "menu_activo": (GObject.SIGNAL_RUN_LAST,
+    "menu_activo": (GObject.SIGNAL_RUN_FIRST,
         GObject.TYPE_NONE, []),
-    #"add_stream": (GObject.SIGNAL_RUN_LAST,
+    #"add_stream": (GObject.SIGNAL_RUN_FIRST,
     #    GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
-    "video": (GObject.SIGNAL_RUN_LAST,
+    "video": (GObject.SIGNAL_RUN_FIRST,
         GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,)),
-    #'stop-record': (GObject.SIGNAL_RUN_LAST,
+    #'stop-record': (GObject.SIGNAL_RUN_FIRST,
     #    GObject.TYPE_NONE, [])
     }
 
@@ -153,7 +152,6 @@ class BasePanel(Gtk.HPaned):
             self.player.disconnect_by_func(self.__update_progress)
             self.player.disconnect_by_func(self.__set_video)
             #self.player.disconnect_by_func(self.__loading_buffer)
-            self.player.stop()
             del(self.player)
             self.player = False
 
@@ -171,11 +169,9 @@ class BasePanel(Gtk.HPaned):
         #self.player.connect("loading-buffer", self.__loading_buffer)
 
         self.player.load(path)
-        #GLib.idle_add(self.player.play)
-        self.__thread = threading.Thread(target=self.player.play)
-        self.__thread.start()
+        self.player.play()
         GLib.idle_add(self.player.set_volumen, volumen)
-        self.derecha.set_sensitive(True)
+        GLib.idle_add(self.derecha.set_sensitive, True)
 
     '''
     def __loading_buffer(self, player, buf):

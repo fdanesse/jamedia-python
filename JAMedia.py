@@ -7,14 +7,14 @@ import sys
 os.putenv('GDK_BACKEND', 'x11')
 
 import gi
-gi.require_version('Gst', '1.0')
+#gi.require_version('Gst', '1.0')
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 from gi.repository import GObject
 from gi.repository import Gdk
 from gi.repository import GLib
-from gi.repository import Gst
+#from gi.repository import Gst
 
 from Widgets.toolbar import Toolbar
 from Widgets.toolbarbusquedas import ToolbarBusquedas
@@ -35,7 +35,8 @@ BASE_PATH = os.path.dirname(__file__)
 TipDescargas = "Arrastra Hacia La Izquierda para Quitarlo de Descargas."
 TipEncontrados = "Arrastra Hacia La Derecha para Agregarlo a Descargas"
 
-Gst.init([])
+#GObject.threads_init()
+#Gst.init([])
 
 
 class JAMedia(Gtk.Window):
