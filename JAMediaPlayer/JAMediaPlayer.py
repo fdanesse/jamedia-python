@@ -20,9 +20,8 @@ from Widgets.Toolbars import Toolbar
 from Widgets.Toolbars import ToolbarSalir
 from Widgets.Toolbars import ToolbarAccion
 #from Widgets.Toolbars import ToolbarAddStream
-
 from Widgets.Widgets import MouseSpeedDetector
-from Widgets.BasePanel import BasePanel
+from BasePanel import BasePanel
 
 #from JAMediaReproductor.JAMediaGrabador import JAMediaGrabador
 

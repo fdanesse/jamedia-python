@@ -25,13 +25,15 @@ class ProgressPlayer(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
+        self.modify_bg(
+            Gtk.StateType.NORMAL, get_colors("toolbars"))
 
         self.__presed = False
 
         self.__progressBar = BarraProgreso()
         self.__volumen = Gtk.VolumeButton()
-        self.__volumen.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
+        self.__volumen.modify_bg(
+            Gtk.StateType.NORMAL, get_colors("toolbars"))
         self.__volumen.set_value(0.1)
 
         hbox = Gtk.HBox()

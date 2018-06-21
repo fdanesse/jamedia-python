@@ -1,24 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   BasePanel.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
+import threading
 import gi
 gi.require_version("Gtk", "3.0")
 
@@ -27,13 +10,14 @@ from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkX11
 
-from Widgets import DialogoDescarga
-from Izquierda import Izquierda
-from Derecha import Derecha
-from JAMediaPlayer.Globales import get_colors
+#from Widgets import DialogoDescarga
+from izquierda.Izquierda import Izquierda
+from derecha.Derecha import Derecha
+
+from Globales import get_colors
 #from JAMediaPlayer.Globales import get_ip
 
-from JAMediaPlayer.JAMediaReproductor.JAMediaReproductor import JAMediaReproductor
+from JAMediaReproductor.JAMediaReproductor import JAMediaReproductor
 
 
 class BasePanel(Gtk.HPaned):
@@ -46,12 +30,13 @@ class BasePanel(Gtk.HPaned):
         GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)),
     "menu_activo": (GObject.SIGNAL_RUN_LAST,
         GObject.TYPE_NONE, []),
-    "add_stream": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
+    #"add_stream": (GObject.SIGNAL_RUN_LAST,
+    #    GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
     "video": (GObject.SIGNAL_RUN_LAST,
         GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,)),
-    'stop-record': (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, [])}
+    #'stop-record': (GObject.SIGNAL_RUN_LAST,
+    #    GObject.TYPE_NONE, [])
+    }
 
     def __init__(self):
 
@@ -60,6 +45,7 @@ class BasePanel(Gtk.HPaned):
         self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
         self.set_border_width(2)
 
+        self.__thread = False
         self.player = False
 
         self.izquierda = Izquierda()
@@ -158,17 +144,10 @@ class BasePanel(Gtk.HPaned):
 
     def __cargar_reproducir(self, widget, path):
         self.derecha.set_sensitive(False)
-
-        # FIXME: Analizar mantener los siguientes valores:
-        # Efectos
-        # balanace
-        # Gamma
-        # Rotacion
-        # Volumen
-
         volumen = 1.0
         if self.player:
-            volumen = float("{:.1f}".format(self.izquierda.progress.get_volumen()))
+            volumen = float("{:.1f}".format(
+                self.izquierda.progress.get_volumen()))
             self.player.disconnect_by_func(self.__endfile)
             self.player.disconnect_by_func(self.__state_changed)
             self.player.disconnect_by_func(self.__update_progress)
@@ -181,7 +160,8 @@ class BasePanel(Gtk.HPaned):
         self.izquierda.progress.set_sensitive(False)
         self.__set_video(False, False)
 
-        xid = self.izquierda.video_visor.get_property('window').get_xid()
+        xid = self.izquierda.video_visor.get_property(
+            'window').get_xid()
         self.player = JAMediaReproductor(xid)
 
         self.player.connect("endfile", self.__endfile)
@@ -191,7 +171,9 @@ class BasePanel(Gtk.HPaned):
         #self.player.connect("loading-buffer", self.__loading_buffer)
 
         self.player.load(path)
-        GLib.idle_add(self.player.play)
+        #GLib.idle_add(self.player.play)
+        self.__thread = threading.Thread(target=self.player.play)
+        self.__thread.start()
         GLib.idle_add(self.player.set_volumen, volumen)
         self.derecha.set_sensitive(True)
 
@@ -217,14 +199,13 @@ class BasePanel(Gtk.HPaned):
         if "playing" in valor:
             self.derecha.player_controls.set_playing()
             self.izquierda.progress.set_sensitive(True)
-            # FIXME: GLib.idle_add(self.__update_balance)
+            GLib.idle_add(self.__update_balance)
         elif "paused" in valor or "None" in valor:
             self.derecha.player_controls.set_paused()
-            # FIXME: GLib.idle_add(self.__update_balance)
+            GLib.idle_add(self.__update_balance)
         else:
             print "Estado del Reproductor desconocido:", valor
 
-    '''
     def __update_balance(self):
         config = {}
         if self.player:
@@ -236,7 +217,6 @@ class BasePanel(Gtk.HPaned):
             hue=config.get('hue', 50.0),
             gamma=config.get('gamma', 10.0))
         return False
-    '''
 
     '''
     def __check_ip(self):

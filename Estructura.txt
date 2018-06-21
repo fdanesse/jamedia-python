@@ -15,7 +15,21 @@ JAMedia
         Toolbar
         ToolbarSalir
         ToolbarAccion
-        ToolbarAddStream
+        **ToolbarAddStream
         MouseSpeedDetector
+        **JAMediaGrabador
         BasePanel
+            Izquierda
+                **ToolbarGrabar
+                VideoVisor
+                **BufferInfo
+                ToolbarInfo
+                ProgressPlayer
+            Derecha
             JAMediaReproductor
+            **DialogoDescarga
+
+
+Gst.MessageType.ERROR:
+(gerror=GLib.Error('Output window was closed', 'gst-resource-error-quark', 3), debug='xvimagesink.c(554): gst_xv_image_sink_handle_xevents (): /GstPlayBin:player/GstPlaySink:playsink/GstBin:vbin/GstPipeline:videobin/GstXvImageSink:xvimagesink')
+flavio@flavio-NE-522:~/Documentos/jamedia-python$

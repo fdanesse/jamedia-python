@@ -1,36 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   Widgets.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 import os
 import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 
-from PanelTube.jamediatube import JAMediaYoutube
-
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_boton
 
-BASE_PATH = os.path.dirname(__file__)
+from JAMediaPlayer.Globales import ICONS_PATH
 
 
 class Help(Gtk.Dialog):
@@ -43,20 +23,22 @@ class Help(Gtk.Dialog):
             buttons=("Cerrar", Gtk.ResponseType.OK))
 
         self.set_decorated(False)
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("window1"))
         self.set_border_width(15)
 
-        tabla1 = Gtk.Table(columns=5, rows=2, homogeneous=False)
+        tabla1 = Gtk.Table(
+            columns=5, rows=2, homogeneous=False)
 
         vbox = Gtk.HBox()
-        archivo = os.path.join(BASE_PATH, "Iconos", "play.svg")
+        archivo = os.path.join(ICONS_PATH, "play.svg")
         self.anterior = get_boton(archivo, flip=True, pixels=24,
             tooltip_text="Anterior")
         self.anterior.connect("clicked", self.__switch)
         self.anterior.show()
         vbox.pack_start(self.anterior, False, False, 0)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "play.svg")
+        archivo = os.path.join(ICONS_PATH, "play.svg")
         self.siguiente = get_boton(archivo, pixels=24,
             tooltip_text="Siguiente")
         self.siguiente.connect("clicked", self.__switch)
@@ -68,13 +50,13 @@ class Help(Gtk.Dialog):
         self.helps = []
         for x in range(1, 3):
             help = Gtk.Image()
-            help.set_from_file(os.path.join(BASE_PATH,
-                "Iconos", "help-%s.svg" % x))
+            help.set_from_file(os.path.join(
+                ICONS_PATH, "help-%s.svg" % x))
             tabla1.attach_defaults(help, 0, 5, 1, 2)
             self.helps.append(help)
 
-        self.vbox.pack_start(tabla1, True, True, 0)
-        self.vbox.show_all()
+        vbox.pack_start(tabla1, True, True, 0)
+        vbox.show_all()
         self.__switch(None)
 
     def __ocultar(self, objeto):

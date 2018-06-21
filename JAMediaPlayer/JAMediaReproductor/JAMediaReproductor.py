@@ -1,29 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   JAMediaReproductor.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 import os
 
 import gi
 gi.require_version('Gst', '1.0')
-gi.require_version('GstVideo', '1.0')  # FIXME: Necesario => AttributeError: 'GstXvImageSink' object has no attribute 'set_window_handle'
+gi.require_version('GstVideo', '1.0')
+'''
+FIXME: Necesario => AttributeError: 'GstXvImageSink'
+object has no attribute 'set_window_handle'
+'''
 
 from gi.repository import GObject
 from gi.repository import GLib
@@ -42,8 +28,8 @@ class JAMediaReproductor(GObject.GObject):
         GObject.TYPE_NONE, (GObject.TYPE_FLOAT,)),
     "video": (GObject.SIGNAL_RUN_LAST,
         GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,)),
-    "loading-buffer": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_INT, )),
+    #"loading-buffer": (GObject.SIGNAL_RUN_LAST,
+    #    GObject.TYPE_NONE, (GObject.TYPE_INT, )),
         }
 
     # Estados: playing, paused, None
@@ -263,6 +249,17 @@ class JAMediaReproductor(GObject.GObject):
         #self.__pipe.set_state(Gst.State.PAUSED)
         self.__pipe.set_state(Gst.State.NULL)
 
+    def get_balance(self):
+        # Valores por defecto para una escala gtk
+        conf = {
+            'saturacion': 50.0,
+            'contraste': 50.0,
+            'brillo': 50.0,
+            'hue': 50.0,
+            'gamma': 10.0,
+            'rotacion': 0}
+        return conf
+        
     def set_balance(self, brillo=False, contraste=False,
         saturacion=False, hue=False, gamma=False):
         if saturacion:

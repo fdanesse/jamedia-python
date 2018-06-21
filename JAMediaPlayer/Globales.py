@@ -36,6 +36,15 @@ def convert_shelve_to_json(path):
     return _dict
 '''
 
+def ocultar(objeto):
+    if objeto.get_visible():
+        objeto.hide()
+
+
+def mostrar(objeto):
+    if not objeto.get_visible():
+        objeto.show()
+
 
 def sensibilizar(objeto):
     if not objeto.get_sensitive():

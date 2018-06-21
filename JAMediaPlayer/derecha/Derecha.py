@@ -1,24 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   Derecha.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 import gi
 gi.require_version("Gtk", "3.0")
 
@@ -29,16 +11,8 @@ from BalanceWidget import BalanceWidget
 from JAMediaPlayerList import PlayerList
 from PlayerControls import PlayerControls
 from JAMediaPlayer.Globales import get_colors
-
-
-def ocultar(objeto):
-    if objeto.get_visible():
-        objeto.hide()
-
-
-def mostrar(objeto):
-    if not objeto.get_visible():
-        objeto.show()
+from JAMediaPlayer.Globales import ocultar
+from JAMediaPlayer.Globales import mostrar
 
 
 class Derecha(Gtk.EventBox):
@@ -51,8 +25,8 @@ class Derecha(Gtk.EventBox):
         GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)),
     "menu_activo": (GObject.SIGNAL_RUN_LAST,
         GObject.TYPE_NONE, []),
-    "add_stream": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
+    #"add_stream": (GObject.SIGNAL_RUN_LAST,
+    #    GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
     "accion-controls": (GObject.SIGNAL_RUN_LAST,
         GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
     'balance-valor': (GObject.SIGNAL_RUN_LAST,
@@ -92,7 +66,7 @@ class Derecha(Gtk.EventBox):
         self.lista.connect("nueva-seleccion", self.__emit_cargar_reproducir)
         self.lista.connect("accion-list", self.__emit_accion_list)
         self.lista.connect("menu_activo", self.__emit_menu_activo)
-        self.lista.connect("add_stream", self.__emit_add_stream)
+        #self.lista.connect("add_stream", self.__emit_add_stream)
         self.lista.connect("len_items", self.__items_in_list)
 
         self.player_controls.connect("accion-controls",
@@ -111,9 +85,11 @@ class Derecha(Gtk.EventBox):
         # anterior, siguiente, pausa, play, stop
         self.emit("accion-controls", accion)
 
+    '''
     def __emit_add_stream(self, widget, title):
         # El usuario agregará una dirección de streaming
         self.emit("add_stream", title)
+    '''
 
     def __emit_menu_activo(self, widget=False):
         # hay un menu contextual presente
@@ -141,8 +117,10 @@ class Derecha(Gtk.EventBox):
         self.lista.setup_init()
         self.player_controls.activar(0)
 
+    '''
     def set_ip(self, valor):
         self.lista.set_ip(valor)
-
+    '''
+    
     def set_nueva_lista(self, archivos):
         self.lista.set_nueva_lista(archivos)

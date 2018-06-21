@@ -1,30 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   Widgets.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 import os
 import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 from gi.repository import GObject
+
+from help import Help
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
@@ -56,7 +40,8 @@ class Toolbar(Gtk.Toolbar):
 
         archivo = os.path.join(
             BASE_PATH, "Iconos", "JAMedia.svg")
-        self.jamedia = get_boton(archivo, flip=False, pixels=35)
+        self.jamedia = get_boton(
+            archivo, flip=False, pixels=35)
         self.jamedia.set_tooltip_text("Cambiar a JAMedia")
         self.jamedia.connect("clicked", self.__emit_switch)
         self.insert(self.jamedia, -1)
@@ -89,9 +74,6 @@ class Toolbar(Gtk.Toolbar):
         dialog.destroy()
 
     def __emit_switch(self, widget):
-        """
-        Cambia de JAMediaTube a JAMedia.
-        """
         self.emit('switch')
 
     def __salir(self, widget):
