@@ -151,8 +151,9 @@ class BasePanel(Gtk.HPaned):
             self.player.disconnect_by_func(self.__state_changed)
             self.player.disconnect_by_func(self.__update_progress)
             self.player.disconnect_by_func(self.__set_video)
+            self.player.kill()
             #self.player.disconnect_by_func(self.__loading_buffer)
-            del(self.player)
+            #del(self.player)
             self.player = False
 
         self.izquierda.progress.set_sensitive(False)
@@ -237,8 +238,8 @@ class BasePanel(Gtk.HPaned):
             self.player.disconnect_by_func(self.__update_progress)
             self.player.disconnect_by_func(self.__set_video)
             #self.player.disconnect_by_func(self.__loading_buffer)
-            self.player.stop()
-            del(self.player)
+            self.player.kill()
+            #del(self.player)
             self.player = False
 
     def set_nueva_lista(self, archivos):

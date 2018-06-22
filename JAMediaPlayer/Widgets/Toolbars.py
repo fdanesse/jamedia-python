@@ -27,7 +27,7 @@ from gi.repository import Gtk
 from gi.repository import GObject
 
 from Widgets import Credits
-from Widgets import Help
+from help import Help
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador

@@ -20,7 +20,7 @@ from Widgets.Toolbars import Toolbar
 from Widgets.Toolbars import ToolbarSalir
 from Widgets.Toolbars import ToolbarAccion
 #from Widgets.Toolbars import ToolbarAddStream
-from Widgets.Widgets import MouseSpeedDetector
+from Widgets.mousespeeddetector import MouseSpeedDetector
 from BasePanel import BasePanel
 
 #from JAMediaReproductor.JAMediaGrabador import JAMediaGrabador
@@ -111,6 +111,7 @@ class JAMediaPlayer(Gtk.EventBox):
     def __realize(self, window):
         self.cursor_root = self.get_property("window").get_cursor()
         self.get_property("window").set_cursor(self.jamedia_cursor)
+
     '''
     def __add_stream(self, widget, tipo, nombre, url):
         add_stream(tipo, [nombre, url])

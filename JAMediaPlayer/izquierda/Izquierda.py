@@ -61,7 +61,7 @@ class Izquierda(Gtk.EventBox):
         #self.toolbar_record.connect("stop", self.__emit_stop_record)
 
         self.video_visor.connect("ocultar_controles", self.__emit_show_controls)
-        #self.video_visor.connect("button_press_event", self.__set_fullscreen)
+        self.video_visor.connect("button_press_event", self.__set_fullscreen)
 
         self.toolbar_info.connect("rotar", self.__emit_rotar)
         #self.toolbar_info.connect("actualizar_streamings", self.__emit_actualizar_streamings)
@@ -84,7 +84,6 @@ class Izquierda(Gtk.EventBox):
     def __emit_rotar(self, widget, sentido):
         self.emit('rotar', sentido)
 
-    '''
     def __set_fullscreen(self, widget, event):
         if event.type.value_name == "GDK_2BUTTON_PRESS":
             win = self.get_toplevel()
@@ -105,7 +104,6 @@ class Izquierda(Gtk.EventBox):
             win.fullscreen()
         else:
             win.unfullscreen()
-    '''
 
     def __emit_show_controls(self, widget, valor):
         zona, ocultar = (valor, self.toolbar_info.ocultar_controles)

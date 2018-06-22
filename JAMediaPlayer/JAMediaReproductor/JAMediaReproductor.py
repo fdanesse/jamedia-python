@@ -16,9 +16,6 @@ from gi.repository import GLib
 from gi.repository import Gst
 from gi.repository import GstVideo
 
-GObject.threads_init()
-Gst.init([])
-
 
 class JAMediaReproductor(GObject.GObject):
 
