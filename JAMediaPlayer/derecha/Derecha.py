@@ -49,9 +49,11 @@ class Derecha(Gtk.EventBox):
         conf_box.pack_start(self.balance, False, False, 0)
 
         scroll = Gtk.ScrolledWindow()
-        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll.set_policy(Gtk.PolicyType.NEVER,
+            Gtk.PolicyType.AUTOMATIC)
         scroll.add_with_viewport(conf_box)
-        scroll.get_child().modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
+        scroll.get_child().modify_bg(
+            Gtk.StateType.NORMAL, get_colors("window"))
 
         vbox.pack_start(scroll, True, True, 0)
         vbox.pack_start(self.lista, True, True, 0)

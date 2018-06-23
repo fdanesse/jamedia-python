@@ -48,7 +48,8 @@ class ProgressPlayer(Gtk.EventBox):
             "button-release-event", self.__button_release_event)
         self.__progressBar.escala.connect(
             "motion-notify-event", self.__motion_notify_event)
-        self.__volumen.connect("value-changed", self.__set_volumen)
+        self.__volumen.connect(
+            "value-changed", self.__set_volumen)
 
         self.show_all()
 
@@ -61,7 +62,8 @@ class ProgressPlayer(Gtk.EventBox):
 
     def set_progress(self, valor):
         if not self.__presed:
-            GLib.idle_add(self.__progressBar.escala.get_adjustment().set_value, valor)
+            adj = self.__progressBar.escala.get_adjustment()
+            GLib.idle_add(adj.set_value, valor)
 
     def __button_press_event(self, widget, event):
         self.__presed = True
@@ -71,7 +73,8 @@ class ProgressPlayer(Gtk.EventBox):
 
     def __motion_notify_event(self, widget, event):
         if self.__presed:
-            self.emit("seek", self.__progressBar.escala.get_adjustment().get_value())
+            adj = self.__progressBar.escala.get_adjustment()
+            self.emit("seek", adj.get_value())
 
 
 class BarraProgreso(Gtk.EventBox):
@@ -80,14 +83,18 @@ class BarraProgreso(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("toolbars"))
 
-        self.escala = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL)
-        self.escala.set_adjustment(Gtk.Adjustment(0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
+        self.escala = Gtk.Scale(
+            orientation=Gtk.Orientation.HORIZONTAL)
+        self.escala.set_adjustment(
+            Gtk.Adjustment(0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
         self.escala.set_digits(0)
         self.escala.set_draw_value(False)
 
         self.add(self.escala)
         self.show_all()
 
-        self.set_size_request(-1, 24)  #FIXME: Necesario para que funcione la escala
+        #FIXME: Necesario para que funcione la escala
+        self.set_size_request(-1, 24)

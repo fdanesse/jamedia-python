@@ -27,17 +27,9 @@ from JAMediaPlayer.Globales import get_my_files_directory
 from JAMediaPlayer.Globales import get_tube_directory
 from JAMediaPlayer.Globales import get_audio_directory
 from JAMediaPlayer.Globales import get_video_directory
+from JAMediaPlayer.Globales import ocultar
+from JAMediaPlayer.Globales import mostrar
 from JAMediaPlayer.Globales import ICONS_PATH
-
-
-def ocultar(objeto):
-    if objeto.get_visible():
-        objeto.hide()
-
-
-def mostrar(objeto):
-    if not objeto.get_visible():
-        objeto.show()
 
 
 class PlayerList(Gtk.Frame):
@@ -50,8 +42,8 @@ class PlayerList(Gtk.Frame):
         GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)),
     "menu_activo": (GObject.SIGNAL_RUN_LAST,
         GObject.TYPE_NONE, []),
-    "add_stream": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
+    #"add_stream": (GObject.SIGNAL_RUN_LAST,
+    #    GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
     "len_items": (GObject.SIGNAL_RUN_LAST,
         GObject.TYPE_NONE, (GObject.TYPE_INT, ))}
 
@@ -84,7 +76,7 @@ class PlayerList(Gtk.Frame):
         self.set_size_request(150, -1)
 
         self.toolbar.connect("cargar_lista", self.cargar_lista)
-        self.toolbar.connect("add_stream", self.__emit_add_stream)
+        #self.toolbar.connect("add_stream", self.__emit_add_stream)
         self.toolbar.connect("menu_activo", self.__emit_menu_activo)
 
         self.lista.connect("nueva-seleccion", self.__emit_nueva_seleccion)
@@ -94,9 +86,11 @@ class PlayerList(Gtk.Frame):
     def __re_emit_len_items(self, widget, items):
         self.emit("len_items", items)
 
+    '''
     def __emit_add_stream(self, widget):
         # El usuario agregará una dirección de streaming
         self.emit("add_stream", self.toolbar.label.get_text())
+    '''
 
     def __emit_menu_activo(self, widget=False):
         # hay un menu contextual presente
@@ -243,8 +237,10 @@ class PlayerList(Gtk.Frame):
             if selector:
                 selector.destroy()
 
+    '''
     def set_ip(self, valor):
         self.toolbar.ip = valor
+    '''
 
     def set_nueva_lista(self, archivos):
         self.__load_files(False, archivos, titulo="Archivos")
@@ -263,7 +259,7 @@ class Lista(Gtk.TreeView):
         Gtk.TreeView.__init__(self, Gtk.ListStore(GdkPixbuf.Pixbuf,
             GObject.TYPE_STRING, GObject.TYPE_STRING))
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
+        #self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
         self.set_property("rules-hint", True)
         self.set_headers_clickable(True)
         self.set_headers_visible(True)

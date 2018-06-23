@@ -171,8 +171,8 @@ class BasePanel(Gtk.HPaned):
 
         self.player.load(path)
         self.player.play()
-        GLib.idle_add(self.player.set_volumen, volumen)
-        GLib.idle_add(self.derecha.set_sensitive, True)
+        self.player.set_volumen(volumen)
+        self.derecha.set_sensitive(True)
 
     '''
     def __loading_buffer(self, player, buf):
