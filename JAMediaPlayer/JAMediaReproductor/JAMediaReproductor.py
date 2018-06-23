@@ -57,8 +57,8 @@ class JAMediaReproductor(GObject.GObject):
             }
         self.__config = self.__config_default.copy()
 
-        self.__pipe = Gst.ElementFactory.make("playbin", "player")
-        self.__pipe.set_property('volume', self.__config['volumen'])
+        self.__pipe = None  #Gst.ElementFactory.make("playbin", "player")
+        #self.__pipe.set_property('volume', self.__config['volumen'])
 
         '''
         # AUDIO ...
@@ -126,8 +126,8 @@ class JAMediaReproductor(GObject.GObject):
             'method', self.__config['rotacion'])
         self.__xvimagesink = Gst.ElementFactory.make(
             'xvimagesink', "xvimagesink")
-        self.__xvimagesink.set_property(
-            "force-aspect-ratio", True)
+        #self.__xvimagesink.set_property(
+        #    "force-aspect-ratio", True)
         self.__xvimagesink.set_window_handle(
             self.__winId)
 
@@ -150,9 +150,20 @@ class JAMediaReproductor(GObject.GObject):
         self.__videoBin.add_pad(Gst.GhostPad.new("sink", pad))
         # ... VIDEO
 
-        self.__pipe.set_property('video-sink', self.__videoBin)
+        #self.__pipe.set_property('video-sink', self.__videoBin)
         #self.__pipe.set_property('audio-sink', self.__audioBin)
 
+        self.__bus = None  #self.__pipe.get_bus()
+        #self.__bus.enable_sync_message_emission()
+        #self.__bus.connect('sync-message', self.__sync_message)
+        self.__reset()
+
+    def __reset(self):
+        self.__pipe = Gst.ElementFactory.make("playbin", "player")
+        self.__pipe.set_property('volume', self.__config['volumen'])
+        self.__pipe.set_property('force-aspect-ratio', True)
+        self.__pipe.set_property('video-sink', self.__videoBin)
+        self.__xvimagesink.set_window_handle(self.__winId)
         self.__bus = self.__pipe.get_bus()
         self.__bus.enable_sync_message_emission()
         self.__bus.connect('sync-message', self.__sync_message)
@@ -255,23 +266,20 @@ class JAMediaReproductor(GObject.GObject):
     def __pause(self):
         self.__pipe.set_state(Gst.State.PAUSED)
     
-    def play(self):
+    def __play(self):
         self.__pipe.set_state(Gst.State.PLAYING)
 
     def pause_play(self):
         if self.__status == Gst.State.PAUSED \
             or self.__status == Gst.State.NULL \
             or self.__status == Gst.State.READY:
-            self.play()
+            self.__xvimagesink.set_window_handle(self.__winId)
+            self.__play()
         elif self.__status == Gst.State.PLAYING:
             self.__pause()
 
     def stop(self):
         self.__pipe.set_state(Gst.State.NULL)
-
-    def kill(self):
-        self.__pipe.set_state(Gst.State.NULL)
-        self.__pipe.unref()
 
     def get_balance(self):
         # Valores por defecto para una escala gtk
@@ -343,7 +351,13 @@ class JAMediaReproductor(GObject.GObject):
             Gst.SeekFlags.KEY_UNIT,
             posicion)
 
-    def load(self, uri):
+    def load(self, uri, xid):
+        self.stop()
+        self.__winId = xid
+        self.__reset()
+        GLib.idle_add(self.__load, uri)
+
+    def __load(self, uri):
         self.stop()
         if not uri:
             return False
@@ -353,5 +367,6 @@ class JAMediaReproductor(GObject.GObject):
         if Gst.uri_is_valid(temp):
             self.__source = temp
             self.__pipe.set_property("uri", self.__source)
+            self.__play()
         else:
             print "FIXME:", "Dirección no válida", temp

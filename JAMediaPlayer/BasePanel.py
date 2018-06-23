@@ -44,7 +44,6 @@ class BasePanel(Gtk.HPaned):
         self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
         self.set_border_width(2)
 
-        self.__thread = False
         self.player = False
 
         self.izquierda = Izquierda()
@@ -143,34 +142,25 @@ class BasePanel(Gtk.HPaned):
 
     def __cargar_reproducir(self, widget, path):
         self.derecha.set_sensitive(False)
+        xid = self.izquierda.video_visor.get_property(
+            'window').get_xid()
         volumen = 1.0
         if self.player:
             volumen = float("{:.1f}".format(
                 self.izquierda.progress.get_volumen()))
-            self.player.disconnect_by_func(self.__endfile)
-            self.player.disconnect_by_func(self.__state_changed)
-            self.player.disconnect_by_func(self.__update_progress)
-            self.player.disconnect_by_func(self.__set_video)
-            self.player.kill()
-            #self.player.disconnect_by_func(self.__loading_buffer)
-            #del(self.player)
-            self.player = False
+        else:
+            self.player = JAMediaReproductor(xid)
+
+            self.player.connect("endfile", self.__endfile)
+            self.player.connect("estado", self.__state_changed)
+            self.player.connect("newposicion", self.__update_progress)
+            self.player.connect("video", self.__set_video)
+            #self.player.connect("loading-buffer", self.__loading_buffer)
 
         self.izquierda.progress.set_sensitive(False)
         self.__set_video(False, False)
 
-        xid = self.izquierda.video_visor.get_property(
-            'window').get_xid()
-        self.player = JAMediaReproductor(xid)
-
-        self.player.connect("endfile", self.__endfile)
-        self.player.connect("estado", self.__state_changed)
-        self.player.connect("newposicion", self.__update_progress)
-        self.player.connect("video", self.__set_video)
-        #self.player.connect("loading-buffer", self.__loading_buffer)
-
-        self.player.load(path)
-        self.player.play()
+        self.player.load(path, xid)
         self.player.set_volumen(volumen)
         self.derecha.set_sensitive(True)
 
