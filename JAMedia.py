@@ -29,6 +29,8 @@ from PanelTube.jamediatube import Buscar, FEED
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
 
 from JAMediaPlayer.Globales import get_colors
+from JAMediaPlayer.Globales import mostrar
+from JAMediaPlayer.Globales import ocultar
 
 BASE_PATH = os.path.dirname(__file__)
 
@@ -124,7 +126,7 @@ class JAMedia(Gtk.Window):
         """
         self.__cancel_toolbar()
         self.paneltube.cancel_toolbars_flotantes()
-        map(self.__ocultar,
+        map(ocultar,
             [self.toolbar_descarga, self.alerta_busqueda])
         if self.archivos:
             self.__switch(None, 'jamedia')
@@ -263,7 +265,7 @@ class JAMedia(Gtk.Window):
         self.toolbar_busqueda.set_sensitive(False)
         self.__cancel_toolbar()
         self.paneltube.cancel_toolbars_flotantes()
-        map(self.__mostrar, [self.alerta_busqueda])
+        map(mostrar, [self.alerta_busqueda])
         self.alerta_busqueda.label.set_text("Buscando: %s" % (palabras))
         objetos = self.paneltube.encontrados.get_children()
         for objeto in objetos:
@@ -285,7 +287,7 @@ class JAMedia(Gtk.Window):
         Se crean los video_widgets y se agregan al panel, segun destino.
         """
         if not videos:
-            map(self.__ocultar, [self.alerta_busqueda])
+            map(ocultar, [self.alerta_busqueda])
             if sensitive:
                 self.paneltube.set_sensitive(True)
             self.toolbar_busqueda.set_sensitive(True)
@@ -323,19 +325,11 @@ class JAMedia(Gtk.Window):
         Cambia entre la vista de descargas y la de reproduccion.
         """
         if valor == 'jamediatube':
-            map(self.__ocultar, [self.jamediaplayer])
-            map(self.__mostrar, [self.box_tube])
+            map(ocultar, [self.jamediaplayer])
+            map(mostrar, [self.box_tube])
         elif valor == 'jamedia':
-            map(self.__ocultar, [self.box_tube])
-            map(self.__mostrar, [self.jamediaplayer])
-
-    def __ocultar(self, objeto):
-        if objeto.get_visible():
-            objeto.hide()
-
-    def __mostrar(self, objeto):
-        if not objeto.get_visible():
-            objeto.show()
+            map(ocultar, [self.box_tube])
+            map(mostrar, [self.jamediaplayer])
 
     def __confirmar_salir(self, widget=None, senial=None):
         self.paneltube.cancel_toolbars_flotantes()

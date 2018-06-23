@@ -57,9 +57,10 @@ class JAMediaReproductor(GObject.GObject):
             }
         self.__config = self.__config_default.copy()
 
-        self.__pipe = Gst.Pipeline()
         self.__pipe = Gst.ElementFactory.make("playbin", "player")
+        self.__pipe.set_property('volume', self.__config['volumen'])
 
+        '''
         # AUDIO ...
         self.__audioBin = Gst.Pipeline()
         self.__audioBin.set_name('audiobin')
@@ -68,47 +69,67 @@ class JAMediaReproductor(GObject.GObject):
         self.__audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
         self.__audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
         self.__audioresample.set_property('quality', 10)
-        self.__volume = Gst.ElementFactory.make('volume', 'volume')
-        self.__volume.set_property('volume', self.__config['volumen'])
+        #self.__volume = Gst.ElementFactory.make('volume', 'volume')
+        #self.__volume.set_property('volume', self.__config['volumen'])
         self.__autoaudiosink = Gst.ElementFactory.make("autoaudiosink", "autoaudiosink")
 
         self.__audioBin.add(self.__audioqueue)
         self.__audioBin.add(self.__audioconvert)
         self.__audioBin.add(self.__audioresample)
-        self.__audioBin.add(self.__volume)
+        #self.__audioBin.add(self.__volume)
         self.__audioBin.add(self.__autoaudiosink)
 
         self.__audioqueue.link(self.__audioconvert)
         self.__audioconvert.link(self.__audioresample)
-        self.__audioresample.link(self.__volume)
-        self.__volume.link(self.__autoaudiosink)
+        #self.__audioresample.link(self.__volume)
+        #self.__volume.link(self.__autoaudiosink)
+        self.__audioresample.link(self.__autoaudiosink)
 
         pad = self.__audioqueue.get_static_pad("sink")
         self.__audioBin.add_pad(Gst.GhostPad.new("sink", pad))
         # ... AUDIO
+        # '''
 
         # VIDEO ...
         self.__videoBin = Gst.Pipeline()
         self.__videoBin.set_name('videobin')
 
-        self.__videoqueue = Gst.ElementFactory.make('queue', 'videoqueue')
-        self.__videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
-        self.__videorate = Gst.ElementFactory.make('videorate', 'videorate')
-        self.__videorate.set_property('skip-to-first', True)
-        self.__videorate.set_property('drop-only', True)
-        self.__videorate.set_property('max-rate', 30)
-        self.__videobalance = Gst.ElementFactory.make('videobalance', "videobalance")
-        self.__videobalance.set_property('saturation', self.__config['saturacion'])
-        self.__videobalance.set_property('contrast', self.__config['contraste'])
-        self.__videobalance.set_property('brightness', self.__config['brillo'])
-        self.__videobalance.set_property('hue', self.__config['hue'])
-        self.__gamma = Gst.ElementFactory.make('gamma', "gamma")
-        self.__gamma.set_property('gamma', self.__config['gamma'])
-        self.__videoflip = Gst.ElementFactory.make('videoflip',"videoflip")
-        self.__videoflip.set_property('method', self.__config['rotacion'])
-        self.__xvimagesink = Gst.ElementFactory.make('xvimagesink', "xvimagesink")
-        self.__xvimagesink.set_property("force-aspect-ratio", True)
-        self.__xvimagesink.set_window_handle(self.__winId)
+        self.__videoqueue = Gst.ElementFactory.make(
+            'queue', 'videoqueue')
+        self.__videoconvert = Gst.ElementFactory.make(
+            'videoconvert', 'videoconvert')
+        self.__videorate = Gst.ElementFactory.make(
+            'videorate', 'videorate')
+        self.__videorate.set_property(
+            'skip-to-first', True)
+        self.__videorate.set_property(
+            'drop-only', True)
+        self.__videorate.set_property(
+            'max-rate', 30)
+        self.__videobalance = Gst.ElementFactory.make(
+            'videobalance', "videobalance")
+        self.__videobalance.set_property(
+            'saturation', self.__config['saturacion'])
+        self.__videobalance.set_property(
+            'contrast', self.__config['contraste'])
+        self.__videobalance.set_property(
+            'brightness', self.__config['brillo'])
+        self.__videobalance.set_property(
+            'hue', self.__config['hue'])
+        self.__gamma = Gst.ElementFactory.make(
+            'gamma', "gamma")
+        self.__gamma.set_property(
+            'gamma', self.__config['gamma'])
+        self.__videoflip = Gst.ElementFactory.make(
+            'videoflip',"videoflip")
+        self.__videoflip.set_property(
+            'method', self.__config['rotacion'])
+        self.__xvimagesink = Gst.ElementFactory.make(
+            'xvimagesink', "xvimagesink")
+        self.__xvimagesink.set_property(
+            "force-aspect-ratio", True)
+        self.__xvimagesink.set_window_handle(
+            self.__winId)
 
         self.__videoBin.add(self.__videoqueue)
         self.__videoBin.add(self.__videoconvert)
@@ -130,7 +151,7 @@ class JAMediaReproductor(GObject.GObject):
         # ... VIDEO
 
         self.__pipe.set_property('video-sink', self.__videoBin)
-        self.__pipe.set_property('audio-sink', self.__audioBin)
+        #self.__pipe.set_property('audio-sink', self.__audioBin)
 
         self.__bus = self.__pipe.get_bus()
         self.__bus.enable_sync_message_emission()
@@ -305,8 +326,9 @@ class JAMediaReproductor(GObject.GObject):
         self.__config['rotation'] = rot
 
     def set_volumen(self, valor):
-        self.__config['volumen'] = float(valor)  # 0.0 - 10.0
-        self.__volume.set_property('volume', self.__config['volumen'])
+        self.__config['volumen'] = float(valor/10)  # 0.0 - 10.0
+        #self.__volume.set_property('volume', self.__config['volumen'])
+        self.__pipe.set_property('volume', self.__config['volumen'])
 
     def set_position(self, posicion):
         '''

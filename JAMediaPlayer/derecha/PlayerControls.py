@@ -28,7 +28,8 @@ class PlayerControls(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("toolbars"))
 
         vbox = Gtk.HBox()
 
@@ -39,30 +40,38 @@ class PlayerControls(Gtk.EventBox):
 
         self.atras = JAMediaToolButton(pixels=24)
         archivo = os.path.join(ICONS_PATH, "siguiente.svg")
-        self.atras.set_imagen(archivo=archivo, flip=True, rotacion=False)
+        self.atras.set_imagen(
+            archivo=archivo, flip=True, rotacion=False)
         self.atras.set_tooltip_text("Anterior")
-        self.atras.connect("clicked", self.__emit_accion, "atras")
+        self.atras.connect("clicked",
+            self.__emit_accion, "atras")
         vbox.pack_start(self.atras, False, True, 0)
 
         self.play = JAMediaToolButton(pixels=24)
         archivo = os.path.join(ICONS_PATH, "play.svg")
-        self.play.set_imagen(archivo=archivo, flip=False, rotacion=False)
+        self.play.set_imagen(
+            archivo=archivo, flip=False, rotacion=False)
         self.play.set_tooltip_text("Reproducir")
-        self.play.connect("clicked", self.__emit_accion, "pausa-play")
+        self.play.connect("clicked",
+            self.__emit_accion, "pausa-play")
         vbox.pack_start(self.play, False, True, 0)
 
         self.siguiente = JAMediaToolButton(pixels=24)
         archivo = os.path.join(ICONS_PATH, "siguiente.svg")
-        self.siguiente.set_imagen(archivo=archivo, flip=False, rotacion=False)
+        self.siguiente.set_imagen(
+            archivo=archivo, flip=False, rotacion=False)
         self.siguiente.set_tooltip_text("Siguiente")
-        self.siguiente.connect("clicked", self.__emit_accion, "siguiente")
+        self.siguiente.connect("clicked",
+            self.__emit_accion, "siguiente")
         vbox.pack_start(self.siguiente, False, True, 0)
 
         self.stop = JAMediaToolButton(pixels=24)
         archivo = os.path.join(ICONS_PATH, "stop.svg")
-        self.stop.set_imagen(archivo=archivo, flip=False, rotacion=False)
+        self.stop.set_imagen(archivo=archivo,
+            flip=False, rotacion=False)
         self.stop.set_tooltip_text("Detener Reproducción")
-        self.stop.connect("clicked", self.__emit_accion, "stop")
+        self.stop.connect("clicked",
+            self.__emit_accion, "stop")
         vbox.pack_start(self.stop, False, True, 0)
 
         self.add(vbox)
@@ -95,7 +104,8 @@ class JAMediaToolButton(Gtk.ToolButton):
 
         Gtk.ToolButton.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("toolbars"))
 
         self.estado = False
         self.pixels = pixels
@@ -103,10 +113,12 @@ class JAMediaToolButton(Gtk.ToolButton):
         self.set_icon_widget(self.imagen)
         self.imagen.show()
 
-        self.imagen.set_size_request(self.pixels, self.pixels)
+        self.imagen.set_size_request(
+            self.pixels, self.pixels)
         self.show_all()
 
-    def set_imagen(self, archivo=None, flip=False, rotacion=False):
+    def set_imagen(self, archivo=None,
+        flip=False, rotacion=False):
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
             os.path.join(archivo), self.pixels, self.pixels)
         if flip:

@@ -37,7 +37,8 @@ class Derecha(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("window"))
 
         vbox = Gtk.VBox()
         conf_box = Gtk.VBox()
@@ -63,13 +64,18 @@ class Derecha(Gtk.EventBox):
 
         self.show_all()
 
-        self.balance.connect("balance-valor", self.__emit_balance)
+        self.balance.connect("balance-valor",
+            self.__emit_balance)
 
-        self.lista.connect("nueva-seleccion", self.__emit_cargar_reproducir)
-        self.lista.connect("accion-list", self.__emit_accion_list)
-        self.lista.connect("menu_activo", self.__emit_menu_activo)
+        self.lista.connect("nueva-seleccion",
+            self.__emit_cargar_reproducir)
+        self.lista.connect("accion-list",
+            self.__emit_accion_list)
+        self.lista.connect("menu_activo",
+            self.__emit_menu_activo)
         #self.lista.connect("add_stream", self.__emit_add_stream)
-        self.lista.connect("len_items", self.__items_in_list)
+        self.lista.connect("len_items",
+            self.__items_in_list)
 
         self.player_controls.connect("accion-controls",
             self.__emit_accion_controls)

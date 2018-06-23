@@ -75,13 +75,18 @@ class PlayerList(Gtk.Frame):
 
         self.set_size_request(150, -1)
 
-        self.toolbar.connect("cargar_lista", self.cargar_lista)
+        self.toolbar.connect("cargar_lista",
+            self.cargar_lista)
         #self.toolbar.connect("add_stream", self.__emit_add_stream)
-        self.toolbar.connect("menu_activo", self.__emit_menu_activo)
+        self.toolbar.connect("menu_activo",
+            self.__emit_menu_activo)
 
-        self.lista.connect("nueva-seleccion", self.__emit_nueva_seleccion)
-        self.lista.connect("button-press-event", self.__click_derecho_en_lista)
-        self.lista.connect("len_items", self.__re_emit_len_items)
+        self.lista.connect("nueva-seleccion",
+            self.__emit_nueva_seleccion)
+        self.lista.connect("button-press-event",
+            self.__click_derecho_en_lista)
+        self.lista.connect("len_items",
+            self.__re_emit_len_items)
 
     def __re_emit_len_items(self, widget, items):
         self.emit("len_items", items)
@@ -256,7 +261,8 @@ class Lista(Gtk.TreeView):
 
     def __init__(self):
 
-        Gtk.TreeView.__init__(self, Gtk.ListStore(GdkPixbuf.Pixbuf,
+        Gtk.TreeView.__init__(self,
+            Gtk.ListStore(GdkPixbuf.Pixbuf,
             GObject.TYPE_STRING, GObject.TYPE_STRING))
 
         #self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
@@ -416,10 +422,12 @@ class My_FileChooser(Gtk.FileChooserDialog):
     def __init__(self, parent=None, action=None,
         filter_type=[], title=None, path=None, mime=[]):
 
-        Gtk.FileChooserDialog.__init__(self, title=title, parent=parent,
+        Gtk.FileChooserDialog.__init__(self,
+            title=title, parent=parent,
             action=action)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("window"))
         self.set_resizable(True)
         self.set_size_request(320, 240)
 
@@ -433,8 +441,10 @@ class My_FileChooser(Gtk.FileChooserDialog):
         boton_salir = Gtk.Button("Salir")
         boton_salir.connect("clicked", self.__salir)
 
-        boton_abrir_directorio.connect("clicked", self.__file_activated)
-        boton_seleccionar_todo.connect("clicked", self.__select_all)
+        boton_abrir_directorio.connect("clicked",
+            self.__file_activated)
+        boton_seleccionar_todo.connect("clicked",
+            self.__select_all)
 
         hbox.pack_end(boton_salir, True, True, 5)
         hbox.pack_end(boton_seleccionar_todo, True, True, 5)
@@ -569,8 +579,10 @@ class JAMediaToolbarList(Gtk.EventBox):
 
         toolbar = Gtk.Toolbar()
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
-        toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
+        self.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("toolbars"))
+        toolbar.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("toolbars"))
 
         archivo = os.path.join(ICONS_PATH, "lista.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
@@ -578,21 +590,26 @@ class JAMediaToolbarList(Gtk.EventBox):
         boton.connect("clicked", self.__get_menu)
         toolbar.insert(boton, -1)
 
-        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        toolbar.insert(get_separador(
+            draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         self.label = Gtk.Label("")
-        self.label.modify_fg(0, get_colors("drawingplayer"))
+        self.label.modify_bg(Gtk.StateType.NORMAL,
+            get_colors("drawingplayer"))
         self.label.show()
         item.add(self.label)
         toolbar.insert(item, -1)
 
-        toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        toolbar.insert(get_separador(
+            draw=False, ancho=0, expand=True), -1)
 
         archivo = os.path.join(ICONS_PATH, "agregar.svg")
-        self.boton_agregar = get_boton(archivo, flip=False, pixels=24)
+        self.boton_agregar = get_boton(
+            archivo, flip=False, pixels=24)
         self.boton_agregar.set_tooltip_text("Agregar Streaming")
-        self.boton_agregar.connect("clicked", self.__emit_add_stream)
+        self.boton_agregar.connect(
+            "clicked", self.__emit_add_stream)
         toolbar.insert(self.boton_agregar, -1)
 
         self.add(toolbar)
@@ -605,31 +622,38 @@ class JAMediaToolbarList(Gtk.EventBox):
         if self.ip:
             item = Gtk.MenuItem("JAMedia Radio")
             menu.append(item)
-            item.connect_object("activate", self.__emit_load_list, 0)
+            item.connect_object("activate",
+                self.__emit_load_list, 0)
 
             item = Gtk.MenuItem("Mis Emisoras")
             menu.append(item)
-            item.connect_object("activate", self.__emit_load_list, 2)
+            item.connect_object("activate",
+                self.__emit_load_list, 2)
 
         item = Gtk.MenuItem("Mis Archivos")
         menu.append(item)
-        item.connect_object("activate", self.__emit_load_list, 5)
+        item.connect_object("activate",
+            self.__emit_load_list, 5)
 
         item = Gtk.MenuItem("JAMediaTube")
         menu.append(item)
-        item.connect_object("activate", self.__emit_load_list, 6)
+        item.connect_object("activate",
+            self.__emit_load_list, 6)
 
         item = Gtk.MenuItem("Audio-JAMediaVideo")
         menu.append(item)
-        item.connect_object("activate", self.__emit_load_list, 7)
+        item.connect_object("activate",
+            self.__emit_load_list, 7)
 
         item = Gtk.MenuItem("Video-JAMediaVideo")
         menu.append(item)
-        item.connect_object("activate", self.__emit_load_list, 8)
+        item.connect_object("activate",
+            self.__emit_load_list, 8)
 
         item = Gtk.MenuItem("Archivos Externos")
         menu.append(item)
-        item.connect_object("activate", self.__emit_load_list, 9)
+        item.connect_object("activate",
+            self.__emit_load_list, 9)
 
         menu.show_all()
         menu.attach_to_widget(widget, self.__null)
