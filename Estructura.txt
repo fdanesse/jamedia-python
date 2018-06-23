@@ -7,6 +7,11 @@ JAMedia
     AlertaBusqueda
     Buscar
     PanelTube
+        Mini_Toolbar
+        ToolbarAccionListasVideos
+        Toolbar_Guardar
+        Toolbar_Videos_Izquierda
+        Toolbar_Videos_Derecha
     JAMediaPlayer
         Toolbar
         ToolbarSalir
@@ -22,6 +27,9 @@ JAMedia
                 ToolbarInfo
                 ProgressPlayer
             Derecha
+                BalanceWidget
+                PlayerList
+                PlayerControls
             JAMediaReproductor
             **DialogoDescarga
 

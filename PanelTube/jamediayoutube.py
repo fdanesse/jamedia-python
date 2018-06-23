@@ -1,32 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   JAMediaYoutube.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-# https://developers.google.com/youtube/1.0/developers_guide_python?hl=
-# es#RetrievingVideos
 # http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
 
 import os
 import time
 import subprocess
-import urllib
 
 from gi.repository import GLib
 from gi.repository import GObject
@@ -34,18 +13,8 @@ from gi.repository import GObject
 from JAMediaPlayer.Globales import get_tube_directory
 
 BASE_PATH = os.path.dirname(__file__)
-STDERR = "/dev/null"
+#STDERR = "/dev/null"
 youtubedl = os.path.join(BASE_PATH, "youtube-dl") #"/usr/bin/youtube-dl"
-
-FEED = {
-    "id": "",
-    "titulo": "",
-    "descripcion": "",
-    "categoria": "",
-    "url": "",
-    "duracion": 0,
-    "previews": ""
-    }
 
 CODECS = [
     [43, "WebM", "360p VP8 N/A 0.5 Vorbis 128"],
@@ -53,54 +22,6 @@ CODECS = [
     [18, "MP4", "270p/360p H.264 Baseline 0.5 AAC 96"],
     [82, "MP4", "360p H.264 3D 0.5 AAC 96"],
     ]
-
-
-class Buscar(GObject.GObject):
-
-    __gsignals__ = {
-    'encontrado': (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING, GObject.TYPE_STRING)),
-    'end': (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, [])}
-
-    def __init__(self, ):
-
-        GObject.GObject.__init__(self)
-
-    def __get_videos(self, consulta, limite):
-        # Obtener web principal con resultado de busqueda y recorrer todas
-        # las pags de la busqueda obtenida hasta conseguir el id de los videos.
-        params = urllib.urlencode({'search_query': consulta})
-        urls = {}
-        print "Comezando la búsqueda de %i videos sobre %s" % (limite, consulta)
-        for pag in range(1, 10):
-            f = urllib.urlopen("http://www.youtube.com/results?%s&filters=video&page=%i" % (params, pag))
-            text = f.read().replace("\n", "")
-            f.close()
-            for item in text.split("data-context-item-id=")[1:]:
-                _id = item.split("\"")[1].strip()
-                url = "http://www.youtube.com/watch?v=%s" % _id
-                if not _id in urls.keys():
-                    urls[_id] = {"url": url}
-                    self.emit("encontrado", _id, url)
-                if len(urls.keys()) >= limite:
-                    break
-            if len(urls.keys()) >= limite:
-                break
-        print "Búsqueda finalizada para:", consulta, "Videos encontrados:", len(urls.keys())
-        self.emit("end")
-
-    def buscar(self, palabras, cantidad):
-        buscar = ""
-        for palabra in palabras.split(" "):
-            buscar = "%s%s+" % (buscar, palabra.lower())
-        if buscar.endswith("+"):
-            buscar = str(buscar[:-1])
-        try:  # FIXME: Porque falla si no hay Conexión.
-            if buscar:
-                self.__get_videos(buscar, cantidad)
-        except:
-            pass
 
 
 class JAMediaYoutube(GObject.GObject):
@@ -194,7 +115,7 @@ class JAMediaYoutube(GObject.GObject):
             youtubedl, self.url, 1, CODECS[self.codec][0], destino)
 
         self.youtubedl = subprocess.Popen(estructura, shell=True,
-            stdout=open(self.STDOUT, "w+b"), stderr=open(self.STDOUT, "r+b"),
+            stdout=open(self.STDOUT, "w+b"), #=open(self.STDOUT, "r+b"),
             universal_newlines=True)
 
         self.salida = open(self.STDOUT, "r")

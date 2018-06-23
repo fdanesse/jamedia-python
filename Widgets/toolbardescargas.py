@@ -27,7 +27,7 @@ from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import GObject
 
-from PanelTube.jamediatube import JAMediaYoutube
+from PanelTube.jamediayoutube import JAMediaYoutube
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador

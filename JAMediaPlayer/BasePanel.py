@@ -150,7 +150,6 @@ class BasePanel(Gtk.HPaned):
                 self.izquierda.progress.get_volumen()))
         else:
             self.player = JAMediaReproductor(xid)
-
             self.player.connect("endfile", self.__endfile)
             self.player.connect("estado", self.__state_changed)
             self.player.connect("newposicion", self.__update_progress)
@@ -228,7 +227,6 @@ class BasePanel(Gtk.HPaned):
             self.player.disconnect_by_func(self.__update_progress)
             self.player.disconnect_by_func(self.__set_video)
             #self.player.disconnect_by_func(self.__loading_buffer)
-            self.player.kill()
             #del(self.player)
             self.player = False
 

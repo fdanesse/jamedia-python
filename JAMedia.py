@@ -24,7 +24,7 @@ from Widgets.toolbarsalir import ToolbarSalir
 from Widgets.widgetvideoitem import WidgetVideoItem
 
 from PanelTube.paneltube import PanelTube
-from PanelTube.jamediatube import Buscar, FEED
+from PanelTube.buscar import Buscar, FEED
 
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
 

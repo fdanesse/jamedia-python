@@ -1,25 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#   Widgets.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 import os
+import shelve
 import gi
 gi.require_version("Gtk", "3.0")
 
@@ -27,13 +10,11 @@ from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import GObject
 
-import shelve
-
-from paneltubewidgets import Mini_Toolbar
-from paneltubewidgets import ToolbarAccionListasVideos
-from paneltubewidgets import Toolbar_Videos_Izquierda
-from paneltubewidgets import Toolbar_Videos_Derecha
-from paneltubewidgets import Toolbar_Guardar
+from minitoolbar import Mini_Toolbar
+from toolbaraccionlistasvideos import ToolbarAccionListasVideos
+from toolbarvideosizquierda import Toolbar_Videos_Izquierda
+from toolbarvideosderecha import Toolbar_Videos_Derecha
+from toolbarguardar import Toolbar_Guardar
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_data_directory
@@ -235,8 +216,8 @@ class PanelTube(Gtk.HPaned):
         """
         Agrega a la lista, los videos almacenados en un archivo shelve.
         """
-        dict_tube = shelve.open(os.path.join(get_data_directory(),
-            "List.tube"))
+        dict_tube = shelve.open(os.path.join(
+            get_data_directory(), "List.tube"))
         _dict = dict_tube.get(key, [])
         dict_tube.close()
         videos = []
@@ -347,8 +328,8 @@ class PanelTube(Gtk.HPaned):
             destino = self.encontrados
             text = TipEncontrados
         elementos = origen.get_children()
-        GLib.idle_add(self.__ejecutar_mover_videos, origen, destino,
-            text, elementos)
+        GLib.idle_add(self.__ejecutar_mover_videos,
+            origen, destino, text, elementos)
 
     def __ejecutar_mover_videos(self, origen, destino, text, elementos):
         """

@@ -32,7 +32,7 @@ import urllib
 import base64
 import subprocess
 
-from PanelTube.jamediatube import JAMediaYoutube
+from PanelTube.jamediayoutube import JAMediaYoutube
 
 from JAMediaPlayer.Globales import get_colors
 
