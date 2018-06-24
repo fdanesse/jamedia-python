@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
@@ -10,11 +9,11 @@ from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import GObject
 
-from minitoolbar import Mini_Toolbar
-from toolbaraccionlistasvideos import ToolbarAccionListasVideos
-from toolbarvideosizquierda import Toolbar_Videos_Izquierda
-from toolbarvideosderecha import Toolbar_Videos_Derecha
-from toolbarguardar import Toolbar_Guardar
+from PanelTube.minitoolbar import Mini_Toolbar
+from PanelTube.toolbaraccionlistasvideos import ToolbarAccionListasVideos
+from PanelTube.toolbarvideosizquierda import Toolbar_Videos_Izquierda
+from PanelTube.toolbarvideosderecha import Toolbar_Videos_Derecha
+from PanelTube.toolbarguardar import Toolbar_Guardar
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_data_directory
@@ -380,7 +379,7 @@ class PanelTube(Gtk.HPaned):
                 return  # No se abre confirmacion.
             self.toolbar_accion_derecha.set_accion(objetos)
         else:
-            print "Caso imprevisto en run_accion de PanelTube."
+            print ("Caso imprevisto en run_accion de PanelTube.")
 
     def __update(self):
         """
@@ -437,12 +436,6 @@ class PanelTube(Gtk.HPaned):
         """
         for toolbar in self.toolbars_flotantes:
             toolbar.cancelar()
-
-    def set_vista_inicial(self):
-        """
-        Las toolbar accion deben estar ocultas inicialmente.
-        """
-        map(self.__cancel_toolbars, self.toolbars_flotantes)
 
     def update_widgets_videos_encontrados(self):
         """

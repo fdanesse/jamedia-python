@@ -26,8 +26,8 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from gi.repository import GObject
 
-from credits import Credits
-from help import Help
+from JAMediaPlayer.Widgets.credits import Credits
+from JAMediaPlayer.Widgets.help import Help
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador

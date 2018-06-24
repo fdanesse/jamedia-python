@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
@@ -16,25 +15,24 @@ from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
 
-from Widgets.Toolbars import Toolbar
-from Widgets.Toolbars import ToolbarSalir
-from Widgets.Toolbars import ToolbarAccion
+from JAMediaPlayer.Widgets.Toolbars import Toolbar
+from JAMediaPlayer.Widgets.Toolbars import ToolbarSalir
+from JAMediaPlayer.Widgets.Toolbars import ToolbarAccion
 #from Widgets.Toolbars import ToolbarAddStream
-from Widgets.mousespeeddetector import MouseSpeedDetector
-from BasePanel import BasePanel
+from JAMediaPlayer.Widgets.mousespeeddetector import MouseSpeedDetector
+from JAMediaPlayer.BasePanel import BasePanel
 
 #from JAMediaReproductor.JAMediaGrabador import JAMediaGrabador
 
-from Globales import get_colors
-from Globales import eliminar_streaming
-#from Globales import add_stream
-from Globales import get_my_files_directory
-from Globales import describe_archivo
+from JAMediaPlayer.Globales import get_colors
+from JAMediaPlayer.Globales import eliminar_streaming
+#from JAMediaPlayer.Globales import add_stream
+from JAMediaPlayer.Globales import get_my_files_directory
 
 #GObject.threads_init()
 #commands.getoutput('PATH=%s:$PATH' % (os.path.dirname(__file__)))
 
-from Globales import ICONS_PATH
+from JAMediaPlayer.Globales import ICONS_PATH
 
 
 class JAMediaPlayer(Gtk.EventBox):
@@ -197,7 +195,7 @@ class JAMediaPlayer(Gtk.EventBox):
         elif accion == "show-config":
             self.base_panel.derecha.show_config()
         else:
-            print self.__accion_toolbar, accion
+            print (self.__accion_toolbar, accion)
 
     def __hide_show(self, widget):
         """

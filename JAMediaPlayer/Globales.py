@@ -1,9 +1,8 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import socket
 import os
-import commands
+#import commands FIXME: No existe en python 3
 import shutil
 import json
 import codecs
@@ -36,24 +35,28 @@ def convert_shelve_to_json(path):
     return _dict
 '''
 
-def ocultar(objeto):
-    if objeto.get_visible():
-        objeto.hide()
+def ocultar(objetos):
+    for objeto in objetos:
+        if objeto.get_visible():
+            objeto.hide()
 
 
-def mostrar(objeto):
-    if not objeto.get_visible():
-        objeto.show()
+def mostrar(objetos):
+    for objeto in objetos:
+        if not objeto.get_visible():
+            objeto.show()
 
 
-def sensibilizar(objeto):
-    if not objeto.get_sensitive():
-        objeto.set_sensitive(True)
+def sensibilizar(objetos):
+    for objeto in objetos:
+        if not objeto.get_sensitive():
+            objeto.set_sensitive(True)
 
 
-def insensibilizar(objeto):
-    if objeto.get_sensitive():
-        objeto.set_sensitive(False)
+def insensibilizar(objetos):
+    for objeto in objetos:
+        if objeto.get_sensitive():
+            objeto.set_sensitive(False)
 
 
 def get_dict(path):
@@ -106,7 +109,7 @@ def get_ip():
     except:
         return False
 
-
+'''
 def describe_archivo(archivo):
     """
     Devuelve el tipo de un archivo (imagen, video, texto).
@@ -117,6 +120,7 @@ def describe_archivo(archivo):
     for dat in datos.split(":")[1:]:
         retorno += " %s" % (dat)
     return retorno
+'''
 
 
 def describe_uri(uri):
@@ -166,7 +170,7 @@ def borrar(origen):
             return False
         return True
     except:
-        print "ERROR Al Intentar Borrar un Archivo"
+        print ("ERROR Al Intentar Borrar un Archivo")
         return False
 
 
@@ -181,7 +185,7 @@ def mover(origen, destino):
             os.system(expresion)
             return True
     except:
-        print "ERROR Al Intentar Mover un Archivo"
+        print ("ERROR Al Intentar Mover un Archivo")
         return False
 
 
@@ -194,7 +198,7 @@ def copiar(origen, destino):
         os.system(expresion)
         return True
     except:
-        print "ERROR Al Intentar Copiar un Archivo"
+        print ("ERROR Al Intentar Copiar un Archivo")
         return False
 
 
@@ -204,7 +208,7 @@ def make_base_directory():
     """
     if not os.path.exists(os.path.join(os.environ["HOME"], "JAMediaDatos")):
         os.mkdir(os.path.join(os.environ["HOME"], "JAMediaDatos"))
-        os.chmod(os.path.join(os.environ["HOME"], "JAMediaDatos"), 0755)
+        os.chmod(os.path.join(os.environ["HOME"], "JAMediaDatos"), stat.S_IXOTH)
 
     # Directorios JAMedia
     DIRECTORIO_MIS_ARCHIVOS = os.path.join(os.environ["HOME"],
@@ -215,11 +219,11 @@ def make_base_directory():
 
     if not os.path.exists(DIRECTORIO_MIS_ARCHIVOS):
         os.mkdir(DIRECTORIO_MIS_ARCHIVOS)
-        os.chmod(DIRECTORIO_MIS_ARCHIVOS, 0755)
+        os.chmod(DIRECTORIO_MIS_ARCHIVOS, stat.S_IXOTH)
 
     if not os.path.exists(DIRECTORIO_DATOS):
         os.mkdir(DIRECTORIO_DATOS)
-        os.chmod(DIRECTORIO_DATOS, 0755)
+        os.chmod(DIRECTORIO_DATOS, stat.S_IXOTH)
 
     # Directorio JAMediaTube
     DIRECTORIO_YOUTUBE = os.path.join(os.environ["HOME"],
@@ -227,7 +231,7 @@ def make_base_directory():
 
     if not os.path.exists(DIRECTORIO_YOUTUBE):
         os.mkdir(DIRECTORIO_YOUTUBE)
-        os.chmod(DIRECTORIO_YOUTUBE, 0755)
+        os.chmod(DIRECTORIO_YOUTUBE, stat.S_IXOTH)
 
     # Directorios JAMediaVideo
     AUDIO_JAMEDIA_VIDEO = os.path.join(os.environ["HOME"],
@@ -235,21 +239,21 @@ def make_base_directory():
 
     if not os.path.exists(AUDIO_JAMEDIA_VIDEO):
         os.mkdir(AUDIO_JAMEDIA_VIDEO)
-        os.chmod(AUDIO_JAMEDIA_VIDEO, 0755)
+        os.chmod(AUDIO_JAMEDIA_VIDEO, stat.S_IXOTH)
 
     VIDEO_JAMEDIA_VIDEO = os.path.join(os.environ["HOME"],
         "JAMediaDatos", "Videos")
 
     if not os.path.exists(VIDEO_JAMEDIA_VIDEO):
         os.mkdir(VIDEO_JAMEDIA_VIDEO)
-        os.chmod(VIDEO_JAMEDIA_VIDEO, 0755)
+        os.chmod(VIDEO_JAMEDIA_VIDEO, stat.S_IXOTH)
 
     IMAGENES_JAMEDIA_VIDEO = os.path.join(os.environ["HOME"],
         "JAMediaDatos", "Fotos")
 
     if not os.path.exists(IMAGENES_JAMEDIA_VIDEO):
         os.mkdir(IMAGENES_JAMEDIA_VIDEO)
-        os.chmod(IMAGENES_JAMEDIA_VIDEO, 0755)
+        os.chmod(IMAGENES_JAMEDIA_VIDEO, stat.S_IXOTH)
 
 
 def get_data_directory():
@@ -378,7 +382,7 @@ def set_listas_default():
     for archivo in listas:
         if not os.path.exists(archivo):
             jamedialista = set_dict(archivo, {})
-            os.chmod(archivo, 0666)
+            os.chmod(archivo, stat.S_IWOTH)
 
     # verificar si las listas están vacías,
     # si lo están se descargan las de JAMedia
@@ -390,7 +394,7 @@ def set_listas_default():
             guarda_lista_de_streamings(os.path.join(DIRECTORIO_DATOS,
                 "JAMediaRadio.JAMedia"), lista_radios)
         except:
-            print "Error al descargar Streamings de Radios."
+            print ("Error al descargar Streamings de Radios.")
 
 
 def download_streamings():
@@ -406,7 +410,7 @@ def download_streamings():
         guarda_lista_de_streamings(os.path.join(DIRECTORIO_DATOS,
             "JAMediaRadio.JAMedia"), lista_radios)
     except:
-        print "Error al descargar Streamings de Radios."
+        print ("Error al descargar Streamings de Radios.")
 
 
 def descarga_lista_de_streamings(url):
@@ -418,7 +422,7 @@ def descarga_lista_de_streamings(url):
         [nombre, url]
     """
 
-    print "Conectandose a:", url, "\n\tDescargando Streamings . . ."
+    print ("Conectandose a:", url, "\n\tDescargando Streamings . . .")
 
     import urllib
 
@@ -456,9 +460,9 @@ def descarga_lista_de_streamings(url):
                 cont += 1
 
             else:
-                print "Direccion Descartada por Repetición:", name, direc
+                print ("Direccion Descartada por Repetición:", name, direc)
 
-        print "\tSe han Descargado:", cont, "Estreamings.\n"
+        print ("\tSe han Descargado:", cont, "Estreamings.\n")
         return streamings
 
     except:

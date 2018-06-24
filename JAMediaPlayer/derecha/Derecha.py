@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import gi
@@ -7,9 +6,9 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from gi.repository import GObject
 
-from BalanceWidget import BalanceWidget
-from JAMediaPlayerList import PlayerList
-from PlayerControls import PlayerControls
+from JAMediaPlayer.derecha.BalanceWidget import BalanceWidget
+from JAMediaPlayer.derecha.JAMediaPlayerList import PlayerList
+from JAMediaPlayer.derecha.PlayerControls import PlayerControls
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import ocultar
 from JAMediaPlayer.Globales import mostrar
@@ -111,17 +110,20 @@ class Derecha(Gtk.EventBox):
         self.emit("cargar-reproducir", path)
 
     def show_config(self):
+        print ('FIXME:', self.show_config)
+        '''
         objs = self.get_child().get_children()
         valor = objs[0].get_visible()
         if valor:
-            ocultar(objs[0])
-            map(mostrar, objs[1:])
+            ocultar([objs[0]])
+            mostrar(objs[1:])
         else:
-            mostrar(objs[0])
-            map(ocultar, objs[1:])
-
+            mostrar([objs[0]])
+            ocultar(objs[1:])
+        '''
+        
     def setup_init(self):
-        ocultar(self.get_child().get_children()[0])
+        ocultar([self.get_child().get_children()[0]])
         self.lista.setup_init()
         self.player_controls.activar(0)
 

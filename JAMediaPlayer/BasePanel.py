@@ -10,13 +10,13 @@ from gi.repository import GObject
 from gi.repository import GdkX11
 
 #from Widgets import DialogoDescarga
-from izquierda.Izquierda import Izquierda
-from derecha.Derecha import Derecha
+from JAMediaPlayer.izquierda.Izquierda import Izquierda
+from JAMediaPlayer.derecha.Derecha import Derecha
 
-from Globales import get_colors
+from JAMediaPlayer.Globales import get_colors
 #from JAMediaPlayer.Globales import get_ip
 
-from JAMediaReproductor.JAMediaReproductor import JAMediaReproductor
+from JAMediaPlayer.JAMediaReproductor.JAMediaReproductor import JAMediaReproductor
 
 
 class BasePanel(Gtk.HPaned):
@@ -190,7 +190,7 @@ class BasePanel(Gtk.HPaned):
             self.derecha.player_controls.set_paused()
             GLib.idle_add(self.__update_balance)
         else:
-            print "Estado del Reproductor desconocido:", valor
+            print ("Estado del Reproductor desconocido:", valor)
 
     def __update_balance(self):
         config = {}

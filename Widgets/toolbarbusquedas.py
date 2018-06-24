@@ -1,23 +1,4 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-#   Widgets.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
 import gi
@@ -29,14 +10,11 @@ from gi.repository import GObject
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
-
-BASE_PATH = os.path.dirname(os.path.dirname(__file__))
+from JAMediaPlayer.Globales import ICONS_PATH
 
 
 class ToolbarBusquedas(Gtk.Toolbar):
-    """
-    Toolbar con widgets de busqueda.
-    """
+    '''Busqueda en youtube'''
 
     __gsignals__ = {
     "comenzar_busqueda": (GObject.SIGNAL_RUN_FIRST,
@@ -49,8 +27,7 @@ class ToolbarBusquedas(Gtk.Toolbar):
         self.modify_bg(Gtk.StateType.NORMAL,
         get_colors("window1"))
 
-        self.insert(get_separador(
-            draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
         item = Gtk.ToolItem()
         label = Gtk.Label("Buscar")
@@ -58,8 +35,7 @@ class ToolbarBusquedas(Gtk.Toolbar):
         item.add(label)
         self.insert(item, -1)
 
-        self.insert(get_separador(
-            draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         self.entrycantidad = Gtk.Entry()
@@ -67,16 +43,13 @@ class ToolbarBusquedas(Gtk.Toolbar):
         self.entrycantidad.set_property("xalign", 0.5)
         self.entrycantidad.set_size_request(40, -1)
         self.entrycantidad.set_max_length(3)
-        self.entrycantidad.set_tooltip_text(
-            "Escribe la cantidad de videos que deseas")
+        self.entrycantidad.set_tooltip_text("Escribe la cantidad de videos que deseas")
         self.entrycantidad.show()
-        self.entrycantidad.connect(
-            'changed', self.__changed_entrycantidad)
+        self.entrycantidad.connect('changed', self.__changed_entrycantidad)
         item.add(self.entrycantidad)
         self.insert(item, -1)
 
-        self.insert(get_separador(
-            draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         label = Gtk.Label("Videos Sobre")
@@ -84,8 +57,7 @@ class ToolbarBusquedas(Gtk.Toolbar):
         item.add(label)
         self.insert(item, -1)
 
-        self.insert(get_separador(
-            draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         self.entrytext = Gtk.Entry()
@@ -98,18 +70,15 @@ class ToolbarBusquedas(Gtk.Toolbar):
         item.add(self.entrytext)
         self.insert(item, -1)
 
-        self.insert(get_separador(
-            draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        archivo = os.path.join(
-            BASE_PATH, "Iconos", "dialog-ok.svg")
+        archivo = os.path.join(ICONS_PATH, "dialog-ok.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Comenzar Búsqueda")
         boton.connect("clicked", self.__emit_buscar)
         self.insert(boton, -1)
 
-        self.insert(get_separador(
-            draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
         self.show_all()
 

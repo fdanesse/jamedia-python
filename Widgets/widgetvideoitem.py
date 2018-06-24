@@ -1,23 +1,4 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-#   Widgets.py por:
-#   Flavio Danesse <fdanesse@gmail.com>
-#   Uruguay
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
 import gi
@@ -84,7 +65,7 @@ class WidgetVideoItem(Gtk.EventBox):
                     pixbuf_file.close()
                     self.videodict["previews"] = image_string
                 except:
-                    print "ERROR: Quizas no hay conexión", self.__init__
+                    print ("ERROR: Quizas no hay conexión", self.__init__)
                 if os.path.exists(archivo):
                     os.remove(archivo)
             else:
@@ -136,7 +117,7 @@ class WidgetVideoItem(Gtk.EventBox):
         err = error.readline().strip()
         # FIXME: Signature extraction failed: Traceback (most recent call last)
         if err:
-            print "Error al actualizar metadatos de:", self.videodict["url"], err
+            print ("Error al actualizar metadatos de:", self.videodict["url"], err)
             process.kill()
             for arch in [salida, error]:
                 arch.close()
@@ -195,7 +176,7 @@ class WidgetVideoItem(Gtk.EventBox):
                 pixbuf_file.close()
                 self.videodict["previews"] = image_string
             except:
-                print "ERROR: Quizas no hay conexión", self.update
+                print ("ERROR: Quizas no hay conexión", self.update)
             if os.path.exists(archivo):
                 os.remove(archivo)
         self.id_label.set_text("%s: %s" % ("id", self.videodict["id"]))

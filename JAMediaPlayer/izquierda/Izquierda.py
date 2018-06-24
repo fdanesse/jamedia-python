@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import gi
@@ -9,14 +8,13 @@ from gi.repository import GLib
 from gi.repository import GObject
 
 #from toolbargrabar import ToolbarGrabar
-from videovisor import VideoVisor
+from JAMediaPlayer.izquierda.videovisor import VideoVisor
 #from bufferinfo import BufferInfo
-from toolbarinfo import ToolbarInfo
+from JAMediaPlayer.izquierda.toolbarinfo import ToolbarInfo
 from JAMediaPlayer.Widgets.ProgressPlayer import ProgressPlayer
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import ocultar
-from JAMediaPlayer.Globales import mostrar
 
 
 class Izquierda(Gtk.EventBox):

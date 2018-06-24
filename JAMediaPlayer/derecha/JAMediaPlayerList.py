@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
@@ -16,7 +15,7 @@ from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
 
 from JAMediaPlayer.Globales import describe_uri
-from JAMediaPlayer.Globales import describe_archivo
+#from JAMediaPlayer.Globales import describe_archivo
 from JAMediaPlayer.Globales import describe_acceso_uri
 from JAMediaPlayer.Globales import get_streamings
 from JAMediaPlayer.Globales import stream_en_archivo
@@ -207,7 +206,7 @@ class PlayerList(Gtk.Frame):
         return filepaths
 
     def setup_init(self):
-        ocultar(self.toolbar.boton_agregar)
+        ocultar([self.toolbar.boton_agregar])
 
     def cargar_lista(self, widget, indice):
         data = get_data_directory()
@@ -219,12 +218,12 @@ class PlayerList(Gtk.Frame):
             7: get_audio_directory(),
             8: get_video_directory(),
             }
-        ocultar(self.toolbar.boton_agregar)
+        ocultar([self.toolbar.boton_agregar])
         if indice == 0:
             self.__seleccionar_lista_de_stream(_dict[0], "JAM-Radio")
         elif indice == 2:
             self.__seleccionar_lista_de_stream(_dict[2], "Radios")
-            mostrar(self.toolbar.boton_agregar)
+            mostrar([self.toolbar.boton_agregar])
         elif indice == 5:
             self.__seleccionar_lista_de_archivos(_dict[indice], "Archivos")
         elif indice == 6:
@@ -337,7 +336,7 @@ class Lista(Gtk.TreeView):
         descripcion = describe_uri(path)
         icono = os.path.join(ICONS_PATH, "sonido.svg")
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(icono, 24, -1)
-
+        '''
         if descripcion:
             if descripcion[2]:
                 # Es un Archivo
@@ -346,6 +345,7 @@ class Lista(Gtk.TreeView):
                     icono = os.path.join(ICONS_PATH, "video.svg")
                     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
                         icono, 24, -1)
+        '''
 
         self.get_model().append([pixbuf, texto, path])
         elementos.remove(elementos[0])
@@ -596,7 +596,7 @@ class JAMediaToolbarList(Gtk.EventBox):
         item = Gtk.ToolItem()
         self.label = Gtk.Label("")
         self.label.modify_bg(Gtk.StateType.NORMAL,
-            get_colors("drawingplayer"))
+            get_colors("toolbars"))
         self.label.show()
         item.add(self.label)
         toolbar.insert(item, -1)

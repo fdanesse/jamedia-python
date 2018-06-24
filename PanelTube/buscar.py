@@ -8,7 +8,6 @@ import urllib
 
 from gi.repository import GObject
 
-
 BASE_PATH = os.path.dirname(__file__)
 #STDERR = "/dev/null"
 
@@ -40,7 +39,7 @@ class Buscar(GObject.GObject):
         # las pags de la busqueda obtenida hasta conseguir el id de los videos.
         params = urllib.urlencode({'search_query': consulta})
         urls = {}
-        print "Comezando la búsqueda de %i videos sobre %s" % (limite, consulta)
+        print ("Comezando la búsqueda de %i videos sobre %s" % (limite, consulta))
         for pag in range(1, 10):
             f = urllib.urlopen("http://www.youtube.com/results?%s&filters=video&page=%i" % (params, pag))
             text = f.read().replace("\n", "")
@@ -55,7 +54,7 @@ class Buscar(GObject.GObject):
                     break
             if len(urls.keys()) >= limite:
                 break
-        print "Búsqueda finalizada para:", consulta, "Videos encontrados:", len(urls.keys())
+        print ("Búsqueda finalizada para:", consulta, "Videos encontrados:", len(urls.keys()))
         self.emit("end")
 
     def buscar(self, palabras, cantidad):

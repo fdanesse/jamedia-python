@@ -205,7 +205,7 @@ class JAMediaReproductor(GObject.GObject):
                     self.__hasVideo = True
                     self.emit("video", True)
         elif mensaje.type == Gst.MessageType.WARNING:
-            print "\n Gst.MessageType.WARNING:", mensaje.parse_warning()
+            print ("\n Gst.MessageType.WARNING:", mensaje.parse_warning())
         elif mensaje.type == Gst.MessageType.LATENCY:
             # http://cgit.collabora.com/git/farstream.git/tree/examples/gui/fs-gui.py
             #print "\n Gst.MessageType.LATENCY"
@@ -227,12 +227,12 @@ class JAMediaReproductor(GObject.GObject):
         elif mensaje.type == Gst.MessageType.EOS:
             #self.video_pipeline.seek_simple(Gst.Format.TIME,
             #Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, 0)
-            print "\n Gst.MessageType.EOS:"
+            print ("\n Gst.MessageType.EOS:")
             self.__new_handle(False)
             self.emit("endfile")
         elif mensaje.type == Gst.MessageType.ERROR:
-            print "\n Gst.MessageType.ERROR:"
-            print mensaje.parse_error()
+            print ("\n Gst.MessageType.ERROR:")
+            print (mensaje.parse_error())
             self.__new_handle(False)
 
     def __pause(self):
@@ -369,4 +369,4 @@ class JAMediaReproductor(GObject.GObject):
             self.__pipe.set_property("uri", self.__source)
             self.__play()
         else:
-            print "FIXME:", "Dirección no válida", temp
+            print ("FIXME:", "Dirección no válida", temp)

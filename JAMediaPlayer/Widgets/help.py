@@ -12,7 +12,7 @@ from gi.repository import GObject
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_boton
-
+from JAMediaPlayer.Globales import ocultar
 from JAMediaPlayer.Globales import ICONS_PATH
 
 
@@ -67,13 +67,9 @@ class Help(Gtk.Dialog):
 
         self.__switch(None)
 
-    def __ocultar(self, objeto):
-        if objeto.get_visible():
-            objeto.hide()
-
     def __switch(self, widget):
         if not widget:
-            map(self.__ocultar, self.helps[1:])
+            ocultar(self.helps[1:])
             self.anterior.hide()
             self.helps[0].show()
         else:
@@ -89,7 +85,7 @@ class Help(Gtk.Dialog):
                     new_index -= 1
 
             helps.remove(helps[new_index])
-            map(self.__ocultar, helps)
+            ocultar(helps)
             self.helps[new_index].show()
 
             if new_index > 0:

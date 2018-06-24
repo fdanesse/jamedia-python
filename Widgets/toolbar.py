@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
@@ -8,7 +7,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from gi.repository import GObject
 
-from help import Help
+from Widgets.help import Help
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
@@ -69,10 +68,13 @@ class Toolbar(Gtk.Toolbar):
         self.show_all()
 
     def __show_help(self, widget):
+        print ('FIXME:', self.__show_help)
+        '''
         dialog = Help(parent=self.get_toplevel())
         dialog.run()
         dialog.destroy()
-
+        '''
+        
     def __emit_switch(self, widget):
         self.emit('switch')
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
@@ -10,7 +9,7 @@ from gi.repository import Gtk
 from gi.repository import GdkPixbuf
 from gi.repository import GObject
 
-from tubelistdialog import TubeListDialog
+from PanelTube.tubelistdialog import TubeListDialog
 
 from JAMediaPlayer.Globales import get_data_directory
 from JAMediaPlayer.Globales import get_colors
@@ -88,17 +87,16 @@ class Mini_Toolbar(Gtk.Toolbar):
         """
         El menu con las listas de videos almacenadas en archivos shelve.
         """
-        dict_tube = shelve.open(os.path.join(
-            get_data_directory(),
-            "List.tube"))
+        print ('FIXME:', self.__get_menu)
+        '''
+        dict_tube = shelve.open(os.path.join(get_data_directory(), "List.tube"))
         keys = dict_tube.keys()
         dict_tube.close()
         if keys:
             self.emit("menu_activo")
             menu = Gtk.Menu()
             administrar = Gtk.MenuItem('Administrar')
-            administrar.connect_object("activate",
-                self.__administrar, None)
+            administrar.connect_object("activate", self.__administrar, None)
             cargar = Gtk.MenuItem('Cargar')
             menu.append(administrar)
             menu.append(cargar)
@@ -107,12 +105,13 @@ class Mini_Toolbar(Gtk.Toolbar):
             for key in keys:
                 item = Gtk.MenuItem(key)
                 menu_listas.append(item)
-                item.connect_object("activate",
-                    self.__emit_abrir, key)
+                item.connect_object("activate", self.__emit_abrir, key)
             menu.show_all()
             menu.attach_to_widget(widget, self.__null)
             menu.popup(None, None, None, None, 1, 0)
+        '''
 
+    ''' 
     def __administrar(self, widget):
         dialogo = TubeListDialog(parent=self.get_toplevel())
         dialogo.run()
@@ -120,7 +119,8 @@ class Mini_Toolbar(Gtk.Toolbar):
 
     def __null(self):
         pass
-
+    '''
+    
     def set_info(self, valor):
         """
         Recibe un entero y actualiza la información.
