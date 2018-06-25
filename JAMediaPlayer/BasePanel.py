@@ -142,14 +142,12 @@ class BasePanel(Gtk.HPaned):
 
     def __cargar_reproducir(self, widget, path):
         self.derecha.set_sensitive(False)
-        xid = self.izquierda.video_visor.get_property(
-            'window').get_xid()
         volumen = 1.0
         if self.player:
             volumen = float("{:.1f}".format(
                 self.izquierda.progress.get_volumen()))
         else:
-            self.player = JAMediaReproductor(xid)
+            self.player = JAMediaReproductor()
             self.player.connect("endfile", self.__endfile)
             self.player.connect("estado", self.__state_changed)
             self.player.connect("newposicion", self.__update_progress)
@@ -158,7 +156,7 @@ class BasePanel(Gtk.HPaned):
 
         self.izquierda.progress.set_sensitive(False)
         self.__set_video(False, False)
-
+        xid = self.izquierda.video_visor.get_property('window').get_xid()
         self.player.load(path, xid)
         self.player.set_volumen(volumen)
         self.derecha.set_sensitive(True)
@@ -183,11 +181,11 @@ class BasePanel(Gtk.HPaned):
 
     def __state_changed(self, widget=None, valor=None):
         if "playing" in valor:
-            self.derecha.player_controls.set_playing()
-            self.izquierda.progress.set_sensitive(True)
+            GLib.idle_add(self.derecha.player_controls.set_playing)
+            GLib.idle_add(self.izquierda.progress.set_sensitive, True)
             GLib.idle_add(self.__update_balance)
         elif "paused" in valor or "None" in valor:
-            self.derecha.player_controls.set_paused()
+            GLib.idle_add(self.derecha.player_controls.set_paused)
             GLib.idle_add(self.__update_balance)
         else:
             print ("Estado del Reproductor desconocido:", valor)
@@ -196,7 +194,7 @@ class BasePanel(Gtk.HPaned):
         config = {}
         if self.player:
             config = self.player.get_balance()
-        self.derecha.balance.set_balance(
+        GLib.idle_add(self.derecha.balance.set_balance, 
             brillo=config.get('brillo', 50.0),
             contraste=config.get('contraste', 50.0),
             saturacion=config.get('saturacion', 50.0),

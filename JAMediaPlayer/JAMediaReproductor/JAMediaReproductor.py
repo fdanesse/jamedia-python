@@ -34,12 +34,12 @@ class JAMediaReproductor(GObject.GObject):
 
     # Estados: playing, paused, None
 
-    def __init__(self, winId):
+    def __init__(self):
 
         GObject.GObject.__init__(self)
 
         self.__source = None
-        self.__winId = winId
+        self.__winId = None
         self.__controller = False
         self.__status = Gst.State.NULL
         self.__hasVideo = False
@@ -57,38 +57,7 @@ class JAMediaReproductor(GObject.GObject):
             }
         self.__config = self.__config_default.copy()
 
-        self.__pipe = None  #Gst.ElementFactory.make("playbin", "player")
-        #self.__pipe.set_property('volume', self.__config['volumen'])
-
-        '''
-        # AUDIO ...
-        self.__audioBin = Gst.Pipeline()
-        self.__audioBin.set_name('audiobin')
-
-        self.__audioqueue = Gst.ElementFactory.make('queue', 'audioqueue')
-        self.__audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
-        self.__audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
-        self.__audioresample.set_property('quality', 10)
-        #self.__volume = Gst.ElementFactory.make('volume', 'volume')
-        #self.__volume.set_property('volume', self.__config['volumen'])
-        self.__autoaudiosink = Gst.ElementFactory.make("autoaudiosink", "autoaudiosink")
-
-        self.__audioBin.add(self.__audioqueue)
-        self.__audioBin.add(self.__audioconvert)
-        self.__audioBin.add(self.__audioresample)
-        #self.__audioBin.add(self.__volume)
-        self.__audioBin.add(self.__autoaudiosink)
-
-        self.__audioqueue.link(self.__audioconvert)
-        self.__audioconvert.link(self.__audioresample)
-        #self.__audioresample.link(self.__volume)
-        #self.__volume.link(self.__autoaudiosink)
-        self.__audioresample.link(self.__autoaudiosink)
-
-        pad = self.__audioqueue.get_static_pad("sink")
-        self.__audioBin.add_pad(Gst.GhostPad.new("sink", pad))
-        # ... AUDIO
-        # '''
+        self.__pipe = None
 
         # VIDEO ...
         self.__videoBin = Gst.Pipeline()
@@ -126,10 +95,6 @@ class JAMediaReproductor(GObject.GObject):
             'method', self.__config['rotacion'])
         self.__xvimagesink = Gst.ElementFactory.make(
             'xvimagesink', "xvimagesink")
-        #self.__xvimagesink.set_property(
-        #    "force-aspect-ratio", True)
-        self.__xvimagesink.set_window_handle(
-            self.__winId)
 
         self.__videoBin.add(self.__videoqueue)
         self.__videoBin.add(self.__videoconvert)
@@ -150,13 +115,7 @@ class JAMediaReproductor(GObject.GObject):
         self.__videoBin.add_pad(Gst.GhostPad.new("sink", pad))
         # ... VIDEO
 
-        #self.__pipe.set_property('video-sink', self.__videoBin)
-        #self.__pipe.set_property('audio-sink', self.__audioBin)
-
-        self.__bus = None  #self.__pipe.get_bus()
-        #self.__bus.enable_sync_message_emission()
-        #self.__bus.connect('sync-message', self.__sync_message)
-        self.__reset()
+        self.__bus = None
 
     def __reset(self):
         self.__pipe = Gst.ElementFactory.make("playbin", "player")
@@ -279,7 +238,8 @@ class JAMediaReproductor(GObject.GObject):
             self.__pause()
 
     def stop(self):
-        self.__pipe.set_state(Gst.State.NULL)
+        if self.__pipe:
+            self.__pipe.set_state(Gst.State.NULL)
 
     def get_balance(self):
         # Valores por defecto para una escala gtk
@@ -334,7 +294,7 @@ class JAMediaReproductor(GObject.GObject):
         self.__config['rotation'] = rot
 
     def set_volumen(self, valor):
-        self.__config['volumen'] = float(valor/10)  # 0.0 - 10.0
+        self.__config['volumen'] = float(valor/100)  # 0.0 - 10.0
         #self.__volume.set_property('volume', self.__config['volumen'])
         self.__pipe.set_property('volume', self.__config['volumen'])
 
