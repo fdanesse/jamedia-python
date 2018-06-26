@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import gi
@@ -9,12 +8,10 @@ from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkX11
 
-#from Widgets import DialogoDescarga
 from JAMediaPlayer.izquierda.Izquierda import Izquierda
 from JAMediaPlayer.derecha.Derecha import Derecha
 
 from JAMediaPlayer.Globales import get_colors
-#from JAMediaPlayer.Globales import get_ip
 
 from JAMediaPlayer.JAMediaReproductor.JAMediaReproductor import JAMediaReproductor
 
@@ -22,19 +19,9 @@ from JAMediaPlayer.JAMediaReproductor.JAMediaReproductor import JAMediaReproduct
 class BasePanel(Gtk.HPaned):
 
     __gsignals__ = {
-    "show-controls": (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, )),
-    "accion-list": (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,
-        GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)),
-    "menu_activo": (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, []),
-    #"add_stream": (GObject.SIGNAL_RUN_FIRST,
-    #    GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
-    "video": (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,)),
-    #'stop-record': (GObject.SIGNAL_RUN_FIRST,
-    #    GObject.TYPE_NONE, [])
+    "show-controls": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, )),
+    "accion-list": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)),
+    "menu_activo": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
     }
 
     def __init__(self):
@@ -44,45 +31,32 @@ class BasePanel(Gtk.HPaned):
         self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
         self.set_border_width(2)
 
-        self.player = False
-
         self.izquierda = Izquierda()
         self.derecha = Derecha()
 
         self.pack1(self.izquierda, resize=True, shrink=True)
         self.pack2(self.derecha, resize=False, shrink=False)
 
+        self.player = JAMediaReproductor()
+        self.player.start()
+        self.player.connect("endfile", self.__endfile)
+        self.player.connect("estado", self.__state_changed)
+        self.player.connect("newposicion", self.__update_progress)
+        self.player.connect("video", self.__set_video)
+        #self.player.connect("loading-buffer", self.__loading_buffer)
+        
         self.show_all()
 
         self.derecha.connect("cargar-reproducir", self.__cargar_reproducir)
         self.derecha.connect("accion-list", self.__emit_accion_list)
         self.derecha.connect("menu_activo", self.__emit_menu_activo)
-        #self.derecha.connect("add_stream", self.__emit_add_stream)
-        self.derecha.connect("accion-controls", self.__accion_controls)
-        self.derecha.connect("balance-valor", self.__accion_balance)
+        self.derecha.playercontrols.connect("accion-controls", self.__accion_controls)
+        self.derecha.balance.connect("balance-valor", self.__accion_balance)
 
         self.izquierda.connect("show-controls", self.__emit_show_controls)
         self.izquierda.connect("rotar", self.__rotar)
-        #self.izquierda.connect("stop-record", self.__stop_record)
         self.izquierda.connect("seek", self.__user_set_progress)
         self.izquierda.connect("volumen", self.__set_volumen)
-        #self.izquierda.connect("actualizar_streamings", self.__actualizar_streamings)
-
-        #GLib.timeout_add(5000, self.__check_ip)
-
-    '''
-    def __stop_record(self, widget):
-        self.__emit_menu_activo()
-        self.emit("stop-record")
-    '''
-    '''
-    def __actualizar_streamings(self, widget):
-        self.__emit_menu_activo()
-        dialog = DialogoDescarga(parent=self.get_toplevel(), force=True)
-        dialog.run()
-        dialog.destroy()
-        # FIXME: Recargar Lista actual
-    '''
 
     def __accion_balance(self, widget, valor, prop):
         # Setea valores de Balance en el reproductor.
@@ -97,12 +71,6 @@ class BasePanel(Gtk.HPaned):
             self.player.set_balance(hue=valor)
         elif prop == "gamma":
             self.player.set_balance(gamma=valor)
-
-    '''
-    def __emit_add_stream(self, widget, title):
-        # El usuario agregará una dirección de streaming
-        self.emit("add_stream", title)
-    '''
 
     def __emit_menu_activo(self, widget=False):
         # hay un menu contextual presente
@@ -143,19 +111,8 @@ class BasePanel(Gtk.HPaned):
     def __cargar_reproducir(self, widget, path):
         self.derecha.set_sensitive(False)
         volumen = 1.0
-        if self.player:
-            volumen = float("{:.1f}".format(
-                self.izquierda.progress.get_volumen()))
-        else:
-            self.player = JAMediaReproductor()
-            self.player.connect("endfile", self.__endfile)
-            self.player.connect("estado", self.__state_changed)
-            self.player.connect("newposicion", self.__update_progress)
-            self.player.connect("video", self.__set_video)
-            #self.player.connect("loading-buffer", self.__loading_buffer)
-
+        volumen = float("{:.1f}".format(self.izquierda.progress.get_volumen()))
         self.izquierda.progress.set_sensitive(False)
-        self.__set_video(False, False)
         xid = self.izquierda.video_visor.get_property('window').get_xid()
         self.player.load(path, xid)
         self.player.set_volumen(volumen)
@@ -173,7 +130,6 @@ class BasePanel(Gtk.HPaned):
 
     def __set_video(self, widget, valor):
         self.izquierda.toolbar_info.set_video(valor)
-        self.emit("video", valor)
 
     def __update_progress(self, objetoemisor, valor):
         # Progreso de la reproducción.
@@ -181,11 +137,11 @@ class BasePanel(Gtk.HPaned):
 
     def __state_changed(self, widget=None, valor=None):
         if "playing" in valor:
-            GLib.idle_add(self.derecha.player_controls.set_playing)
+            GLib.idle_add(self.derecha.playercontrols.set_playing)
             GLib.idle_add(self.izquierda.progress.set_sensitive, True)
             GLib.idle_add(self.__update_balance)
         elif "paused" in valor or "None" in valor:
-            GLib.idle_add(self.derecha.player_controls.set_paused)
+            GLib.idle_add(self.derecha.playercontrols.set_paused)
             GLib.idle_add(self.__update_balance)
         else:
             print ("Estado del Reproductor desconocido:", valor)
@@ -202,16 +158,8 @@ class BasePanel(Gtk.HPaned):
             gamma=config.get('gamma', 10.0))
         return False
 
-    '''
-    def __check_ip(self):
-        valor = get_ip()
-        self.izquierda.set_ip(valor)
-        self.derecha.set_ip(valor)
-        return True
-    '''
-
     def __endfile(self, widget=None, senial=None):
-        self.derecha.player_controls.set_paused()
+        self.derecha.playercontrols.set_paused()
         self.derecha.lista.seleccionar_siguiente()
 
     def setup_init(self):
@@ -225,7 +173,6 @@ class BasePanel(Gtk.HPaned):
             self.player.disconnect_by_func(self.__update_progress)
             self.player.disconnect_by_func(self.__set_video)
             #self.player.disconnect_by_func(self.__loading_buffer)
-            #del(self.player)
             self.player = False
 
     def set_nueva_lista(self, archivos):

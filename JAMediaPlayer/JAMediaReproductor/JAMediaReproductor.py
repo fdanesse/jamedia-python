@@ -1,7 +1,7 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
+import threading
 
 import gi
 gi.require_version('Gst', '1.0')
@@ -17,19 +17,14 @@ from gi.repository import Gst
 from gi.repository import GstVideo
 
 
-class JAMediaReproductor(GObject.GObject):
+class JAMediaReproductor(GObject.GObject, threading.Thread):
 
     __gsignals__ = {
-    "endfile": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, []),
-    "estado": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
-    "newposicion": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_FLOAT,)),
-    "video": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,)),
-    #"loading-buffer": (GObject.SIGNAL_RUN_LAST,
-    #    GObject.TYPE_NONE, (GObject.TYPE_INT, )),
+    "endfile": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, []),
+    "estado": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
+    "newposicion": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT,)),
+    "video": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,)),
+    #"loading-buffer": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_INT, )),
         }
 
     # Estados: playing, paused, None
@@ -37,7 +32,10 @@ class JAMediaReproductor(GObject.GObject):
     def __init__(self):
 
         GObject.GObject.__init__(self)
+        threading.Thread.__init__(self)
 
+        self.setDaemon(True)
+        
         self.__source = None
         self.__winId = None
         self.__controller = False
@@ -63,38 +61,22 @@ class JAMediaReproductor(GObject.GObject):
         self.__videoBin = Gst.Pipeline()
         self.__videoBin.set_name('videobin')
 
-        self.__videoqueue = Gst.ElementFactory.make(
-            'queue', 'videoqueue')
-        self.__videoconvert = Gst.ElementFactory.make(
-            'videoconvert', 'videoconvert')
-        self.__videorate = Gst.ElementFactory.make(
-            'videorate', 'videorate')
-        self.__videorate.set_property(
-            'skip-to-first', True)
-        self.__videorate.set_property(
-            'drop-only', True)
-        self.__videorate.set_property(
-            'max-rate', 30)
-        self.__videobalance = Gst.ElementFactory.make(
-            'videobalance', "videobalance")
-        self.__videobalance.set_property(
-            'saturation', self.__config['saturacion'])
-        self.__videobalance.set_property(
-            'contrast', self.__config['contraste'])
-        self.__videobalance.set_property(
-            'brightness', self.__config['brillo'])
-        self.__videobalance.set_property(
-            'hue', self.__config['hue'])
-        self.__gamma = Gst.ElementFactory.make(
-            'gamma', "gamma")
-        self.__gamma.set_property(
-            'gamma', self.__config['gamma'])
-        self.__videoflip = Gst.ElementFactory.make(
-            'videoflip',"videoflip")
-        self.__videoflip.set_property(
-            'method', self.__config['rotacion'])
-        self.__xvimagesink = Gst.ElementFactory.make(
-            'xvimagesink', "xvimagesink")
+        self.__videoqueue = Gst.ElementFactory.make('queue', 'videoqueue')
+        self.__videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
+        self.__videorate = Gst.ElementFactory.make('videorate', 'videorate')
+        self.__videorate.set_property('skip-to-first', True)
+        self.__videorate.set_property('drop-only', True)
+        self.__videorate.set_property('max-rate', 30)
+        self.__videobalance = Gst.ElementFactory.make('videobalance', "videobalance")
+        self.__videobalance.set_property('saturation', self.__config['saturacion'])
+        self.__videobalance.set_property('contrast', self.__config['contraste'])
+        self.__videobalance.set_property('brightness', self.__config['brillo'])
+        self.__videobalance.set_property('hue', self.__config['hue'])
+        self.__gamma = Gst.ElementFactory.make('gamma', "gamma")
+        self.__gamma.set_property('gamma', self.__config['gamma'])
+        self.__videoflip = Gst.ElementFactory.make('videoflip',"videoflip")
+        self.__videoflip.set_property('method', self.__config['rotacion'])
+        self.__xvimagesink = Gst.ElementFactory.make('xvimagesink', "xvimagesink")
 
         self.__videoBin.add(self.__videoqueue)
         self.__videoBin.add(self.__videoconvert)
@@ -117,6 +99,9 @@ class JAMediaReproductor(GObject.GObject):
 
         self.__bus = None
 
+    def run(self):
+        pass
+
     def __reset(self):
         self.__pipe = Gst.ElementFactory.make("playbin", "player")
         self.__pipe.set_property('volume', self.__config['volumen'])
@@ -135,8 +120,6 @@ class JAMediaReproductor(GObject.GObject):
                     self.__status = new
                     self.emit("estado", "playing")
                     self.__new_handle(True)
-                    # Si se llama enseguida falla.
-                    #GLib.idle_add(self.__re_config)
             elif old == Gst.State.READY and new == Gst.State.PAUSED:
                 if self.__status != new:
                     self.__status = new
@@ -158,13 +141,13 @@ class JAMediaReproductor(GObject.GObject):
             if 'audio-codec' in datos and not 'video-codec' in datos:
                 if self.__hasVideo == True or self.__hasVideo == None:
                     self.__hasVideo = False
-                    self.emit("video", False)
+                    #self.emit("video", False)
             elif 'video-codec' in datos:
                 if self.__hasVideo == False or self.__hasVideo == None:
                     self.__hasVideo = True
                     self.emit("video", True)
         elif mensaje.type == Gst.MessageType.WARNING:
-            print ("\n Gst.MessageType.WARNING:", mensaje.parse_warning())
+            pass  #print ("\n Gst.MessageType.WARNING:", mensaje.parse_warning())
         elif mensaje.type == Gst.MessageType.LATENCY:
             # http://cgit.collabora.com/git/farstream.git/tree/examples/gui/fs-gui.py
             #print "\n Gst.MessageType.LATENCY"
@@ -186,7 +169,7 @@ class JAMediaReproductor(GObject.GObject):
         elif mensaje.type == Gst.MessageType.EOS:
             #self.video_pipeline.seek_simple(Gst.Format.TIME,
             #Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, 0)
-            print ("\n Gst.MessageType.EOS:")
+            #print ("\n Gst.MessageType.EOS:")
             self.__new_handle(False)
             self.emit("endfile")
         elif mensaje.type == Gst.MessageType.ERROR:
@@ -313,6 +296,7 @@ class JAMediaReproductor(GObject.GObject):
 
     def load(self, uri, xid):
         self.stop()
+        self.emit("video", False)
         self.__winId = xid
         self.__reset()
         GLib.idle_add(self.__load, uri)

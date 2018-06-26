@@ -89,7 +89,7 @@ class JAMediaPlayer(Gtk.EventBox):
         self.base_panel.connect("menu_activo", self.__cancel_toolbars)
         #self.base_panel.connect("add_stream", self.__run_add_stream)
         #self.base_panel.connect("stop-record", self.__detener_grabacion)
-        self.base_panel.connect("video", self.__set_video)
+        self.base_panel.player.connect("video", self.__set_video)
 
         #self.toolbar_accion.connect("accion-stream", self.__accion_stream)
         #self.toolbar_accion.connect("grabar", self.__grabar)
