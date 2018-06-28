@@ -13,22 +13,11 @@ from gi.repository import GdkPixbuf
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
-
-#from JAMediaPlayer.Globales import describe_uri
-#from JAMediaPlayer.Globales import describe_archivo
-#from JAMediaPlayer.Globales import describe_acceso_uri
-#from JAMediaPlayer.Globales import get_streamings
-#from JAMediaPlayer.Globales import stream_en_archivo
-
 from JAMediaPlayer.Globales import get_JAMedia_Directory
-#from JAMediaPlayer.Globales import get_data_directory
-#from JAMediaPlayer.Globales import get_my_files_directory
-#from JAMediaPlayer.Globales import get_tube_directory
-#from JAMediaPlayer.Globales import get_audio_directory
-#from JAMediaPlayer.Globales import get_video_directory
 from JAMediaPlayer.Globales import ocultar
 from JAMediaPlayer.Globales import mostrar
 from JAMediaPlayer.Globales import ICONS_PATH
+# FIXME: Borrar las funciones que no se usan
 
 
 class PlayerList(Gtk.Frame):
@@ -44,7 +33,7 @@ class PlayerList(Gtk.Frame):
         self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
 
         self.directorio = get_JAMedia_Directory()
-        self.mime = ['audio/*', 'video/*']
+        self.mime = ['audio/*', 'video/*', 'application/ogg']
 
         vbox = Gtk.VBox()
 
@@ -64,9 +53,9 @@ class PlayerList(Gtk.Frame):
         self.set_size_request(150, -1)
 
         self.toolbar.openfiles.connect("clicked", self.__openfiles)
-        self.toolbar.appendfiles.connect("clicked", self.__openfiles)
+        self.toolbar.appendfiles.connect("clicked", self.__openfiles) #FIXME: append files
         self.toolbar.clearlist.connect("clicked", self.lista.get_model().clear)
-        #self.lista.connect("button-press-event", self.__click_derecho_en_lista)
+        #FIXME: self.lista.connect("button-press-event", self.__click_derecho_en_lista)
 
     def __openfiles(self, widget):
         selector = My_FileChooser(parent=self.get_toplevel(),
@@ -91,10 +80,10 @@ class PlayerList(Gtk.Frame):
     def __load_list(self, items, tipo):
         if tipo == "load":
             self.lista.get_model().clear()
-            #self.emit("accion-list", False, "limpiar", False)
         self.lista.agregar_items(items)
 
-    '''def __click_derecho_en_lista(self, widget, event):
+    '''
+    def __click_derecho_en_lista(self, widget, event):
         boton = event.button
         pos = (event.x, event.y)
         tiempo = event.time
@@ -117,21 +106,9 @@ class PlayerList(Gtk.Frame):
             #menu = MenuList(widget, boton, pos, tiempo, path, widget.get_model())
             #menu.connect('accion', self.__emit_accion_list)
             #menu.popup(None, None, None, None, boton, tiempo)
-        '''
+    '''
 
     '''
-    def seleccionar_primero(self):
-        self.lista.seleccionar_primero()
-
-    def seleccionar_ultimo(self):
-        self.lista.seleccionar_ultimo()
-
-    def seleccionar_anterior(self):
-        self.lista.seleccionar_anterior()
-
-    def seleccionar_siguiente(self):
-        self.lista.seleccionar_siguiente()
-
     def select_valor(self, path_origen):
         self.lista.select_valor(path_origen)
     '''
@@ -160,7 +137,7 @@ class Lista(Gtk.TreeView):
 
     __gsignals__ = {
     "nueva-seleccion": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, )),
-    #"len_items": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_INT, ))
+    "len_items": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_INT, ))
     }
 
     def __init__(self):
@@ -168,14 +145,11 @@ class Lista(Gtk.TreeView):
         Gtk.TreeView.__init__(self, Gtk.ListStore(GdkPixbuf.Pixbuf, GObject.TYPE_STRING, GObject.TYPE_STRING))
 
         self.__valorSelected = None
-        #self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
-        #self.set_property("rules-hint", True)
         self.set_headers_clickable(True)
         self.set_headers_visible(True)
         self.set_reorderable(True)
 
         self.__setear_columnas()
-        #self.get_selection().set_select_function(self.__selecciones)
         self.get_selection().connect("changed", self.__changedSelection)
 
         self.show_all()
@@ -185,16 +159,8 @@ class Lista(Gtk.TreeView):
         valor = self.get_model().get_value(_iter, 2)
         if self.__valorSelected != valor:
             self.__valorSelected = valor
-            self.emit('nueva-seleccion', valor)
+            self.emit('nueva-seleccion', self.__valorSelected)
             self.scroll_to_cell(self.get_model().get_path(_iter))
-
-    '''def __selecciones(self, treeselection, model, path, is_selected):
-        if not is_selected:
-            _iter = self.get_model().get_iter(path)
-            valor = self.get_model().get_value(_iter, 2)
-            self.emit('nueva-seleccion', valor)
-            self.scroll_to_cell(self.get_model().get_path(_iter))
-        return True'''
 
     def __setear_columnas(self):
         self.append_column(self.__construir_columna_icono('', 0, True))
@@ -222,14 +188,13 @@ class Lista(Gtk.TreeView):
         return columna
 
     def __ejecutar_agregar_elemento(self, elementos):
-        #self.set_sensitive(False)
         if not elementos:
+            self.emit("len_items", self.get_model().iter_n_children())
             self.seleccionar_primero()
-            #self.set_sensitive(True)
             return False
 
         texto, path = elementos[0]
-        #descripcion = describe_uri(path)
+        #FIXME: descripcion = describe_uri(path)
         icono = os.path.join(ICONS_PATH, "sonido.svg")
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(icono, 24, -1)
         '''
@@ -242,7 +207,6 @@ class Lista(Gtk.TreeView):
                     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
                         icono, 24, -1)
         '''
-
         self.get_model().append([pixbuf, texto, path])
         elementos.remove(elementos[0])
         GLib.idle_add(self.__ejecutar_agregar_elemento, elementos)
@@ -317,8 +281,7 @@ class JAMediaToolbarList(Gtk.EventBox):
 
 class My_FileChooser(Gtk.FileChooserDialog):
 
-    __gsignals__ = {
-    'load-files': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, ))}
+    __gsignals__ = {'load-files': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, ))}
 
     def __init__(self, parent=None, action=None, filter_type=[], title=None, path=None, mime=[]):
 

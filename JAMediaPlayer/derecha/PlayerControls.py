@@ -17,8 +17,7 @@ from JAMediaPlayer.Globales import insensibilizar
 
 class PlayerControls(Gtk.EventBox):
 
-    __gsignals__ = {
-    "accion-controls": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,))}
+    __gsignals__ = {"accion-controls": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,))}
 
     def __init__(self):
 
@@ -28,10 +27,8 @@ class PlayerControls(Gtk.EventBox):
 
         vbox = Gtk.HBox()
 
-        self.pix_play = GdkPixbuf.Pixbuf.new_from_file_at_size(
-            os.path.join(ICONS_PATH, "play.svg"), 24, 24)
-        self.pix_paused = GdkPixbuf.Pixbuf.new_from_file_at_size(
-            os.path.join(ICONS_PATH, "pausa.svg"), 24, 24)
+        self.pix_play = GdkPixbuf.Pixbuf.new_from_file_at_size(os.path.join(ICONS_PATH, "play.svg"), 24, 24)
+        self.pix_paused = GdkPixbuf.Pixbuf.new_from_file_at_size(os.path.join(ICONS_PATH, "pausa.svg"), 24, 24)
 
         self.atras = JAMediaToolButton(pixels=24)
         archivo = os.path.join(ICONS_PATH, "siguiente.svg")

@@ -19,6 +19,8 @@ ICONS_PATH = os.path.join(
 
 radios = 'https://sites.google.com/site/sugaractivities/jamediaobjects/jam/lista-de-radios-2014'
 
+# FIXME: Borrar las funciones que no se usan
+
 '''
 def convert_shelve_to_json(path):
     print "Convert:", path

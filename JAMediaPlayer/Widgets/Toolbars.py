@@ -21,6 +21,7 @@ from JAMediaPlayer.Globales import borrar
 from JAMediaPlayer.Globales import mover
 
 from JAMediaPlayer.Globales import ICONS_PATH
+# FIXME: Borrar las Toolbars que no se usan
 
 
 class Toolbar(Gtk.EventBox):
@@ -87,7 +88,7 @@ class Toolbar(Gtk.EventBox):
     def __emit_accion(self, widget, accion):
         self.emit('accion', accion)
 
-
+'''
 class ToolbarAccion(Gtk.EventBox):
     """
     Toolbar para que el usuario confirme las acciones que se realizan sobre
@@ -223,156 +224,4 @@ class ToolbarAccion(Gtk.EventBox):
         self.accion = None
         self.iter = None
         self.hide()
-
-
-class ToolbarSalir(Gtk.EventBox):
-    """
-    Toolbar para confirmar salir de la aplicación.
-    """
-
-    __gsignals__ = {
-    "salir": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, [])}
-
-    def __init__(self):
-
-        Gtk.EventBox.__init__(self)
-
-        toolbar = Gtk.Toolbar()
-
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
-        toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
-
-        toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
-
-        archivo = os.path.join(ICONS_PATH, "button-cancel.svg")
-        boton = get_boton(archivo, flip=False, pixels=24)
-        boton.set_tooltip_text("Cancelar")
-        boton.connect("clicked", self.cancelar)
-        toolbar.insert(boton, -1)
-
-        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
-
-        item = Gtk.ToolItem()
-        self.label = Gtk.Label("")
-        self.label.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer"))
-        self.label.show()
-        item.add(self.label)
-        toolbar.insert(item, -1)
-
-        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
-
-        archivo = os.path.join(ICONS_PATH, "dialog-ok.svg")
-        boton = get_boton(archivo, flip=False, pixels=24)
-        boton.set_tooltip_text("Aceptar")
-        boton.connect("clicked", self.__emit_salir)
-        toolbar.insert(boton, -1)
-
-        toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
-
-        self.add(toolbar)
-        self.show_all()
-
-    def __emit_salir(self, widget):
-        self.cancelar()
-        self.emit('salir')
-
-    def run(self, nombre_aplicacion):
-        self.label.set_text("¿Salir de %s?" % (nombre_aplicacion))
-        self.show()
-
-    def cancelar(self, widget=None):
-        self.label.set_text("")
-        self.hide()
-
-
-class ToolbarAddStream(Gtk.EventBox):
-    """
-    Toolbar para agregar streamings.
-    """
-
-    __gsignals__ = {
-    "add-stream": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING,
-        GObject.TYPE_STRING, GObject.TYPE_STRING))}
-
-    def __init__(self):
-
-        Gtk.EventBox.__init__(self)
-
-        toolbar = Gtk.Toolbar()
-
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
-        toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
-
-        self.tipo = None
-
-        toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
-
-        archivo = os.path.join(ICONS_PATH, "button-cancel.svg")
-        boton = get_boton(archivo, flip=False, pixels=24)
-        boton.set_tooltip_text("Cancelar")
-        boton.connect("clicked", self.cancelar)
-        toolbar.insert(boton, -1)
-
-        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
-
-        frame = Gtk.Frame()
-        frame.set_label('Nombre')
-        self.nombre = Gtk.Entry()
-        event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
-        event.set_border_width(4)
-        event.add(self.nombre)
-        frame.add(event)
-        frame.show_all()
-        item = Gtk.ToolItem()
-        item.add(frame)
-        toolbar.insert(item, -1)
-
-        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
-
-        frame = Gtk.Frame()
-        frame.set_label('URL')
-        self.url = Gtk.Entry()
-        event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
-        event.set_border_width(4)
-        event.add(self.url)
-        frame.add(event)
-        frame.show_all()
-        item = Gtk.ToolItem()
-        self.url.show()
-        item.add(frame)
-        toolbar.insert(item, -1)
-
-        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
-
-        archivo = os.path.join(ICONS_PATH, "dialog-ok.svg")
-        boton = get_boton(archivo, flip=False, pixels=24)
-        boton.set_tooltip_text("Aceptar")
-        boton.connect("clicked", self.__emit_add_stream)
-        toolbar.insert(boton, -1)
-
-        toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
-
-        self.add(toolbar)
-        self.show_all()
-
-    def __emit_add_stream(self, widget):
-        nombre, url = (self.nombre.get_text(), self.url.get_text())
-        if nombre and url:
-            self.emit('add-stream', self.tipo, nombre, url)
-        self.cancelar()
-
-    def set_accion(self, tipo):
-        self.show()
-        self.nombre.set_text("")
-        self.url.set_text("")
-        self.tipo = tipo
-
-    def cancelar(self, widget=None):
-        self.tipo = None
-        self.nombre.set_text("")
-        self.url.set_text("")
-        self.hide()
+'''

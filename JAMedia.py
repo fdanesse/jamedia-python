@@ -119,8 +119,10 @@ class JAMedia(Gtk.Window):
         ocultar([self.toolbar_descarga, self.alerta_busqueda])
         if self.archivos:
             self.__switch(None, 'jamedia')
+            ''' FIXME: No Implementado
             self.jamediaplayer.base_panel.derecha.lista.set_nueva_lista(self.archivos)
             self.archivos = []
+            '''
         else:
             self.__switch(None, 'jamediatube')
 
@@ -322,11 +324,13 @@ class JAMedia(Gtk.Window):
         Gtk.main_quit()
         sys.exit(0)
 
+    '''
     def set_archivos(self, pistas):
         """
         Cuando se ejecuta pasandole archivos como parámetros.
         """
         self.archivos = pistas
+    '''
 
 
 '''

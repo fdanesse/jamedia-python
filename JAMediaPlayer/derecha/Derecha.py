@@ -38,26 +38,13 @@ class Derecha(Gtk.EventBox):
         vbox.pack_start(self.__scroll, True, True, 0)
         vbox.pack_start(self.lista, True, True, 0)
         vbox.pack_end(self.playercontrols, False, False, 0)
-
         self.add(vbox)
-
         self.show_all()
-
-        #self.lista.connect("menu_activo", self.__emit_menu_activo)
-        #self.lista.connect("len_items", self.__items_in_list)
-
+        self.lista.lista.connect("len_items", self.__len_items)
         self.set_size_request(150, -1)
 
-    '''
-    def __items_in_list(self, widget, items):
+    def __len_items(self, widget, items):
         self.playercontrols.activar(items)
-    '''
-
-    '''
-    def __emit_menu_activo(self, widget=False):
-        # hay un menu contextual presente
-        self.emit("menu_activo")
-    '''
 
     def show_config(self):
         valor = self.__scroll.get_visible()
@@ -70,4 +57,4 @@ class Derecha(Gtk.EventBox):
         
     def setup_init(self):
         ocultar([self.__scroll])
-        #self.playercontrols.activar(0) FIXME: Arreglar
+        self.playercontrols.activar(0)
