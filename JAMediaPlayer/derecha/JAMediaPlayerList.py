@@ -157,7 +157,7 @@ class Lista(Gtk.TreeView):
     def __changedSelection(self, treeSelection):
         modelo, _iter = self.get_selection().get_selected()
         valor = self.get_model().get_value(_iter, 2)
-        if self.__valorSelected != valor:
+        if self.__valorSelected != valor and self.__valorSelected != None:
             self.__valorSelected = valor
             self.emit('nueva-seleccion', self.__valorSelected)
             self.scroll_to_cell(self.get_model().get_path(_iter))
@@ -190,6 +190,7 @@ class Lista(Gtk.TreeView):
     def __ejecutar_agregar_elemento(self, elementos):
         if not elementos:
             self.emit("len_items", self.get_model().iter_n_children())
+            self.__valorSelected = False
             self.seleccionar_primero()
             return False
 
@@ -213,6 +214,7 @@ class Lista(Gtk.TreeView):
         return False
 
     def agregar_items(self, elementos):
+        self.__valorSelected = None # FIXME: Necesario para que no falle al vaciar la lista
         GLib.idle_add(self.__ejecutar_agregar_elemento, elementos)
 
     def seleccionar_siguiente(self, widget=None):
