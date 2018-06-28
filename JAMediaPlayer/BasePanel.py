@@ -20,8 +20,7 @@ class BasePanel(Gtk.HPaned):
 
     __gsignals__ = {
     "show-controls": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, )),
-    "accion-list": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)),
-    "menu_activo": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
+    #"menu_activo": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
     }
 
     def __init__(self):
@@ -38,7 +37,6 @@ class BasePanel(Gtk.HPaned):
         self.pack2(self.derecha, resize=False, shrink=False)
 
         self.player = JAMediaReproductor()
-        self.player.start()
         self.player.connect("endfile", self.__endfile)
         self.player.connect("estado", self.__state_changed)
         self.player.connect("newposicion", self.__update_progress)
@@ -47,9 +45,8 @@ class BasePanel(Gtk.HPaned):
         
         self.show_all()
 
-        self.derecha.connect("cargar-reproducir", self.__cargar_reproducir)
-        self.derecha.connect("accion-list", self.__emit_accion_list)
-        self.derecha.connect("menu_activo", self.__emit_menu_activo)
+        self.derecha.lista.lista.connect("nueva-seleccion", self.__cargar_reproducir)
+        #self.derecha.connect("menu_activo", self.__emit_menu_activo)
         self.derecha.playercontrols.connect("accion-controls", self.__accion_controls)
         self.derecha.balance.connect("balance-valor", self.__accion_balance)
 
@@ -60,7 +57,7 @@ class BasePanel(Gtk.HPaned):
 
     def __accion_balance(self, widget, valor, prop):
         # Setea valores de Balance en el reproductor.
-        self.__emit_menu_activo()
+        #self.__emit_menu_activo()
         if prop == "saturacion":
             self.player.set_balance(saturacion=valor)
         elif prop == "contraste":
@@ -72,22 +69,20 @@ class BasePanel(Gtk.HPaned):
         elif prop == "gamma":
             self.player.set_balance(gamma=valor)
 
+    '''
     def __emit_menu_activo(self, widget=False):
         # hay un menu contextual presente
         self.emit("menu_activo")
         #self.izquierda.buffer_info.hide()
-
-    def __emit_accion_list(self, widget, lista, accion, _iter):
-        # borrar, copiar, mover, grabar, etc . . .
-        self.emit("accion-list", lista, accion, _iter)
+    '''
 
     def __accion_controls(self, widget, accion):
         # anterior, siguiente, pausa, play, stop
-        self.__emit_menu_activo()
+        #self.__emit_menu_activo()
         if accion == "atras":
-            self.derecha.lista.seleccionar_anterior()
+            self.derecha.lista.lista.seleccionar_anterior()
         elif accion == "siguiente":
-            self.derecha.lista.seleccionar_siguiente()
+            self.derecha.lista.lista.seleccionar_siguiente()
         elif accion == "stop":
             if self.player:
                 self.player.stop()
@@ -96,12 +91,12 @@ class BasePanel(Gtk.HPaned):
                 self.player.pause_play()
 
     def __set_volumen(self, widget, valor):
-        self.__emit_menu_activo()
+        #self.__emit_menu_activo()
         if self.player:
             self.player.set_volumen(valor)
 
     def __user_set_progress(self, widget, valor):
-        self.__emit_menu_activo()
+        #self.__emit_menu_activo()
         if self.player:
             self.player.set_position(valor)
 
@@ -109,14 +104,15 @@ class BasePanel(Gtk.HPaned):
         self.emit("show-controls", datos)
 
     def __cargar_reproducir(self, widget, path):
-        self.derecha.set_sensitive(False)
+        #self.derecha.set_sensitive(False)
+        print ('__cargar_reproducir', path)
         volumen = 1.0
         volumen = float("{:.1f}".format(self.izquierda.progress.get_volumen()))
         self.izquierda.progress.set_sensitive(False)
         xid = self.izquierda.video_visor.get_property('window').get_xid()
         self.player.load(path, xid)
         self.player.set_volumen(volumen)
-        self.derecha.set_sensitive(True)
+        #self.derecha.set_sensitive(True)
 
     '''
     def __loading_buffer(self, player, buf):
@@ -125,10 +121,11 @@ class BasePanel(Gtk.HPaned):
     
     def __rotar(self, widget, valor):
         if self.player:
-            self.__emit_menu_activo()
+            #self.__emit_menu_activo()
             self.player.rotar(valor)
 
     def __set_video(self, widget, valor):
+        print ("VIDEO:", valor)
         self.izquierda.toolbar_info.set_video(valor)
 
     def __update_progress(self, objetoemisor, valor):
@@ -159,21 +156,5 @@ class BasePanel(Gtk.HPaned):
         return False
 
     def __endfile(self, widget=None, senial=None):
-        self.derecha.playercontrols.set_paused()
-        self.derecha.lista.seleccionar_siguiente()
-
-    def setup_init(self):
-        self.izquierda.setup_init()
-        self.derecha.setup_init()
-
-    def salir(self):
-        if self.player:
-            self.player.disconnect_by_func(self.__endfile)
-            self.player.disconnect_by_func(self.__state_changed)
-            self.player.disconnect_by_func(self.__update_progress)
-            self.player.disconnect_by_func(self.__set_video)
-            #self.player.disconnect_by_func(self.__loading_buffer)
-            self.player = False
-
-    def set_nueva_lista(self, archivos):
-        self.derecha.set_nueva_lista(archivos)
+        #self.derecha.playercontrols.set_paused()
+        GLib.idle_add(self.derecha.lista.lista.seleccionar_siguiente)

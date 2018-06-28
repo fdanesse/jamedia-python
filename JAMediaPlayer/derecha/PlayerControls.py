@@ -75,14 +75,12 @@ class PlayerControls(Gtk.EventBox):
 
     def activar(self, valor):
         if valor == 0:
-            map(insensibilizar, [self.atras, self.play,
-                self.siguiente, self.stop])
+            insensibilizar([self.atras, self.play, self.siguiente, self.stop])
         elif valor == 1:
-            map(insensibilizar, [self.atras, self.siguiente])
-            map(sensibilizar, [self.play, self.stop])
+            insensibilizar([self.atras, self.siguiente])
+            sensibilizar([self.play, self.stop])
         else:
-            map(sensibilizar, [self.atras, self.play,
-                self.siguiente, self.stop])
+            sensibilizar([self.atras, self.play, self.siguiente, self.stop])
 
 
 class JAMediaToolButton(Gtk.ToolButton):

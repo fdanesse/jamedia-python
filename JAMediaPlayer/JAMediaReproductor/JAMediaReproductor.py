@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import threading
 
 import gi
 gi.require_version('Gst', '1.0')
@@ -17,7 +16,7 @@ from gi.repository import Gst
 from gi.repository import GstVideo
 
 
-class JAMediaReproductor(GObject.GObject, threading.Thread):
+class JAMediaReproductor(GObject.GObject):
 
     __gsignals__ = {
     "endfile": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, []),
@@ -32,9 +31,6 @@ class JAMediaReproductor(GObject.GObject, threading.Thread):
     def __init__(self):
 
         GObject.GObject.__init__(self)
-        threading.Thread.__init__(self)
-
-        self.setDaemon(True)
         
         self.__source = None
         self.__winId = None
@@ -56,8 +52,10 @@ class JAMediaReproductor(GObject.GObject, threading.Thread):
         self.__config = self.__config_default.copy()
 
         self.__pipe = None
+        self.__videoBin = None
+        self.__bus = None
 
-        # VIDEO ...
+    def __makeVideoBin(self):
         self.__videoBin = Gst.Pipeline()
         self.__videoBin.set_name('videobin')
 
@@ -95,14 +93,17 @@ class JAMediaReproductor(GObject.GObject, threading.Thread):
 
         pad = self.__videoqueue.get_static_pad("sink")
         self.__videoBin.add_pad(Gst.GhostPad.new("sink", pad))
-        # ... VIDEO
-
-        self.__bus = None
-
-    def run(self):
-        pass
-
+        
     def __reset(self):
+        self.__source = None
+        #self.__winId = None
+        #self.__controller = False
+        self.__status = Gst.State.NULL
+        self.__hasVideo = False
+        self.__duration = 0
+        self.__position = 0
+
+        self.__makeVideoBin()
         self.__pipe = Gst.ElementFactory.make("playbin", "player")
         self.__pipe.set_property('volume', self.__config['volumen'])
         self.__pipe.set_property('force-aspect-ratio', True)
@@ -140,8 +141,9 @@ class JAMediaReproductor(GObject.GObject, threading.Thread):
             datos = taglist.to_string()
             if 'audio-codec' in datos and not 'video-codec' in datos:
                 if self.__hasVideo == True or self.__hasVideo == None:
-                    self.__hasVideo = False
+                    #self.__hasVideo = False
                     #self.emit("video", False)
+                    pass
             elif 'video-codec' in datos:
                 if self.__hasVideo == False or self.__hasVideo == None:
                     self.__hasVideo = True
@@ -177,9 +179,6 @@ class JAMediaReproductor(GObject.GObject, threading.Thread):
             print (mensaje.parse_error())
             self.__new_handle(False)
 
-    def __pause(self):
-        self.__pipe.set_state(Gst.State.PAUSED)
-
     def __new_handle(self, reset):
         if self.__controller:
             GLib.source_remove(self.__controller)
@@ -204,12 +203,14 @@ class JAMediaReproductor(GObject.GObject, threading.Thread):
             # Se emite un flotante de 0.0 a 100.?
             self.emit("newposicion", self.__position)
         return True
-
-    def __pause(self):
-        self.__pipe.set_state(Gst.State.PAUSED)
     
+    def __pause(self):
+        if self.__pipe:
+            self.__pipe.set_state(Gst.State.PAUSED)
+
     def __play(self):
-        self.__pipe.set_state(Gst.State.PLAYING)
+        if self.__pipe:
+            self.__pipe.set_state(Gst.State.PLAYING)
 
     def pause_play(self):
         if self.__status == Gst.State.PAUSED \
@@ -221,7 +222,7 @@ class JAMediaReproductor(GObject.GObject, threading.Thread):
             self.__pause()
 
     def stop(self):
-        if self.__pipe:
+        if self.__pipe and (self.__status != Gst.State.NULL and self.__status != Gst.State.PAUSED):
             self.__pipe.set_state(Gst.State.NULL)
 
     def get_balance(self):
@@ -277,8 +278,7 @@ class JAMediaReproductor(GObject.GObject, threading.Thread):
         self.__config['rotation'] = rot
 
     def set_volumen(self, valor):
-        self.__config['volumen'] = float(valor/100)  # 0.0 - 10.0
-        #self.__volume.set_property('volume', self.__config['volumen'])
+        self.__config['volumen'] = float(valor/50)  # 0.0 - 10.0
         self.__pipe.set_property('volume', self.__config['volumen'])
 
     def set_position(self, posicion):
@@ -299,12 +299,6 @@ class JAMediaReproductor(GObject.GObject, threading.Thread):
         self.emit("video", False)
         self.__winId = xid
         self.__reset()
-        GLib.idle_add(self.__load, uri)
-
-    def __load(self, uri):
-        self.stop()
-        if not uri:
-            return False
         temp = uri
         if os.path.exists(temp):
             temp = Gst.filename_to_uri(uri)

@@ -63,18 +63,8 @@ class ToolbarInfo(Gtk.EventBox):
         item.add(switch)
         toolbar.insert(item, -1)
 
-        '''
-        archivo = os.path.join(ICONS_PATH, "iconplay.svg")
-        self.descarga = get_boton(archivo, flip=False,
-            rotacion=GdkPixbuf.PixbufRotation.CLOCKWISE,
-            pixels=24)
-        self.descarga.set_tooltip_text("Actualizar Streamings")
-        self.descarga.set_sensitive(False)
-        self.descarga.connect("clicked",
-            self.__emit_actualizar_streamings)
-        toolbar.insert(self.descarga, -1)
-        '''
-
+        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        
         self.add(toolbar)
         self.show_all()
 

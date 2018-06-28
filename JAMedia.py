@@ -119,7 +119,7 @@ class JAMedia(Gtk.Window):
         ocultar([self.toolbar_descarga, self.alerta_busqueda])
         if self.archivos:
             self.__switch(None, 'jamedia')
-            self.jamediaplayer.base_panel.set_nueva_lista(self.archivos)
+            self.jamediaplayer.base_panel.derecha.lista.set_nueva_lista(self.archivos)
             self.archivos = []
         else:
             self.__switch(None, 'jamediatube')
