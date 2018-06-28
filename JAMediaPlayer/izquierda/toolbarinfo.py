@@ -6,7 +6,6 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 from gi.repository import GObject
-from gi.repository import GdkPixbuf
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
@@ -18,8 +17,7 @@ from JAMediaPlayer.Globales import insensibilizar
 
 class ToolbarInfo(Gtk.EventBox):
 
-    __gsignals__ = {
-    'rotar': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_STRING,))}
+    __gsignals__ = {'rotar': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_STRING,))}
 
     def __init__(self):
 
@@ -48,6 +46,7 @@ class ToolbarInfo(Gtk.EventBox):
 
         toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
+        # FIXME: Modificar
         item = Gtk.ToolItem()
         label = Gtk.Label("Ocultar Controles:")
         label.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
@@ -81,6 +80,6 @@ class ToolbarInfo(Gtk.EventBox):
 
     def set_video(self, valor):
         if valor:
-            map(sensibilizar, [self.boton_izquierda, self.boton_derecha])
+            sensibilizar([self.boton_izquierda, self.boton_derecha])
         else:
-            map(insensibilizar, [self.boton_izquierda, self.boton_derecha])
+            insensibilizar([self.boton_izquierda, self.boton_derecha])

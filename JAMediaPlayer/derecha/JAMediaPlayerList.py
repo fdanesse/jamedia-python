@@ -53,8 +53,8 @@ class PlayerList(Gtk.Frame):
         self.set_size_request(150, -1)
 
         self.toolbar.openfiles.connect("clicked", self.__openfiles)
-        self.toolbar.appendfiles.connect("clicked", self.__openfiles) #FIXME: append files
-        self.toolbar.clearlist.connect("clicked", self.lista.get_model().clear)
+        #self.toolbar.appendfiles.connect("clicked", self.__openfiles) #FIXME: append files
+        #self.toolbar.clearlist.connect("clicked", self.lista.get_model().clear)
         #FIXME: self.lista.connect("button-press-event", self.__click_derecho_en_lista)
 
     def __openfiles(self, widget):

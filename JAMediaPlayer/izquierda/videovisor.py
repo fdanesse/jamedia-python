@@ -1,7 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import gi
 gi.require_version("Gtk", "3.0")
 
@@ -14,16 +12,13 @@ from JAMediaPlayer.Globales import get_colors
 
 class VideoVisor(Gtk.DrawingArea):
 
-    __gsignals__ = {
-    "ocultar_controles": (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,))}
+    __gsignals__ = {"ocultar_controles": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,))}
 
     def __init__(self):
 
         Gtk.DrawingArea.__init__(self)
 
-        self.modify_bg(
-            Gtk.StateType.NORMAL, get_colors("drawingplayer"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer"))
 
         self.add_events(
             Gdk.EventMask.KEY_PRESS_MASK |

@@ -1,7 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import gi
 gi.require_version("Gtk", "3.0")
 
@@ -10,30 +8,25 @@ from gi.repository import GLib
 from gi.repository import GObject
 
 from JAMediaPlayer.Globales import get_colors
-from JAMediaPlayer.Globales import ICONS_PATH
 
 
 class ProgressPlayer(Gtk.EventBox):
 
     __gsignals__ = {
-    "seek": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_FLOAT, )),
-    "volumen": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_FLOAT,))}
+    "seek": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, )),
+    "volumen": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT,))}
 
     def __init__(self):
 
         Gtk.EventBox.__init__(self)
 
-        self.modify_bg(
-            Gtk.StateType.NORMAL, get_colors("toolbars"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
 
         self.__presed = False
 
         self.__progressBar = BarraProgreso()
         self.__volumen = Gtk.VolumeButton()
-        self.__volumen.modify_bg(
-            Gtk.StateType.NORMAL, get_colors("toolbars"))
+        self.__volumen.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
         self.__volumen.set_value(0.1)
 
         hbox = Gtk.HBox()
@@ -42,14 +35,10 @@ class ProgressPlayer(Gtk.EventBox):
 
         self.add(hbox)
 
-        self.__progressBar.escala.connect(
-            "button-press-event", self.__button_press_event)
-        self.__progressBar.escala.connect(
-            "button-release-event", self.__button_release_event)
-        self.__progressBar.escala.connect(
-            "motion-notify-event", self.__motion_notify_event)
-        self.__volumen.connect(
-            "value-changed", self.__set_volumen)
+        self.__progressBar.escala.connect("button-press-event", self.__button_press_event)
+        self.__progressBar.escala.connect("button-release-event", self.__button_release_event)
+        self.__progressBar.escala.connect("motion-notify-event", self.__motion_notify_event)
+        self.__volumen.connect("value-changed", self.__set_volumen)
 
         self.show_all()
 
@@ -83,13 +72,10 @@ class BarraProgreso(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL,
-            get_colors("toolbars"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
 
-        self.escala = Gtk.Scale(
-            orientation=Gtk.Orientation.HORIZONTAL)
-        self.escala.set_adjustment(
-            Gtk.Adjustment(0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
+        self.escala = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL)
+        self.escala.set_adjustment(Gtk.Adjustment(0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
         self.escala.set_digits(0)
         self.escala.set_draw_value(False)
 

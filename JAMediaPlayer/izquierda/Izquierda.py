@@ -63,7 +63,6 @@ class Izquierda(Gtk.EventBox):
     def __set_fullscreen(self, widget, event):
         if event.type.value_name == "GDK_2BUTTON_PRESS":
             win = self.get_toplevel()
-            widget.set_sensitive(False)
             screen = win.get_screen()
             w, h = win.get_size()
             ww, hh = (screen.get_width(), screen.get_height())
@@ -73,7 +72,6 @@ class Izquierda(Gtk.EventBox):
             else:
                 win.set_border_width(0)
                 GLib.idle_add(self.__set_full, win, True)
-            widget.set_sensitive(True)
 
     def __set_full(self, win, valor):
         if valor:
@@ -86,6 +84,5 @@ class Izquierda(Gtk.EventBox):
         self.emit("show-controls", (zona, ocultar))
 
     def setup_init(self):
-        #map(ocultar, [self.toolbar_record, self.buffer_info])
         self.toolbar_info.set_video(False)
         self.progress.set_sensitive(False)
