@@ -45,11 +45,16 @@ class BasePanel(Gtk.HPaned):
         self.derecha.lista.lista.connect("nueva-seleccion", self.__cargar_reproducir)
         self.derecha.playercontrols.connect("accion-controls", self.__accion_controls)
         self.derecha.balance.connect("balance-valor", self.__accion_balance)
+        self.derecha.lista.lista.connect("len_items", self.__len_items)
 
         self.izquierda.connect("show-controls", self.__emit_show_controls)
         self.izquierda.connect("rotar", self.__rotar)
         self.izquierda.connect("seek", self.__user_set_progress)
         self.izquierda.connect("volumen", self.__set_volumen)
+
+    def __len_items(self, widget, items):
+        if items == 0 and self.player:
+            self.player.stop()
 
     def __accion_balance(self, widget, valor, prop):
         if prop == "saturacion":

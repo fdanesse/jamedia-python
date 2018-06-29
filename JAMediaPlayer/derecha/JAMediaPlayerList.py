@@ -52,21 +52,24 @@ class PlayerList(Gtk.Frame):
 
         self.set_size_request(150, -1)
 
-        self.toolbar.openfiles.connect("clicked", self.__openfiles)
-        #self.toolbar.appendfiles.connect("clicked", self.__openfiles) #FIXME: append files
-        #self.toolbar.clearlist.connect("clicked", self.lista.get_model().clear)
+        self.toolbar.openfiles.connect("clicked", self.__openfiles, "load")
+        self.toolbar.appendfiles.connect("clicked", self.__openfiles, "add")
+        self.toolbar.clearlist.connect("clicked", self.__clearList)
         #FIXME: self.lista.connect("button-press-event", self.__click_derecho_en_lista)
 
-    def __openfiles(self, widget):
+    def __clearList(self, widget):
+        self.lista.get_model().clear()
+
+    def __openfiles(self, widget, tipo):
         selector = My_FileChooser(parent=self.get_toplevel(),
             filter_type=[], action=Gtk.FileChooserAction.OPEN,
             mime=self.mime, title="Abrir Archivos", path=self.directorio)
-        selector.connect('load-files', self.__load_files)
+        selector.connect('load-files', self.__load_files, tipo)
         selector.run()
         if selector:
             selector.destroy()
 
-    def __load_files(self, widget, archivos):
+    def __load_files(self, widget, archivos, tipo):
         items = []
         archivos.sort()
         for path in archivos:
@@ -75,7 +78,7 @@ class PlayerList(Gtk.Frame):
             archivo = os.path.basename(path)
             items.append([archivo, path])
             self.directorio = os.path.dirname(path)
-        self.__load_list(items, "load")
+        self.__load_list(items, tipo)
 
     def __load_list(self, items, tipo):
         if tipo == "load":
@@ -156,11 +159,14 @@ class Lista(Gtk.TreeView):
 
     def __changedSelection(self, treeSelection):
         modelo, _iter = self.get_selection().get_selected()
-        valor = self.get_model().get_value(_iter, 2)
+        if not _iter:
+            self.emit("len_items", 0)
+            return
+        valor = modelo.get_value(_iter, 2)
         if self.__valorSelected != valor and self.__valorSelected != None:
             self.__valorSelected = valor
             self.emit('nueva-seleccion', self.__valorSelected)
-            self.scroll_to_cell(self.get_model().get_path(_iter))
+            self.scroll_to_cell(modelo.get_path(_iter))
 
     def __setear_columnas(self):
         self.append_column(self.__construir_columna_icono('', 0, True))
@@ -214,12 +220,13 @@ class Lista(Gtk.TreeView):
         return False
 
     def agregar_items(self, elementos):
+        # FIXME: no permitir paths repetidos.
         self.__valorSelected = None # FIXME: Necesario para que no falle al vaciar la lista
         GLib.idle_add(self.__ejecutar_agregar_elemento, elementos)
 
     def seleccionar_siguiente(self, widget=None):
         modelo, _iter = self.get_selection().get_selected()
-        iternext = self.get_model().iter_next(_iter)
+        iternext = modelo.iter_next(_iter)
         if iternext:
             self.get_selection().select_iter(iternext)
         else:
@@ -228,7 +235,7 @@ class Lista(Gtk.TreeView):
 
     def seleccionar_anterior(self, widget=None):
         modelo, _iter = self.get_selection().get_selected()
-        previous = self.get_model().iter_previous(_iter)
+        previous = modelo.iter_previous(_iter)
         if previous:
             self.get_selection().select_iter(previous)
         else:
