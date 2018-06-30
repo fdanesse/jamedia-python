@@ -4,11 +4,7 @@ import os
 
 import gi
 gi.require_version('Gst', '1.0')
-gi.require_version('GstVideo', '1.0')
-'''
-FIXME: Necesario => AttributeError: 'GstXvImageSink'
-object has no attribute 'set_window_handle'
-'''
+gi.require_version('GstVideo', '1.0')  #NOTA: Necesario => AttributeError: 'GstXvImageSink' object has no attribute 'set_window_handle'
 
 from gi.repository import GObject
 from gi.repository import GLib
@@ -307,4 +303,4 @@ class JAMediaReproductor(GObject.GObject):
             self.__pipe.set_property("uri", self.__source)
             self.__play()
         else:
-            print ("FIXME:", "Dirección no válida", temp)
+            print ("Dirección no válida", temp)

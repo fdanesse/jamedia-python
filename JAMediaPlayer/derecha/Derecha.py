@@ -56,6 +56,5 @@ class Derecha(Gtk.EventBox):
             ocultar([self.lista, self.playercontrols])
         
     def setup_init(self):
-        #FIXME: activar y desactivar los iconos de la toolbar en la lista de reproducción
         ocultar([self.__scroll])
         self.playercontrols.activar(0)

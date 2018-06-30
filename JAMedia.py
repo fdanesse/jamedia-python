@@ -21,8 +21,8 @@ from Widgets.toolbarbusquedas import ToolbarBusquedas
 from Widgets.alertabusquedas import AlertaBusqueda
 from Widgets.toolbardescargas import ToolbarDescargas
 from Widgets.toolbarsalir import ToolbarSalir
-from Widgets.widgetvideoitem import WidgetVideoItem
 
+from PanelTube.widgetvideoitem import WidgetVideoItem
 from PanelTube.paneltube import PanelTube
 from PanelTube.buscar import Buscar, FEED
 
@@ -111,10 +111,7 @@ class JAMedia(Gtk.Window):
         self.realize()
 
     def __setup_init2(self, widget):
-        """
-        Inicializa la aplicación a su estado fundamental.
-        """
-        self.__cancel_toolbar()
+        self.toolbar_salir.cancelar()
         self.paneltube.cancel_toolbars_flotantes()
         ocultar([self.toolbar_descarga, self.alerta_busqueda])
         if self.archivos:
@@ -126,19 +123,11 @@ class JAMedia(Gtk.Window):
         else:
             self.__switch(None, 'jamediatube')
 
-        self.paneltube.encontrados.drag_dest_set(
-            Gtk.DestDefaults.ALL,
-            target,
-            Gdk.DragAction.MOVE)
-
+        self.paneltube.encontrados.drag_dest_set(Gtk.DestDefaults.ALL, target, Gdk.DragAction.MOVE)
         self.paneltube.encontrados.connect("drag-drop", self.__drag_drop)
         self.paneltube.encontrados.drag_dest_add_uri_targets()
 
-        self.paneltube.descargar.drag_dest_set(
-            Gtk.DestDefaults.ALL,
-            target,
-            Gdk.DragAction.MOVE)
-
+        self.paneltube.descargar.drag_dest_set(Gtk.DestDefaults.ALL, target, Gdk.DragAction.MOVE)
         self.paneltube.descargar.connect("drag-drop", self.__drag_drop)
         self.paneltube.descargar.drag_dest_add_uri_targets()
 
@@ -149,17 +138,15 @@ class JAMedia(Gtk.Window):
         self.jamediaplayer.connect('salir', self.__switch, 'jamediatube')
         self.toolbar_busqueda.connect("comenzar_busqueda", self.__comenzar_busqueda)
         self.paneltube.connect('download', self.__run_download)
-        self.paneltube.connect('open_shelve_list', self.__open_shelve_list)
+        #self.paneltube.connect('open_shelve_list', self.__open_shelve_list)
         self.toolbar_descarga.connect('end', self.__run_download)
-        self.paneltube.connect("cancel_toolbar", self.__cancel_toolbar)
+        self.paneltube.connect("cancel_toolbar", self.toolbar_salir.cancelar)
         self.buscador.connect("encontrado", self.__add_video_encontrado)
-        self.buscador.connect("end", self.__end_busqueda)
+        self.buscador.connect("end", self.paneltube.update_widgets_videos_encontrados)
         
         self.resize(640, 480)
 
-    def __cancel_toolbar(self, widget=None):
-        self.toolbar_salir.cancelar()
-
+    '''
     def __open_shelve_list(self, widget, shelve_list, toolbarwidget):
         """
         Carga una lista de videos almacenada en un archivo en el area del
@@ -177,11 +164,8 @@ class JAMedia(Gtk.Window):
             objeto.get_parent().remove(objeto)
             objeto.destroy()
         GLib.idle_add(self.__add_videos, shelve_list, destino)
-
+    '''
     def __run_download(self, widget):
-        """
-        Comienza descarga de un video.
-        """
         if self.toolbar_descarga.estado:
             return
         videos = self.paneltube.descargar.get_children()
@@ -192,14 +176,11 @@ class JAMedia(Gtk.Window):
             self.toolbar_descarga.hide()
     
     def __drag_drop(self, destino, drag_context, x, y, n):
-        """
-        Ejecuta drop sobre un destino.
-        """
         videoitem = Gtk.drag_get_source_widget(drag_context)
         if videoitem.get_parent() == destino:
             return
         else:
-            # E try siguiente es para evitar problemas cuando:
+            # El try siguiente es para evitar problemas cuando:
             # El drag termina luego de que el origen se ha
             # comenzado a descargar y por lo tanto, no tiene padre.
             try:
@@ -212,42 +193,11 @@ class JAMedia(Gtk.Window):
             elif destino == self.paneltube.encontrados:
                 text = TipEncontrados
             videoitem.set_tooltip_text(text)
-    
-    def __add_video_encontrado(self, buscador, _id, url):
-        """
-        Cuando el buscador encuentra un video, se agrega al panel.
-        """
-        video = dict(FEED)
-        video["id"] = _id
-        video["titulo"] = ""
-        video["descripcion"] = ""
-        video["categoria"] = ""
-        video["url"] = url
-        video["duracion"] = 0
-        video["previews"] = ""
-        self.__add_videos([video],
-            self.paneltube.encontrados, sensitive=False)
-        while Gtk.events_pending():
-            Gtk.main_iteration()
-        # Para evitar mover videos antes de lanzar actualización de metadatos
-
-    def __end_busqueda(self, buscador):
-        """
-        Cuando Termina la Búsqueda, se actualizan los widgets de videos.
-        """
-        self.paneltube.update_widgets_videos_encontrados()
-        self.paneltube.set_sensitive(True)
 
     def __comenzar_busqueda(self, widget, palabras, cantidad):
-        """
-        Muestra alerta de busqueda y lanza secuencia de busqueda y
-        agregado de videos al panel.
-        """
-        print ('FIXME:', self.__comenzar_busqueda)
-        '''
         self.paneltube.set_sensitive(False)
         self.toolbar_busqueda.set_sensitive(False)
-        self.__cancel_toolbar()
+        self.toolbar_salir.cancelar()
         self.paneltube.cancel_toolbars_flotantes()
         self.alerta_busqueda.show()
         self.alerta_busqueda.label.set_text("Buscando: %s" % (palabras))
@@ -255,22 +205,21 @@ class JAMedia(Gtk.Window):
         for objeto in objetos:
             objeto.get_parent().remove(objeto)
             objeto.destroy()
-        GLib.timeout_add(300, self.__lanzar_busqueda, palabras, cantidad)
-    '''
-    '''
-    def __lanzar_busqueda(self, palabras, cantidad):
-        """
-        Lanza la Búsqueda y comienza secuencia que agrega los videos al panel.
-        """
-        print (palabras, cantidad)
         # FIXME: Reparar (Si no hay conexión)
-        self.buscador.buscar(palabras, cantidad)
-        return False
-    '''
+        GLib.idle_add(self.buscador.buscar, palabras, cantidad)
+
+    def __add_video_encontrado(self, buscador, _id, url):
+        video = FEED.copy()
+        video["id"] = _id
+        #video["titulo"] = ""
+        #video["descripcion"] = ""
+        #video["categoria"] = ""
+        video["url"] = url
+        #video["duracion"] = 0
+        #video["previews"] = ""
+        self.__add_videos([video], self.paneltube.encontrados, sensitive=False)
+
     def __add_videos(self, videos, destino, sensitive=True):
-        """
-        Se crean los video_widgets y se agregan al panel, segun destino.
-        """
         if not videos:
             ocultar([self.alerta_busqueda])
             if sensitive:
@@ -278,37 +227,25 @@ class JAMedia(Gtk.Window):
             self.toolbar_busqueda.set_sensitive(True)
             return False
 
-        video = videos[0]
-        videowidget = WidgetVideoItem(video)
-        text = TipEncontrados
-
-        if destino == self.paneltube.encontrados:
-            text = TipEncontrados
-        elif destino == self.paneltube.descargar:
-            text = TipDescargas
-
-        videowidget.set_tooltip_text(text)
-        videowidget.show_all()
-        videowidget.drag_source_set(
-            Gdk.ModifierType.BUTTON1_MASK,
-            target,
-            Gdk.DragAction.MOVE)
-        videos.remove(video)
-        destino.pack_start(videowidget, False, False, 1)
-
-        texto = "Encontrado: %s" % (video["titulo"])
+        texto = "Encontrado: %s" % (videos[0]["titulo"])
         if len(texto) > 50:
             texto = str(texto[0:50]) + " . . . "
 
+        videowidget = WidgetVideoItem(videos[0])
+        if destino == self.paneltube.encontrados:
+            videowidget.set_tooltip_text(TipEncontrados)
+        elif destino == self.paneltube.descargar:
+            videowidget.set_tooltip_text(TipDescargas)
+        videowidget.show_all()
+        videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
+        videos.remove(videos[0])
+        destino.pack_start(videowidget, False, False, 1)
+
         self.alerta_busqueda.label.set_text(texto)
-        GLib.idle_add(self.__add_videos,
-            videos, destino, sensitive)
+        GLib.idle_add(self.__add_videos, videos, destino, sensitive)
         return False
 
     def __switch(self, widget, valor):
-        """
-        Cambia entre la vista de descargas y la de reproduccion.
-        """
         if valor == 'jamediatube':
             self.jamediaplayer.hide()
             self.box_tube.show()
@@ -324,55 +261,10 @@ class JAMedia(Gtk.Window):
         Gtk.main_quit()
         sys.exit(0)
 
-    '''
-    def set_archivos(self, pistas):
-        """
-        Cuando se ejecuta pasandole archivos como parámetros.
-        """
-        self.archivos = pistas
-    '''
-
-
-'''
-def check_path(path):
-    if os.path.exists(path):
-        if os.path.isfile(path):
-            datos = describe_archivo(path)
-            if 'audio' in datos or 'video' in datos or \
-                'application/ogg' in datos or \
-                'application/octet-stream' in datos:
-                    return path
-    return False
-'''
-
 
 if __name__ == "__main__":
     GObject.threads_init()
     Gdk.threads_init()
     Gst.init([])
-    '''
-    items = []
-    if len(sys.argv) > 1:
-        for campo in sys.argv[1:]:
-            path = os.path.join(campo)
-            if os.path.isfile(path):
-                item = get_item_list(path)
-                if item:
-                    items.append(item)
-            elif os.path.isdir(path):
-                for arch in os.listdir(path):
-                    newpath = os.path.join(path, arch)
-                    if os.path.isfile(newpath):
-                        item = get_item_list(newpath)
-                        if item:
-                            items.append(item)
-        if items:
-            jamedia = JAMedia()
-            jamedia.set_pistas(items)
-        else:
-            jamedia = JAMedia()
-    else:
-        jamedia = JAMedia()
-    '''
     jamedia = JAMedia()
     Gtk.main()

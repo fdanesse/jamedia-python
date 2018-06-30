@@ -17,15 +17,13 @@ class ToolbarBusquedas(Gtk.Toolbar):
     '''Busqueda en youtube'''
 
     __gsignals__ = {
-    "comenzar_busqueda": (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING, GObject.TYPE_INT))}
+    "comenzar_busqueda": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_STRING, GObject.TYPE_INT))}
 
     def __init__(self):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL,
-        get_colors("window1"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
@@ -125,11 +123,9 @@ class AlertaBusqueda(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL,
-            get_colors("window1"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
 
-        self.insert(get_separador(
-            draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         item.set_expand(True)

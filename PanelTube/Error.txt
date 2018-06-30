@@ -1,0 +1,11 @@
+Error al actualizar metadatos de: http://www.youtube.com/watch?v=RgULjdsjiLQ ERROR: Signature extraction failed: Traceback (most recent call last):
+
+ERROR: Signature extraction failed: Traceback (most recent call last):
+  File "/home/flavio/Documentos/jamedia-python/PanelTube/youtube_dl/extractor/youtube.py", line 638, in _decrypt_signature
+    video_id, player_url, s
+  File "/home/flavio/Documentos/jamedia-python/PanelTube/youtube_dl/extractor/youtube.py", line 530, in _extract_signature_function
+    raise ExtractorError('Cannot identify player %r' % player_url)
+    
+ExtractorError: Cannot identify player u'/yts/jsbin/player-vflunOvo8/en_US/base.js'; please report this issue on https://yt-dl.org/bug .
+Make sure you are using the latest version; see  https://yt-dl.org/update  on how to update.
+Be sure to call youtube-dl with the --verbose flag and include its complete output.

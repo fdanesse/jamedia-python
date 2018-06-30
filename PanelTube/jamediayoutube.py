@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
@@ -14,7 +13,7 @@ from JAMediaPlayer.Globales import get_tube_directory
 
 BASE_PATH = os.path.dirname(__file__)
 #STDERR = "/dev/null"
-youtubedl = os.path.join(BASE_PATH, "youtube-dl") #"/usr/bin/youtube-dl"
+youtubedl = "/usr/bin/youtube-dl" #os.path.join(BASE_PATH, "youtube-dl") #"/usr/bin/youtube-dl"
 
 CODECS = [
     [43, "WebM", "360p VP8 N/A 0.5 Vorbis 128"],
@@ -27,8 +26,7 @@ CODECS = [
 class JAMediaYoutube(GObject.GObject):
 
     __gsignals__ = {
-    'progress_download': (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING, ))}
+    'progress_download': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_STRING, ))}
 
     def __init__(self):
 
@@ -61,9 +59,6 @@ class JAMediaYoutube(GObject.GObject):
         return str(texto).replace(" ", "_")
 
     def __get_progress(self):
-        """
-        Actualiza el Progreso de la descarga.
-        """
         progress = self.salida.readline()
         if progress:
             if "100.0%" in progress.split():
@@ -86,9 +81,6 @@ class JAMediaYoutube(GObject.GObject):
         return self.estado
 
     def download(self, url, titulo):
-        """
-        Inicia la descarga de un archivo.
-        """
         self.datos_originales = [url, titulo]
 
         self.ultimosdatos = False
@@ -111,12 +103,9 @@ class JAMediaYoutube(GObject.GObject):
         archivo = "%s%s%s" % ("\"", self.titulo, "\"")
         destino = os.path.join(get_tube_directory(), archivo)
 
-        estructura = "python %s %s -i -R %s -f %s --no-part -o %s" % (
-            youtubedl, self.url, 1, CODECS[self.codec][0], destino)
+        estructura = "python %s %s -i -R %s -f %s --no-part -o %s" % (youtubedl, self.url, 1, CODECS[self.codec][0], destino)
 
-        self.youtubedl = subprocess.Popen(estructura, shell=True,
-            stdout=open(self.STDOUT, "w+b"), #=open(self.STDOUT, "r+b"),
-            universal_newlines=True)
+        self.youtubedl = subprocess.Popen(estructura, shell=True,stdout=open(self.STDOUT, "w+b"), universal_newlines=True)  #=open(self.STDOUT, "r+b"), 
 
         self.salida = open(self.STDOUT, "r")
 

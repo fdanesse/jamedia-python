@@ -19,16 +19,14 @@ from JAMediaPlayer.Globales import get_separador
 class ToolbarDescargas(Gtk.VBox):
 
     __gsignals__ = {
-    'end': (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, [])}
+    'end': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, [])}
 
     def __init__(self):
 
         Gtk.VBox.__init__(self)
 
         self.toolbar = Gtk.Toolbar()
-        self.toolbar.modify_bg(Gtk.StateType.NORMAL,
-            get_colors("download"))
+        self.toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
 
         self.label_titulo = None
         self.label_progreso = None
@@ -48,8 +46,7 @@ class ToolbarDescargas(Gtk.VBox):
 
         self.jamediayoutube = JAMediaYoutube()
 
-        self.toolbar.insert(get_separador(draw=False,
-            ancho=3, expand=False), -1)
+        self.toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         self.label_titulo = Gtk.Label("")
@@ -57,8 +54,7 @@ class ToolbarDescargas(Gtk.VBox):
         item.add(self.label_titulo)
         self.toolbar.insert(item, -1)
 
-        self.toolbar.insert(get_separador(draw=False,
-            ancho=3, expand=False), -1)
+        self.toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         self.label_progreso = Gtk.Label("")
@@ -88,13 +84,9 @@ class ToolbarDescargas(Gtk.VBox):
 
         self.show_all()
 
-        self.jamediayoutube.connect("progress_download",
-            self.__progress_download)
+        self.jamediayoutube.connect("progress_download", self.__progress_download)
 
     def __handle(self):
-        """
-        Verifica que se esté descargando el archivo.
-        """
         if self.ultimosdatos != self.datostemporales:
             self.ultimosdatos = self.datostemporales
             self.contadortestigo = 0
@@ -103,14 +95,11 @@ class ToolbarDescargas(Gtk.VBox):
         if self.contadortestigo > 15:
             print ("\nNo se pudo controlar la descarga de:")
             print ("%s %s\n" % (self.titulo, self.url))
-            self.__cancel_download()
+            #self.__cancel_download()
             return False
         return True
 
     def __progress_download(self, widget, progress):
-        """
-        Muestra el progreso de la descarga.
-        """
         self.datostemporales = progress
         datos = progress.split(" ")
 
@@ -133,7 +122,7 @@ class ToolbarDescargas(Gtk.VBox):
             self.barra_progreso.set_progress(valor=int(porciento))
 
             if porciento >= 100.0:  # nunca llega
-                self.__cancel_download()
+                #self.__cancel_download()
                 return False
             else:
                 dat = progress.split("[download]")[1]
@@ -141,16 +130,13 @@ class ToolbarDescargas(Gtk.VBox):
                     self.label_progreso.set_text(dat)
 
         if "100.0%" in progress.split(" "):
-            self.__cancel_download()
+            #self.__cancel_download()
             return False
         if not self.get_visible():
             self.show()
         return True
 
-    def __cancel_download(self, button=None, event=None):
-        """
-        Cancela la descarga actual.
-        """
+    '''def __cancel_download(self, button=None, event=None):
         # FIXME: No funciona correctamente, la descarga continúa.
         if self.actualizador:
             GLib.source_remove(self.actualizador)
@@ -165,12 +151,9 @@ class ToolbarDescargas(Gtk.VBox):
             pass
         self.estado = False
         self.emit("end")
-        return False
+        return False'''
 
     def download(self, video_item):
-        """
-        Comienza a descargar un video-item.
-        """
         self.estado = True
         self.progress = 0.0
         self.datostemporales = None

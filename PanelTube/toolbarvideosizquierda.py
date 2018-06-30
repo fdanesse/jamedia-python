@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
@@ -20,30 +19,24 @@ class Toolbar_Videos_Izquierda(Gtk.Toolbar):
     """
 
     __gsignals__ = {
-    "borrar": (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, []),
-    "mover_videos": (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, [])}
+    "borrar": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
+    "mover_videos": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, [])}
 
     def __init__(self):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL,
-            get_colors("drawingplayer1"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
 
-        self.insert(get_separador(
-            draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(
-            ICONS_PATH, "alejar.svg")
+        archivo = os.path.join(ICONS_PATH, "alejar.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Borrar Lista")
         boton.connect("clicked", self.__emit_borrar)
         self.insert(boton, -1)
 
-        archivo = os.path.join(
-            ICONS_PATH, "iconplay.svg")
+        archivo = os.path.join(ICONS_PATH, "iconplay.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Enviar a Descargas")
         boton.connect("clicked", self.__emit_adescargas)

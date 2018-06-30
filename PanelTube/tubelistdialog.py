@@ -1,6 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+'''
 import os
 import gi
 gi.require_version("Gtk", "3.0")
@@ -12,7 +11,7 @@ from gi.repository import GdkPixbuf
 
 import shelve
 
-from Widgets.widgetvideoitem import WidgetVideoItem
+from PanelTube.widgetvideoitem import WidgetVideoItem
 
 from JAMediaPlayer.Globales import get_data_directory
 from JAMediaPlayer.Globales import get_colors
@@ -338,3 +337,4 @@ class Lista(Gtk.TreeView):
         self.get_toplevel().set_sensitive(False)
         self.permitir_select = False
         GLib.idle_add(self.__ejecutar_agregar_elemento, elementos)
+'''

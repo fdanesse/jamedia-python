@@ -82,5 +82,5 @@ class BarraProgreso(Gtk.EventBox):
         self.add(self.escala)
         self.show_all()
 
-        #FIXME: Necesario para que funcione la escala
+        #NOTA: Necesario para que funcione la escala
         self.set_size_request(-1, 24)

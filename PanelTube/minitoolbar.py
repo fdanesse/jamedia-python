@@ -9,7 +9,7 @@ from gi.repository import Gtk
 from gi.repository import GdkPixbuf
 from gi.repository import GObject
 
-from PanelTube.tubelistdialog import TubeListDialog
+#from PanelTube.tubelistdialog import TubeListDialog
 
 from JAMediaPlayer.Globales import get_data_directory
 from JAMediaPlayer.Globales import get_colors

@@ -13,30 +13,23 @@ import urllib
 import base64
 import subprocess
 
-from PanelTube.jamediayoutube import JAMediaYoutube
-
 from JAMediaPlayer.Globales import get_colors
 
-BASE_PATH = os.path.dirname(os.path.dirname(__file__))
-youtubedl = os.path.join(BASE_PATH, "youtube-dl")  #"/usr/bin/youtube-dl"
+youtubedl = "/usr/bin/youtube-dl"  #os.path.join(os.path.dirname(__file__), "youtube-dl")  #"/usr/bin/youtube-dl"
 
 
 class WidgetVideoItem(Gtk.EventBox):
 
     __gsignals__ = {
-    #"clicked": (GObject.SIGNAL_RUN_FIRST,
-    #    GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
-    "end-update": (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, []),
-    "click_derecho": (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,))}
+    #"clicked": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
+    "end-update": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
+    "click_derecho": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,))}
 
     def __init__(self, videodict):
 
         Gtk.EventBox.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL,
-            get_colors("widgetvideoitem1"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("widgetvideoitem1"))
         self.set_border_width(2)
 
         self._temp_dat = []
@@ -56,8 +49,7 @@ class WidgetVideoItem(Gtk.EventBox):
                 try:
                     # FIXME: Porque Falla si no hay Conexión.
                     fileimage, headers = urllib.urlretrieve(url, archivo)
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
-                        fileimage, 200, 150)
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(fileimage, 200, 150)
                     self.imagen.set_from_pixbuf(pixbuf)
                     # Convertir imagen a string por si se quiere guardar.
                     pixbuf_file = open(fileimage, 'rb')
@@ -78,12 +70,9 @@ class WidgetVideoItem(Gtk.EventBox):
                 self.imagen.set_from_pixbuf(pixbuf)
 
         self.id_label = Gtk.Label("%s: %s" % ("id", self.videodict["id"]))
-        self.id_titulo = Gtk.Label("%s: %s" % ("Título",
-            self.videodict["titulo"]))
-        self.id_categoria = Gtk.Label("%s: %s" % ("Categoría",
-            self.videodict["categoria"]))
-        self.id_duracion = Gtk.Label("%s: %s %s" % ("Duración",
-            self.videodict["duracion"], "Minutos"))
+        self.id_titulo = Gtk.Label("%s: %s" % ("Título", self.videodict["titulo"]))
+        self.id_categoria = Gtk.Label("%s: %s" % ("Categoría", self.videodict["categoria"]))
+        self.id_duracion = Gtk.Label("%s: %s %s" % ("Duración", self.videodict["duracion"], "Minutos"))
         self.id_url = Gtk.Label("%s: %s" % ("url", self.videodict["url"]))
 
         vbox.pack_start(self.id_label, True, True, 0)
@@ -109,14 +98,10 @@ class WidgetVideoItem(Gtk.EventBox):
         self.emit("click_derecho", event)
 
     def __get_progress(self, salida, STDOUT, process, error, STERR):
-        """
-        Lectura del subproceso que obtiene los metadatos del video.
-        """
-
         progress = salida.readline().strip()
         err = error.readline().strip()
         # FIXME: Signature extraction failed: Traceback (most recent call last)
-        if err:
+        '''if err:
             print ("Error al actualizar metadatos de:", self.videodict["url"], err)
             process.kill()
             for arch in [salida, error]:
@@ -126,7 +111,7 @@ class WidgetVideoItem(Gtk.EventBox):
                     os.unlink(arch)
             del(self._temp_dat)
             self.emit("end-update")
-            return False
+            return False'''
         if progress:
             self._temp_dat.append(progress)
         if len(self._temp_dat) == 3:
@@ -145,31 +130,19 @@ class WidgetVideoItem(Gtk.EventBox):
         return True
 
     def __run_update(self, widget):
-        """
-        Obtenidos todos los metadatos del video, se actualizan los widgets.
-        """
         GLib.timeout_add(100, self.__update)
 
     def __update(self):
-        """
-        Obtenidos todos los metadatos del video, se actualizan los widgets.
-        """
-        while Gtk.events_pending():
-            Gtk.main_iteration()
         if self.videodict.get("previews", False):
             # 1 lista con 1 url
-            url = self.videodict["previews"][0]
+            if self.videodict["previews"]:
+                url = self.videodict["previews"][0]
             archivo = "/tmp/preview%s" % self.videodict["id"]
             try:
                 # FIXME: Porque Falla si no hay Conexión.
                 fileimage, headers = urllib.urlretrieve(url, archivo)
-                while Gtk.events_pending():
-                    Gtk.main_iteration()
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
-                    fileimage, 200, 150)
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(fileimage, 200, 150)
                 self.imagen.set_from_pixbuf(pixbuf)
-                while Gtk.events_pending():
-                    Gtk.main_iteration()
                 # Convertir imagen a string por si se quiere guardar.
                 pixbuf_file = open(fileimage, 'rb')
                 image_string = base64.b64encode(pixbuf_file.read())
@@ -180,32 +153,23 @@ class WidgetVideoItem(Gtk.EventBox):
             if os.path.exists(archivo):
                 os.remove(archivo)
         self.id_label.set_text("%s: %s" % ("id", self.videodict["id"]))
-        self.id_titulo.set_text("%s: %s" % ("Título",
-            self.videodict["titulo"]))
-        self.id_categoria.set_text("%s: %s" % ("Categoría",
-            self.videodict["categoria"]))
-        self.id_duracion.set_text("%s: %s %s" % ("Duración",
-            self.videodict["duracion"], "Minutos"))
+        self.id_titulo.set_text("%s: %s" % ("Título", self.videodict["titulo"]))
+        self.id_categoria.set_text("%s: %s" % ("Categoría", self.videodict["categoria"]))
+        self.id_duracion.set_text("%s: %s %s" % ("Duración", self.videodict["duracion"], "Minutos"))
         self.id_url.set_text("%s: %s" % ("url", self.videodict["url"]))
-        while Gtk.events_pending():
-            Gtk.main_iteration()
         return False
 
     def update(self):
         """
-        Luego de agregados todos los widgets de videos, cada uno actualiza sus
-        previews y demás metadatos, utilizando un subproceso para no afectar a
-        la interfaz gráfica.
+        Actualiza previews y metadatos.
         """
+        #NOTA: desde PanelTube
         _url = self.videodict["url"]
         STDOUT = "/tmp/jamediatube-dl%s" % self.videodict["id"]
         STERR = "/tmp/jamediatube-dlERR%s" % self.videodict["id"]
         estructura = "python %s -s -e --get-thumbnail --get-duration %s" % (youtubedl, _url)
-        process = subprocess.Popen(estructura, shell=True,
-            stdout=open(STDOUT, "w+b"), stderr=open(STERR, "w+b"),
-            universal_newlines=True)
+        process = subprocess.Popen(estructura, shell=True, stdout=open(STDOUT, "w+b"), stderr=open(STERR, "w+b"), universal_newlines=True)
         salida = open(STDOUT, "r")
         error = open(STERR, "r")
         self.connect("end-update", self.__run_update)
-        GLib.timeout_add(100, self.__get_progress, salida, STDOUT,
-            process, error, STERR)
+        GLib.timeout_add(100, self.__get_progress, salida, STDOUT, process, error, STERR)

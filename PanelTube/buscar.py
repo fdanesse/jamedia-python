@@ -1,15 +1,12 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
 
 import os
-import urllib
+import urllib.parse
+import urllib.request
 
 from gi.repository import GObject
-
-BASE_PATH = os.path.dirname(__file__)
-#STDERR = "/dev/null"
 
 FEED = {
     "id": "",
@@ -25,10 +22,8 @@ FEED = {
 class Buscar(GObject.GObject):
 
     __gsignals__ = {
-    'encontrado': (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING, GObject.TYPE_STRING)),
-    'end': (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, [])}
+    'encontrado': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_STRING, GObject.TYPE_STRING)),
+    'end': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, [])}
 
     def __init__(self, ):
 
@@ -37,12 +32,12 @@ class Buscar(GObject.GObject):
     def __get_videos(self, consulta, limite):
         # Obtener web principal con resultado de busqueda y recorrer todas
         # las pags de la busqueda obtenida hasta conseguir el id de los videos.
-        params = urllib.urlencode({'search_query': consulta})
+        params = urllib.parse.urlencode({'search_query': consulta})
         urls = {}
         print ("Comezando la búsqueda de %i videos sobre %s" % (limite, consulta))
         for pag in range(1, 10):
-            f = urllib.urlopen("http://www.youtube.com/results?%s&filters=video&page=%i" % (params, pag))
-            text = f.read().replace("\n", "")
+            f = urllib.request.urlopen("http://www.youtube.com/results?%s&filters=video&page=%i" % (params, pag))
+            text = str(f.read()).replace("\n", "")
             f.close()
             for item in text.split("data-context-item-id=")[1:]:
                 _id = item.split("\"")[1].strip()
@@ -67,4 +62,4 @@ class Buscar(GObject.GObject):
             if buscar:
                 self.__get_videos(buscar, cantidad)
         except:
-            pass
+            print ("No tienes conexión ?")
