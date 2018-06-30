@@ -39,12 +39,9 @@ class VideoVisor(Gtk.DrawingArea):
         x, y = (int(event.x), int(event.y))
         rect = self.get_allocation()
         xx, yy, ww, hh = (rect.x, rect.y, rect.width, rect.height)
-
-        if x in range(ww - 60, ww) or y in range(yy, yy + 60) \
-            or y in range(hh - 60, hh):
+        if x in range(ww - 60, ww) or y in range(yy, yy + 60) or y in range(hh - 60, hh):
             self.emit("ocultar_controles", False)
-            return True
         else:
             self.emit("ocultar_controles", True)
-            return True
+        return True
             

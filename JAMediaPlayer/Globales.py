@@ -14,8 +14,7 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GdkPixbuf
 
-ICONS_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)), "Iconos")
+ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 radios = 'https://sites.google.com/site/sugaractivities/jamediaobjects/jam/lista-de-radios-2014'
 
@@ -60,7 +59,7 @@ def insensibilizar(objetos):
         if objeto.get_sensitive():
             objeto.set_sensitive(False)
 
-
+'''
 def get_dict(path):
     if not os.path.exists(path):
         return {}
@@ -71,8 +70,8 @@ def get_dict(path):
     except:
         pass  #_dict = convert_shelve_to_json(path)
     return _dict
-
-
+'''
+'''
 def set_dict(path, _dict):
     archivo = open(path, "w")
     archivo.write(
@@ -82,7 +81,7 @@ def set_dict(path, _dict):
             separators=(", ", ":"),
             sort_keys=True))
     archivo.close()
-
+'''
 
 def get_colors(key):
     _dict = {
@@ -100,7 +99,7 @@ def get_colors(key):
     # (True, color=Gdk.Color(red=61680, green=59110, blue=43690))
     return Gdk.Color.parse(_dict.get(key, "#ffffff")).color
 
-
+'''
 def get_ip():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -110,7 +109,7 @@ def get_ip():
         return bool(ret)
     except:
         return False
-
+'''
 '''
 def describe_archivo(archivo):
     """
@@ -124,7 +123,7 @@ def describe_archivo(archivo):
     return retorno
 '''
 
-
+'''
 def describe_uri(uri):
     """
     Explica de que se trata el uri, si existe.
@@ -142,8 +141,8 @@ def describe_uri(uri):
         return [unidad, directorio, archivo, enlace]
     else:
         return False
-
-
+'''
+'''
 def describe_acceso_uri(uri):
     """
     Devuelve los permisos de acceso sobre una uri.
@@ -160,8 +159,8 @@ def describe_acceso_uri(uri):
         return [lectura, escritura, ejecucion]
     else:
         return False
-
-
+'''
+'''
 def borrar(origen):
     try:
         if os.path.isdir(origen):
@@ -174,8 +173,8 @@ def borrar(origen):
     except:
         print ("ERROR Al Intentar Borrar un Archivo")
         return False
-
-
+'''
+'''
 def mover(origen, destino):
     try:
         if os.path.isdir(origen):
@@ -189,8 +188,8 @@ def mover(origen, destino):
     except:
         print ("ERROR Al Intentar Mover un Archivo")
         return False
-
-
+'''
+'''
 def copiar(origen, destino):
     try:
         if os.path.isdir(origen):
@@ -202,7 +201,7 @@ def copiar(origen, destino):
     except:
         print ("ERROR Al Intentar Copiar un Archivo")
         return False
-
+'''
 
 def make_base_directory():
     """
@@ -279,7 +278,7 @@ def get_tube_directory():
         make_base_directory()
     return DIRECTORIO_YOUTUBE
 
-
+'''
 def get_audio_directory():
     """
     Devuelve el Directorio de Audio de JAMedia y JAMediaTube.
@@ -289,8 +288,8 @@ def get_audio_directory():
     if not os.path.exists(AUDIO_JAMEDIA_VIDEO):
         make_base_directory()
     return AUDIO_JAMEDIA_VIDEO
-
-
+'''
+'''
 def get_imagenes_directory():
     """
     Devuelve el Directorio de Imagenes de JAMediaVideo y JAMediaImagenes.
@@ -300,8 +299,8 @@ def get_imagenes_directory():
     if not os.path.exists(IMAGENES_JAMEDIA_VIDEO):
         make_base_directory()
     return IMAGENES_JAMEDIA_VIDEO
-
-
+'''
+'''
 def get_video_directory():
     """
     Devuelve el Directorio de Video de JAMediaVideo.
@@ -311,7 +310,7 @@ def get_video_directory():
     if not os.path.exists(VIDEO_JAMEDIA_VIDEO):
         make_base_directory()
     return VIDEO_JAMEDIA_VIDEO
-
+'''
 
 def get_my_files_directory():
     """
@@ -330,7 +329,7 @@ def get_JAMedia_Directory():
         make_base_directory()
     return path
 
-
+'''
 def eliminar_streaming(url, lista):
     """
     Elimina un Streaming de una lista de jamedia.
@@ -353,7 +352,7 @@ def eliminar_streaming(url, lista):
             del(_dict[item[0]])
     if cambios:
         set_dict(path, _dict)
-
+'''
 '''
 def add_stream(tipo, item):
     """
@@ -368,7 +367,7 @@ def add_stream(tipo, item):
     _dict[item[0].strip()] = item[1].strip()
     set_dict(path, _dict)
 '''
-
+'''
 def set_listas_default():
     """
     Crea las listas para JAMedia si es que no existen y
@@ -397,8 +396,8 @@ def set_listas_default():
                 "JAMediaRadio.JAMedia"), lista_radios)
         except:
             print ("Error al descargar Streamings de Radios.")
-
-
+'''
+'''
 def download_streamings():
     """
     Descarga los streaming desde la web de JAMedia.
@@ -413,8 +412,8 @@ def download_streamings():
             "JAMediaRadio.JAMedia"), lista_radios)
     except:
         print ("Error al descargar Streamings de Radios.")
-
-
+'''
+'''
 def descarga_lista_de_streamings(url):
     """
     Recibe la web donde se publican los streamings de radio o televisión de
@@ -469,12 +468,12 @@ def descarga_lista_de_streamings(url):
 
     except:
         return []
-
-
+'''
+'''
 def clear_lista_de_streamings(path):
     set_dict(path, {})
-
-
+'''
+'''
 def guarda_lista_de_streamings(path, items):
     """
     Recibe el path a un archivo de lista de streamings
@@ -485,8 +484,8 @@ def guarda_lista_de_streamings(path, items):
     for item in items:
         _dict[item[0].strip()] = item[1].strip()
     set_dict(path, _dict)
-
-
+'''
+'''
 def get_streamings(path):
     """
     Recibe el path a un archivo de streamings
@@ -498,8 +497,8 @@ def get_streamings(path):
     for key in keys:
         items.append([key, _dict[key]])
     return items
-
-
+'''
+'''
 def stream_en_archivo(streaming, path):
     """
     Verifica si un streaming está en
@@ -511,7 +510,7 @@ def stream_en_archivo(streaming, path):
         if streaming == item:
             return True
     return False
-
+'''
 
 def get_separador(draw=False, ancho=0, expand=False):
     """
@@ -529,6 +528,25 @@ def get_boton(archivo, flip=False, rotacion=None,
     Devuelve un toolbutton generico.
     """
     boton = Gtk.ToolButton()
+    imagen = Gtk.Image()
+    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
+        archivo, pixels, pixels)
+    if flip:
+        pixbuf = pixbuf.flip(True)
+    if rotacion:
+        pixbuf = pixbuf.rotate_simple(rotacion)
+    imagen.set_from_pixbuf(pixbuf)
+    boton.set_icon_widget(imagen)
+    imagen.show()
+    boton.show()
+    if tooltip_text:
+        boton.set_tooltip_text(tooltip_text)
+        boton.TOOLTIP = tooltip_text
+    return boton
+
+def get_toggle_boton(archivo, flip=False, rotacion=None,
+    pixels=24, tooltip_text=None):
+    boton = Gtk.ToggleToolButton()
     imagen = Gtk.Image()
     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
         archivo, pixels, pixels)

@@ -15,10 +15,10 @@ from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
 from JAMediaPlayer.Globales import get_my_files_directory
-from JAMediaPlayer.Globales import describe_acceso_uri
-from JAMediaPlayer.Globales import copiar
-from JAMediaPlayer.Globales import borrar
-from JAMediaPlayer.Globales import mover
+#from JAMediaPlayer.Globales import describe_acceso_uri
+#from JAMediaPlayer.Globales import copiar
+#from JAMediaPlayer.Globales import borrar
+#from JAMediaPlayer.Globales import mover
 
 from JAMediaPlayer.Globales import ICONS_PATH
 # FIXME: Borrar las Toolbars que no se usan

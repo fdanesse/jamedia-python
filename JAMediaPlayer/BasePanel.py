@@ -138,5 +138,5 @@ class BasePanel(Gtk.HPaned):
         return False
 
     def __endfile(self, widget=None, senial=None):
-        self.derecha.playercontrols.set_paused()
+        GLib.idle_add(self.derecha.playercontrols.set_paused)
         GLib.idle_add(self.derecha.lista.lista.seleccionar_siguiente)

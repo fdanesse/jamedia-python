@@ -175,8 +175,8 @@ class Lista(Gtk.TreeView):
 
     def __construir_columa(self, text, index, visible):
         render = Gtk.CellRendererText()
-        # FIXME: render.set_property("background", get_colors("window"))
-        # FIXME: render.set_property("foreground", get_colors("drawingplayer"))
+        #render.set_property("background", get_colors("window"))
+        #render.set_property("foreground", get_colors("drawingplayer"))
         columna = Gtk.TreeViewColumn(text, render, text=index)
         columna.set_sort_column_id(index)
         columna.set_property('visible', visible)
@@ -186,7 +186,7 @@ class Lista(Gtk.TreeView):
 
     def __construir_columna_icono(self, text, index, visible):
         render = Gtk.CellRendererPixbuf()
-        # FIXME: render.set_property("cell-background", get_colors("toolbars"))
+        #render.set_property("cell-background", get_colors("toolbars"))
         columna = Gtk.TreeViewColumn(text, render, pixbuf=index)
         columna.set_property('visible', visible)
         columna.set_property('resizable', False)
@@ -201,7 +201,7 @@ class Lista(Gtk.TreeView):
             return False
 
         texto, path = elementos[0]
-        #FIXME: descripcion = describe_uri(path)
+        #descripcion = describe_uri(path)
         icono = os.path.join(ICONS_PATH, "sonido.svg")
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(icono, 24, -1)
         '''
@@ -219,9 +219,23 @@ class Lista(Gtk.TreeView):
         GLib.idle_add(self.__ejecutar_agregar_elemento, elementos)
         return False
 
+    def __getItems(self):
+        modelo = self.get_model()
+        item = modelo.get_iter_first()
+        items = []
+        _iter = None
+        while item:
+            _iter = item
+            items.append([modelo.get_value(_iter, 1), modelo.get_value(_iter, 2)])
+            item = modelo.iter_next(item)
+        return items
+
+    def __filterItems(self, item, items):
+        return not item in items
+        
     def agregar_items(self, elementos):
-        # FIXME: no permitir paths repetidos.
-        self.__valorSelected = None # FIXME: Necesario para que no falle al vaciar la lista
+        elementos = [item for item in elementos if self.__filterItems(item, self.__getItems())]
+        self.__valorSelected = None #NOTA: Necesario para que no falle al vaciar la lista
         GLib.idle_add(self.__ejecutar_agregar_elemento, elementos)
 
     def seleccionar_siguiente(self, widget=None):
@@ -243,7 +257,8 @@ class Lista(Gtk.TreeView):
         return False
 
     def seleccionar_primero(self, widget=None):
-        self.get_selection().select_iter(self.get_model().get_iter_first())
+        iter = self.get_model().get_iter_first()
+        if iter: self.get_selection().select_iter(iter)
 
     def seleccionar_ultimo(self, widget=None):
         model = self.get_model()
