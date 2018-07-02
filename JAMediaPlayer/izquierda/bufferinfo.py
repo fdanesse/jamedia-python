@@ -1,6 +1,7 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# FIXME: Borrar si no se usa
+'''
 import os
 import gi
 gi.require_version("Gtk", "3.0")
@@ -16,7 +17,7 @@ from JAMediaPlayer.Globales import ICONS_PATH
 from JAMediaPlayer.Globales import sensibilizar
 from JAMediaPlayer.Globales import insensibilizar
 
-'''
+
 class BufferInfo(Gtk.EventBox):
 
     def __init__(self):

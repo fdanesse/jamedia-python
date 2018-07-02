@@ -30,7 +30,7 @@ class Toolbar_Videos_Derecha(Gtk.Toolbar):
 
         self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
 
-        archivo = os.path.join(ICONS_PATH, "iconplay.svg")
+        archivo = os.path.join(ICONS_PATH, "play.svg")
         boton = get_boton(archivo, flip=True, pixels=24)
         boton.set_tooltip_text("Quitar de Descargas")
         boton.connect("clicked", self.__emit_aencontrados)
@@ -44,7 +44,7 @@ class Toolbar_Videos_Derecha(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(ICONS_PATH, "iconplay.svg")
+        archivo = os.path.join(ICONS_PATH, "play.svg")
         boton = get_boton(archivo, flip=False, pixels=24, rotacion=GdkPixbuf.PixbufRotation.CLOCKWISE)
         boton.set_tooltip_text("Descargar")
         boton.connect("clicked", self.__emit_comenzar_descarga)

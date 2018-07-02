@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import gi
@@ -13,8 +12,7 @@ from gi.repository import GObject
 class MouseSpeedDetector(GObject.GObject):
 
     __gsignals__ = {
-        'estado': (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING,))}
+        'estado': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,))}
 
     def __init__(self, parent):
 

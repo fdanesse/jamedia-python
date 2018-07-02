@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
@@ -25,13 +24,9 @@ from JAMediaPlayer.Globales import ICONS_PATH
 
 
 class Toolbar(Gtk.EventBox):
-    """
-    Toolbar principal de JAMedia.
-    """
 
     __gsignals__ = {
-    'accion': (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING,))}
+    'accion': (GObject.SIGNAL_RUN_LAST,GObject.TYPE_NONE, (GObject.TYPE_STRING,))}
 
     def __init__(self):
 
@@ -50,13 +45,13 @@ class Toolbar(Gtk.EventBox):
         boton.connect("clicked", self.__show_credits)
         toolbar.insert(boton, -1)
 
-        archivo = os.path.join(ICONS_PATH, "JAMedia-help.svg")
+        archivo = os.path.join(ICONS_PATH, "help.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Ayuda")
         boton.connect("clicked", self.__show_help)
         toolbar.insert(boton, -1)
 
-        archivo = os.path.join(ICONS_PATH, "configurar.svg")
+        archivo = os.path.join(ICONS_PATH, "control_panel.png")
         self.configurar = get_boton(archivo, flip=False, pixels=24)
         self.configurar.set_tooltip_text("Configuraciones")
         self.configurar.connect("clicked", self.__emit_accion, "show-config")
@@ -97,11 +92,8 @@ class ToolbarAccion(Gtk.EventBox):
     """
 
     __gsignals__ = {
-    "grabar": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
-    "accion-stream": (GObject.SIGNAL_RUN_LAST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING,
-        GObject.TYPE_STRING))}
+    "grabar": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
+    "accion-stream": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING, GObject.TYPE_STRING))}
 
     def __init__(self):
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-import shelve
+# FIXME: import shelve
 import gi
 gi.require_version("Gtk", "3.0")
 
@@ -19,24 +19,17 @@ from JAMediaPlayer.Globales import ICONS_PATH
 
 
 class Mini_Toolbar(Gtk.Toolbar):
-    """
-    Mini toolbars Superior izquierda y derecha.
-    """
 
     __gsignals__ = {
-    "guardar": (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, []),
-    "abrir": (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
-    "menu_activo": (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, [])}
+    "guardar": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
+    "abrir": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
+    "menu_activo": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, [])}
 
     def __init__(self, text):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL,
-            get_colors("drawingplayer1"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
 
         self.label = None
         self.texto = text
@@ -49,8 +42,7 @@ class Mini_Toolbar(Gtk.Toolbar):
         item.add(self.label)
         self.insert(item, -1)
 
-        self.insert(get_separador(
-            draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
         archivo = os.path.join(ICONS_PATH, "lista.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
@@ -59,8 +51,7 @@ class Mini_Toolbar(Gtk.Toolbar):
         self.insert(boton, -1)
 
         archivo = os.path.join(ICONS_PATH, "play.svg")
-        boton = get_boton(archivo, flip=False, pixels=24,
-            rotacion=GdkPixbuf.PixbufRotation.CLOCKWISE)
+        boton = get_boton(archivo, flip=False, pixels=24,rotacion=GdkPixbuf.PixbufRotation.CLOCKWISE)
         boton.set_tooltip_text("Guardar Lista")
         boton.connect("clicked", self.__emit_guardar)
         self.insert(boton, -1)

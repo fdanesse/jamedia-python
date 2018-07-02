@@ -17,7 +17,6 @@ from JAMediaPlayer.Globales import get_JAMedia_Directory
 from JAMediaPlayer.Globales import ocultar
 from JAMediaPlayer.Globales import mostrar
 from JAMediaPlayer.Globales import ICONS_PATH
-# FIXME: Borrar las funciones que no se usan
 
 
 class PlayerList(Gtk.Frame):
@@ -157,10 +156,10 @@ class Lista(Gtk.TreeView):
             return False
 
         texto, path = elementos[0]
-        #descripcion = describe_uri(path)
         icono = os.path.join(ICONS_PATH, "sonido.svg")
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(icono, 24, -1)
         '''
+        #FIXME: descripcion = describe_uri(path)
         if descripcion:
             if descripcion[2]:
                 # Es un Archivo

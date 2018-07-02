@@ -14,9 +14,6 @@ from JAMediaPlayer.Globales import ICONS_PATH
 
 
 class Toolbar_Videos_Izquierda(Gtk.Toolbar):
-    """
-    toolbar inferior izquierda para videos encontrados.
-    """
 
     __gsignals__ = {
     "borrar": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
@@ -36,7 +33,7 @@ class Toolbar_Videos_Izquierda(Gtk.Toolbar):
         boton.connect("clicked", self.__emit_borrar)
         self.insert(boton, -1)
 
-        archivo = os.path.join(ICONS_PATH, "iconplay.svg")
+        archivo = os.path.join(ICONS_PATH, "play.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Enviar a Descargas")
         boton.connect("clicked", self.__emit_adescargas)

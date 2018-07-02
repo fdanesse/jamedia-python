@@ -1,14 +1,10 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
-
 import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
-from gi.repository import GLib
-from gi.repository import GObject
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_boton
@@ -20,29 +16,24 @@ class Help(Gtk.Dialog):
 
     def __init__(self, parent=None):
 
-        Gtk.Dialog.__init__(self, parent=parent,
-            buttons=("Cerrar", Gtk.ResponseType.ACCEPT))
+        Gtk.Dialog.__init__(self, parent=parent, buttons=("Cerrar", Gtk.ResponseType.ACCEPT))
 
         self.set_decorated(False)
-        self.modify_bg(Gtk.StateType.NORMAL,
-            get_colors("widgetvideoitem"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("widgetvideoitem"))
         self.set_border_width(15)
 
-        tabla1 = Gtk.Table(
-            columns=5, rows=2, homogeneous=False)
+        tabla1 = Gtk.Table(columns=5, rows=2, homogeneous=False)
 
         vbox = Gtk.HBox()
         archivo = os.path.join(ICONS_PATH, "play.svg")
-        self.anterior = get_boton(archivo, flip=True,
-            pixels=24, tooltip_text="Anterior")
+        self.anterior = get_boton(archivo, flip=True, pixels=24, tooltip_text="Anterior")
 
         self.anterior.connect("clicked", self.__switch)
         self.anterior.show()
         vbox.pack_start(self.anterior, False, False, 0)
 
         archivo = os.path.join(ICONS_PATH, "play.svg")
-        self.siguiente = get_boton(archivo, pixels=24,
-            tooltip_text="Siguiente")
+        self.siguiente = get_boton(archivo, pixels=24, tooltip_text="Siguiente")
 
         self.siguiente.connect("clicked", self.__switch)
         self.siguiente.show()
@@ -55,8 +46,7 @@ class Help(Gtk.Dialog):
         for x in range(3, 7):
             try:
                 help = Gtk.Image()
-                help.set_from_file(
-                    os.path.join(ICONS_PATH, "help-%s.svg" % x))
+                help.set_from_file(os.path.join(ICONS_PATH, "help-%s.svg" % x))
                 tabla1.attach_defaults(help, 0, 5, 1, 2)
                 self.helps.append(help)
             except:

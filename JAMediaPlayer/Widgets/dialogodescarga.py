@@ -1,6 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+'''
 import gi
 gi.require_version("Gtk", "3.0")
 
@@ -21,14 +20,12 @@ class DialogoDescarga(Gtk.Dialog):
         Gtk.Dialog.__init__(self, parent=parent)
 
         self.set_decorated(False)
-        self.modify_bg(Gtk.StateType.NORMAL,
-            get_colors("window"))
+        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
         self.set_border_width(15)
 
         self.force = force
 
-        label = Gtk.Label(
-            "*** Descargando Streamings de JAMedia ***")
+        label = Gtk.Label("*** Descargando Streamings de JAMedia ***")
         label.show()
 
         self.vbox.pack_start(label, True, True, 5)
@@ -47,4 +44,4 @@ class DialogoDescarga(Gtk.Dialog):
             set_listas_default()
         self.destroy()
         return False
-        
+'''

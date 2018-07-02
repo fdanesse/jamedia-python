@@ -1,6 +1,7 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# FIXME: Borrar si no se usa
+'''
 import os
 import gi
 gi.require_version("Gtk", "3.0")
@@ -14,7 +15,6 @@ from JAMediaPlayer.Globales import get_boton
 from JAMediaPlayer.Globales import ICONS_PATH
 
 
-'''
 class ToolbarGrabar(Gtk.EventBox):
     """
     Informa al usuario cuando se está grabando desde un streaming.
@@ -35,16 +35,14 @@ class ToolbarGrabar(Gtk.EventBox):
         self.toolbar = Gtk.Toolbar()
         self.toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer"))
 
-        self.toolbar.insert(get_separador(draw=False,
-            ancho=3, expand=False), -1)
+        self.toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         archivo = os.path.join(ICONS_PATH, "stop.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Detener")
         self.toolbar.insert(boton, -1)
 
-        self.toolbar.insert(get_separador(draw=False,
-            ancho=3, expand=False), -1)
+        self.toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
         self.label = Gtk.Label("Grabador Detenido.")
@@ -66,12 +64,9 @@ class ToolbarGrabar(Gtk.EventBox):
     def __update(self):
         if self.color == self.colors[0]:
             self.color = self.colors[1]
-
         elif self.color == self.colors[1]:
             self.color = self.colors[0]
-
         self.label.modify_bg(Gtk.StateType.NORMAL, self.color)
-
         if not self.get_visible():
             self.show()
 
