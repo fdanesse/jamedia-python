@@ -11,9 +11,9 @@ from gi.repository import GObject
 
 from JAMediaPlayer.Globales import get_tube_directory
 
-BASE_PATH = os.path.dirname(__file__)
+#BASE_PATH = os.path.dirname(__file__)
 #STDERR = "/dev/null"
-youtubedl = "/usr/bin/youtube-dl" #os.path.join(BASE_PATH, "youtube-dl") #"/usr/bin/youtube-dl"
+youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")  #os.path.join(#, "youtube-dl")
 
 CODECS = [
     [43, "WebM", "360p VP8 N/A 0.5 Vorbis 128"],
@@ -86,8 +86,8 @@ class JAMediaYoutube(GObject.GObject):
         self.ultimosdatos = False
         self.contador = 0
 
-        #print "Intentando Descargar:", titulo
-        #print "\t En Formato:", CODECS[self.codec]
+        print ("Intentando Descargar:", titulo)
+        print ("\t En Formato:", CODECS[self.codec])
 
         self.estado = True
         # http://youtu.be/XWDZMMMbvhA => codigo compartir
@@ -105,7 +105,7 @@ class JAMediaYoutube(GObject.GObject):
 
         estructura = "python %s %s -i -R %s -f %s --no-part -o %s" % (youtubedl, self.url, 1, CODECS[self.codec][0], destino)
 
-        self.youtubedl = subprocess.Popen(estructura, shell=True,stdout=open(self.STDOUT, "w+b"), universal_newlines=True)  #=open(self.STDOUT, "r+b"), 
+        self.youtubedl = subprocess.Popen(estructura, shell=True,stdout=open(self.STDOUT, "w+b"), universal_newlines=True)
 
         self.salida = open(self.STDOUT, "r")
 

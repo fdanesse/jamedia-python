@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 import json
 
 from .common import InfoExtractor
-from ..compat import compat_urllib_request
 from ..utils import (
     float_or_none,
     int_or_none,
+    sanitized_Request,
 )
 
 
@@ -21,7 +21,7 @@ class CollegeRamaIE(InfoExtractor):
                 'ext': 'mp4',
                 'title': 'Een nieuwe wereld: waarden, bewustzijn en techniek van de mensheid 2.0.',
                 'description': '',
-                'thumbnail': 're:^https?://.*\.jpg$',
+                'thumbnail': r're:^https?://.*\.jpg(?:\?.*?)?$',
                 'duration': 7713.088,
                 'timestamp': 1413309600,
                 'upload_date': '20141014',
@@ -35,6 +35,7 @@ class CollegeRamaIE(InfoExtractor):
                 'ext': 'wmv',
                 'title': '64ste Vakantiecursus: Afvalwater',
                 'description': 'md5:7fd774865cc69d972f542b157c328305',
+                'thumbnail': r're:^https?://.*\.jpg(?:\?.*?)?$',
                 'duration': 10853,
                 'timestamp': 1326446400,
                 'upload_date': '20120113',
@@ -46,13 +47,13 @@ class CollegeRamaIE(InfoExtractor):
         video_id = self._match_id(url)
 
         player_options_request = {
-            "getPlayerOptionsRequest": {
-                "ResourceId": video_id,
-                "QueryString": "",
+            'getPlayerOptionsRequest': {
+                'ResourceId': video_id,
+                'QueryString': '',
             }
         }
 
-        request = compat_urllib_request.Request(
+        request = sanitized_Request(
             'http://collegerama.tudelft.nl/Mediasite/PlayerService/PlayerService.svc/json/GetPlayerOptions',
             json.dumps(player_options_request))
         request.add_header('Content-Type', 'application/json')

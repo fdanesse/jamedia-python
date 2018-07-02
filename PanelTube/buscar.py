@@ -62,4 +62,5 @@ class Buscar(GObject.GObject):
             if buscar:
                 self.__get_videos(buscar, cantidad)
         except:
+            #FIXME: La interfaz queda insensitive
             print ("No tienes conexión ?")

@@ -15,7 +15,7 @@ import subprocess
 
 from JAMediaPlayer.Globales import get_colors
 
-youtubedl = "/usr/bin/youtube-dl"  #os.path.join(os.path.dirname(__file__), "youtube-dl")  #"/usr/bin/youtube-dl"
+youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")  #"/usr/bin/youtube-dl"
 
 
 class WidgetVideoItem(Gtk.EventBox):
@@ -41,6 +41,7 @@ class WidgetVideoItem(Gtk.EventBox):
         self.imagen = Gtk.Image()
         hbox.pack_start(self.imagen, False, False, 3)
 
+        # FIXME: Código Duplicado
         if self.videodict.get("previews", False):
             if type(self.videodict["previews"]) == list:
                 # 1 lista con 1 url, o base64 en un archivo de busquedas.
@@ -48,7 +49,7 @@ class WidgetVideoItem(Gtk.EventBox):
                 archivo = "/tmp/preview%s" % self.videodict["id"]
                 try:
                     # FIXME: Porque Falla si no hay Conexión.
-                    fileimage, headers = urllib.urlretrieve(url, archivo)
+                    fileimage, headers = urllib.request.urlretrieve(url, archivo)
                     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(fileimage, 200, 150)
                     self.imagen.set_from_pixbuf(pixbuf)
                     # Convertir imagen a string por si se quiere guardar.
@@ -57,6 +58,7 @@ class WidgetVideoItem(Gtk.EventBox):
                     pixbuf_file.close()
                     self.videodict["previews"] = image_string
                 except:
+                    #FIXME: Verificar que sucede si no hay conexión
                     print ("ERROR: Quizas no hay conexión", self.__init__)
                 if os.path.exists(archivo):
                     os.remove(archivo)
@@ -100,8 +102,7 @@ class WidgetVideoItem(Gtk.EventBox):
     def __get_progress(self, salida, STDOUT, process, error, STERR):
         progress = salida.readline().strip()
         err = error.readline().strip()
-        # FIXME: Signature extraction failed: Traceback (most recent call last)
-        '''if err:
+        if err:
             print ("Error al actualizar metadatos de:", self.videodict["url"], err)
             process.kill()
             for arch in [salida, error]:
@@ -111,7 +112,7 @@ class WidgetVideoItem(Gtk.EventBox):
                     os.unlink(arch)
             del(self._temp_dat)
             self.emit("end-update")
-            return False'''
+            return False
         if progress:
             self._temp_dat.append(progress)
         if len(self._temp_dat) == 3:
@@ -133,6 +134,7 @@ class WidgetVideoItem(Gtk.EventBox):
         GLib.timeout_add(100, self.__update)
 
     def __update(self):
+        # FIXME: Código Duplicado
         if self.videodict.get("previews", False):
             # 1 lista con 1 url
             if self.videodict["previews"]:
@@ -140,7 +142,7 @@ class WidgetVideoItem(Gtk.EventBox):
             archivo = "/tmp/preview%s" % self.videodict["id"]
             try:
                 # FIXME: Porque Falla si no hay Conexión.
-                fileimage, headers = urllib.urlretrieve(url, archivo)
+                fileimage, headers = urllib.request.urlretrieve(url, archivo)
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(fileimage, 200, 150)
                 self.imagen.set_from_pixbuf(pixbuf)
                 # Convertir imagen a string por si se quiere guardar.
@@ -149,7 +151,8 @@ class WidgetVideoItem(Gtk.EventBox):
                 pixbuf_file.close()
                 self.videodict["previews"] = image_string
             except:
-                print ("ERROR: Quizas no hay conexión", self.update)
+                #FIXME: Verificar que sucede si no hay conexión
+                print ("ERROR: Quizas no hay conexión", self.__update)
             if os.path.exists(archivo):
                 os.remove(archivo)
         self.id_label.set_text("%s: %s" % ("id", self.videodict["id"]))
@@ -160,9 +163,6 @@ class WidgetVideoItem(Gtk.EventBox):
         return False
 
     def update(self):
-        """
-        Actualiza previews y metadatos.
-        """
         #NOTA: desde PanelTube
         _url = self.videodict["url"]
         STDOUT = "/tmp/jamediatube-dl%s" % self.videodict["id"]

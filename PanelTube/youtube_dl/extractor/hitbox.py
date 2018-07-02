@@ -10,13 +10,14 @@ from ..utils import (
     float_or_none,
     int_or_none,
     compat_str,
+    determine_ext,
 )
 
 
 class HitboxIE(InfoExtractor):
     IE_NAME = 'hitbox'
-    _VALID_URL = r'https?://(?:www\.)?hitbox\.tv/video/(?P<id>[0-9]+)'
-    _TEST = {
+    _VALID_URL = r'https?://(?:www\.)?(?:hitbox|smashcast)\.tv/(?:[^/]+/)*videos?/(?P<id>[0-9]+)'
+    _TESTS = [{
         'url': 'http://www.hitbox.tv/video/203213',
         'info_dict': {
             'id': '203213',
@@ -24,7 +25,7 @@ class HitboxIE(InfoExtractor):
             'alt_title': 'hitboxlive - Aug 9th #6',
             'description': '',
             'ext': 'mp4',
-            'thumbnail': 're:^https?://.*\.jpg$',
+            'thumbnail': r're:^https?://.*\.jpg$',
             'duration': 215.1666,
             'resolution': 'HD 720p',
             'uploader': 'hitboxlive',
@@ -37,12 +38,15 @@ class HitboxIE(InfoExtractor):
             # m3u8 download
             'skip_download': True,
         },
-    }
+    }, {
+        'url': 'https://www.smashcast.tv/hitboxlive/videos/203213',
+        'only_matching': True,
+    }]
 
     def _extract_metadata(self, url, video_id):
         thumb_base = 'https://edge.sf.hitbox.tv'
         metadata = self._download_json(
-            '%s/%s' % (url, video_id), video_id)
+            '%s/%s' % (url, video_id), video_id, 'Downloading metadata JSON')
 
         date = 'media_live_since'
         media_type = 'livestream'
@@ -61,14 +65,15 @@ class HitboxIE(InfoExtractor):
         views = int_or_none(video_meta.get('media_views'))
         timestamp = parse_iso8601(video_meta.get(date), ' ')
         categories = [video_meta.get('category_name')]
-        thumbs = [
-            {'url': thumb_base + video_meta.get('media_thumbnail'),
-             'width': 320,
-             'height': 180},
-            {'url': thumb_base + video_meta.get('media_thumbnail_large'),
-             'width': 768,
-             'height': 432},
-        ]
+        thumbs = [{
+            'url': thumb_base + video_meta.get('media_thumbnail'),
+            'width': 320,
+            'height': 180
+        }, {
+            'url': thumb_base + video_meta.get('media_thumbnail_large'),
+            'width': 768,
+            'height': 432
+        }]
 
         return {
             'id': video_id,
@@ -87,29 +92,48 @@ class HitboxIE(InfoExtractor):
     def _real_extract(self, url):
         video_id = self._match_id(url)
 
-        metadata = self._extract_metadata(
-            'https://www.hitbox.tv/api/media/video',
-            video_id)
-
         player_config = self._download_json(
-            'https://www.hitbox.tv/api/player/config/video/%s' % video_id,
-            video_id)
+            'https://www.smashcast.tv/api/player/config/video/%s' % video_id,
+            video_id, 'Downloading video JSON')
 
-        clip = player_config.get('clip')
-        video_url = clip.get('url')
-        res = clip.get('bitrates', [])[0].get('label')
+        formats = []
+        for video in player_config['clip']['bitrates']:
+            label = video.get('label')
+            if label == 'Auto':
+                continue
+            video_url = video.get('url')
+            if not video_url:
+                continue
+            bitrate = int_or_none(video.get('bitrate'))
+            if determine_ext(video_url) == 'm3u8':
+                if not video_url.startswith('http'):
+                    continue
+                formats.append({
+                    'url': video_url,
+                    'ext': 'mp4',
+                    'tbr': bitrate,
+                    'format_note': label,
+                    'protocol': 'm3u8_native',
+                })
+            else:
+                formats.append({
+                    'url': video_url,
+                    'tbr': bitrate,
+                    'format_note': label,
+                })
+        self._sort_formats(formats)
 
-        metadata['resolution'] = res
-        metadata['url'] = video_url
-        metadata['protocol'] = 'm3u8'
+        metadata = self._extract_metadata(
+            'https://www.smashcast.tv/api/media/video', video_id)
+        metadata['formats'] = formats
 
         return metadata
 
 
 class HitboxLiveIE(HitboxIE):
     IE_NAME = 'hitbox:live'
-    _VALID_URL = r'https?://(?:www\.)?hitbox\.tv/(?!video)(?P<id>.+)'
-    _TEST = {
+    _VALID_URL = r'https?://(?:www\.)?(?:hitbox|smashcast)\.tv/(?P<id>[^/?#&]+)'
+    _TESTS = [{
         'url': 'http://www.hitbox.tv/dimak',
         'info_dict': {
             'id': 'dimak',
@@ -124,43 +148,67 @@ class HitboxLiveIE(HitboxIE):
             # live
             'skip_download': True,
         },
-    }
+    }, {
+        'url': 'https://www.smashcast.tv/dimak',
+        'only_matching': True,
+    }]
+
+    @classmethod
+    def suitable(cls, url):
+        return False if HitboxIE.suitable(url) else super(HitboxLiveIE, cls).suitable(url)
 
     def _real_extract(self, url):
         video_id = self._match_id(url)
 
-        metadata = self._extract_metadata(
-            'https://www.hitbox.tv/api/media/live',
-            video_id)
-
         player_config = self._download_json(
-            'https://www.hitbox.tv/api/player/config/live/%s' % video_id,
+            'https://www.smashcast.tv/api/player/config/live/%s' % video_id,
             video_id)
 
         formats = []
         cdns = player_config.get('cdns')
         servers = []
         for cdn in cdns:
+            # Subscribe URLs are not playable
+            if cdn.get('rtmpSubscribe') is True:
+                continue
             base_url = cdn.get('netConnectionUrl')
-            host = re.search('.+\.([^\.]+\.[^\./]+)/.+', base_url).group(1)
+            host = re.search(r'.+\.([^\.]+\.[^\./]+)/.+', base_url).group(1)
             if base_url not in servers:
                 servers.append(base_url)
                 for stream in cdn.get('bitrates'):
                     label = stream.get('label')
-                    if label != 'Auto':
+                    if label == 'Auto':
+                        continue
+                    stream_url = stream.get('url')
+                    if not stream_url:
+                        continue
+                    bitrate = int_or_none(stream.get('bitrate'))
+                    if stream.get('provider') == 'hls' or determine_ext(stream_url) == 'm3u8':
+                        if not stream_url.startswith('http'):
+                            continue
                         formats.append({
-                            'url': '%s/%s' % (base_url, stream.get('url')),
+                            'url': stream_url,
                             'ext': 'mp4',
-                            'vbr': stream.get('bitrate'),
-                            'resolution': label,
+                            'tbr': bitrate,
+                            'format_note': label,
+                            'rtmp_live': True,
+                        })
+                    else:
+                        formats.append({
+                            'url': '%s/%s' % (base_url, stream_url),
+                            'ext': 'mp4',
+                            'tbr': bitrate,
                             'rtmp_live': True,
                             'format_note': host,
                             'page_url': url,
                             'player_url': 'http://www.hitbox.tv/static/player/flowplayer/flowplayer.commercial-3.2.16.swf',
                         })
-
         self._sort_formats(formats)
+
+        metadata = self._extract_metadata(
+            'https://www.smashcast.tv/api/media/live', video_id)
         metadata['formats'] = formats
         metadata['is_live'] = True
         metadata['title'] = self._live_title(metadata.get('title'))
+
         return metadata

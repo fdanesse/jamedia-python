@@ -11,7 +11,7 @@ from ..utils import (
 
 
 class WallaIE(InfoExtractor):
-    _VALID_URL = r'http://vod\.walla\.co\.il/[^/]+/(?P<id>\d+)/(?P<display_id>.+)'
+    _VALID_URL = r'https?://vod\.walla\.co\.il/[^/]+/(?P<id>\d+)/(?P<display_id>.+)'
     _TEST = {
         'url': 'http://vod.walla.co.il/movie/2642630/one-direction-all-for-one',
         'info_dict': {
@@ -20,7 +20,7 @@ class WallaIE(InfoExtractor):
             'ext': 'flv',
             'title': 'וואן דיירקשן: ההיסטריה',
             'description': 'md5:de9e2512a92442574cdb0913c49bc4d8',
-            'thumbnail': 're:^https?://.*\.jpg',
+            'thumbnail': r're:^https?://.*\.jpg',
             'duration': 3600,
         },
         'params': {

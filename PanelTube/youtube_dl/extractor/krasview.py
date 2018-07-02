@@ -1,4 +1,4 @@
-# encoding: utf-8
+# coding: utf-8
 from __future__ import unicode_literals
 
 import json
@@ -23,7 +23,10 @@ class KrasViewIE(InfoExtractor):
             'title': 'Снег, лёд, заносы',
             'description': 'Снято в городе Нягань, в Ханты-Мансийском автономном округе.',
             'duration': 27,
-            'thumbnail': 're:^https?://.*\.jpg',
+            'thumbnail': r're:^https?://.*\.jpg',
+        },
+        'params': {
+            'skip_download': 'Not accessible from Travis CI server',
         },
     }
 
@@ -40,8 +43,10 @@ class KrasViewIE(InfoExtractor):
         description = self._og_search_description(webpage, default=None)
         thumbnail = flashvars.get('image') or self._og_search_thumbnail(webpage)
         duration = int_or_none(flashvars.get('duration'))
-        width = int_or_none(self._og_search_property('video:width', webpage, 'video width'))
-        height = int_or_none(self._og_search_property('video:height', webpage, 'video height'))
+        width = int_or_none(self._og_search_property(
+            'video:width', webpage, 'video width', default=None))
+        height = int_or_none(self._og_search_property(
+            'video:height', webpage, 'video height', default=None))
 
         return {
             'id': video_id,

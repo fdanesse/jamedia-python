@@ -2,14 +2,12 @@
 from __future__ import unicode_literals
 
 from .common import InfoExtractor
-from ..compat import (
-    compat_urllib_parse,
-    compat_urllib_request,
-)
 from ..utils import (
     int_or_none,
     parse_duration,
     parse_filesize,
+    sanitized_Request,
+    urlencode_postdata,
 )
 
 
@@ -21,7 +19,7 @@ class MinhatecaIE(InfoExtractor):
             'id': '125848331',
             'ext': 'mp4',
             'title': 'youtube-dl test video',
-            'thumbnail': 're:^https?://.*\.jpg$',
+            'thumbnail': r're:^https?://.*\.jpg$',
             'filesize_approx': 1530000,
             'duration': 9,
             'view_count': int,
@@ -39,9 +37,9 @@ class MinhatecaIE(InfoExtractor):
             ('fileId', video_id),
             ('__RequestVerificationToken', token),
         ]
-        req = compat_urllib_request.Request(
+        req = sanitized_Request(
             'http://minhateca.com.br/action/License/Download',
-            data=compat_urllib_parse.urlencode(token_data))
+            data=urlencode_postdata(token_data))
         req.add_header('Content-Type', 'application/x-www-form-urlencoded')
         data = self._download_json(
             req, video_id, note='Downloading metadata')

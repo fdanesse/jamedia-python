@@ -14,7 +14,7 @@ class HistoricFilmsIE(InfoExtractor):
             'ext': 'mov',
             'title': 'Historic Films: GP-7',
             'description': 'md5:1a86a0f3ac54024e419aba97210d959a',
-            'thumbnail': 're:^https?://.*\.jpg$',
+            'thumbnail': r're:^https?://.*\.jpg$',
             'duration': 2096,
         },
     }
@@ -25,7 +25,8 @@ class HistoricFilmsIE(InfoExtractor):
         webpage = self._download_webpage(url, video_id)
 
         tape_id = self._search_regex(
-            r'class="tapeId">([^<]+)<', webpage, 'tape id')
+            [r'class="tapeId"[^>]*>([^<]+)<', r'tapeId\s*:\s*"([^"]+)"'],
+            webpage, 'tape id')
 
         title = self._og_search_title(webpage)
         description = self._og_search_description(webpage)

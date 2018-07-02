@@ -24,7 +24,7 @@ class GigaIE(InfoExtractor):
             'ext': 'mp4',
             'title': 'Anime Awesome: Chihiros Reise ins Zauberland – Das Beste kommt zum Schluss',
             'description': 'md5:afdf5862241aded4718a30dff6a57baf',
-            'thumbnail': 're:^https?://.*\.jpg$',
+            'thumbnail': r're:^https?://.*\.jpg$',
             'duration': 578,
             'timestamp': 1414749706,
             'upload_date': '20141031',
@@ -85,7 +85,8 @@ class GigaIE(InfoExtractor):
             r'class="author">([^<]+)</a>', webpage, 'uploader', fatal=False)
 
         view_count = str_to_int(self._search_regex(
-            r'<span class="views"><strong>([\d.]+)</strong>', webpage, 'view count', fatal=False))
+            r'<span class="views"><strong>([\d.,]+)</strong>',
+            webpage, 'view count', fatal=False))
 
         return {
             'id': video_id,

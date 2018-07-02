@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import socket
+#import socket
 import os
 #import commands FIXME: No existe en python 3
-import shutil
-import json
-import codecs
+#import shutil
+#import json
+#import codecs
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -204,19 +204,13 @@ def copiar(origen, destino):
 '''
 
 def make_base_directory():
-    """
-    Crea toda la estructura de Directorios de JAMedia.
-    """
     if not os.path.exists(os.path.join(os.environ["HOME"], "JAMediaDatos")):
         os.mkdir(os.path.join(os.environ["HOME"], "JAMediaDatos"))
         os.chmod(os.path.join(os.environ["HOME"], "JAMediaDatos"), stat.S_IXOTH)
 
     # Directorios JAMedia
-    DIRECTORIO_MIS_ARCHIVOS = os.path.join(os.environ["HOME"],
-        "JAMediaDatos", "MisArchivos")
-
-    DIRECTORIO_DATOS = os.path.join(os.environ["HOME"],
-        "JAMediaDatos", "Datos")
+    DIRECTORIO_MIS_ARCHIVOS = os.path.join(os.environ["HOME"], "JAMediaDatos", "MisArchivos")
+    DIRECTORIO_DATOS = os.path.join(os.environ["HOME"], "JAMediaDatos", "Datos")
 
     if not os.path.exists(DIRECTORIO_MIS_ARCHIVOS):
         os.mkdir(DIRECTORIO_MIS_ARCHIVOS)
@@ -227,30 +221,26 @@ def make_base_directory():
         os.chmod(DIRECTORIO_DATOS, stat.S_IXOTH)
 
     # Directorio JAMediaTube
-    DIRECTORIO_YOUTUBE = os.path.join(os.environ["HOME"],
-        "JAMediaDatos", "YoutubeVideos")
+    DIRECTORIO_YOUTUBE = os.path.join(os.environ["HOME"], "JAMediaDatos", "YoutubeVideos")
 
     if not os.path.exists(DIRECTORIO_YOUTUBE):
         os.mkdir(DIRECTORIO_YOUTUBE)
         os.chmod(DIRECTORIO_YOUTUBE, stat.S_IXOTH)
 
     # Directorios JAMediaVideo
-    AUDIO_JAMEDIA_VIDEO = os.path.join(os.environ["HOME"],
-        "JAMediaDatos", "Audio")
+    AUDIO_JAMEDIA_VIDEO = os.path.join(os.environ["HOME"], "JAMediaDatos", "Audio")
 
     if not os.path.exists(AUDIO_JAMEDIA_VIDEO):
         os.mkdir(AUDIO_JAMEDIA_VIDEO)
         os.chmod(AUDIO_JAMEDIA_VIDEO, stat.S_IXOTH)
 
-    VIDEO_JAMEDIA_VIDEO = os.path.join(os.environ["HOME"],
-        "JAMediaDatos", "Videos")
+    VIDEO_JAMEDIA_VIDEO = os.path.join(os.environ["HOME"], "JAMediaDatos", "Videos")
 
     if not os.path.exists(VIDEO_JAMEDIA_VIDEO):
         os.mkdir(VIDEO_JAMEDIA_VIDEO)
         os.chmod(VIDEO_JAMEDIA_VIDEO, stat.S_IXOTH)
 
-    IMAGENES_JAMEDIA_VIDEO = os.path.join(os.environ["HOME"],
-        "JAMediaDatos", "Fotos")
+    IMAGENES_JAMEDIA_VIDEO = os.path.join(os.environ["HOME"], "JAMediaDatos", "Fotos")
 
     if not os.path.exists(IMAGENES_JAMEDIA_VIDEO):
         os.mkdir(IMAGENES_JAMEDIA_VIDEO)
@@ -258,22 +248,14 @@ def make_base_directory():
 
 
 def get_data_directory():
-    """
-    Devuelve el Directorio de Datos de JAMedia y JAMediaTube.
-    """
-    DIRECTORIO_DATOS = os.path.join(os.environ["HOME"],
-        "JAMediaDatos", "Datos")
+    DIRECTORIO_DATOS = os.path.join(os.environ["HOME"], "JAMediaDatos", "Datos")
     if not os.path.exists(DIRECTORIO_DATOS):
         make_base_directory()
     return DIRECTORIO_DATOS
 
 
 def get_tube_directory():
-    """
-    Devuelve el Directorio de Videos de JAMediaTube.
-    """
-    DIRECTORIO_YOUTUBE = os.path.join(os.environ["HOME"],
-        "JAMediaDatos", "YoutubeVideos")
+    DIRECTORIO_YOUTUBE = os.path.join(os.environ["HOME"], "JAMediaDatos", "YoutubeVideos")
     if not os.path.exists(DIRECTORIO_YOUTUBE):
         make_base_directory()
     return DIRECTORIO_YOUTUBE
@@ -313,11 +295,7 @@ def get_video_directory():
 '''
 
 def get_my_files_directory():
-    """
-    Devuelve el Directorio de Archivos del usuario en JAMedia.
-    """
-    DIRECTORIO_MIS_ARCHIVOS = os.path.join(os.environ["HOME"],
-        "JAMediaDatos", "MisArchivos")
+    DIRECTORIO_MIS_ARCHIVOS = os.path.join(os.environ["HOME"], "JAMediaDatos", "MisArchivos")
     if not os.path.exists(DIRECTORIO_MIS_ARCHIVOS):
         make_base_directory()
     return DIRECTORIO_MIS_ARCHIVOS
@@ -513,24 +491,16 @@ def stream_en_archivo(streaming, path):
 '''
 
 def get_separador(draw=False, ancho=0, expand=False):
-    """
-    Devuelve un separador generico.
-    """
     separador = Gtk.SeparatorToolItem()
     separador.props.draw = draw
     separador.set_size_request(ancho, -1)
     separador.set_expand(expand)
     return separador
 
-def get_boton(archivo, flip=False, rotacion=None,
-    pixels=24, tooltip_text=None):
-    """
-    Devuelve un toolbutton generico.
-    """
+def get_boton(archivo, flip=False, rotacion=None, pixels=24, tooltip_text=None):
     boton = Gtk.ToolButton()
     imagen = Gtk.Image()
-    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
-        archivo, pixels, pixels)
+    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(archivo, pixels, pixels)
     if flip:
         pixbuf = pixbuf.flip(True)
     if rotacion:
@@ -544,12 +514,10 @@ def get_boton(archivo, flip=False, rotacion=None,
         boton.TOOLTIP = tooltip_text
     return boton
 
-def get_toggle_boton(archivo, flip=False, rotacion=None,
-    pixels=24, tooltip_text=None):
+def get_toggle_boton(archivo, flip=False, rotacion=None, pixels=24, tooltip_text=None):
     boton = Gtk.ToggleToolButton()
     imagen = Gtk.Image()
-    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
-        archivo, pixels, pixels)
+    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(archivo, pixels, pixels)
     if flip:
         pixbuf = pixbuf.flip(True)
     if rotacion:
@@ -562,3 +530,4 @@ def get_toggle_boton(archivo, flip=False, rotacion=None,
         boton.set_tooltip_text(tooltip_text)
         boton.TOOLTIP = tooltip_text
     return boton
+    

@@ -2,10 +2,9 @@ from __future__ import unicode_literals
 
 from .common import InfoExtractor
 from ..utils import (
-    xpath_text,
-    xpath_with_ns,
     int_or_none,
-    float_or_none,
+    determine_ext,
+    mimetype2ext,
 )
 
 
@@ -13,53 +12,51 @@ class TweakersIE(InfoExtractor):
     _VALID_URL = r'https?://tweakers\.net/video/(?P<id>\d+)'
     _TEST = {
         'url': 'https://tweakers.net/video/9926/new-nintendo-3ds-xl-op-alle-fronten-beter.html',
-        'md5': '1b5afa817403bb5baa08359dca31e6df',
+        'md5': 'fe73e417c093a788e0160c4025f88b15',
         'info_dict': {
             'id': '9926',
             'ext': 'mp4',
             'title': 'New Nintendo 3DS XL - Op alle fronten beter',
-            'description': 'md5:f97324cc71e86e11c853f0763820e3ba',
-            'thumbnail': 're:^https?://.*\.jpe?g$',
+            'description': 'md5:3789b21fed9c0219e9bcaacd43fab280',
+            'thumbnail': r're:^https?://.*\.jpe?g$',
             'duration': 386,
+            'uploader_id': 's7JeEm',
         }
     }
 
     def _real_extract(self, url):
         video_id = self._match_id(url)
+        video_data = self._download_json(
+            'https://tweakers.net/video/s1playlist/%s/1920/1080/playlist.json' % video_id,
+            video_id)['items'][0]
 
-        playlist = self._download_xml(
-            'https://tweakers.net/video/s1playlist/%s/playlist.xspf' % video_id,
-            video_id)
+        title = video_data['title']
 
-        NS_MAP = {
-            'xspf': 'http://xspf.org/ns/0/',
-            's1': 'http://static.streamone.nl/player/ns/0',
-        }
-
-        track = playlist.find(xpath_with_ns('./xspf:trackList/xspf:track', NS_MAP))
-
-        title = xpath_text(
-            track, xpath_with_ns('./xspf:title', NS_MAP), 'title')
-        description = xpath_text(
-            track, xpath_with_ns('./xspf:annotation', NS_MAP), 'description')
-        thumbnail = xpath_text(
-            track, xpath_with_ns('./xspf:image', NS_MAP), 'thumbnail')
-        duration = float_or_none(
-            xpath_text(track, xpath_with_ns('./xspf:duration', NS_MAP), 'duration'),
-            1000)
-
-        formats = [{
-            'url': location.text,
-            'format_id': location.get(xpath_with_ns('s1:label', NS_MAP)),
-            'width': int_or_none(location.get(xpath_with_ns('s1:width', NS_MAP))),
-            'height': int_or_none(location.get(xpath_with_ns('s1:height', NS_MAP))),
-        } for location in track.findall(xpath_with_ns('./xspf:location', NS_MAP))]
+        formats = []
+        for location in video_data.get('locations', {}).get('progressive', []):
+            format_id = location.get('label')
+            width = int_or_none(location.get('width'))
+            height = int_or_none(location.get('height'))
+            for source in location.get('sources', []):
+                source_url = source.get('src')
+                if not source_url:
+                    continue
+                ext = mimetype2ext(source.get('type')) or determine_ext(source_url)
+                formats.append({
+                    'format_id': format_id,
+                    'url': source_url,
+                    'width': width,
+                    'height': height,
+                    'ext': ext,
+                })
+        self._sort_formats(formats)
 
         return {
             'id': video_id,
             'title': title,
-            'description': description,
-            'thumbnail': thumbnail,
-            'duration': duration,
+            'description': video_data.get('description'),
+            'thumbnail': video_data.get('poster'),
+            'duration': int_or_none(video_data.get('duration')),
+            'uploader_id': video_data.get('account'),
             'formats': formats,
         }

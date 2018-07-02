@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 from __future__ import unicode_literals
 
 from .common import InfoExtractor
@@ -29,6 +29,10 @@ class FolketingetIE(InfoExtractor):
             'timestamp': 1416493800,
             'upload_date': '20141120',
             'duration': 3960,
+        },
+        'params': {
+            # rtmp download
+            'skip_download': True,
         },
     }
 

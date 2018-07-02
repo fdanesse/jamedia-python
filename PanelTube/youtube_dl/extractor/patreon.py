@@ -1,10 +1,8 @@
-# encoding: utf-8
+# coding: utf-8
 from __future__ import unicode_literals
 
 from .common import InfoExtractor
-from ..utils import (
-    js_to_json,
-)
+from ..utils import js_to_json
 
 
 class PatreonIE(InfoExtractor):
@@ -65,9 +63,9 @@ class PatreonIE(InfoExtractor):
             'password': password,
         }
 
-        request = compat_urllib_request.Request(
+        request = sanitized_Request(
             'https://www.patreon.com/processLogin',
-            compat_urllib_parse.urlencode(login_form).encode('utf-8')
+            compat_urllib_parse_urlencode(login_form).encode('utf-8')
         )
         login_page = self._download_webpage(request, None, note='Logging in as %s' % username)
 
@@ -87,7 +85,7 @@ class PatreonIE(InfoExtractor):
             r'<div class="attach"><a target="_blank" href="([^"]+)">',
             webpage, 'attachment URL', default=None)
         embed = self._html_search_regex(
-            r'<div id="watchCreation">\s*<iframe class="embedly-embed" src="([^"]+)"',
+            r'<div[^>]+id="watchCreation"[^>]*>\s*<iframe[^>]+src="([^"]+)"',
             webpage, 'embedded URL', default=None)
 
         if attach_fn is not None:

@@ -25,7 +25,7 @@ class NetzkinoIE(InfoExtractor):
             'comments': 'mincount:3',
             'description': 'md5:1eddeacc7e62d5a25a2d1a7290c64a28',
             'upload_date': '20120813',
-            'thumbnail': 're:https?://.*\.jpg$',
+            'thumbnail': r're:https?://.*\.jpg$',
             'timestamp': 1344858571,
             'age_limit': 12,
         },
@@ -49,7 +49,7 @@ class NetzkinoIE(InfoExtractor):
             'http://www.netzkino.de/beta/dist/production.min.js', video_id,
             note='Downloading player code')
         avo_js = self._search_regex(
-            r'window\.avoCore\s*=.*?urlTemplate:\s*(\{.*?"\})',
+            r'var urlTemplate=(\{.*?"\})',
             production_js, 'URL templates')
         templates = self._parse_json(
             avo_js, video_id, transform_source=js_to_json)

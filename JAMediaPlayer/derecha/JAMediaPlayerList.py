@@ -55,10 +55,9 @@ class PlayerList(Gtk.Frame):
         self.toolbar.openfiles.connect("clicked", self.__openfiles, "load")
         self.toolbar.appendfiles.connect("clicked", self.__openfiles, "add")
         self.toolbar.clearlist.connect("clicked", self.__clearList)
-        #FIXME: self.lista.connect("button-press-event", self.__click_derecho_en_lista)
-
+        
     def __clearList(self, widget):
-        self.lista.get_model().clear()
+        self.lista.limpiar()
 
     def __openfiles(self, widget, tipo):
         selector = My_FileChooser(parent=self.get_toplevel(),
@@ -82,58 +81,8 @@ class PlayerList(Gtk.Frame):
 
     def __load_list(self, items, tipo):
         if tipo == "load":
-            self.lista.get_model().clear()
+            self.lista.limpiar()
         self.lista.agregar_items(items)
-
-    '''
-    def __click_derecho_en_lista(self, widget, event):
-        boton = event.button
-        pos = (event.x, event.y)
-        tiempo = event.time
-        path, columna, xdefondo, ydefondo = (None, None, None, None)
-        try:
-            path, columna, xdefondo, ydefondo = widget.get_path_at_pos(
-                int(pos[0]), int(pos[1]))
-        except:
-            return
-        # TreeView.get_path_at_pos(event.x, event.y) devuelve:
-        # * La ruta de acceso en el punto especificado (x, y),
-        # en relación con las coordenadas widget
-        # * El Gtk.TreeViewColumn en ese punto
-        # * La coordenada X en relación con el fondo de la celda
-        # * La coordenada Y en relación con el fondo de la celda
-        if boton == 1 or boton == 2:
-            return
-        elif boton == 3:
-            self.__emit_menu_activo()
-            #menu = MenuList(widget, boton, pos, tiempo, path, widget.get_model())
-            #menu.connect('accion', self.__emit_accion_list)
-            #menu.popup(None, None, None, None, boton, tiempo)
-    '''
-
-    '''
-    def select_valor(self, path_origen):
-        self.lista.select_valor(path_origen)
-    '''
-
-    '''
-    def get_selected_path(self):
-        modelo, _iter = self.lista.get_selection().get_selected()
-        valor = self.lista.get_model().get_value(_iter, 2)
-        return valor
-    '''
-
-    '''
-    def get_items_paths(self):
-        filepaths = []
-        model = self.lista.get_model()
-        item = model.get_iter_first()
-        self.lista.get_selection().select_iter(item)
-        while item:
-            filepaths.append(model.get_value(item, 2))
-            item = model.iter_next(item)
-        return filepaths
-    '''
 
 
 class Lista(Gtk.TreeView):
@@ -154,16 +103,23 @@ class Lista(Gtk.TreeView):
 
         self.__setear_columnas()
         self.get_selection().connect("changed", self.__changedSelection)
-
+        self.get_model().connect("row-deleted", self.__rowDeleted)
         self.show_all()
+    
+    def __rowDeleted(self, widget, _row):
+        if self.get_model().iter_n_children() == 0:
+            self.__valorSelected = None
+            self.emit("len_items", 0)
 
     def __changedSelection(self, treeSelection):
-        modelo, _iter = self.get_selection().get_selected()
+        modelo, _iter = treeSelection.get_selected()
         if not _iter:
+            #NOTA: Al parecer nunca sucede pero no está de más
+            self.__valorSelected = None
             self.emit("len_items", 0)
             return
         valor = modelo.get_value(_iter, 2)
-        if self.__valorSelected != valor and self.__valorSelected != None:
+        if self.__valorSelected != valor:
             self.__valorSelected = valor
             self.emit('nueva-seleccion', self.__valorSelected)
             self.scroll_to_cell(modelo.get_path(_iter))
@@ -195,9 +151,9 @@ class Lista(Gtk.TreeView):
 
     def __ejecutar_agregar_elemento(self, elementos):
         if not elementos:
+            if not self.__valorSelected:
+                self.seleccionar_primero()
             self.emit("len_items", self.get_model().iter_n_children())
-            self.__valorSelected = False
-            self.seleccionar_primero()
             return False
 
         texto, path = elementos[0]
@@ -232,33 +188,34 @@ class Lista(Gtk.TreeView):
 
     def __filterItems(self, item, items):
         return not item in items
-        
+
     def agregar_items(self, elementos):
         elementos = [item for item in elementos if self.__filterItems(item, self.__getItems())]
-        self.__valorSelected = None #NOTA: Necesario para que no falle al vaciar la lista
         GLib.idle_add(self.__ejecutar_agregar_elemento, elementos)
 
     def seleccionar_siguiente(self, widget=None):
         modelo, _iter = self.get_selection().get_selected()
-        iternext = modelo.iter_next(_iter)
-        if iternext:
-            self.get_selection().select_iter(iternext)
-        else:
-            self.seleccionar_primero()
+        if _iter:
+            iternext = modelo.iter_next(_iter)
+            if iternext:
+                self.get_selection().select_iter(iternext)
+            else:
+                self.seleccionar_primero()
         return False
 
     def seleccionar_anterior(self, widget=None):
         modelo, _iter = self.get_selection().get_selected()
-        previous = modelo.iter_previous(_iter)
-        if previous:
-            self.get_selection().select_iter(previous)
-        else:
-            self.seleccionar_ultimo()
+        if _iter:
+            previous = modelo.iter_previous(_iter)
+            if previous:
+                self.get_selection().select_iter(previous)
+            else:
+                self.seleccionar_ultimo()
         return False
 
     def seleccionar_primero(self, widget=None):
-        iter = self.get_model().get_iter_first()
-        if iter: self.get_selection().select_iter(iter)
+        _iter = self.get_model().get_iter_first()
+        if _iter: self.get_selection().select_iter(_iter)
 
     def seleccionar_ultimo(self, widget=None):
         model = self.get_model()
@@ -269,6 +226,11 @@ class Lista(Gtk.TreeView):
             item = model.iter_next(item)
         if _iter:
             self.get_selection().select_iter(_iter)
+
+    def limpiar(self, widget=None):
+        self.get_selection().disconnect_by_func(self.__changedSelection)
+        self.get_model().clear()
+        self.get_selection().connect("changed", self.__changedSelection)
 
 
 class JAMediaToolbarList(Gtk.EventBox):

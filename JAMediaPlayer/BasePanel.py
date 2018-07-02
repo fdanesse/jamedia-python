@@ -92,6 +92,7 @@ class BasePanel(Gtk.HPaned):
         self.emit("show-controls", datos)
 
     def __cargar_reproducir(self, widget, path):
+        #print("CARGAR:", path)
         volumen = 1.0
         volumen = float("{:.1f}".format(self.izquierda.progress.get_volumen()))
         self.izquierda.progress.set_sensitive(False)

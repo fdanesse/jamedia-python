@@ -317,11 +317,10 @@ class PanelTube(Gtk.HPaned):
             widget.set_sensitive(True)
         if not items:
             del(items)
-            #self.toolbar_videos_izquierda.set_sensitive(True)
-            #self.toolbar_encontrados.set_sensitive(True)
+            self.toolbar_videos_izquierda.set_sensitive(True)
+            self.toolbar_encontrados.set_sensitive(True)
             return False
         item = items[0]
-        #items = list(items[1:])
         items.remove(item)
         if item:
             if item.get_parent():
@@ -333,23 +332,17 @@ class PanelTube(Gtk.HPaned):
             self.__update_next(False, items)
 
     def cancel_toolbars_flotantes(self, widget=None):
-        """
-        Óculta las toolbars flotantes, se llama desde la raíz de la aplicación
-        cuando va a presentar una toolbar flotante allí, de este modo nunca
-        habrá más de una toolbar flotante visible.
-        """
         for toolbar in self.toolbars_flotantes:
             toolbar.cancelar()
 
     def update_widgets_videos_encontrados(self, buscador):
         """
-        Luego de agregados todos los widgets de videos, cada uno actualiza sus
-        previews y demás metadatos, utilizando un subproceso para no afectar a la interfaz gráfica.
+        widgets de videos actualizan sus metadatos.
         """
-        #self.toolbar_videos_izquierda.set_sensitive(False)
-        #self.toolbar_encontrados.set_sensitive(False)
+        self.toolbar_videos_izquierda.set_sensitive(False)
+        self.toolbar_encontrados.set_sensitive(False)
         items = list(self.encontrados.get_children())
-        #for item in items:
-        #    item.set_sensitive(False)
+        for item in items:
+            item.set_sensitive(False)
         self.__update_next(False, items)
-        self.set_sensitive(True)  # Desde JAMedia.__comenzar_busqueda esta insensitive
+        self.set_sensitive(True)  #NOTA: Desde JAMedia.__comenzar_busqueda esta insensitive

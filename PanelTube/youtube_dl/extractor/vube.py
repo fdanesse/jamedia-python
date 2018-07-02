@@ -15,7 +15,7 @@ from ..utils import (
 class VubeIE(InfoExtractor):
     IE_NAME = 'vube'
     IE_DESC = 'Vube.com'
-    _VALID_URL = r'http://vube\.com/(?:[^/]+/)+(?P<id>[\da-zA-Z]{10})\b'
+    _VALID_URL = r'https?://vube\.com/(?:[^/]+/)+(?P<id>[\da-zA-Z]{10})\b'
 
     _TESTS = [
         {
@@ -26,7 +26,7 @@ class VubeIE(InfoExtractor):
                 'ext': 'mp4',
                 'title': 'Best Drummer Ever [HD]',
                 'description': 'md5:2d63c4b277b85c2277761c2cf7337d71',
-                'thumbnail': 're:^https?://.*\.jpg',
+                'thumbnail': r're:^https?://.*\.jpg',
                 'uploader': 'William',
                 'timestamp': 1406876915,
                 'upload_date': '20140801',
@@ -36,6 +36,7 @@ class VubeIE(InfoExtractor):
                 'comment_count': int,
                 'categories': ['amazing', 'hd', 'best drummer ever', 'william wei', 'bucket drumming', 'street drummer', 'epic street drumming'],
             },
+            'skip': 'Not accessible from Travis CI server',
         }, {
             'url': 'http://vube.com/Chiara+Grispo+Video+Channel/YL2qNPkqon',
             'md5': 'db7aba89d4603dadd627e9d1973946fe',
@@ -44,7 +45,7 @@ class VubeIE(InfoExtractor):
                 'ext': 'mp4',
                 'title': 'Chiara Grispo - Price Tag by Jessie J',
                 'description': 'md5:8ea652a1f36818352428cb5134933313',
-                'thumbnail': 're:^http://frame\.thestaticvube\.com/snap/[0-9x]+/102e7e63057-5ebc-4f5c-4065-6ce4ebde131f\.jpg$',
+                'thumbnail': r're:^http://frame\.thestaticvube\.com/snap/[0-9x]+/102e7e63057-5ebc-4f5c-4065-6ce4ebde131f\.jpg$',
                 'uploader': 'Chiara.Grispo',
                 'timestamp': 1388743358,
                 'upload_date': '20140103',
@@ -64,7 +65,7 @@ class VubeIE(InfoExtractor):
                 'ext': 'mp4',
                 'title': 'My 7 year old Sister and I singing "Alive" by Krewella',
                 'description': 'md5:40bcacb97796339f1690642c21d56f4a',
-                'thumbnail': 're:^http://frame\.thestaticvube\.com/snap/[0-9x]+/102265d5a9f-0f17-4f6b-5753-adf08484ee1e\.jpg$',
+                'thumbnail': r're:^http://frame\.thestaticvube\.com/snap/[0-9x]+/102265d5a9f-0f17-4f6b-5753-adf08484ee1e\.jpg$',
                 'uploader': 'Seraina',
                 'timestamp': 1396492438,
                 'upload_date': '20140403',
@@ -83,7 +84,7 @@ class VubeIE(InfoExtractor):
                 'ext': 'mp4',
                 'title': 'Frozen - Let It Go Cover by Siren Gene',
                 'description': 'My rendition of "Let It Go" originally sung by Idina Menzel.',
-                'thumbnail': 're:^http://frame\.thestaticvube\.com/snap/[0-9x]+/10283ab622a-86c9-4681-51f2-30d1f65774af\.jpg$',
+                'thumbnail': r're:^http://frame\.thestaticvube\.com/snap/[0-9x]+/10283ab622a-86c9-4681-51f2-30d1f65774af\.jpg$',
                 'uploader': 'Siren',
                 'timestamp': 1395448018,
                 'upload_date': '20140322',

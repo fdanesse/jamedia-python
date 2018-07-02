@@ -16,7 +16,11 @@ class RTPIE(InfoExtractor):
             'ext': 'mp3',
             'title': 'Paixões Cruzadas',
             'description': 'As paixões musicais de António Cartaxo e António Macedo',
-            'thumbnail': 're:^https?://.*\.jpg',
+            'thumbnail': r're:^https?://.*\.jpg',
+        },
+        'params': {
+            # rtmp download
+            'skip_download': True,
         },
     }, {
         'url': 'http://www.rtp.pt/play/p831/a-quimica-das-coisas',

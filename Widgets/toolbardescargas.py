@@ -12,8 +12,7 @@ from PanelTube.jamediayoutube import JAMediaYoutube
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
-
-# from progressbar import ProgressBar
+from JAMediaPlayer.Widgets.ProgressPlayer import BarraProgreso
 
 
 class ToolbarDescargas(Gtk.VBox):
@@ -28,14 +27,9 @@ class ToolbarDescargas(Gtk.VBox):
         self.toolbar = Gtk.Toolbar()
         self.toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
 
-        self.label_titulo = None
-        self.label_progreso = None
         self.progress = 0.0
-        self.barra_progreso = None
         self.estado = False
-
         self.actualizador = False
-
         self.datostemporales = None
         self.ultimosdatos = None
         self.contadortestigo = 0
@@ -62,21 +56,19 @@ class ToolbarDescargas(Gtk.VBox):
         item.add(self.label_progreso)
         self.toolbar.insert(item, -1)
 
-        #self.toolbar.insert(G.get_separador(draw = False,
-        #    ancho = 0, expand = True), -1)
+        #self.toolbar.insert(G.get_separador(draw = False, ancho = 0, expand = True), -1)
 
         # FIXME: BUG. Las descargas no se cancelan.
         #archivo = os.path.join(BASE_PATH, "Iconos","stop.svg")
-        #boton = G.get_boton(archivo, flip = False,
-        #    pixels = G.get_pixels(1))
+        #boton = G.get_boton(archivo, flip = False, pixels = G.get_pixels(1))
         #boton.set_tooltip_text("Cancelar")
         #boton.connect("clicked", self.cancel_download)
         #self.toolbar.insert(boton, -1)
 
-        #self.toolbar.insert(G.get_separador(draw = False,
-        #    ancho = 3, expand = False), -1)
+        #self.toolbar.insert(G.get_separador(draw = False, ancho = 3, expand = False), -1)
 
-        self.barra_progreso = Gtk.ProgressBar() #FIXME: Progreso_Descarga()
+        self.barra_progreso = BarraProgreso()
+        self.barra_progreso.modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
         self.barra_progreso.show()
 
         self.pack_start(self.toolbar, False, False, 0)
@@ -95,63 +87,44 @@ class ToolbarDescargas(Gtk.VBox):
         if self.contadortestigo > 15:
             print ("\nNo se pudo controlar la descarga de:")
             print ("%s %s\n" % (self.titulo, self.url))
-            #self.__cancel_download()
+            self.__cancel_download()
             return False
         return True
 
     def __progress_download(self, widget, progress):
         self.datostemporales = progress
-        datos = progress.split(" ")
-
-        if datos[0] == '[youtube]':
-            dat = progress.split('[youtube]')[1]
+        if '[youtube]' in self.datostemporales:
+            dat = self.datostemporales.replace('[youtube]', '').strip()
             if self.label_progreso.get_text() != dat:
                 self.label_progreso.set_text(dat)
-        elif datos[0] == '[download]':
-            dat = progress.split('[download]')[1]
-            if self.label_progreso.get_text() != dat:
-                self.label_progreso.set_text(dat)
-        elif datos[0] == '\r[download]':
-            porciento = 0.0
-            if "%" in datos[2]:
-                porciento = datos[2].split("%")[0]
-            elif "%" in datos[3]:
-                porciento = datos[3].split("%")[0]
-
-            porciento = float(porciento)
-            self.barra_progreso.set_progress(valor=int(porciento))
-
-            if porciento >= 100.0:  # nunca llega
-                #self.__cancel_download()
-                return False
-            else:
-                dat = progress.split("[download]")[1]
-                if self.label_progreso.get_text() != dat:
-                    self.label_progreso.set_text(dat)
-
-        if "100.0%" in progress.split(" "):
-            #self.__cancel_download()
+        elif '[download]' in self.datostemporales:
+            if '%' in self.datostemporales:
+                lista = self.datostemporales.strip().split(" ")
+                porcentaje = [item for item in lista if "%" in item]
+                if porcentaje:
+                    index = lista.index(porcentaje[0])
+                    text = ''
+                    for item in lista[index:]:
+                        text = "%s %s" % (text, item)
+                    if self.label_progreso.get_text() != text.strip():
+                        self.label_progreso.set_text(text.strip())
+                    adj = self.barra_progreso.escala.get_adjustment()
+                    GLib.idle_add(adj.set_value, float(porcentaje[0].replace("%", '')))
+        if "100.0%" in self.datostemporales:
+            self.__cancel_download()
             return False
-        if not self.get_visible():
-            self.show()
         return True
 
-    '''def __cancel_download(self, button=None, event=None):
+    def __cancel_download(self, button=None, event=None):
         # FIXME: No funciona correctamente, la descarga continúa.
         if self.actualizador:
             GLib.source_remove(self.actualizador)
             self.actualizador = False
-        try:
-            self.jamediayoutube.reset()
-        except:
-            pass
-        try:
-            self.video_item.destroy()
-        except:
-            pass
+        self.jamediayoutube.reset()
+        self.video_item.destroy()
         self.estado = False
         self.emit("end")
-        return False'''
+        return False
 
     def download(self, video_item):
         self.estado = True

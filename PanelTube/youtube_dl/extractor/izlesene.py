@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import re
 
 from .common import InfoExtractor
+from ..compat import compat_urllib_parse_unquote
 from ..utils import (
     determine_ext,
     float_or_none,
@@ -28,9 +29,9 @@ class IzleseneIE(InfoExtractor):
                 'ext': 'mp4',
                 'title': 'Sevinçten Çıldırtan Doğum Günü Hediyesi',
                 'description': 'md5:253753e2655dde93f59f74b572454f6d',
-                'thumbnail': 're:^http://.*\.jpg',
+                'thumbnail': r're:^https?://.*\.jpg',
                 'uploader_id': 'pelikzzle',
-                'timestamp': 1404302298,
+                'timestamp': int,
                 'upload_date': '20140702',
                 'duration': 95.395,
                 'age_limit': 0,
@@ -43,10 +44,9 @@ class IzleseneIE(InfoExtractor):
                 'id': '17997',
                 'ext': 'mp4',
                 'title': 'Tarkan Dortmund 2006 Konseri',
-                'description': 'Tarkan Dortmund 2006 Konseri',
-                'thumbnail': 're:^http://.*\.jpg',
+                'thumbnail': r're:^https://.*\.jpg',
                 'uploader_id': 'parlayankiz',
-                'timestamp': 1163322193,
+                'timestamp': int,
                 'upload_date': '20061112',
                 'duration': 253.666,
                 'age_limit': 0,
@@ -61,15 +61,15 @@ class IzleseneIE(InfoExtractor):
         webpage = self._download_webpage(url, video_id)
 
         title = self._og_search_title(webpage)
-        description = self._og_search_description(webpage)
+        description = self._og_search_description(webpage, default=None)
         thumbnail = self._proto_relative_url(
             self._og_search_thumbnail(webpage), scheme='http:')
 
         uploader = self._html_search_regex(
             r"adduserUsername\s*=\s*'([^']+)';",
-            webpage, 'uploader', fatal=False, default='')
+            webpage, 'uploader', fatal=False)
         timestamp = parse_iso8601(self._html_search_meta(
-            'uploadDate', webpage, 'upload date', fatal=False))
+            'uploadDate', webpage, 'upload date'))
 
         duration = float_or_none(self._html_search_regex(
             r'"videoduration"\s*:\s*"([^"]+)"',
@@ -86,8 +86,7 @@ class IzleseneIE(InfoExtractor):
 
         # Might be empty for some videos.
         streams = self._html_search_regex(
-            r'"qualitylevel"\s*:\s*"([^"]+)"',
-            webpage, 'streams', fatal=False, default='')
+            r'"qualitylevel"\s*:\s*"([^"]+)"', webpage, 'streams', default='')
 
         formats = []
         if streams:
@@ -95,15 +94,15 @@ class IzleseneIE(InfoExtractor):
                 quality, url = re.search(r'\[(\w+)\](.+)', stream).groups()
                 formats.append({
                     'format_id': '%sp' % quality if quality else 'sd',
-                    'url': url,
+                    'url': compat_urllib_parse_unquote(url),
                     'ext': ext,
                 })
         else:
             stream_url = self._search_regex(
-                r'"streamurl"\s?:\s?"([^"]+)"', webpage, 'stream URL')
+                r'"streamurl"\s*:\s*"([^"]+)"', webpage, 'stream URL')
             formats.append({
                 'format_id': 'sd',
-                'url': stream_url,
+                'url': compat_urllib_parse_unquote(stream_url),
                 'ext': ext,
             })
 

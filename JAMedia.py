@@ -211,12 +211,7 @@ class JAMedia(Gtk.Window):
     def __add_video_encontrado(self, buscador, _id, url):
         video = FEED.copy()
         video["id"] = _id
-        #video["titulo"] = ""
-        #video["descripcion"] = ""
-        #video["categoria"] = ""
         video["url"] = url
-        #video["duracion"] = 0
-        #video["previews"] = ""
         self.__add_videos([video], self.paneltube.encontrados, sensitive=False)
 
     def __add_videos(self, videos, destino, sensitive=True):

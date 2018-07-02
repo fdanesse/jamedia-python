@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import re
 
 from .common import InfoExtractor
+from ..compat import compat_str
 from ..utils import (
     ExtractorError,
     int_or_none,
@@ -23,8 +24,8 @@ class TurboIE(InfoExtractor):
             'ext': 'mp4',
             'duration': 3715,
             'title': 'Turbo du 07/09/2014 : Renault Twingo 3, Bentley Continental GT Speed, CES, Guide Achat Dacia... ',
-            'description': 'Retrouvez dans cette rubrique toutes les vidéos de l\'Turbo du 07/09/2014 : Renault Twingo 3, Bentley Continental GT Speed, CES, Guide Achat Dacia... ',
-            'thumbnail': 're:^https?://.*\.jpg$',
+            'description': 'Turbo du 07/09/2014 : Renault Twingo 3, Bentley Continental GT Speed, CES, Guide Achat Dacia...',
+            'thumbnail': r're:^https?://.*\.jpg$',
         }
     }
 
@@ -42,14 +43,14 @@ class TurboIE(InfoExtractor):
         title = xpath_text(item, './title', 'title')
         duration = int_or_none(xpath_text(item, './durate', 'duration'))
         thumbnail = xpath_text(item, './visuel_clip', 'thumbnail')
-        description = self._og_search_description(webpage)
+        description = self._html_search_meta('description', webpage)
 
         formats = []
         get_quality = qualities(['3g', 'sd', 'hq'])
         for child in item:
             m = re.search(r'url_video_(?P<quality>.+)', child.tag)
             if m:
-                quality = m.group('quality')
+                quality = compat_str(m.group('quality'))
                 formats.append({
                     'format_id': quality,
                     'url': child.text,

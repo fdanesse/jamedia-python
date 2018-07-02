@@ -1,123 +1,299 @@
 # coding: utf-8
-
 from __future__ import unicode_literals
 
-import math
 import random
 import re
+import string
 import time
 
 from .common import InfoExtractor
 from ..utils import (
     ExtractorError,
+    get_element_by_class,
+    js_to_json,
+    str_or_none,
+    strip_jsonp,
 )
 
 
 class YoukuIE(InfoExtractor):
+    IE_NAME = 'youku'
+    IE_DESC = '优酷'
     _VALID_URL = r'''(?x)
         (?:
-            http://(?:v|player)\.youku\.com/(?:v_show/id_|player\.php/sid/)|
+            https?://(
+                (?:v|player)\.youku\.com/(?:v_show/id_|player\.php/sid/)|
+                video\.tudou\.com/v/)|
             youku:)
         (?P<id>[A-Za-z0-9]+)(?:\.html|/v\.swf|)
     '''
-    _TEST = {
-        'url': 'http://v.youku.com/v_show/id_XNDgyMDQ2NTQw.html',
-        'md5': 'ffe3f2e435663dc2d1eea34faeff5b5b',
-        'params': {
-            'test': False
-        },
+
+    _TESTS = [{
+        # MD5 is unstable
+        'url': 'http://v.youku.com/v_show/id_XMTc1ODE5Njcy.html',
         'info_dict': {
-            'id': 'XNDgyMDQ2NTQw_part00',
-            'ext': 'flv',
-            'title': 'youtube-dl test video "\'/\\ä↭𝕐'
+            'id': 'XMTc1ODE5Njcy',
+            'title': '★Smile﹗♡ Git Fresh -Booty Music舞蹈.',
+            'ext': 'mp4',
+            'duration': 74.73,
+            'thumbnail': r're:^https?://.*',
+            'uploader': '。躲猫猫、',
+            'uploader_id': '36017967',
+            'uploader_url': 'http://i.youku.com/u/UMTQ0MDcxODY4',
+            'tags': list,
         }
-    }
+    }, {
+        'url': 'http://player.youku.com/player.php/sid/XNDgyMDQ2NTQw/v.swf',
+        'only_matching': True,
+    }, {
+        'url': 'http://v.youku.com/v_show/id_XODgxNjg1Mzk2_ev_1.html',
+        'info_dict': {
+            'id': 'XODgxNjg1Mzk2',
+            'ext': 'mp4',
+            'title': '武媚娘传奇 85',
+            'duration': 1999.61,
+            'thumbnail': r're:^https?://.*',
+            'uploader': '疯狂豆花',
+            'uploader_id': '62583473',
+            'uploader_url': 'http://i.youku.com/u/UMjUwMzMzODky',
+            'tags': list,
+        },
+    }, {
+        'url': 'http://v.youku.com/v_show/id_XMTI1OTczNDM5Mg==.html',
+        'info_dict': {
+            'id': 'XMTI1OTczNDM5Mg',
+            'ext': 'mp4',
+            'title': '花千骨 04',
+            'duration': 2363,
+            'thumbnail': r're:^https?://.*',
+            'uploader': '放剧场-花千骨',
+            'uploader_id': '772849359',
+            'uploader_url': 'http://i.youku.com/u/UMzA5MTM5NzQzNg==',
+            'tags': list,
+        },
+    }, {
+        'url': 'http://v.youku.com/v_show/id_XNjA1NzA2Njgw.html',
+        'note': 'Video protected with password',
+        'info_dict': {
+            'id': 'XNjA1NzA2Njgw',
+            'ext': 'mp4',
+            'title': '邢義田复旦讲座之想象中的胡人—从“左衽孔子”说起',
+            'duration': 7264.5,
+            'thumbnail': r're:^https?://.*',
+            'uploader': 'FoxJin1006',
+            'uploader_id': '322014285',
+            'uploader_url': 'http://i.youku.com/u/UMTI4ODA1NzE0MA==',
+            'tags': list,
+        },
+        'params': {
+            'videopassword': '100600',
+        },
+    }, {
+        # /play/get.json contains streams with "channel_type":"tail"
+        'url': 'http://v.youku.com/v_show/id_XOTUxMzg4NDMy.html',
+        'info_dict': {
+            'id': 'XOTUxMzg4NDMy',
+            'ext': 'mp4',
+            'title': '我的世界☆明月庄主☆车震猎杀☆杀人艺术Minecraft',
+            'duration': 702.08,
+            'thumbnail': r're:^https?://.*',
+            'uploader': '明月庄主moon',
+            'uploader_id': '38465621',
+            'uploader_url': 'http://i.youku.com/u/UMTUzODYyNDg0',
+            'tags': list,
+        },
+    }, {
+        'url': 'http://video.tudou.com/v/XMjIyNzAzMTQ4NA==.html?f=46177805',
+        'info_dict': {
+            'id': 'XMjIyNzAzMTQ4NA',
+            'ext': 'mp4',
+            'title': '卡马乔国足开大脚长传冲吊集锦',
+            'duration': 289,
+            'thumbnail': r're:^https?://.*',
+            'uploader': '阿卜杜拉之星',
+            'uploader_id': '2382249',
+            'uploader_url': 'http://i.youku.com/u/UOTUyODk5Ng==',
+            'tags': list,
+        },
+    }, {
+        'url': 'http://video.tudou.com/v/XMjE4ODI3OTg2MA==.html',
+        'only_matching': True,
+    }]
 
-    def _gen_sid(self):
-        nowTime = int(time.time() * 1000)
-        random1 = random.randint(1000, 1998)
-        random2 = random.randint(1000, 9999)
+    @staticmethod
+    def get_ysuid():
+        return '%d%s' % (int(time.time()), ''.join([
+            random.choice(string.ascii_letters) for i in range(3)]))
 
-        return "%d%d%d" % (nowTime, random1, random2)
-
-    def _get_file_ID_mix_string(self, seed):
-        mixed = []
-        source = list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/\:._-1234567890")
-        seed = float(seed)
-        for i in range(len(source)):
-            seed = (seed * 211 + 30031) % 65536
-            index = math.floor(seed / 65536 * len(source))
-            mixed.append(source[int(index)])
-            source.remove(source[int(index)])
-        # return ''.join(mixed)
-        return mixed
-
-    def _get_file_id(self, fileId, seed):
-        mixed = self._get_file_ID_mix_string(seed)
-        ids = fileId.split('*')
-        realId = []
-        for ch in ids:
-            if ch:
-                realId.append(mixed[int(ch)])
-        return ''.join(realId)
+    def get_format_name(self, fm):
+        _dict = {
+            '3gp': 'h6',
+            '3gphd': 'h5',
+            'flv': 'h4',
+            'flvhd': 'h4',
+            'mp4': 'h3',
+            'mp4hd': 'h3',
+            'mp4hd2': 'h4',
+            'mp4hd3': 'h4',
+            'hd2': 'h2',
+            'hd3': 'h1',
+        }
+        return _dict.get(fm)
 
     def _real_extract(self, url):
-        mobj = re.match(self._VALID_URL, url)
-        video_id = mobj.group('id')
+        video_id = self._match_id(url)
 
-        info_url = 'http://v.youku.com/player/getPlayList/VideoIDS/' + video_id
+        self._set_cookie('youku.com', '__ysuid', self.get_ysuid())
+        self._set_cookie('youku.com', 'xreferrer', 'http://www.youku.com')
 
-        config = self._download_json(info_url, video_id)
+        _, urlh = self._download_webpage_handle(
+            'https://log.mmstat.com/eg.js', video_id, 'Retrieving cna info')
+        # The etag header is '"foobar"'; let's remove the double quotes
+        cna = urlh.headers['etag'][1:-1]
 
-        error_code = config['data'][0].get('error_code')
-        if error_code:
-            # -8 means blocked outside China.
-            error = config['data'][0].get('error')  # Chinese and English, separated by newline.
-            raise ExtractorError(error or 'Server reported error %i' % error_code,
-                                 expected=True)
+        # request basic data
+        basic_data_params = {
+            'vid': video_id,
+            'ccode': '0402' if 'tudou.com' in url else '0401',
+            'client_ip': '192.168.1.1',
+            'utid': cna,
+            'client_ts': time.time() / 1000,
+        }
 
-        video_title = config['data'][0]['title']
-        seed = config['data'][0]['seed']
+        video_password = self._downloader.params.get('videopassword')
+        if video_password:
+            basic_data_params['password'] = video_password
 
-        format = self._downloader.params.get('format', None)
-        supported_format = list(config['data'][0]['streamfileids'].keys())
+        headers = {
+            'Referer': url,
+        }
+        headers.update(self.geo_verification_headers())
+        data = self._download_json(
+            'https://ups.youku.com/ups/get.json', video_id,
+            'Downloading JSON metadata',
+            query=basic_data_params, headers=headers)['data']
 
-        # TODO proper format selection
-        if format is None or format == 'best':
-            if 'hd2' in supported_format:
-                format = 'hd2'
+        error = data.get('error')
+        if error:
+            error_note = error.get('note')
+            if error_note is not None and '因版权原因无法观看此视频' in error_note:
+                raise ExtractorError(
+                    'Youku said: Sorry, this video is available in China only', expected=True)
+            elif error_note and '该视频被设为私密' in error_note:
+                raise ExtractorError(
+                    'Youku said: Sorry, this video is private', expected=True)
             else:
-                format = 'flv'
-            ext = 'flv'
-        elif format == 'worst':
-            format = 'mp4'
-            ext = 'mp4'
-        else:
-            format = 'flv'
-            ext = 'flv'
+                msg = 'Youku server reported error %i' % error.get('code')
+                if error_note is not None:
+                    msg += ': ' + error_note
+                raise ExtractorError(msg)
 
-        fileid = config['data'][0]['streamfileids'][format]
-        keys = [s['k'] for s in config['data'][0]['segs'][format]]
-        # segs is usually a dictionary, but an empty *list* if an error occured.
+        # get video title
+        video_data = data['video']
+        title = video_data['title']
 
-        files_info = []
-        sid = self._gen_sid()
-        fileid = self._get_file_id(fileid, seed)
+        formats = [{
+            'url': stream['m3u8_url'],
+            'format_id': self.get_format_name(stream.get('stream_type')),
+            'ext': 'mp4',
+            'protocol': 'm3u8_native',
+            'filesize': int(stream.get('size')),
+            'width': stream.get('width'),
+            'height': stream.get('height'),
+        } for stream in data['stream'] if stream.get('channel_type') != 'tail']
+        self._sort_formats(formats)
 
-        # column 8,9 of fileid represent the segment number
-        # fileid[7:9] should be changed
-        for index, key in enumerate(keys):
-            temp_fileid = '%s%02X%s' % (fileid[0:8], index, fileid[10:])
-            download_url = 'http://k.youku.com/player/getFlvPath/sid/%s_%02X/st/flv/fileid/%s?k=%s' % (sid, index, temp_fileid, key)
+        return {
+            'id': video_id,
+            'title': title,
+            'formats': formats,
+            'duration': video_data.get('seconds'),
+            'thumbnail': video_data.get('logo'),
+            'uploader': video_data.get('username'),
+            'uploader_id': str_or_none(video_data.get('userid')),
+            'uploader_url': data.get('uploader', {}).get('homepage'),
+            'tags': video_data.get('tags'),
+        }
 
-            info = {
-                'id': '%s_part%02d' % (video_id, index),
-                'url': download_url,
-                'uploader': None,
-                'upload_date': None,
-                'title': video_title,
-                'ext': ext,
-            }
-            files_info.append(info)
 
-        return files_info
+class YoukuShowIE(InfoExtractor):
+    _VALID_URL = r'https?://list\.youku\.com/show/id_(?P<id>[0-9a-z]+)\.html'
+    IE_NAME = 'youku:show'
+
+    _TESTS = [{
+        'url': 'http://list.youku.com/show/id_zc7c670be07ff11e48b3f.html',
+        'info_dict': {
+            'id': 'zc7c670be07ff11e48b3f',
+            'title': '花千骨 DVD版',
+            'description': 'md5:a1ae6f5618571bbeb5c9821f9c81b558',
+        },
+        'playlist_count': 50,
+    }, {
+        # Episode number not starting from 1
+        'url': 'http://list.youku.com/show/id_zefbfbd70efbfbd780bef.html',
+        'info_dict': {
+            'id': 'zefbfbd70efbfbd780bef',
+            'title': '超级飞侠3',
+            'description': 'md5:275715156abebe5ccc2a1992e9d56b98',
+        },
+        'playlist_count': 24,
+    }, {
+        # Ongoing playlist. The initial page is the last one
+        'url': 'http://list.youku.com/show/id_za7c275ecd7b411e1a19e.html',
+        'only_matchine': True,
+    }]
+
+    def _extract_entries(self, playlist_data_url, show_id, note, query):
+        query['callback'] = 'cb'
+        playlist_data = self._download_json(
+            playlist_data_url, show_id, query=query, note=note,
+            transform_source=lambda s: js_to_json(strip_jsonp(s)))['html']
+        drama_list = (get_element_by_class('p-drama-grid', playlist_data) or
+                      get_element_by_class('p-drama-half-row', playlist_data))
+        if drama_list is None:
+            raise ExtractorError('No episodes found')
+        video_urls = re.findall(r'<a[^>]+href="([^"]+)"', drama_list)
+        return playlist_data, [
+            self.url_result(self._proto_relative_url(video_url, 'http:'), YoukuIE.ie_key())
+            for video_url in video_urls]
+
+    def _real_extract(self, url):
+        show_id = self._match_id(url)
+        webpage = self._download_webpage(url, show_id)
+
+        entries = []
+        page_config = self._parse_json(self._search_regex(
+            r'var\s+PageConfig\s*=\s*({.+});', webpage, 'page config'),
+            show_id, transform_source=js_to_json)
+        first_page, initial_entries = self._extract_entries(
+            'http://list.youku.com/show/module', show_id,
+            note='Downloading initial playlist data page',
+            query={
+                'id': page_config['showid'],
+                'tab': 'showInfo',
+            })
+        first_page_reload_id = self._html_search_regex(
+            r'<div[^>]+id="(reload_\d+)', first_page, 'first page reload id')
+        # The first reload_id has the same items as first_page
+        reload_ids = re.findall('<li[^>]+data-id="([^"]+)">', first_page)
+        for idx, reload_id in enumerate(reload_ids):
+            if reload_id == first_page_reload_id:
+                entries.extend(initial_entries)
+                continue
+            _, new_entries = self._extract_entries(
+                'http://list.youku.com/show/episode', show_id,
+                note='Downloading playlist data page %d' % (idx + 1),
+                query={
+                    'id': page_config['showid'],
+                    'stage': reload_id,
+                })
+            entries.extend(new_entries)
+
+        desc = self._html_search_meta('description', webpage, fatal=False)
+        playlist_title = desc.split(',')[0] if desc else None
+        detail_li = get_element_by_class('p-intro', webpage)
+        playlist_description = get_element_by_class(
+            'intro-more', detail_li) if detail_li else None
+
+        return self.playlist_result(
+            entries, show_id, playlist_title, playlist_description)

@@ -8,7 +8,7 @@ from ..utils import ExtractorError
 
 
 class Sport5IE(InfoExtractor):
-    _VALID_URL = r'http://(?:www|vod)?\.sport5\.co\.il/.*\b(?:Vi|docID)=(?P<id>\d+)'
+    _VALID_URL = r'https?://(?:www|vod)?\.sport5\.co\.il/.*\b(?:Vi|docID)=(?P<id>\d+)'
     _TESTS = [
         {
             'url': 'http://vod.sport5.co.il/?Vc=147&Vi=176331&Page=1',
@@ -41,7 +41,7 @@ class Sport5IE(InfoExtractor):
 
         webpage = self._download_webpage(url, media_id)
 
-        video_id = self._html_search_regex('clipId=([\w-]+)', webpage, 'video id')
+        video_id = self._html_search_regex(r'clipId=([\w-]+)', webpage, 'video id')
 
         metadata = self._download_xml(
             'http://sport5-metadata-rr-d.nsacdn.com/vod/vod/%s/HDS/metadata.xml' % video_id,
