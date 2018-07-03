@@ -8,6 +8,7 @@ from gi.repository import Gdk
 from gi.repository import GObject
 
 from JAMediaPlayer.Globales import get_colors
+# FIXME: Cuando no hay video reproduciendose la interfaz no se dibuja bien
 
 
 class VideoVisor(Gtk.DrawingArea):

@@ -46,14 +46,13 @@ class Derecha(Gtk.EventBox):
     def __len_items(self, widget, items):
         self.playercontrols.activar(items)
 
-    def show_config(self):
-        valor = self.__scroll.get_visible()
-        if valor:
-            ocultar([self.__scroll])
-            mostrar([self.lista, self.playercontrols])
-        else:
+    def show_config(self, val):
+        if val:
             mostrar([self.__scroll])
             ocultar([self.lista, self.playercontrols])
+        else:
+            ocultar([self.__scroll])
+            mostrar([self.lista, self.playercontrols])
         
     def setup_init(self):
         ocultar([self.__scroll])

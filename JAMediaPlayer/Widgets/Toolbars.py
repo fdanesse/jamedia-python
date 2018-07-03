@@ -27,7 +27,7 @@ from JAMediaPlayer.Globales import ICONS_PATH
 class Toolbar(Gtk.EventBox):
 
     __gsignals__ = {
-    'accion': (GObject.SIGNAL_RUN_LAST,GObject.TYPE_NONE, (GObject.TYPE_STRING,))}
+    'show_config': (GObject.SIGNAL_RUN_LAST,GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,))}
 
     def __init__(self):
 
@@ -58,16 +58,16 @@ class Toolbar(Gtk.EventBox):
 
         #FIXME: Cambiar a togglebutton
         archivo = os.path.join(ICONS_PATH, "control_panel.png")
-        self.configurar = get_boton(archivo, flip=False, pixels=24)
+        self.configurar = get_toggle_boton(archivo, flip=False, pixels=24)
         self.configurar.set_tooltip_text("Configuraciones")
-        self.configurar.connect("clicked", self.__emit_accion, "show-config")
+        self.configurar.connect("toggled", self.__emit_show_config)
         toolbar.insert(self.configurar, -1)
 
         archivo = os.path.join(ICONS_PATH, "controls.svg")
-        controls = get_toggle_boton(archivo, flip=True, pixels=24)
-        controls.set_tooltip_text("Ocultar/Mostrar Controles")
-        controls.connect("toggled", self.__set_controles_view)
-        toolbar.insert(controls, -1)
+        self.__controls = get_toggle_boton(archivo, flip=True, pixels=24)
+        self.__controls.set_tooltip_text("Ocultar/Mostrar Controles")
+        self.__controls.connect("toggled", self.__set_controles_view)
+        toolbar.insert(self.__controls, -1)
 
         archivo = os.path.join(ICONS_PATH, "fullscreen.png")
         self.__full = get_toggle_boton(archivo, flip=True, pixels=24)
@@ -78,10 +78,9 @@ class Toolbar(Gtk.EventBox):
         toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
         archivo = os.path.join(ICONS_PATH, "button-cancel.svg")
-        boton = get_boton(archivo, flip=False, pixels=24)
-        boton.set_tooltip_text("Salir")
-        boton.connect("clicked", self.__emit_accion, "salir")
-        toolbar.insert(boton, -1)
+        self.salir = get_boton(archivo, flip=False, pixels=12)
+        self.salir.set_tooltip_text("Salir")
+        toolbar.insert(self.salir, -1)
 
         toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
@@ -101,6 +100,9 @@ class Toolbar(Gtk.EventBox):
     def __set_controles_view(self, widget):
         self.ocultar_controles = widget.get_active()
 
+    def __emit_show_config(self, widget):
+        self.emit('show_config', widget.get_active())
+
     '''
     def __show_credits(self, widget):
         dialog = Credits(parent=self.get_toplevel())
@@ -114,9 +116,6 @@ class Toolbar(Gtk.EventBox):
         dialog.run()
         dialog.destroy()
     '''
-    
-    def __emit_accion(self, widget, accion):
-        self.emit('accion', accion)
 
 
 '''

@@ -55,8 +55,9 @@ class JAMediaPlayer(Gtk.EventBox):
         self.mouse_listener = MouseSpeedDetector(self)
         self.mouse_listener.new_handler(True)
 
-        self.__toolbar.connect("accion", self.__accion_toolbar)
-
+        self.__toolbar.salir.connect("clicked", self.__emit_salir)
+        self.__toolbar.connect("show_config", self.__show_config)
+        
         #FIXME: self.base_panel.connect("menu_activo", self.__cancel_toolbars)
         self.base_panel.player.connect("video", self.__set_video)
         self.base_panel.izquierda.video_visor.connect("ocultar_controles", self.__show_controls)
@@ -73,6 +74,7 @@ class JAMediaPlayer(Gtk.EventBox):
             GLib.idle_add(self.__toolbar.set_full, None)
 
     def __set_video(self, widget, valor):
+        self.__toolbar.configurar.set_active(False)
         self.__toolbar.configurar.set_sensitive(valor)
 
     def __realize(self, window):
@@ -85,13 +87,11 @@ class JAMediaPlayer(Gtk.EventBox):
         self.base_panel.derecha.setup_init()
         return False
 
-    def __accion_toolbar(self, widget, accion):
-        if accion == "salir":
-            self.emit('salir')
-        elif accion == "show-config":
-            self.base_panel.derecha.show_config()
-        else:
-            print (self.__accion_toolbar, accion)
+    def __emit_salir(self, widget):
+        self.emit('salir')
+
+    def __show_config(self, widget, val):
+        self.base_panel.derecha.show_config(val)
 
     def __hide_show(self, widget):
         self.mouse_listener.new_handler(widget.get_visible())
