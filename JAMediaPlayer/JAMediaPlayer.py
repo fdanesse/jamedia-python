@@ -57,15 +57,20 @@ class JAMediaPlayer(Gtk.EventBox):
 
         self.__toolbar.connect("accion", self.__accion_toolbar)
 
-        self.base_panel.connect("show-controls", self.__ocultar_controles)
-        #self.base_panel.connect("menu_activo", self.__cancel_toolbars)
+        #FIXME: self.base_panel.connect("menu_activo", self.__cancel_toolbars)
         self.base_panel.player.connect("video", self.__set_video)
+        self.base_panel.izquierda.video_visor.connect("ocultar_controles", self.__show_controls)
+        self.base_panel.izquierda.video_visor.connect("button_press_event", self.__set_fullscreen)
 
         self.mouse_listener.connect("estado", self.__set_mouse)
         self.connect("hide", self.__hide_show)
         self.connect("show", self.__hide_show)
 
         GLib.idle_add(self.__setup_init)
+
+    def __set_fullscreen(self, widget, event):
+        if event.type.value_name == "GDK_2BUTTON_PRESS":
+            GLib.idle_add(self.__toolbar.set_full, None)
 
     def __set_video(self, widget, valor):
         self.__toolbar.configurar.set_sensitive(valor)
@@ -119,8 +124,8 @@ class JAMediaPlayer(Gtk.EventBox):
                     win.set_cursor(self.__cursor_root)
                     return
 
-    def __ocultar_controles(self, widget, datos):
-        zona, ocultar = datos
+    def __show_controls(self, widget, valor):
+        zona, ocultar = (valor, self.__toolbar.ocultar_controles)
         self.__mouse_in_visor = zona
         if zona and ocultar:
             self.set_border_width(0)

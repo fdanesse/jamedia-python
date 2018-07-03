@@ -13,6 +13,7 @@ from JAMediaPlayer.Widgets.help import Help
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
+from JAMediaPlayer.Globales import get_toggle_boton
 from JAMediaPlayer.Globales import get_my_files_directory
 #from JAMediaPlayer.Globales import describe_acceso_uri
 #from JAMediaPlayer.Globales import copiar
@@ -32,6 +33,8 @@ class Toolbar(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
+        self.ocultar_controles = False
+
         toolbar = Gtk.Toolbar()
 
         self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
@@ -42,20 +45,35 @@ class Toolbar(Gtk.EventBox):
         archivo = os.path.join(ICONS_PATH, "JAMedia.svg")
         boton = get_boton(archivo, flip=False, pixels=35)
         boton.set_tooltip_text("Creditos")
-        boton.connect("clicked", self.__show_credits)
+        #FIXME: boton.connect("clicked", self.__show_credits)
         toolbar.insert(boton, -1)
 
         archivo = os.path.join(ICONS_PATH, "help.svg")
         boton = get_boton(archivo, flip=False, pixels=24)
         boton.set_tooltip_text("Ayuda")
-        boton.connect("clicked", self.__show_help)
+        #FIXME: boton.connect("clicked", self.__show_help)
         toolbar.insert(boton, -1)
 
+        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+
+        #FIXME: Cambiar a togglebutton
         archivo = os.path.join(ICONS_PATH, "control_panel.png")
         self.configurar = get_boton(archivo, flip=False, pixels=24)
         self.configurar.set_tooltip_text("Configuraciones")
         self.configurar.connect("clicked", self.__emit_accion, "show-config")
         toolbar.insert(self.configurar, -1)
+
+        archivo = os.path.join(ICONS_PATH, "controls.svg")
+        controls = get_toggle_boton(archivo, flip=True, pixels=24)
+        controls.set_tooltip_text("Ocultar/Mostrar Controles")
+        controls.connect("toggled", self.__set_controles_view)
+        toolbar.insert(controls, -1)
+
+        archivo = os.path.join(ICONS_PATH, "fullscreen.png")
+        self.__full = get_toggle_boton(archivo, flip=True, pixels=24)
+        self.__full.set_tooltip_text("Full/UnFull Screen")
+        self.__full.connect("toggled", self.__set_full)
+        toolbar.insert(self.__full, -1)
 
         toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
@@ -69,19 +87,37 @@ class Toolbar(Gtk.EventBox):
 
         self.add(toolbar)
         self.show_all()
+    
+    def set_full(self, widget):
+        self.__full.set_active(not self.__full.get_active())
 
+    def __set_full(self, widget):
+        win = self.get_toplevel()
+        if self.__full.get_active():
+            win.fullscreen()
+        else:
+            win.unfullscreen()
+
+    def __set_controles_view(self, widget):
+        self.ocultar_controles = widget.get_active()
+
+    '''
     def __show_credits(self, widget):
         dialog = Credits(parent=self.get_toplevel())
         dialog.run()
         dialog.destroy()
-
+    '''
+    
+    '''
     def __show_help(self, widget):
         dialog = Help(parent=self.get_toplevel())
         dialog.run()
         dialog.destroy()
-
+    '''
+    
     def __emit_accion(self, widget, accion):
         self.emit('accion', accion)
+
 
 '''
 class ToolbarAccion(Gtk.EventBox):

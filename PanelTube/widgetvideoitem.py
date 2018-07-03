@@ -23,7 +23,8 @@ class WidgetVideoItem(Gtk.EventBox):
     __gsignals__ = {
     #"clicked": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
     "end-update": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
-    "click_derecho": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,))}
+    #"click_derecho": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,))
+    }
 
     def __init__(self, videodict):
 
@@ -42,6 +43,7 @@ class WidgetVideoItem(Gtk.EventBox):
         hbox.pack_start(self.imagen, False, False, 3)
 
         # FIXME: Código Duplicado
+        '''
         if self.videodict.get("previews", False):
             if type(self.videodict["previews"]) == list:
                 # 1 lista con 1 url, o base64 en un archivo de busquedas.
@@ -70,7 +72,8 @@ class WidgetVideoItem(Gtk.EventBox):
                 loader.close()
                 pixbuf = loader.get_pixbuf()
                 self.imagen.set_from_pixbuf(pixbuf)
-
+        '''
+        
         self.id_label = Gtk.Label("%s: %s" % ("id", self.videodict["id"]))
         self.id_titulo = Gtk.Label("%s: %s" % ("Título", self.videodict["titulo"]))
         self.id_categoria = Gtk.Label("%s: %s" % ("Categoría", self.videodict["categoria"]))
@@ -90,14 +93,17 @@ class WidgetVideoItem(Gtk.EventBox):
         self.add(hbox)
 
         self.show_all()
-        self.connect("button_press_event", self.__button_press)
-
+        #self.connect("button_press_event", self.__button_press)
+    
+    '''
+    # FIXME: Reparar
     def __button_press(self, widget, event):
         #self.modify_bg(Gtk.StateType.NORMAL, self.colorclicked)
         #if event.button == 1:
         #   self.emit("clicked", event)
         #elif event.button == 3:
         self.emit("click_derecho", event)
+    '''
 
     def __get_progress(self, salida, STDOUT, process, error, STERR):
         progress = salida.readline().strip()

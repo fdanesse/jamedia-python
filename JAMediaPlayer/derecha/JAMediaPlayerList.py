@@ -245,7 +245,7 @@ class JAMediaToolbarList(Gtk.EventBox):
 
         archivo = os.path.join(ICONS_PATH, "document-open.svg")
         self.openfiles = get_boton(archivo, flip=False, pixels=24)
-        self.openfiles.set_tooltip_text("Cargar Archivos.")
+        self.openfiles.set_tooltip_text("Cargar Archivos")
         toolbar.insert(self.openfiles, -1)
 
         archivo = os.path.join(ICONS_PATH, "document-new.svg")

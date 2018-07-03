@@ -13,7 +13,6 @@ from JAMediaPlayer.Globales import get_boton
 from JAMediaPlayer.Globales import ICONS_PATH
 from JAMediaPlayer.Globales import sensibilizar
 from JAMediaPlayer.Globales import insensibilizar
-from JAMediaPlayer.Globales import get_toggle_boton
 
 
 class ToolbarInfo(Gtk.EventBox):
@@ -28,8 +27,6 @@ class ToolbarInfo(Gtk.EventBox):
 
         self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
         toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
-
-        self.ocultar_controles = False
 
         toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
@@ -46,42 +43,15 @@ class ToolbarInfo(Gtk.EventBox):
         toolbar.insert(self.boton_derecha, -1)
 
         toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
-
-        archivo = os.path.join(ICONS_PATH, "controls.svg")
-        controls = get_toggle_boton(archivo, flip=True, pixels=24)
-        controls.set_tooltip_text("Ocultar/Mostrar Controles")
-        controls.connect("toggled", self.__set_controles_view)
-        toolbar.insert(controls, -1)
-
-        archivo = os.path.join(ICONS_PATH, "fullscreen.png")
-        self.__full = get_toggle_boton(archivo, flip=True, pixels=24)
-        self.__full.set_tooltip_text("Full/UnFull Screen")
-        self.__full.connect("toggled", self.__set_full)
-        toolbar.insert(self.__full, -1)
-
-        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
         
         self.add(toolbar)
         self.show_all()
-
-    def set_full(self, widget):
-        self.__full.set_active(not self.__full.get_active())
-
-    def __set_full(self, widget):
-        win = self.get_toplevel()
-        if self.__full.get_active():
-            win.fullscreen()
-        else:
-            win.unfullscreen()
-
+    
     def __emit_rotar(self, widget):
         if widget == self.boton_derecha:
             self.emit('rotar', "Derecha")
         elif widget == self.boton_izquierda:
             self.emit('rotar', "Izquierda")
-
-    def __set_controles_view(self, widget):
-        self.ocultar_controles = widget.get_active()
 
     def set_video(self, valor):
         if valor:

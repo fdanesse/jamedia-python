@@ -19,7 +19,6 @@ from JAMediaPlayer.Globales import ocultar
 class Izquierda(Gtk.EventBox):
 
     __gsignals__ = {
-    "show-controls": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
     'rotar': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
     "seek": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, )),
     "volumen": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT,))}
@@ -44,9 +43,7 @@ class Izquierda(Gtk.EventBox):
 
         self.add(vbox)
         self.show_all()
-
-        self.video_visor.connect("ocultar_controles", self.__emit_show_controls)
-        self.video_visor.connect("button_press_event", self.__set_fullscreen)
+        
         self.toolbar_info.connect("rotar", self.__emit_rotar)
         self.progress.connect("seek", self.__emit_seek)
         self.progress.connect("volumen", self.__emit_volumen)
@@ -59,14 +56,6 @@ class Izquierda(Gtk.EventBox):
 
     def __emit_rotar(self, widget, sentido):
         self.emit('rotar', sentido)
-
-    def __set_fullscreen(self, widget, event):
-        if event.type.value_name == "GDK_2BUTTON_PRESS":
-            GLib.idle_add(self.toolbar_info.set_full, None)
-
-    def __emit_show_controls(self, widget, valor):
-        zona, ocultar = (valor, self.toolbar_info.ocultar_controles)
-        self.emit("show-controls", (zona, ocultar))
 
     def setup_init(self):
         self.toolbar_info.set_video(False)

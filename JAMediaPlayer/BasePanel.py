@@ -18,8 +18,6 @@ from JAMediaPlayer.JAMediaReproductor.JAMediaReproductor import JAMediaReproduct
 
 class BasePanel(Gtk.HPaned):
 
-    __gsignals__ = {"show-controls": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, ))}
-
     def __init__(self):
 
         Gtk.HPaned.__init__(self)
@@ -47,7 +45,6 @@ class BasePanel(Gtk.HPaned):
         self.derecha.balance.connect("balance-valor", self.__accion_balance)
         self.derecha.lista.lista.connect("len_items", self.__len_items)
 
-        self.izquierda.connect("show-controls", self.__emit_show_controls)
         self.izquierda.connect("rotar", self.__rotar)
         self.izquierda.connect("seek", self.__user_set_progress)
         self.izquierda.connect("volumen", self.__set_volumen)
@@ -87,9 +84,6 @@ class BasePanel(Gtk.HPaned):
     def __user_set_progress(self, widget, valor):
         if self.player:
             self.player.set_position(valor)
-
-    def __emit_show_controls(self, widget, datos):
-        self.emit("show-controls", datos)
 
     def __cargar_reproducir(self, widget, path):
         volumen = 1.0
