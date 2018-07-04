@@ -7,11 +7,12 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
 
-from JAMediaPlayer.Globales import get_colors
 # FIXME: Cuando no hay video reproduciendose la interfaz no se dibuja bien
 
 
 class VideoVisor(Gtk.DrawingArea):
+
+    __gtype_name__ = 'VideoVisor'
 
     __gsignals__ = {"ocultar_controles": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,))}
 
@@ -19,7 +20,7 @@ class VideoVisor(Gtk.DrawingArea):
 
         Gtk.DrawingArea.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer"))
+        self.set_css_name('VideoVisor')
 
         self.add_events(
             Gdk.EventMask.KEY_PRESS_MASK |

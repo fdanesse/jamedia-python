@@ -12,11 +12,10 @@ from JAMediaPlayer.izquierda.videovisor import VideoVisor
 from JAMediaPlayer.izquierda.toolbarinfo import ToolbarInfo
 from JAMediaPlayer.Widgets.ProgressPlayer import ProgressPlayer
 
-from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import ocultar
 
 
-class Izquierda(Gtk.EventBox):
+class Izquierda(Gtk.VBox):
 
     __gsignals__ = {
     'rotar': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
@@ -25,23 +24,18 @@ class Izquierda(Gtk.EventBox):
 
     def __init__(self):
 
-        Gtk.EventBox.__init__(self)
-
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer"))
-
-        vbox = Gtk.VBox()
+        Gtk.VBox.__init__(self)
 
         self.video_visor = VideoVisor()
         #self.buffer_info = BufferInfo()
         self.toolbar_info = ToolbarInfo()
         self.progress = ProgressPlayer()
 
-        vbox.pack_start(self.video_visor, True, True, 0)
-        #vbox.pack_start(self.buffer_info, False, False, 0)
-        vbox.pack_start(self.toolbar_info, False, False, 0)
-        vbox.pack_start(self.progress, False, False, 0)
+        self.pack_start(self.video_visor, True, True, 0)
+        #self.pack_start(self.buffer_info, False, False, 0)
+        self.pack_start(self.toolbar_info, False, False, 0)
+        self.pack_start(self.progress, False, False, 0)
 
-        self.add(vbox)
         self.show_all()
         
         self.toolbar_info.connect("rotar", self.__emit_rotar)

@@ -1,0 +1,78 @@
+/*http://wiki.xfce.org/howto/gtk_theme*/
+/*https://developer.gnome.org/gtk3/3.0/GtkCssProvider.html*/
+/*background: url{../images/imagen.png} no-repeat;*/
+/*https://gist.github.com/carlos-jenkins/8923124#file-gtk-dark-css*/
+
+@define-color bg_toolbar1 #778899;
+@define-color bg_toolbar2 #e9b96e;
+@define-color bg_widgetvideo #f0e6aa;
+@define-color jamedia1 #ff6600;
+@define-color bg_drawing #778899;
+
+window {
+    background-color: @bg_widgetvideo; 
+    color: black;
+    font: 12px "Comic Sans";
+    border: 2px solid @bg_widgetvideo;
+}
+
+GtkDrawingArea, VideoVisor {
+    background-image: image(@jamedia1);
+    /*background-repeat: no-repeat;*/
+    background-color: @jamedia1;
+    border: 2px solid red;
+}
+
+toolbar {
+    background-color: @bg_toolbar1;
+}
+
+button {
+    background-image: image(@bg_toolbar1);
+    background-color: @bg_toolbar1;
+    border-radius: 0;
+    border: 1px solid @bg_toolbar1;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.7s;
+}
+button:hover {
+    background-image: none;
+    background-color: cyan;
+    border-radius: 0;
+    border: 1px solid @bg_toolbar1;
+    margin: 0;
+    padding: 0;
+}
+button:checked {
+    background-image: image(gray);
+    background-color: gray;
+    border-radius: 0;
+    border: 1px solid @bg_toolbar1;
+    margin: 0;
+    padding: 0;
+}
+
+/*
+#volumen, volumen, .volumen, GtkVolumeButton {
+    margin: 0;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 10px;
+    border: 5px solid @jamedia1;
+    background-image: image(gray);
+    background-color: gray;
+}
+*/
+
+/* Barra de Progreso */
+scale, BarraProgreso {
+    background-image: image(@bg_toolbar1);
+    background-color: @bg_toolbar1;
+    border-radius: 0;
+    border: 1px solid @bg_toolbar1;
+    padding: 0;
+    margin: 0;
+    margin-left: 10px;
+    margin-right: 10px;
+}

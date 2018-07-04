@@ -29,30 +29,23 @@ class Mini_Toolbar(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
-
         self.label = None
         self.texto = text
         self.numero = 0
 
         item = Gtk.ToolItem()
         self.label = Gtk.Label("%s: %s" % (text, self.numero))
-        #self.label.modify_fg(Gtk.StateType.NORMAL, get_colors("window1"))
         self.label.show()
         item.add(self.label)
         self.insert(item, -1)
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(ICONS_PATH, "lista.svg")
-        boton = get_boton(archivo, flip=False, pixels=24)
-        boton.set_tooltip_text("Lista de Búsquedas")
+        boton = get_boton(os.path.join(ICONS_PATH, "lista.svg"), flip=False, pixels=24, tooltip_text="Lista de Búsquedas")
         boton.connect("clicked", self.__get_menu)
         self.insert(boton, -1)
 
-        archivo = os.path.join(ICONS_PATH, "play.svg")
-        boton = get_boton(archivo, flip=False, pixels=24,rotacion=GdkPixbuf.PixbufRotation.CLOCKWISE)
-        boton.set_tooltip_text("Guardar Lista")
+        boton = get_boton(os.path.join(ICONS_PATH, "play.svg"), flip=False, pixels=24,rotacion=GdkPixbuf.PixbufRotation.CLOCKWISE, tooltip_text="Guardar Lista")
         boton.connect("clicked", self.__emit_guardar)
         self.insert(boton, -1)
 
@@ -69,9 +62,6 @@ class Mini_Toolbar(Gtk.Toolbar):
         self.emit('guardar')
 
     def __emit_abrir(self, key):
-        """
-        Para que se carguen todos los videos desde un archivo shelve.
-        """
         self.emit('abrir', key)
 
     def __get_menu(self, widget):
@@ -113,9 +103,6 @@ class Mini_Toolbar(Gtk.Toolbar):
     '''
     
     def set_info(self, valor):
-        """
-        Recibe un entero y actualiza la información.
-        """
         if valor != self.numero:
             self.numero = valor
             text = "%s: %s" % (self.texto, str(self.numero))

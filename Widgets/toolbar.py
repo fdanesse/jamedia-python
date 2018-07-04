@@ -26,27 +26,19 @@ class Toolbar(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
-
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        archivo = os.path.join(ICONS_PATH, "JAMedia.svg")
-        self.jamedia = get_boton(archivo, flip=False, pixels=35)
-        self.jamedia.set_tooltip_text("Cambiar a JAMedia")
+        self.jamedia = get_boton(os.path.join(ICONS_PATH, "JAMedia.svg"), flip=False, pixels=35, tooltip_text="Cambiar a JAMedia")
         self.jamedia.connect("clicked", self.__emit_switch)
         self.insert(self.jamedia, -1)
 
-        archivo = os.path.join(ICONS_PATH, "help.svg")
-        boton = get_boton(archivo, flip=False, pixels=24)
-        boton.set_tooltip_text("Ayuda")
+        boton = get_boton(os.path.join(ICONS_PATH, "help.svg"), flip=False, pixels=24, tooltip_text="Ayuda")
         boton.connect("clicked", self.__show_help)
         self.insert(boton, -1)
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(ICONS_PATH, "button-cancel.svg")
-        boton = get_boton(archivo, flip=False, pixels=12)
-        boton.set_tooltip_text("Salir")
+        boton = get_boton(os.path.join(ICONS_PATH, "button-cancel.svg"), flip=False, pixels=12, tooltip_text="Salir")
         boton.connect("clicked", self.__salir)
         self.insert(boton, -1)
 

@@ -10,7 +10,7 @@ from gi.repository import GObject
 from JAMediaPlayer.Globales import get_colors
 
 
-class ProgressPlayer(Gtk.EventBox):
+class ProgressPlayer(Gtk.HBox):
 
     __gsignals__ = {
     "seek": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, )),
@@ -18,22 +18,17 @@ class ProgressPlayer(Gtk.EventBox):
 
     def __init__(self):
 
-        Gtk.EventBox.__init__(self)
-
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
+        Gtk.HBox.__init__(self)
 
         self.__presed = False
 
         self.__progressBar = BarraProgreso()
         self.__volumen = Gtk.VolumeButton()
-        self.__volumen.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
+        self.__volumen.set_css_name('volumen')
         self.__volumen.set_value(0.1)
 
-        hbox = Gtk.HBox()
-        hbox.pack_start(self.__progressBar, True, True, 0)
-        hbox.pack_end(self.__volumen, False, False, 0)
-
-        self.add(hbox)
+        self.pack_start(self.__progressBar, True, True, 0)
+        self.pack_end(self.__volumen, False, True, 0)
 
         self.__progressBar.escala.connect("button-press-event", self.__button_press_event)
         self.__progressBar.escala.connect("button-release-event", self.__button_release_event)
@@ -72,7 +67,8 @@ class BarraProgreso(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
+        #NOTA: tambien se puede hacer: __gtype_name__ = 'BarraProgreso'
+        self.set_css_name('BarraProgreso')
 
         self.escala = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL)
         self.escala.set_adjustment(Gtk.Adjustment(0.0, 0.0, 101.0, 0.1, 1.0, 1.0))

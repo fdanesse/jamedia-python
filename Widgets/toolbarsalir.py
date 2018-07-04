@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 import gi
 gi.require_version("Gtk", "3.0")
 
@@ -9,9 +8,6 @@ from gi.repository import GObject
 
 from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
-from JAMediaPlayer.Globales import get_boton
-
-BASE_PATH = os.path.dirname(os.path.dirname(__file__))
 
 
 class ToolbarSalir(Gtk.Toolbar):
@@ -27,26 +23,19 @@ class ToolbarSalir(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(BASE_PATH, "Iconos", "button-cancel.svg")
-        boton = get_boton(archivo, flip=False, pixels=12)
-        boton.set_tooltip_text("Cancelar")
-        boton.connect("clicked", self.cancelar)
+        boton = Gtk.ToolButton()
+        boton.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
+        boton.set_label('Salir')
+        boton.set_tooltip_text("Salir")
+        boton.connect("clicked", self.__emit_salir)
         self.insert(boton, -1)
 
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        #self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        item = Gtk.ToolItem()
-        self.label = Gtk.Label("")
-        self.label.show()
-        item.add(self.label)
-        self.insert(item, -1)
-
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
-
-        archivo = os.path.join(BASE_PATH, "Iconos", "dialog-ok.svg")
-        boton = get_boton(archivo, flip=False, pixels=12)
-        boton.set_tooltip_text("Aceptar")
-        boton.connect("clicked", self.__emit_salir)
+        boton = Gtk.ToolButton()
+        boton.set_label('Cancelar')
+        boton.set_tooltip_text("Cancelar")
+        boton.connect("clicked", self.cancelar)
         self.insert(boton, -1)
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
@@ -58,10 +47,8 @@ class ToolbarSalir(Gtk.Toolbar):
         self.emit('salir')
 
     def run(self, nombre_aplicacion):
-        self.label.set_text("¿Salir de %s?" % (nombre_aplicacion))
         self.show()
 
     def cancelar(self, widget=None):
-        self.label.set_text("")
         self.hide()
         

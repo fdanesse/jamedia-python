@@ -14,7 +14,6 @@ from JAMediaPlayer.Globales import ICONS_PATH
 
 
 class ToolbarBusquedas(Gtk.Toolbar):
-    '''Busqueda en youtube'''
 
     __gsignals__ = {
     "comenzar_busqueda": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_STRING, GObject.TYPE_INT))}
@@ -70,9 +69,7 @@ class ToolbarBusquedas(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        archivo = os.path.join(ICONS_PATH, "dialog-ok.svg")
-        boton = get_boton(archivo, flip=False, pixels=24)
-        boton.set_tooltip_text("Comenzar Búsqueda")
+        boton = get_boton(os.path.join(ICONS_PATH, "dialog-ok.svg"), flip=False, pixels=24, tooltip_text="Comenzar Búsqueda")
         boton.connect("clicked", self.__emit_buscar)
         self.insert(boton, -1)
 
@@ -94,9 +91,7 @@ class ToolbarBusquedas(Gtk.Toolbar):
 
     def __alerta_busqueda_invalida(self):
         # FIXME: Recordar dar estilo a este dialog
-        dialog = Gtk.Dialog(parent=self.get_toplevel(),
-            flags=Gtk.DialogFlags.MODAL,
-            buttons=["OK", Gtk.ResponseType.OK])
+        dialog = Gtk.Dialog(parent=self.get_toplevel(), flags=Gtk.DialogFlags.MODAL, buttons=["OK", Gtk.ResponseType.OK])
         t = "No se puede realizar esta búsqueda.\n"
         t = "%s%s" % (t, "Revisa la cantidad y el texto para la búsqueda.")
         label = Gtk.Label(t)
@@ -112,29 +107,3 @@ class ToolbarBusquedas(Gtk.Toolbar):
                 widget.set_text("1")
         except:
             widget.set_text("")
-
-
-class AlertaBusqueda(Gtk.Toolbar):
-    """
-    Para informar que se está buscando con JAMediaTube.
-    """
-
-    def __init__(self):
-
-        Gtk.Toolbar.__init__(self)
-
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
-
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
-
-        item = Gtk.ToolItem()
-        item.set_expand(True)
-        self.label = Gtk.Label("")
-        self.label.set_justify(Gtk.Justification.LEFT)
-        #self.label.set_line_wrap(True)
-        self.label.show()
-        item.add(self.label)
-        self.insert(item, -1)
-
-        self.show_all()
-        

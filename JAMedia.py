@@ -45,35 +45,23 @@ target = [Gtk.TargetEntry.new('Mover', Gtk.TargetFlags.SAME_APP, 0)]
 
 class JAMedia(Gtk.Window):
 
+    __gtype_name__ = 'JAMediaWindow'
+
     def __init__(self):
 
         Gtk.Window.__init__(self)
 
+        self.set_style()
+
         self.set_title("JAMedia")
         self.set_icon_from_file(os.path.join(BASE_PATH,"Iconos", "JAMedia.svg"))
-        self.modify_bg(Gtk.StateType.NORMAL,get_colors("window1"))
         self.set_resizable(True)
         self.set_border_width(2)
         self.set_position(Gtk.WindowPosition.CENTER)
 
-        self.box_tube = None
-
-        self.toolbar = None
-        self.toolbar_busqueda = None
-        self.toolbar_descarga = None
-        self.toolbar_salir = None
-        self.alerta_busqueda = None
-        self.paneltube = None
-
-        self.jamediaplayer = None
-
         self.archivos = []
         self.buscador = Buscar()
 
-        GLib.idle_add(self.__setup_init)
-        print ("JAMedia process:", os.getpid())
-
-    def __setup_init(self):
         boxbase = Gtk.VBox()
 
         self.box_tube = Gtk.VBox()
@@ -84,22 +72,10 @@ class JAMedia(Gtk.Window):
         self.alerta_busqueda = AlertaBusqueda()
         self.paneltube = PanelTube()
 
-        event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
-        event.add(self.toolbar)
-        self.box_tube.pack_start(event, False, False, 0)
-
-        event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
-        event.add(self.toolbar_salir)
-        self.box_tube.pack_start(event, False, False, 0)
-
+        self.box_tube.pack_start(self.toolbar, False, False, 0)
+        self.box_tube.pack_start(self.toolbar_salir, False, False, 0)
         self.box_tube.pack_start(self.toolbar_busqueda, False, False, 0)
-
-        event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
-        event.add(self.toolbar_descarga)
-        self.box_tube.pack_start(event, False, False, 0)
+        self.box_tube.pack_start(self.toolbar_descarga, False, False, 0)
 
         self.box_tube.pack_start(self.alerta_busqueda, False, False, 0)
         self.box_tube.pack_start(self.paneltube, True, True, 0)
@@ -110,11 +86,21 @@ class JAMedia(Gtk.Window):
         boxbase.pack_start(self.jamediaplayer, True, True, 0)
         self.add(boxbase)
 
-        self.connect('realize', self.__setup_init2)
+        self.connect('realize', self.__realized)
         self.show_all()
         self.realize()
 
-    def __setup_init2(self, widget):
+        print ("JAMedia process:", os.getpid())
+
+    def set_style(self):
+        screen = Gdk.Screen.get_default()
+        css_provider = Gtk.CssProvider()
+        style_path = os.path.join(BASE_PATH, "Estilo.css")
+        css_provider.load_from_path(style_path)
+        context = Gtk.StyleContext()
+        context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_SETTINGS)
+
+    def __realized(self, widget):
         self.toolbar_salir.cancelar()
         self.paneltube.cancel_toolbars_flotantes()
         ocultar([self.toolbar_descarga, self.alerta_busqueda])

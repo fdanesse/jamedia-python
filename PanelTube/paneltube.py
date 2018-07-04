@@ -24,6 +24,8 @@ TipEncontrados = "Arrastra Hacia La Derecha para Agregarlo a Descargas"
 
 class PanelTube(Gtk.HPaned):
 
+    __gtype_name__ = 'PanelTube'
+
     __gsignals__ = {
     'download': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
     'open_shelve_list': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, GObject.TYPE_PYOBJECT)),
@@ -33,7 +35,7 @@ class PanelTube(Gtk.HPaned):
 
         Gtk.HPaned.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        #self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
 
         self.toolbar_encontrados = Mini_Toolbar("Videos Encontrados")
         #self.toolbar_guardar_encontrados = Toolbar_Guardar()
@@ -61,7 +63,7 @@ class PanelTube(Gtk.HPaned):
 
         scroll = self.__get_scroll()
         event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        #event.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
         event.add(self.encontrados)
         scroll.add_with_viewport(event)
         box.pack_start(scroll, True, True, 0)

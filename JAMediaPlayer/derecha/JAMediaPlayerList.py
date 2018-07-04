@@ -10,7 +10,7 @@ from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
 
-from JAMediaPlayer.Globales import get_colors
+#from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
 from JAMediaPlayer.Globales import get_JAMedia_Directory
@@ -29,7 +29,7 @@ class PlayerList(Gtk.Frame):
 
         Gtk.Frame.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
+        #self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
 
         self.directorio = get_JAMedia_Directory()
         self.mime = ['audio/*', 'video/*', 'application/ogg']
@@ -232,35 +232,16 @@ class Lista(Gtk.TreeView):
         self.get_selection().connect("changed", self.__changedSelection)
 
 
-class JAMediaToolbarList(Gtk.EventBox):
-
+class JAMediaToolbarList(Gtk.Toolbar):
     def __init__(self):
-
-        Gtk.EventBox.__init__(self)
-
-        toolbar = Gtk.Toolbar()
-
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
-        toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
-
-        archivo = os.path.join(ICONS_PATH, "document-open.svg")
-        self.openfiles = get_boton(archivo, flip=False, pixels=24)
-        self.openfiles.set_tooltip_text("Cargar Archivos")
-        toolbar.insert(self.openfiles, -1)
-
-        archivo = os.path.join(ICONS_PATH, "document-new.svg")
-        self.appendfiles = get_boton(archivo, flip=False, pixels=24)
-        self.appendfiles.set_tooltip_text("Agregar Archivos")
-        toolbar.insert(self.appendfiles, -1)
-
-        archivo = os.path.join(ICONS_PATH, "clear.svg")
-        self.clearlist = get_boton(archivo, flip=False, pixels=24)
-        self.clearlist.set_tooltip_text("Limpiar Lista")
-        toolbar.insert(self.clearlist, -1)
-
-        toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
-
-        self.add(toolbar)
+        Gtk.Toolbar.__init__(self)
+        self.openfiles = get_boton(os.path.join(ICONS_PATH, "document-open.svg"), flip=False, pixels=24, tooltip_text="Cargar Archivos")
+        self.insert(self.openfiles, -1)
+        self.appendfiles = get_boton(os.path.join(ICONS_PATH, "document-new.svg"), flip=False, pixels=24, tooltip_text="Agregar Archivos")
+        self.insert(self.appendfiles, -1)
+        self.clearlist = get_boton(os.path.join(ICONS_PATH, "clear.svg"), flip=False, pixels=24, tooltip_text="Limpiar Lista")
+        self.insert(self.clearlist, -1)
+        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
         self.show_all()
 
 
@@ -272,7 +253,7 @@ class My_FileChooser(Gtk.FileChooserDialog):
 
         Gtk.FileChooserDialog.__init__(self, title=title, parent=parent, action=action)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
+        #self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
         self.set_resizable(True)
         self.set_size_request(320, 240)
 

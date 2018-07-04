@@ -37,49 +37,36 @@ class Toolbar(Gtk.EventBox):
 
         toolbar = Gtk.Toolbar()
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
-        toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
+        #self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
+        #toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
 
         toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        archivo = os.path.join(ICONS_PATH, "JAMedia.svg")
-        boton = get_boton(archivo, flip=False, pixels=35)
-        boton.set_tooltip_text("Creditos")
+        boton = get_boton(os.path.join(ICONS_PATH, "JAMedia.svg"), flip=False, pixels=35, tooltip_text="Creditos")
         #FIXME: boton.connect("clicked", self.__show_credits)
         toolbar.insert(boton, -1)
 
-        archivo = os.path.join(ICONS_PATH, "help.svg")
-        boton = get_boton(archivo, flip=False, pixels=24)
-        boton.set_tooltip_text("Ayuda")
+        boton = get_boton(os.path.join(ICONS_PATH, "help.svg"), flip=False, pixels=24, tooltip_text="Ayuda")
         #FIXME: boton.connect("clicked", self.__show_help)
         toolbar.insert(boton, -1)
 
         toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        #FIXME: Cambiar a togglebutton
-        archivo = os.path.join(ICONS_PATH, "control_panel.png")
-        self.configurar = get_toggle_boton(archivo, flip=False, pixels=24)
-        self.configurar.set_tooltip_text("Configuraciones")
+        self.configurar = get_toggle_boton(os.path.join(ICONS_PATH, "control_panel.png"), flip=False, pixels=24, tooltip_text="Configuraciones")
         self.configurar.connect("toggled", self.__emit_show_config)
         toolbar.insert(self.configurar, -1)
 
-        archivo = os.path.join(ICONS_PATH, "controls.svg")
-        self.__controls = get_toggle_boton(archivo, flip=True, pixels=24)
-        self.__controls.set_tooltip_text("Ocultar/Mostrar Controles")
+        self.__controls = get_toggle_boton(os.path.join(ICONS_PATH, "controls.svg"), flip=True, pixels=24, tooltip_text="Ocultar/Mostrar Controles")
         self.__controls.connect("toggled", self.__set_controles_view)
         toolbar.insert(self.__controls, -1)
 
-        archivo = os.path.join(ICONS_PATH, "fullscreen.png")
-        self.__full = get_toggle_boton(archivo, flip=True, pixels=24)
-        self.__full.set_tooltip_text("Full/UnFull Screen")
+        self.__full = get_toggle_boton(os.path.join(ICONS_PATH, "fullscreen.png"), flip=True, pixels=24, tooltip_text="Full/UnFull Screen")
         self.__full.connect("toggled", self.__set_full)
         toolbar.insert(self.__full, -1)
 
         toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(ICONS_PATH, "button-cancel.svg")
-        self.salir = get_boton(archivo, flip=False, pixels=12)
-        self.salir.set_tooltip_text("Salir")
+        self.salir = get_boton(os.path.join(ICONS_PATH, "button-cancel.svg"), flip=False, pixels=12, tooltip_text="Salir")
         toolbar.insert(self.salir, -1)
 
         toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
