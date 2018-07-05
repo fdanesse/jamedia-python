@@ -8,7 +8,6 @@ from gi.repository import Gtk
 from JAMediaPlayer.derecha.BalanceWidget import BalanceWidget
 from JAMediaPlayer.derecha.JAMediaPlayerList import PlayerList
 from JAMediaPlayer.derecha.PlayerControls import PlayerControls
-from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import ocultar
 from JAMediaPlayer.Globales import mostrar
 

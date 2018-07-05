@@ -22,6 +22,9 @@ class ToolbarInfo(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
+        self.set_css_name('toolbarinfo')
+        self.set_name('toolbarinfo')
+
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
         self.boton_izquierda = get_boton(os.path.join(ICONS_PATH, "rotar.svg"), flip=False, pixels=24, tooltip_text="Izquierda")
@@ -33,7 +36,7 @@ class ToolbarInfo(Gtk.Toolbar):
         self.insert(self.boton_derecha, -1)
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
-        
+        #FIXME: Agregar información de tiempo y tamaño?
         self.show_all()
     
     def __emit_rotar(self, widget):

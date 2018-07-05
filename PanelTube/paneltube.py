@@ -15,7 +15,6 @@ from PanelTube.toolbarvideosizquierda import Toolbar_Videos_Izquierda
 from PanelTube.toolbarvideosderecha import Toolbar_Videos_Derecha
 #from PanelTube.toolbarguardar import Toolbar_Guardar
 
-from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_data_directory
 
 TipDescargas = "Arrastra Hacia La Izquierda para Quitarlo de Descargas."
@@ -35,7 +34,8 @@ class PanelTube(Gtk.HPaned):
 
         Gtk.HPaned.__init__(self)
 
-        #self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        self.set_css_name('paneltube')
+        self.set_name('paneltube')
 
         self.toolbar_encontrados = Mini_Toolbar("Videos Encontrados")
         #self.toolbar_guardar_encontrados = Toolbar_Guardar()
@@ -63,7 +63,6 @@ class PanelTube(Gtk.HPaned):
 
         scroll = self.__get_scroll()
         event = Gtk.EventBox()
-        #event.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
         event.add(self.encontrados)
         scroll.add_with_viewport(event)
         box.pack_start(scroll, True, True, 0)
@@ -85,7 +84,6 @@ class PanelTube(Gtk.HPaned):
 
         scroll = self.__get_scroll()
         event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
         event.add(self.descargar)
         scroll.add_with_viewport(event)
         box.pack_start(scroll, True, True, 0)
@@ -224,7 +222,7 @@ class PanelTube(Gtk.HPaned):
         Envia la señal descargar para comenzar la descarga de un video en la
         lista, cuando el usuario hace click en el boton descargar.
         """
-        #map(self.__cancel_toolbars, self.toolbars_flotantes)
+        #FIXME: map(self.__cancel_toolbars, self.toolbars_flotantes)
         self.emit('download')
 
     def __mover_videos(self, widget):

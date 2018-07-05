@@ -118,16 +118,12 @@ class JAMediaPlayer(Gtk.VBox):
         zona, ocultar = (valor, self.__toolbar.ocultar_controles)
         self.__mouse_in_visor = zona
         if zona and ocultar:
-            self.set_border_width(0)
-            self.base_panel.set_border_width(0)
             self.__toolbar.hide()
             self.base_panel.derecha.hide()
             self.base_panel.izquierda.toolbar_info.hide()
             self.base_panel.izquierda.progress.hide()
         elif not zona and ocultar:
             self.__toolbar.show()
-            self.set_border_width(2)
-            self.base_panel.set_border_width(2)
             self.base_panel.derecha.show()
             self.base_panel.izquierda.toolbar_info.show()
             self.base_panel.izquierda.progress.show()

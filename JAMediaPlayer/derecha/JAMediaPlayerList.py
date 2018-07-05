@@ -10,7 +10,6 @@ from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
 
-#from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
 from JAMediaPlayer.Globales import get_JAMedia_Directory
@@ -28,8 +27,6 @@ class PlayerList(Gtk.Frame):
     def __init__(self):
 
         Gtk.Frame.__init__(self)
-
-        #self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
 
         self.directorio = get_JAMedia_Directory()
         self.mime = ['audio/*', 'video/*', 'application/ogg']
@@ -59,28 +56,23 @@ class PlayerList(Gtk.Frame):
         self.lista.limpiar()
 
     def __openfiles(self, widget, tipo):
-        selector = My_FileChooser(parent=self.get_toplevel(),
-            filter_type=[], action=Gtk.FileChooserAction.OPEN,
-            mime=self.mime, title="Abrir Archivos", path=self.directorio)
+        selector = My_FileChooser(parent=self.get_toplevel(),filter_type=[], action=Gtk.FileChooserAction.OPEN,mime=self.mime, title="Abrir Archivos", path=self.directorio)
         selector.connect('load-files', self.__load_files, tipo)
         selector.run()
-        if selector:
-            selector.destroy()
+        if selector:selector.destroy()
 
     def __load_files(self, widget, archivos, tipo):
         items = []
         archivos.sort()
         for path in archivos:
-            if not os.path.isfile(path):
-                continue
+            if not os.path.isfile(path):continue
             archivo = os.path.basename(path)
             items.append([archivo, path])
             self.directorio = os.path.dirname(path)
         self.__load_list(items, tipo)
 
     def __load_list(self, items, tipo):
-        if tipo == "load":
-            self.lista.limpiar()
+        if tipo == "load":self.lista.limpiar()
         self.lista.agregar_items(items)
 
 
@@ -96,9 +88,9 @@ class Lista(Gtk.TreeView):
         Gtk.TreeView.__init__(self, Gtk.ListStore(GdkPixbuf.Pixbuf, GObject.TYPE_STRING, GObject.TYPE_STRING))
 
         self.__valorSelected = None
-        self.set_headers_clickable(True)
-        self.set_headers_visible(True)
-        self.set_reorderable(True)
+        #self.set_headers_clickable(True)
+        self.set_headers_visible(False)
+        #self.set_reorderable(True)
 
         self.__setear_columnas()
         self.get_selection().connect("changed", self.__changedSelection)
@@ -150,8 +142,7 @@ class Lista(Gtk.TreeView):
 
     def __ejecutar_agregar_elemento(self, elementos):
         if not elementos:
-            if not self.__valorSelected:
-                self.seleccionar_primero()
+            if not self.__valorSelected:self.seleccionar_primero()
             self.emit("len_items", self.get_model().iter_n_children())
             return False
 
@@ -235,16 +226,19 @@ class Lista(Gtk.TreeView):
 class JAMediaToolbarList(Gtk.Toolbar):
     def __init__(self):
         Gtk.Toolbar.__init__(self)
-        self.openfiles = get_boton(os.path.join(ICONS_PATH, "document-open.svg"), flip=False, pixels=24, tooltip_text="Cargar Archivos")
+        self.set_css_name('toolbarlist')
+        self.set_name('toolbarlist')
+        self.openfiles = get_boton(os.path.join(ICONS_PATH, "document-open.svg"), flip=False, pixels=18, tooltip_text="Cargar Archivos")
         self.insert(self.openfiles, -1)
-        self.appendfiles = get_boton(os.path.join(ICONS_PATH, "document-new.svg"), flip=False, pixels=24, tooltip_text="Agregar Archivos")
+        self.appendfiles = get_boton(os.path.join(ICONS_PATH, "document-new.svg"), flip=False, pixels=18, tooltip_text="Agregar Archivos")
         self.insert(self.appendfiles, -1)
-        self.clearlist = get_boton(os.path.join(ICONS_PATH, "clear.svg"), flip=False, pixels=24, tooltip_text="Limpiar Lista")
+        self.clearlist = get_boton(os.path.join(ICONS_PATH, "clear.svg"), flip=False, pixels=18, tooltip_text="Limpiar Lista")
         self.insert(self.clearlist, -1)
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
         self.show_all()
 
 
+# FIXME: Estilizar
 class My_FileChooser(Gtk.FileChooserDialog):
 
     __gsignals__ = {'load-files': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, ))}
@@ -253,7 +247,6 @@ class My_FileChooser(Gtk.FileChooserDialog):
 
         Gtk.FileChooserDialog.__init__(self, title=title, parent=parent, action=action)
 
-        #self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
         self.set_resizable(True)
         self.set_size_request(320, 240)
 

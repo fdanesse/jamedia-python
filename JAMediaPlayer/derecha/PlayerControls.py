@@ -23,6 +23,9 @@ class PlayerControls(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
+        self.set_css_name('toolbarcontrols')
+        self.set_name('toolbarcontrols')
+
         self.pix_play = GdkPixbuf.Pixbuf.new_from_file_at_size(os.path.join(ICONS_PATH, "play.svg"), 24, 24)
         self.pix_paused = GdkPixbuf.Pixbuf.new_from_file_at_size(os.path.join(ICONS_PATH, "pausa.svg"), 24, 24)
 
@@ -34,7 +37,7 @@ class PlayerControls(Gtk.Toolbar):
 
         self.play = JAMediaToolButton(pixels=24)
         self.play.set_imagen(archivo=os.path.join(ICONS_PATH, "play.svg"), flip=False, rotacion=False)
-        self.play.set_tooltip_text("Reproducir")
+        self.play.set_tooltip_text("Play")
         self.play.connect("clicked",self.__emit_accion, "pausa-play")
         self.insert(self.play, -1)
 
@@ -56,9 +59,11 @@ class PlayerControls(Gtk.Toolbar):
         self.emit("accion-controls", accion)
 
     def set_paused(self):
+        self.play.set_tooltip_text("Pausa")
         self.play.set_paused(self.pix_play)
 
     def set_playing(self):
+        self.play.set_tooltip_text("Play")
         self.play.set_playing(self.pix_paused)
 
     def activar(self, valor):
@@ -88,22 +93,17 @@ class JAMediaToolButton(Gtk.ToolButton):
 
     def set_imagen(self, archivo=None,
         flip=False, rotacion=False):
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
-            os.path.join(archivo), self.pixels, self.pixels)
-        if flip:
-            pixbuf = pixbuf.flip(True)
-        if rotacion:
-            pixbuf = pixbuf.rotate_simple(rotacion)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(os.path.join(archivo), self.pixels, self.pixels)
+        if flip:pixbuf = pixbuf.flip(True)
+        if rotacion:pixbuf = pixbuf.rotate_simple(rotacion)
         self.imagen.set_from_pixbuf(pixbuf)
 
     def set_playing(self, pixbuf):
-        if self.estado:
-            return
+        if self.estado:return
         self.estado = True
         self.imagen.set_from_pixbuf(pixbuf)
 
     def set_paused(self, pixbuf):
-        if not self.estado:
-            return
+        if not self.estado:return
         self.estado = False
         self.imagen.set_from_pixbuf(pixbuf)
