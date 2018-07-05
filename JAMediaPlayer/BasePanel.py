@@ -11,8 +11,6 @@ from gi.repository import GdkX11
 from JAMediaPlayer.izquierda.Izquierda import Izquierda
 from JAMediaPlayer.derecha.Derecha import Derecha
 
-from JAMediaPlayer.Globales import get_colors
-
 from JAMediaPlayer.JAMediaReproductor.JAMediaReproductor import JAMediaReproductor
 
 
@@ -22,8 +20,7 @@ class BasePanel(Gtk.HPaned):
 
         Gtk.HPaned.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
-        self.set_border_width(2)
+        # FIXME: self.set_border_width(2)
 
         self.izquierda = Izquierda()
         self.derecha = Derecha()

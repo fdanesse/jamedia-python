@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# FIXME: Borrar si no se usa
 '''
 import gi
 gi.require_version("Gtk", "3.0")

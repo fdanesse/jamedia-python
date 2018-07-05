@@ -12,15 +12,11 @@ from gi.repository import GObject
 
 class VideoVisor(Gtk.DrawingArea):
 
-    __gtype_name__ = 'VideoVisor'
-
     __gsignals__ = {"ocultar_controles": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,))}
 
     def __init__(self):
 
         Gtk.DrawingArea.__init__(self)
-
-        self.set_css_name('VideoVisor')
 
         self.add_events(
             Gdk.EventMask.KEY_PRESS_MASK |
@@ -47,3 +43,7 @@ class VideoVisor(Gtk.DrawingArea):
             self.emit("ocultar_controles", True)
         return True
             
+    def do_draw(self, contexto):
+        Gdk.cairo_set_source_color(contexto, Gdk.Color.parse("#000000").color)
+        contexto.paint()
+        return True

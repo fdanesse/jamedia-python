@@ -7,10 +7,10 @@ from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import GObject
 
-from JAMediaPlayer.Globales import get_colors
+from JAMediaPlayer.Globales import get_separador
 
 
-class ProgressPlayer(Gtk.HBox):
+class ProgressPlayer(Gtk.Toolbar):
 
     __gsignals__ = {
     "seek": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, )),
@@ -18,17 +18,28 @@ class ProgressPlayer(Gtk.HBox):
 
     def __init__(self):
 
-        Gtk.HBox.__init__(self)
+        Gtk.Toolbar.__init__(self)
 
         self.__presed = False
+        self.set_css_name('progressplayer')
+        self.set_name('progressplayer')
 
         self.__progressBar = BarraProgreso()
         self.__volumen = Gtk.VolumeButton()
         self.__volumen.set_css_name('volumen')
         self.__volumen.set_value(0.1)
 
-        self.pack_start(self.__progressBar, True, True, 0)
-        self.pack_end(self.__volumen, False, True, 0)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        item = Gtk.ToolItem()
+        item.set_expand(True)
+        item.add(self.__progressBar)
+        self.insert(item, -1)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        item = Gtk.ToolItem()
+        item.set_expand(False)
+        item.add(self.__volumen)
+        self.insert(item, -1)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         self.__progressBar.escala.connect("button-press-event", self.__button_press_event)
         self.__progressBar.escala.connect("button-release-event", self.__button_release_event)
@@ -68,9 +79,11 @@ class BarraProgreso(Gtk.EventBox):
         Gtk.EventBox.__init__(self)
 
         #NOTA: tambien se puede hacer: __gtype_name__ = 'BarraProgreso'
-        self.set_css_name('BarraProgreso')
+        self.set_css_name('progressplayerscale')
+        self.set_name('progressplayerscale')
 
         self.escala = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL)
+        #FIXME: Mejorar saltos del ajuste
         self.escala.set_adjustment(Gtk.Adjustment(0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
         self.escala.set_digits(0)
         self.escala.set_draw_value(False)

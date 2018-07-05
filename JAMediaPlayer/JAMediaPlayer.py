@@ -14,23 +14,16 @@ from JAMediaPlayer.Widgets.Toolbars import Toolbar
 from JAMediaPlayer.Widgets.mousespeeddetector import MouseSpeedDetector
 from JAMediaPlayer.BasePanel import BasePanel
 
-from JAMediaPlayer.Globales import get_colors
-
-#GObject.threads_init()
-#commands.getoutput('PATH=%s:$PATH' % (os.path.dirname(__file__)))
-
 from JAMediaPlayer.Globales import ICONS_PATH
 
 
-class JAMediaPlayer(Gtk.EventBox):
+class JAMediaPlayer(Gtk.VBox):
 
     __gsignals__ = {"salir": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
     def __init__(self):
 
-        Gtk.EventBox.__init__(self)
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window"))
-        self.set_border_width(2)
+        Gtk.VBox.__init__(self)
 
         self.__mouse_in_visor = False
         self.__cursor_root = Gdk.Cursor(Gdk.CursorType.BLANK_CURSOR)
@@ -39,16 +32,13 @@ class JAMediaPlayer(Gtk.EventBox):
         self.__jamedia_cursor = Gdk.Cursor(Gdk.Display.get_default(), pixbuf, 0, 0)
 
         self.__toolbar = Toolbar()
-
         self.base_panel = BasePanel()
 
-        vbox = Gtk.VBox()
-        vbox.pack_start(self.__toolbar, False, False, 0)
-        vbox.pack_start(self.base_panel, True, True, 0)
+        self.pack_start(self.__toolbar, False, False, 0)
+        self.pack_start(self.base_panel, True, True, 0)
 
         self.connect("realize", self.__realize)
 
-        self.add(vbox)
         self.show_all()
 
         # Controlador del mouse. http://www.pyGtk.org/pyGtk2reference/class-gdkdisplay.html

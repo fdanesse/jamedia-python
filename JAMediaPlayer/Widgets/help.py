@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+# FIXME: Suplantar
+'''
 import os
 import gi
 gi.require_version("Gtk", "3.0")
@@ -92,4 +94,4 @@ class Help(Gtk.Dialog):
         for help in self.helps:
             if help.get_visible():
                 return self.helps.index(help)
-                
+'''

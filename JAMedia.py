@@ -56,7 +56,7 @@ class JAMedia(Gtk.Window):
         self.set_title("JAMedia")
         self.set_icon_from_file(os.path.join(BASE_PATH,"Iconos", "JAMedia.svg"))
         self.set_resizable(True)
-        self.set_border_width(2)
+        #FIXME: self.set_border_width(2)
         self.set_position(Gtk.WindowPosition.CENTER)
 
         self.archivos = []

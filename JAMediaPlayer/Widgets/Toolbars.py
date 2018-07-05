@@ -7,10 +7,9 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from gi.repository import GObject
 
-from JAMediaPlayer.Widgets.credits import Credits
-from JAMediaPlayer.Widgets.help import Help
+#from JAMediaPlayer.Widgets.credits import Credits
+#from JAMediaPlayer.Widgets.help import Help
 
-from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
 from JAMediaPlayer.Globales import get_toggle_boton
@@ -24,54 +23,48 @@ from JAMediaPlayer.Globales import ICONS_PATH
 # FIXME: Borrar las Toolbars que no se usan
 
 
-class Toolbar(Gtk.EventBox):
+class Toolbar(Gtk.Toolbar):
 
     __gsignals__ = {
     'show_config': (GObject.SIGNAL_RUN_LAST,GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,))}
 
     def __init__(self):
 
-        Gtk.EventBox.__init__(self)
+        Gtk.Toolbar.__init__(self)
 
         self.ocultar_controles = False
 
-        toolbar = Gtk.Toolbar()
-
-        #self.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
-        #toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("toolbars"))
-
-        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         boton = get_boton(os.path.join(ICONS_PATH, "JAMedia.svg"), flip=False, pixels=35, tooltip_text="Creditos")
         #FIXME: boton.connect("clicked", self.__show_credits)
-        toolbar.insert(boton, -1)
+        self.insert(boton, -1)
 
         boton = get_boton(os.path.join(ICONS_PATH, "help.svg"), flip=False, pixels=24, tooltip_text="Ayuda")
         #FIXME: boton.connect("clicked", self.__show_help)
-        toolbar.insert(boton, -1)
+        self.insert(boton, -1)
 
-        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         self.configurar = get_toggle_boton(os.path.join(ICONS_PATH, "control_panel.png"), flip=False, pixels=24, tooltip_text="Configuraciones")
         self.configurar.connect("toggled", self.__emit_show_config)
-        toolbar.insert(self.configurar, -1)
+        self.insert(self.configurar, -1)
 
         self.__controls = get_toggle_boton(os.path.join(ICONS_PATH, "controls.svg"), flip=True, pixels=24, tooltip_text="Ocultar/Mostrar Controles")
         self.__controls.connect("toggled", self.__set_controles_view)
-        toolbar.insert(self.__controls, -1)
+        self.insert(self.__controls, -1)
 
         self.__full = get_toggle_boton(os.path.join(ICONS_PATH, "fullscreen.png"), flip=True, pixels=24, tooltip_text="Full/UnFull Screen")
         self.__full.connect("toggled", self.__set_full)
-        toolbar.insert(self.__full, -1)
+        self.insert(self.__full, -1)
 
-        toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
         self.salir = get_boton(os.path.join(ICONS_PATH, "button-cancel.svg"), flip=False, pixels=12, tooltip_text="Salir")
-        toolbar.insert(self.salir, -1)
+        self.insert(self.salir, -1)
 
-        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        self.add(toolbar)
         self.show_all()
     
     def set_full(self, widget):

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+# FIXME: Suplanatar
+'''
 import os
 import gi
 gi.require_version("Gtk", "3.0")
@@ -25,3 +27,4 @@ class Credits(Gtk.Dialog):
 
         self.vbox.pack_start(imagen, True, True, 0)
         self.vbox.show_all()
+'''
