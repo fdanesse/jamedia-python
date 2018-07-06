@@ -189,7 +189,7 @@ class JAMedia(Gtk.Window):
         self.toolbar_salir.cancelar()
         self.paneltube.cancel_toolbars_flotantes()
         self.alerta_busqueda.show()
-        self.alerta_busqueda.label.set_text("Buscando: %s" % (palabras))
+        self.alerta_busqueda.label.set_text("Buscando: %s..." % (palabras))
         objetos = self.paneltube.encontrados.get_children()
         for objeto in objetos:
             objeto.get_parent().remove(objeto)

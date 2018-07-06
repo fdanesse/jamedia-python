@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import os
 import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 from gi.repository import GObject
 
-from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
-from JAMediaPlayer.Globales import get_boton
 from JAMediaPlayer.Globales import ICONS_PATH
 
 
@@ -22,11 +19,13 @@ class ToolbarBusquedas(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        self.set_css_name('toolbarbusquedas')
+        self.set_name('toolbarbusquedas')
 
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
+        item.set_expand(False)
         label = Gtk.Label("Buscar")
         label.show()
         item.add(label)
@@ -35,10 +34,10 @@ class ToolbarBusquedas(Gtk.Toolbar):
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
+        item.set_expand(False)
         self.entrycantidad = Gtk.Entry()
-        self.entrycantidad.set_text("50")
-        self.entrycantidad.set_property("xalign", 0.5)
-        self.entrycantidad.set_size_request(40, -1)
+        self.entrycantidad.props.placeholder_text = "50"
+        self.entrycantidad.set_width_chars(3)
         self.entrycantidad.set_max_length(3)
         self.entrycantidad.set_tooltip_text("Escribe la cantidad de videos que deseas")
         self.entrycantidad.show()
@@ -49,6 +48,7 @@ class ToolbarBusquedas(Gtk.Toolbar):
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
+        item.set_expand(False)
         label = Gtk.Label("Videos Sobre")
         label.show()
         item.add(label)
@@ -57,10 +57,11 @@ class ToolbarBusquedas(Gtk.Toolbar):
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         item = Gtk.ToolItem()
+        item.set_expand(False)
         self.entrytext = Gtk.Entry()
-        self.entrytext.set_size_request(400, -1)
+        self.entrytext.props.placeholder_text = "Artista, Título o ambos."
+        self.entrytext.set_width_chars(20)
         self.entrytext.set_max_length(50)
-        self.entrytext.set_property("xalign", 0.5)
         self.entrytext.set_tooltip_text("Escribe lo que Buscas")
         self.entrytext.show()
         self.entrytext.connect('activate', self.__emit_buscar)
@@ -69,7 +70,9 @@ class ToolbarBusquedas(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        boton = get_boton(os.path.join(ICONS_PATH, "dialog-ok.svg"), flip=False, pixels=24, tooltip_text="Comenzar Búsqueda")
+        boton =  Gtk.ToolButton()
+        boton.set_label("Run")
+        boton.set_tooltip_text("Comenzar Búsqueda")
         boton.connect("clicked", self.__emit_buscar)
         self.insert(boton, -1)
 

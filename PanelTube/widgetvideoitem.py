@@ -151,11 +151,12 @@ class WidgetVideoItem(Gtk.EventBox):
                 fileimage, headers = urllib.request.urlretrieve(url, archivo)
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(fileimage, 200, 150)
                 self.imagen.set_from_pixbuf(pixbuf)
-                # Convertir imagen a string por si se quiere guardar.
-                pixbuf_file = open(fileimage, 'rb')
+                # FIXME: Convertir imagen a string por si se quiere guardar.
+                '''pixbuf_file = open(fileimage, 'rb')
                 image_string = base64.b64encode(pixbuf_file.read())
                 pixbuf_file.close()
-                self.videodict["previews"] = image_string
+                self.videodict["previews"] = image_string'''
+                self.videodict["previews"] = pixbuf
             except:
                 #FIXME: Verificar que sucede si no hay conexión
                 print ("ERROR: Quizas no hay conexión", self.__update)

@@ -6,6 +6,7 @@
 
 @define-color bg_toolbar1 #778899;
 @define-color bg_toolbar2 #e9b96e;
+@define-color bg_toolbar3 #FFECB3;
 /*@define-color bg_widgetvideo #f0e6aa;*/
 @define-color jamedia1 #ff6600;
 @define-color green1 #388E3C; /* dark primary */
@@ -13,10 +14,11 @@
 @define-color green3 #C8E6C9; /* ligth primary */
 
 window {
-    background-image: image(@bg_toolbar1);
-    background-color: @bg_toolbar1; 
+    background-image: image(white);
+    background-color: white; 
     color: black;
-    font: 12px "Comic Sans";
+    font: 10pt "Comic Sans";
+    font-weight: normal;
 }
 
 toolbar {
@@ -26,7 +28,7 @@ toolbar {
 button {
     background-image: image(@bg_toolbar1);
     background-color: @bg_toolbar1;
-    border-radius: 15%;
+    border-radius: 8%;
     border: 0.1em solid @bg_toolbar1;
     margin: 0;
     padding: 0;
@@ -35,31 +37,62 @@ button {
 button:hover {
     background-image: image(@green3);
     background-color: @green3;
-    border-radius: 15%;
+    border-radius: 8%;
     border: 0.1em solid @green3;
     margin: 0;
     padding: 0;
 }
 button:checked {
-    background-image: image(@green2);
-    background-color: @green2;
-    border-radius: 15%;
+    background-image: image(@green3);
+    background-color: @green3;
+    border-radius: 8%;
     border: 0.01em solid black;
     margin: 0;
     padding: 0;
 }
 
-/*
-self.set_css_name('toolbarsalir')
-self.set_name('toolbarsalir')
-*/
 #toolbarsalir{
     background-color: @bg_toolbar2;
-    /*background-image: -gtk-gradient (linear,left top, left bottom,from (cyan),to (shade (red, 0.95)));*/
 }
 #toolbarsalir button {
     padding-left: 5px;
     padding-right: 5px;
+}
+
+#toolbarbusquedas {
+    background-color: @bg_toolbar2;
+    border: 0.1em solid @jamedia1;
+}
+#toolbarbusquedas button {
+    background-image: image(@green2);
+    background-color: @green2;
+    border-radius: 8%;
+    border: 0.1em solid @green2;
+    padding-left: 15px;
+    padding-right: 15px;
+    font-weight: bold;
+    font-size: 12pt;
+}
+#toolbarbusquedas button:hover {
+    background-image: image(@green3);
+    background-color: @green3;
+    border-radius: 8%;
+    border: 0.1em solid @green3;
+    padding-left: 15px;
+    padding-right: 15px;
+    font-weight: bold;
+    font-size: 12pt;
+}
+
+#alertabusquedas {
+    background-image: image(@jamedia1);
+    background-color: @jamedia1;
+    border: 0.1em solid @jamedia1;
+    font-weight: bold;
+    /* FIXME: No funciona:
+    animation-name: playing_anim;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;*/
 }
 
 #toolbarcontrols button {
@@ -83,7 +116,6 @@ self.set_name('toolbarsalir')
 }
 
 /* Barra de Progreso */
-/*#progressplayer {}*/
 scale {
     background-image: image(@bg_toolbar1);
     background-color: @bg_toolbar1;
@@ -94,15 +126,13 @@ scale {
     margin-left: 3px;
     margin-right: 3px;
 }
-/* El icono de la escala */
-/* https://developer.gnome.org/gtk3/stable/chap-css-overview.html */
+/* El icono de la escala https://developer.gnome.org/gtk3/stable/chap-css-overview.html */
 slider {
     background-image: image(@green3);
     background-color: @green3;
     outline-style: outset;
     border: 0.1em solid black;
     border-radius: 100%;
-    /* box-shadow: 0.1em 0.1em 0.1em black, -0.1em -0.1em 0.1em black, 0.1em -0.1em 0.1em black, -0.1em 0.1em 0.1em black; */
 }
 /* canal sin reproducir */
 trough {
@@ -127,9 +157,26 @@ trough highlight{
     background-image: image(white);
     background-color: white;
     border: none;
-    opacity: 1;
-    animation: fade 1s;
 }
+
+/*
+@keyframes playing_anim {
+    0% {
+        background-image: image(@bg_toolbar3);
+        background-color: @bg_toolbar3;
+    }
+  
+    50% {
+        background-image: image(@bg_toolbar1);
+        background-color: @bg_toolbar1;
+    }
+  
+    100% {
+        background-image: image(@bg_toolbar3);
+        background-color: @bg_toolbar3;
+    }
+  }
+*/
 
 /*
 FIME: scrollbars
@@ -140,6 +187,12 @@ help
 credits
 toolbar busquedas
 mejorar transiciones en botones
+cargar subtítulos
+cargar listas de radio o televisión
+copiar, mover, borrar
+convertir
+informacion de duración, tamaño y codecs
+establecer orden de foco en la toolbar de busqueda
 */
 .coso {
 color: #388E3C;
@@ -147,4 +200,17 @@ color: #4CAF50;
 color: #C8E6C9;
 }
 
-@keyframes fade {0% {opacity: 0;}100% {opacity: 1;}}
+/*Notas:
+
+def on_button_clicked(self, widget, valid):
+    style_context = widget.get_style_context()
+    if valid:
+        style_context.add_class("bigger")
+    else:
+        style_context.remove_class("bigger")
+
+self.set_css_name('toolbarsalir')
+self.set_name('toolbarsalir')
+
+background-image: -gtk-gradient (linear,left top, left bottom,from (cyan),to (shade (red, 0.95)));
+*/

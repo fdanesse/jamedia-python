@@ -5,7 +5,6 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 
-from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
 
 
@@ -15,7 +14,8 @@ class AlertaBusqueda(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("window1"))
+        self.set_css_name('alertabusquedas')
+        self.set_name('alertabusquedas')
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
@@ -23,7 +23,6 @@ class AlertaBusqueda(Gtk.Toolbar):
         item.set_expand(True)
         self.label = Gtk.Label("")
         self.label.set_justify(Gtk.Justification.LEFT)
-        #self.label.set_line_wrap(True)
         self.label.show()
         item.add(self.label)
         self.insert(item, -1)

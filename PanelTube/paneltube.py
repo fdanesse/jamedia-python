@@ -53,44 +53,24 @@ class PanelTube(Gtk.HPaned):
         
         # Izquierda       
         box = Gtk.VBox()
-
         box.pack_start(self.toolbar_encontrados, False, False, 0)
-
-        '''event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
-        event.add(self.toolbar_guardar_encontrados)
-        box.pack_start(event, False, False, 0)'''
-
+        #box.pack_start(self.toolbar_guardar_encontrados, False, False, 0)
         scroll = self.__get_scroll()
-        event = Gtk.EventBox()
-        event.add(self.encontrados)
-        scroll.add_with_viewport(event)
+        scroll.add_with_viewport(self.encontrados)
         box.pack_start(scroll, True, True, 0)
-
         box.pack_start(self.toolbar_accion_izquierda, False, False, 0)
         box.pack_start(self.toolbar_videos_izquierda, False, False, 0)
-
         self.pack1(box, resize=False, shrink=False)
 
         # Derecha
         box = Gtk.VBox()
-
         box.pack_start(self.toolbar_descargar, False, False, 0)
-
-        '''event = Gtk.EventBox()
-        event.modify_bg(Gtk.StateType.NORMAL, get_colors("drawingplayer1"))
-        event.add(self.toolbar_guardar_descargar)
-        box.pack_start(event, False, False, 0)'''
-
+        #box.pack_start(self.toolbar_guardar_descargar, False, False, 0)
         scroll = self.__get_scroll()
-        event = Gtk.EventBox()
-        event.add(self.descargar)
-        scroll.add_with_viewport(event)
+        scroll.add_with_viewport(self.descargar)
         box.pack_start(scroll, True, True, 0)
-
         box.pack_start(self.toolbar_accion_derecha, False, False, 0)
         box.pack_start(self.toolbar_videos_derecha, False, False, 0)
-
         self.pack2(box, resize=False, shrink=False)
 
         self.show_all()
@@ -219,8 +199,7 @@ class PanelTube(Gtk.HPaned):
 
     def __comenzar_descarga(self, widget):
         """
-        Envia la señal descargar para comenzar la descarga de un video en la
-        lista, cuando el usuario hace click en el boton descargar.
+        Comenzar la descarga.
         """
         #FIXME: map(self.__cancel_toolbars, self.toolbars_flotantes)
         self.emit('download')
@@ -310,8 +289,7 @@ class PanelTube(Gtk.HPaned):
 
     def __update_next(self, widget, items):
         """
-        Un video ha actualizado sus metadatos, lanza la actualización del
-        siguiente video manteniendo lo mas baja posible la actividad en la red.
+        Un video ha actualizado sus metadatos, lanza la actualización del siguiente.
         """
         if widget:
             widget.set_sensitive(True)
