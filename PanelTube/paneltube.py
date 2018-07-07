@@ -57,7 +57,7 @@ class PanelTube(Gtk.HPaned):
         
         # Izquierda       
         box = Gtk.VBox()
-        box.pack_start(self.toolbar_encontrados, False, False, 0)
+        #box.pack_start(self.toolbar_encontrados, False, False, 0)
         #box.pack_start(self.toolbar_guardar_encontrados, False, False, 0)
         scroll = self.__get_scroll()
         scroll.add_with_viewport(self.encontrados)
@@ -68,7 +68,7 @@ class PanelTube(Gtk.HPaned):
 
         # Derecha
         box = Gtk.VBox()
-        box.pack_start(self.toolbar_descargar, False, False, 0)
+        #box.pack_start(self.toolbar_descargar, False, False, 0)
         #box.pack_start(self.toolbar_guardar_descargar, False, False, 0)
         scroll = self.__get_scroll()
         scroll.add_with_viewport(self.descargar)

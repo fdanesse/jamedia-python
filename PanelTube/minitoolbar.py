@@ -31,11 +31,13 @@ class Mini_Toolbar(Gtk.Toolbar):
         self.set_css_name('minitoolbar')
         self.set_name('minitoolbar')
 
-        self.label = None
         self.texto = text
         self.numero = 0
 
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+
         item = Gtk.ToolItem()
+        item.set_expand(False)
         self.label = Gtk.Label("%s: %s" % (text, self.numero))
         self.label.show()
         item.add(self.label)
