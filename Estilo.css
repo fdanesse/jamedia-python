@@ -6,15 +6,15 @@
 
 @define-color bg_toolbar1 #778899;
 @define-color bg_toolbar2 #e9b96e;
-@define-color bg_toolbar3 #FFECB3;
-/*@define-color bg_widgetvideo #f0e6aa;*/
 @define-color jamedia1 #ff6600;
+@define-color jamedia2 #FF9800;
+@define-color jamedia3 #FFE0B2;
 @define-color green1 #388E3C; /* dark primary */
 @define-color green2 #4CAF50; /* primary */
 @define-color green3 #C8E6C9; /* ligth primary */
 
 window {
-    background-image: image(white);
+    /*background-image: image(white);*/
     background-color: white; 
     color: black;
     font: 10pt "Comic Sans";
@@ -22,20 +22,21 @@ window {
 }
 
 toolbar {
+    /*background-image: image(@bg_toolbar1);*/
     background-color: @bg_toolbar1;
 }
 
 button {
-    background-image: image(@bg_toolbar1);
+    /*background-image: image(@bg_toolbar1);*/
     background-color: @bg_toolbar1;
     border-radius: 8%;
     border: 0.1em solid @bg_toolbar1;
     margin: 0;
     padding: 0;
-    transition: background-color 300ms ease-in-out;
+    /*FIXME: No funciona. transition: background-color 500ms ease-in-out;*/
 }
 button:hover {
-    background-image: image(@green3);
+    /*background-image: image(@green3);*/
     background-color: @green3;
     border-radius: 8%;
     border: 0.1em solid @green3;
@@ -43,7 +44,7 @@ button:hover {
     padding: 0;
 }
 button:checked {
-    background-image: image(@green3);
+    /*background-image: image(@green3);*/
     background-color: @green3;
     border-radius: 8%;
     border: 0.01em solid black;
@@ -60,12 +61,12 @@ button:checked {
 }
 
 #toolbarbusquedas {
-    background-color: @bg_toolbar2;
-    border: 0.1em solid @jamedia1;
+    background-color: @jamedia3;
+    border: 0.1em solid @green2;
 }
 #toolbarbusquedas button {
-    background-image: image(@green2);
-    background-color: @green2;
+    /*background-image: image(@jamedia1);*/
+    background-color: @jamedia1;
     border-radius: 8%;
     border: 0.1em solid @green2;
     padding-left: 15px;
@@ -74,10 +75,10 @@ button:checked {
     font-size: 12pt;
 }
 #toolbarbusquedas button:hover {
-    background-image: image(@green3);
-    background-color: @green3;
+    /*background-image: image(@jamedia2);*/
+    background-color: @jamedia2;
     border-radius: 8%;
-    border: 0.1em solid @green3;
+    border: 0.1em solid @green2;
     padding-left: 15px;
     padding-right: 15px;
     font-weight: bold;
@@ -85,7 +86,7 @@ button:checked {
 }
 
 #alertabusquedas {
-    background-image: image(@jamedia1);
+    /*background-image: image(@jamedia1);*/
     background-color: @jamedia1;
     border: 0.1em solid @jamedia1;
     font-weight: bold;
@@ -106,18 +107,27 @@ button:checked {
 }
 
 #progressplayer button {
-    margin: 0;
     margin-left: 3px;
     margin-right: 3px;
-    padding: 0;
     padding-left: 3px;
     padding-right: 3px;
     border-radius: 100%;
 }
 
+#toolbarvideos button {
+    margin-left: 2px;
+    margin-right: 2px;
+    border-radius: 100%;
+}
+
+#minitoolbar button {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
 /* Barra de Progreso */
 scale {
-    background-image: image(@bg_toolbar1);
+    /*background-image: image(@bg_toolbar1);*/
     background-color: @bg_toolbar1;
     border-radius: 0;
     border: none;
@@ -128,42 +138,60 @@ scale {
 }
 /* El icono de la escala https://developer.gnome.org/gtk3/stable/chap-css-overview.html */
 slider {
-    background-image: image(@green3);
-    background-color: @green3;
+    /*background-image: image(white);*/
+    background-color: white;
     outline-style: outset;
     border: 0.1em solid black;
     border-radius: 100%;
 }
 /* canal sin reproducir */
 trough {
-    background-image: image(@green3);
-    background-color: @green3;
+    /*background-image: image(gray);*/
+    background-color: gray;
     outline-style: outset;
-    border: 0.1em solid @green3;
+    border: 0.1em solid black;
     border-radius: 2px;
-    box-shadow: 0.1em 0.1em 0.1em black, -0.1em -0.1em 0.1em black, 0.1em -0.1em 0.1em black, -0.1em 0.1em 0.1em black;
+    /*box-shadow: 0.1em 0.1em 0.1em black, -0.1em -0.1em 0.1em black, 0.1em -0.1em 0.1em black, -0.1em 0.1em 0.1em black;*/
 }
 /* canal reproducido */
 trough highlight{
-    background-image: image(@green1);
-    background-color: @green1;
+    /*background-image: image(white);*/
+    background-color: white;
     outline-style: outset;
-    border: 0.1em solid @green1;
+    border: 0.1em solid black;
     border-radius: 2px;
-    box-shadow: 0.1em 0.1em 0.1em black, -0.1em -0.1em 0.1em black, 0.1em -0.1em 0.1em black, -0.1em 0.1em 0.1em black;
+    /*box-shadow: 0.1em 0.1em 0.1em black, -0.1em -0.1em 0.1em black, 0.1em -0.1em 0.1em black, -0.1em 0.1em 0.1em black;*/
 }
 
 #paneltube {
-    background-image: image(white);
+    /*background-image: image(white);*/
     background-color: white;
     border: none;
+}
+
+#videoitem {
+    /*background-image: image(@green3);*/
+    background-color: @green3;
+    border: 1px @bg_toolbar1 solid;
+    outline-style: outset;
+    border-radius: 8px;
+}
+#videoitem image {
+    border: 1px @jamedia3 solid;
+    outline-style: outset;
+    border-radius: 8px;
+    margin: 4px;
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.8), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
+}
+#videocontainer, #videoitemHB {
+    padding: 8px;
 }
 
 /*
 @keyframes playing_anim {
     0% {
-        background-image: image(@bg_toolbar3);
-        background-color: @bg_toolbar3;
+        background-image: image(@jamedia3);
+        background-color: @jamedia3;
     }
   
     50% {
@@ -172,20 +200,18 @@ trough highlight{
     }
   
     100% {
-        background-image: image(@bg_toolbar3);
-        background-color: @bg_toolbar3;
+        background-image: image(@jamedia3);
+        background-color: @jamedia3;
     }
   }
 */
 
 /*
 FIME: scrollbars
-background ventana
 iconos en blanco y negro
 treeview
 help
 credits
-toolbar busquedas
 mejorar transiciones en botones
 cargar subtítulos
 cargar listas de radio o televisión
@@ -193,11 +219,24 @@ copiar, mover, borrar
 convertir
 informacion de duración, tamaño y codecs
 establecer orden de foco en la toolbar de busqueda
+que en la toolbar de busquedas aparezca: Actualizando metadatos de video ... ?
+reparar toolbar videos en paneltube
+reparar toolbar encontrados para que muestre el texto mientras se actualizan los metadatos, quizas sea mejor
+mantener la alerta abierta y actualizar alli estos datos
+en los video items agregar botones para borrar, descargar, convertir, etc ...
+cambiar colores de progressbar
+cambiar colores de toolbar salir
+agregar imagen de arrastre en drag and drop de paneltube
 */
 .coso {
-color: #388E3C;
-color: #4CAF50;
-color: #C8E6C9;
+    color: #778899; /*bg_toolbar1*/
+    color: #e9b96e; /*bg_toolbar2*/
+    color: #ff6600; /*jamedia1*/
+    color: #FF9800; /*jamedia2*/
+    color: #FFE0B2; /*jamedia3*/
+    color: #388E3C; /*green1*/
+    color: #4CAF50; /*green2*/
+    color: #C8E6C9; /*green3*/
 }
 
 /*Notas:

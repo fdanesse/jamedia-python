@@ -223,7 +223,7 @@ class JAMedia(Gtk.Window):
         videowidget.show_all()
         videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
         videos.remove(videos[0])
-        destino.pack_start(videowidget, False, False, 1)
+        destino.pack_start(videowidget, False, False, 3)
 
         self.alerta_busqueda.label.set_text(texto)
         GLib.idle_add(self.__add_videos, videos, destino, sensitive)

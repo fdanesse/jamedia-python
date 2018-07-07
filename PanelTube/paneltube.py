@@ -40,14 +40,18 @@ class PanelTube(Gtk.HPaned):
         self.toolbar_encontrados = Mini_Toolbar("Videos Encontrados")
         #self.toolbar_guardar_encontrados = Toolbar_Guardar()
         self.encontrados = Gtk.VBox()  # Contenedor de WidgetVideoItems
-        
+        self.encontrados.set_css_name('videocontainer')
+        self.encontrados.set_name('videocontainer')
+
         self.toolbar_accion_izquierda = ToolbarAccionListasVideos()  # Confirmar borrar lista de videos
         self.toolbar_videos_izquierda = Toolbar_Videos_Izquierda()
         
         self.toolbar_descargar = Mini_Toolbar("Videos Para Descargar")
         #self.toolbar_guardar_descargar = Toolbar_Guardar()
         self.descargar = Gtk.VBox()  # Contenedor de WidgetVideoItems
-        
+        self.descargar.set_css_name('videocontainer')
+        self.descargar.set_name('videocontainer')
+
         self.toolbar_accion_derecha = ToolbarAccionListasVideos()  # Confirmar borrar lista de videos
         self.toolbar_videos_derecha = Toolbar_Videos_Derecha()
         
@@ -230,7 +234,7 @@ class PanelTube(Gtk.HPaned):
             return False
         if elementos[0].get_parent() == origen:
             origen.remove(elementos[0])
-            destino.pack_start(elementos[0], False, False, 1)
+            destino.pack_start(elementos[0], False, False, 3)
             elementos[0].set_tooltip_text(text)
         elementos.remove(elementos[0])
         GLib.idle_add(self.__ejecutar_mover_videos, origen, destino, text, elementos)

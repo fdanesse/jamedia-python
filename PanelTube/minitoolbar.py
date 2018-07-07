@@ -12,7 +12,6 @@ from gi.repository import GObject
 #from PanelTube.tubelistdialog import TubeListDialog
 
 from JAMediaPlayer.Globales import get_data_directory
-from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
 from JAMediaPlayer.Globales import ICONS_PATH
@@ -28,6 +27,9 @@ class Mini_Toolbar(Gtk.Toolbar):
     def __init__(self, text):
 
         Gtk.Toolbar.__init__(self)
+
+        self.set_css_name('minitoolbar')
+        self.set_name('minitoolbar')
 
         self.label = None
         self.texto = text

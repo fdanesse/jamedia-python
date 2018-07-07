@@ -10,10 +10,8 @@ from gi.repository import GObject
 from gi.repository import GdkPixbuf
 
 import urllib
-import base64
+#import base64
 import subprocess
-
-from JAMediaPlayer.Globales import get_colors
 
 youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")  #"/usr/bin/youtube-dl"
 
@@ -30,15 +28,15 @@ class WidgetVideoItem(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
-        self.modify_bg(Gtk.StateType.NORMAL, get_colors("widgetvideoitem1"))
-        self.set_border_width(2)
-
+        self.set_css_name('videoitem')
+        self.set_name('videoitem')
+        
         self._temp_dat = []
         self.videodict = videodict
 
         hbox = Gtk.HBox()
-        vbox = Gtk.VBox()
-
+        hbox.set_css_name('videoitemHB')
+        hbox.set_name('videoitemHB')
         self.imagen = Gtk.Image()
         hbox.pack_start(self.imagen, False, False, 3)
 
@@ -80,6 +78,7 @@ class WidgetVideoItem(Gtk.EventBox):
         self.id_duracion = Gtk.Label("%s: %s %s" % ("Duración", self.videodict["duracion"], "Minutos"))
         self.id_url = Gtk.Label("%s: %s" % ("url", self.videodict["url"]))
 
+        vbox = Gtk.VBox()
         vbox.pack_start(self.id_label, True, True, 0)
         vbox.pack_start(self.id_titulo, True, True, 0)
         vbox.pack_start(self.id_categoria, True, True, 0)

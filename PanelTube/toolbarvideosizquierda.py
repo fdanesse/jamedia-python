@@ -22,6 +22,9 @@ class Toolbar_Videos_Izquierda(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
+        self.set_css_name('toolbarvideos')
+        self.set_name('toolbarvideos')
+
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
         boton = get_boton(os.path.join(ICONS_PATH, "alejar.svg"), flip=False, pixels=24, tooltip_text="Borrar Lista")
