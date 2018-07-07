@@ -64,6 +64,8 @@ class JAMedia(Gtk.Window):
         boxbase = Gtk.VBox()
 
         self.box_tube = Gtk.VBox()
+        self.box_tube.set_css_name('boxtube')
+        self.box_tube.set_name('boxtube')
         self.toolbar = Toolbar()
         self.toolbar_busqueda = ToolbarBusquedas()
         self.toolbar_descarga = ToolbarDescargas()
@@ -174,7 +176,7 @@ class JAMedia(Gtk.Window):
             # comenzado a descargar y por lo tanto, no tiene padre.
             try:
                 videoitem.get_parent().remove(videoitem)
-                destino.pack_start(videoitem, False, False, 1)
+                destino.pack_start(videoitem, False, False, 3)
             except:
                 return
             if destino == self.paneltube.descargar:

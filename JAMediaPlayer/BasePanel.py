@@ -20,7 +20,8 @@ class BasePanel(Gtk.HPaned):
 
         Gtk.HPaned.__init__(self)
 
-        # FIXME: self.set_border_width(2)
+        self.set_css_name('jamediaplayerpanel')
+        self.set_name('jamediaplayerpanel')
 
         self.izquierda = Izquierda()
         self.derecha = Derecha()

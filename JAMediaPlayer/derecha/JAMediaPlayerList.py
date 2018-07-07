@@ -37,6 +37,8 @@ class PlayerList(Gtk.Frame):
         self.lista = Lista()
 
         scroll = Gtk.ScrolledWindow()
+        scroll.set_css_name('scrolllist')
+        scroll.set_name('scrolllist')
         scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll.add(self.lista)
 

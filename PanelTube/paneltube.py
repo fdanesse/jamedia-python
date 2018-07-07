@@ -277,6 +277,8 @@ class PanelTube(Gtk.HPaned):
 
     def __get_scroll(self):
         scroll = Gtk.ScrolledWindow()
+        scroll.set_css_name('scrolllist')
+        scroll.set_name('scrolllist')
         scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         return scroll
 

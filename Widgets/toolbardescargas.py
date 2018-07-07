@@ -10,7 +10,6 @@ from gi.repository import GObject
 
 from PanelTube.jamediayoutube import JAMediaYoutube
 
-from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Widgets.ProgressPlayer import BarraProgreso
 
@@ -24,8 +23,12 @@ class ToolbarDescargas(Gtk.VBox):
 
         Gtk.VBox.__init__(self)
 
+        self.set_css_name('vboxdescargas')
+        self.set_name('vboxdescargas')
+
         self.toolbar = Gtk.Toolbar()
-        self.toolbar.modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
+        self.toolbar.set_css_name('toolbardescargas')
+        self.toolbar.set_name('toolbardescargas')
 
         self.progress = 0.0
         self.estado = False
@@ -68,7 +71,6 @@ class ToolbarDescargas(Gtk.VBox):
         #self.toolbar.insert(G.get_separador(draw = False, ancho = 3, expand = False), -1)
 
         self.barra_progreso = BarraProgreso()
-        self.barra_progreso.modify_bg(Gtk.StateType.NORMAL, get_colors("download"))
         self.barra_progreso.show()
 
         self.pack_start(self.toolbar, False, False, 0)
