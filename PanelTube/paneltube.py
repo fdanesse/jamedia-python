@@ -202,20 +202,12 @@ class PanelTube(Gtk.HPaned):
     '''
 
     def __comenzar_descarga(self, widget):
-        """
-        Comenzar la descarga.
-        """
-        #FIXME: map(self.__cancel_toolbars, self.toolbars_flotantes)
+        self.emit("cancel_toolbar")
         self.emit('download')
 
     def __mover_videos(self, widget):
-        """
-        Pasa todos los videos de una lista a otra.
-        """
         #FIXME: Eliminar Repetidos
-        #self.set_sensitive(False)
-        #self.get_toplevel().toolbar_busqueda.set_sensitive(False)
-        #map(self.__cancel_toolbars, self.toolbars_flotantes)
+        self.emit("cancel_toolbar")
         if widget == self.toolbar_videos_izquierda:
             origen = self.encontrados
             destino = self.descargar
@@ -229,8 +221,6 @@ class PanelTube(Gtk.HPaned):
 
     def __ejecutar_mover_videos(self, origen, destino, text, elementos):
         if not elementos:
-            #self.set_sensitive(True)
-            #self.get_toplevel().toolbar_busqueda.set_sensitive(True)
             return False
         if elementos[0].get_parent() == origen:
             origen.remove(elementos[0])
@@ -240,18 +230,12 @@ class PanelTube(Gtk.HPaned):
         GLib.idle_add(self.__ejecutar_mover_videos, origen, destino, text, elementos)
     
     def __ejecutar_borrar(self, widget, objetos):
-        #self.set_sensitive(False)
-        #self.get_toplevel().toolbar_busqueda.set_sensitive(False)
+        self.emit("cancel_toolbar")
         for objeto in objetos:
             objeto.destroy()
-        #self.set_sensitive(True)
-        #self.get_toplevel().toolbar_busqueda.set_sensitive(True)
     
     def __set_borrar(self, widget):
-        """
-        Llama a toolbar accion para pedir confirmacion sobre borrar una lista de videos de la lista.
-        """
-        self.cancel_toolbars_flotantes()
+        self.emit("cancel_toolbar")
         if widget == self.toolbar_videos_izquierda:
             objetos = self.encontrados.get_children()
             if not objetos or objetos == None:
@@ -282,17 +266,6 @@ class PanelTube(Gtk.HPaned):
         scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         return scroll
 
-    '''
-    def __cancel_toolbars(self, widget):
-        """
-        Cuando se activa un menú o se muestra una toolbar flotante, se ocultan
-        todas las demás y se envía la señal para ocultar otras toolbars
-        flotantes en la raíz de la aplicación.
-        """
-        self.emit("cancel_toolbar")
-        widget.cancelar()
-    '''
-
     def __update_next(self, widget, items):
         """
         Un video ha actualizado sus metadatos, lanza la actualización del siguiente.
@@ -316,6 +289,7 @@ class PanelTube(Gtk.HPaned):
             self.__update_next(False, items)
 
     def cancel_toolbars_flotantes(self, widget=None):
+        print ("Cancelar")
         for toolbar in self.toolbars_flotantes:
             toolbar.cancelar()
 

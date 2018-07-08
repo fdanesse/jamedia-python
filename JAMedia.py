@@ -102,8 +102,7 @@ class JAMedia(Gtk.Window):
         context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_SETTINGS)
 
     def __realized(self, widget):
-        self.toolbar_salir.cancelar()
-        self.paneltube.cancel_toolbars_flotantes()
+        self.__cancel_toolbars()
         ocultar([self.toolbar_descarga, self.alerta_busqueda])
         if self.archivos:
             self.__switch(None, 'jamedia')
@@ -131,11 +130,15 @@ class JAMedia(Gtk.Window):
         self.paneltube.connect('download', self.__run_download)
         #self.paneltube.connect('open_shelve_list', self.__open_shelve_list)
         self.toolbar_descarga.connect('end', self.__run_download)
-        self.paneltube.connect("cancel_toolbar", self.toolbar_salir.cancelar)
+        self.paneltube.connect("cancel_toolbar", self.__cancel_toolbars)
         self.buscador.connect("encontrado", self.__add_video_encontrado)
         self.buscador.connect("end", self.paneltube.update_widgets_videos_encontrados)
         
         self.resize(640, 480)
+
+    def __cancel_toolbars(self, widget=None):
+        self.toolbar_salir.cancelar()
+        self.paneltube.cancel_toolbars_flotantes()
 
     '''
     def __open_shelve_list(self, widget, shelve_list, toolbarwidget):
@@ -188,8 +191,7 @@ class JAMedia(Gtk.Window):
     def __comenzar_busqueda(self, widget, palabras, cantidad):
         self.paneltube.set_sensitive(False)
         self.toolbar_busqueda.set_sensitive(False)
-        self.toolbar_salir.cancelar()
-        self.paneltube.cancel_toolbars_flotantes()
+        self.__cancel_toolbars()
         self.alerta_busqueda.show()
         self.alerta_busqueda.label.set_text("Buscando: %s..." % (palabras))
         objetos = self.paneltube.encontrados.get_children()
@@ -241,7 +243,7 @@ class JAMedia(Gtk.Window):
 
     def __confirmar_salir(self, widget=None, senial=None):
         self.paneltube.cancel_toolbars_flotantes()
-        self.toolbar_salir.run("JAMediaTube")
+        self.toolbar_salir.run()
 
     def __salir(self, widget=None, senial=None):
         Gtk.main_quit()

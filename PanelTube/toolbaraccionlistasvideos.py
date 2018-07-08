@@ -21,31 +21,26 @@ class ToolbarAccionListasVideos(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
+        self.set_css_name('toolbaraccionvideos')
+        self.set_name('toolbaraccionvideos')
+
         self.objetos = None
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        archivo = os.path.join(ICONS_PATH, "button-cancel.svg")
-        boton = get_boton(archivo, flip=False, pixels=24)
+        boton = Gtk.ToolButton()
+        boton.set_label('Cancelar')
         boton.set_tooltip_text("Cancelar")
         boton.connect("clicked", self.cancelar)
         self.insert(boton, -1)
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        item = Gtk.ToolItem()
-        self.label = Gtk.Label("")
-        self.label.show()
-        item.add(self.label)
-        self.insert(item, -1)
-
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
-
-        '''archivo = os.path.join(ICONS_PATH, "dialog-ok.svg")
-        boton = get_boton(archivo, flip=False, pixels=24)
-        boton.set_tooltip_text("Aceptar")
+        boton = Gtk.ToolButton()
+        boton.set_label('Descartar')
+        boton.set_tooltip_text("Descartar")
         boton.connect("clicked", self.__realizar_accion)
-        self.insert(boton, -1)'''
+        self.insert(boton, -1)
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
@@ -61,11 +56,9 @@ class ToolbarAccionListasVideos(Gtk.Toolbar):
 
     def set_accion(self, objetos):
         self.objetos = objetos
-        self.label.set_text("¿Eliminar?")
         self.show_all()
 
     def cancelar(self, widget=None):
         self.objetos = None
-        self.label.set_text("")
         self.hide()
         

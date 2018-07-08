@@ -14,6 +14,10 @@
 @define-color green3 #C8E6C9; /* ligth primary */
 @define-color border rgba(0,0,0, 0.5);
 
+x {
+    color: rgba(76, 175, 80, 0.5);
+}
+
 window {
     background-image: image(white);
     background-color: white; 
@@ -55,13 +59,24 @@ button:checked {
     padding: 0;
 }
 
-#toolbarsalir{
-    background-image: image(@jamedia1);
-    background-color: @jamedia1;
+#toolbarsalir, #toolbaraccionvideos{
+    background-image: image(@jamedia2);
+    background-color: @jamedia2;
     padding: 10px;
     border: 1px solid @border;
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.8), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
 }
-#toolbarsalir button {
+#toolbarsalir button, toolbaraccionvideos button {
+    background-image: image(@green2);
+    background-color: @green2;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-weight: bold;
+    border: 1px solid @border;
+}
+#toolbarsalir button:hover, toolbaraccionvideos button:hover {
+    background-image: image(@green3);
+    background-color: @green3;
     padding-left: 5px;
     padding-right: 5px;
     font-weight: bold;
@@ -73,6 +88,7 @@ button:checked {
     background-color: @jamedia3;
     border: 1px solid @border;
 }
+
 #vboxdescargas {
     background-image: image(@jamedia2);
     background-color: @jamedia2;
@@ -124,12 +140,7 @@ button:checked {
     animation-iteration-count: infinite;*/
 }
 
-#toolbarcontrols button {
-    margin-left: 3px;
-    border-radius: 100%;
-}
-
-#toolbarinfo button {
+#toolbarcontrols button, #toolbarinfo button {
     margin-left: 3px;
     border-radius: 100%;
 }

@@ -45,8 +45,11 @@ class ToolbarSalir(Gtk.Toolbar):
         self.cancelar()
         self.emit('salir')
 
-    def run(self, nombre_aplicacion):
-        self.show()
+    def run(self):
+        if self.get_visible():
+            self.cancelar()
+        else:
+            self.show()
 
     def cancelar(self, widget=None):
         self.hide()
