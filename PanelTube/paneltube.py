@@ -251,7 +251,7 @@ class PanelTube(Gtk.HPaned):
     
     def __update(self):
         """
-        Actualiza información en toolbars de videos encontrados y en descaga.
+        FIXME:Actualiza información en toolbars de videos encontrados y en descaga.
         """
         encontrados = len(self.encontrados.get_children())
         endescargas = len(self.descargar.get_children())
@@ -289,7 +289,6 @@ class PanelTube(Gtk.HPaned):
             self.__update_next(False, items)
 
     def cancel_toolbars_flotantes(self, widget=None):
-        print ("Cancelar")
         for toolbar in self.toolbars_flotantes:
             toolbar.cancelar()
 
@@ -297,6 +296,7 @@ class PanelTube(Gtk.HPaned):
         """
         widgets de videos actualizan sus metadatos.
         """
+        # FIXME: Solo los video items deben estar inactivos hasta que se actualicen sus metadatos
         self.toolbar_videos_izquierda.set_sensitive(False)
         self.toolbar_encontrados.set_sensitive(False)
         items = list(self.encontrados.get_children())

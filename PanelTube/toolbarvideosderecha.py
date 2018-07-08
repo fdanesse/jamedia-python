@@ -28,7 +28,7 @@ class Toolbar_Videos_Derecha(Gtk.Toolbar):
         self.set_name('toolbarvideos')
         
         boton = get_boton(os.path.join(ICONS_PATH, "play.svg"), flip=True, pixels=24, tooltip_text="Quitar de Descargas")
-        boton.connect("clicked", self.__emit_aencontrados)
+        boton.connect("clicked", self.__emit_encontrados)
         self.insert(boton, -1)
 
         boton = get_boton(os.path.join(ICONS_PATH, "alejar.svg"), flip=False, pixels=24, tooltip_text="Borrar Lista")
@@ -46,7 +46,7 @@ class Toolbar_Videos_Derecha(Gtk.Toolbar):
     def __emit_comenzar_descarga(self, widget):
         self.emit('comenzar_descarga')
 
-    def __emit_aencontrados(self, widget):
+    def __emit_encontrados(self, widget):
         self.emit('mover_videos')
 
     def __emit_borrar(self, widget):

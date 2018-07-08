@@ -28,8 +28,8 @@ class Mini_Toolbar(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.set_css_name('minitoolbar')
-        self.set_name('minitoolbar')
+        style_context = self.get_style_context()
+        style_context.add_class("minitoolbar")
 
         self.texto = text
         self.numero = 0

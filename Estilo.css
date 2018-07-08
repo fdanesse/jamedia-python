@@ -5,18 +5,13 @@
 /*https://developer.gnome.org/gtk3/stable/chap-css-properties.html*/
 
 @define-color bg_toolbar1 #778899;
-@define-color bg_toolbar2 #e9b96e;
 @define-color jamedia1 #ff6600;
 @define-color jamedia2 #FF9800;
 @define-color jamedia3 #FFE0B2;
-@define-color green1 #388E3C; /* dark primary */
-@define-color green2 #4CAF50; /* primary */
-@define-color green3 #C8E6C9; /* ligth primary */
+@define-color green1 #388E3C;
+@define-color green2 #4CAF50;
+@define-color green3 #C8E6C9;
 @define-color border rgba(0,0,0, 0.5);
-
-x {
-    color: rgba(76, 175, 80, 0.5);
-}
 
 window {
     background-image: image(white);
@@ -59,34 +54,30 @@ button:checked {
     padding: 0;
 }
 
-#toolbarsalir, #toolbaraccionvideos{
+#toolbarsalir, .toolbaraccionvideos{
     background-image: image(@jamedia2);
     background-color: @jamedia2;
     padding: 10px;
     border: 1px solid @border;
     box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.8), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
 }
-#toolbarsalir button, toolbaraccionvideos button {
+#toolbarsalir button, .toolbaraccionvideos button {
     background-image: image(@green2);
     background-color: @green2;
     padding-left: 5px;
     padding-right: 5px;
     font-weight: bold;
     border: 1px solid @border;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
 }
-#toolbarsalir button:hover, toolbaraccionvideos button:hover {
+#toolbarsalir button:hover, .toolbaraccionvideos button:hover {
     background-image: image(@green3);
     background-color: @green3;
     padding-left: 5px;
     padding-right: 5px;
     font-weight: bold;
     border: 1px solid @border;
-}
-
-#toolbarbusquedas {
-    background-image: image(@jamedia3);
-    background-color: @jamedia3;
-    border: 1px solid @border;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
 }
 
 #vboxdescargas {
@@ -108,24 +99,31 @@ button:checked {
     margin:3px;
 }
 
+#toolbarbusquedas {
+    background-image: image(@jamedia3);
+    background-color: @jamedia3;
+    border: 1px solid @border;
+}
 #toolbarbusquedas button {
-    /*background-image: image(@jamedia1);*/
+    background-image: image(@jamedia1);
     background-color: @jamedia1;
     border-radius: 8%;
     border: 1px solid @border;
     padding-left: 15px;
     padding-right: 15px;
     font-weight: bold;
-    font-size: 12pt;
+    font-size: 10pt;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
 }
 #toolbarbusquedas button:hover {
-    /*background-image: image(@jamedia2);*/
+    background-image: image(@jamedia2);
     background-color: @jamedia2;
     border-radius: 8%;
     padding-left: 15px;
     padding-right: 15px;
     font-weight: bold;
-    font-size: 12pt;
+    font-size: 10pt;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
 }
 
 #alertabusquedas {
@@ -162,20 +160,20 @@ button:checked {
     border-radius: 100%;
 }
 
-#minitoolbar {
+/*.minitoolbar {
     background-image: image(@bg_toolbar1);
     background-color: @bg_toolbar1;
     margin: 0;
     padding: 3px;
 }
-#minitoolbar button {
+.minitoolbar button {
     margin-left: 2px;
     margin-right: 2px;
-}
+}*/
 
 /* Barra de Progreso */
 scale {
-    /*background-image: image(@bg_toolbar1);*/
+    background-image: image(@bg_toolbar1);
     background-color: @bg_toolbar1;
     border-radius: 0;
     border: none;
@@ -200,7 +198,6 @@ trough {
     border: 0.1em solid @border;
     border-radius: 2px;
     box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.3), 0 3px 6px 0 rgba(0, 0, 0, 0);
-    /*box-shadow: 0.1em 0.1em 0.1em black, -0.1em -0.1em 0.1em black, 0.1em -0.1em 0.1em black, -0.1em 0.1em 0.1em black;*/
 }
 /* canal reproducido */
 trough highlight{
@@ -209,7 +206,6 @@ trough highlight{
     outline-style: outset;
     border: 0.1em solid white;
     border-radius: 2px;
-    /*box-shadow: 0.1em 0.1em 0.1em black, -0.1em -0.1em 0.1em black, 0.1em -0.1em 0.1em black, -0.1em 0.1em 0.1em black;*/
 }
 
 #paneltube {
@@ -282,9 +278,7 @@ trough highlight{
 
 /*
 FIME:
-reparar toolbar accion videos
 agregar terminal con información de rendimiento
-scrollbars
 treeview
 help
 credits
@@ -302,10 +296,10 @@ en los video items agregar botones para borrar, descargar, convertir, guardar po
 en la toolbar busquedas, poder descargar una dirección específica
 agregar imagen de arrastre en drag and drop de paneltube
 cambiar minitoolbars por opciones en toolbar videos
+los botones en toolar videos se activan y desactivan si hay o no elementos en la lista, solo los video items se mantienen insensibles mientras actualizan metadatos
 */
 .coso {
     color: #778899; /*bg_toolbar1*/
-    color: #e9b96e; /*bg_toolbar2*/
     color: #ff6600; /*jamedia1*/
     color: #FF9800; /*jamedia2*/
     color: #FFE0B2; /*jamedia3*/

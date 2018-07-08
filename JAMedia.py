@@ -102,7 +102,6 @@ class JAMedia(Gtk.Window):
         context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_SETTINGS)
 
     def __realized(self, widget):
-        self.__cancel_toolbars()
         ocultar([self.toolbar_descarga, self.alerta_busqueda])
         if self.archivos:
             self.__switch(None, 'jamedia')
@@ -208,6 +207,7 @@ class JAMedia(Gtk.Window):
         self.__add_videos([video], self.paneltube.encontrados, sensitive=False)
 
     def __add_videos(self, videos, destino, sensitive=True):
+        #FIXME: cambiar, al parecer se pasa solo un video por vez
         if not videos:
             ocultar([self.alerta_busqueda])
             if sensitive:
@@ -234,6 +234,7 @@ class JAMedia(Gtk.Window):
         return False
 
     def __switch(self, widget, valor):
+        self.__cancel_toolbars()
         if valor == 'jamediatube':
             self.jamediaplayer.hide()
             self.box_tube.show()

@@ -6,6 +6,7 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 from gi.repository import GObject
+from gi.repository import GLib
 
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
@@ -21,8 +22,8 @@ class ToolbarAccionListasVideos(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.set_css_name('toolbaraccionvideos')
-        self.set_name('toolbaraccionvideos')
+        style_context = self.get_style_context()
+        style_context.add_class("toolbaraccionvideos")
 
         self.objetos = None
 
@@ -37,8 +38,8 @@ class ToolbarAccionListasVideos(Gtk.Toolbar):
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         boton = Gtk.ToolButton()
-        boton.set_label('Descartar')
-        boton.set_tooltip_text("Descartar")
+        boton.set_label('Limpiar')
+        boton.set_tooltip_text("Limpiar")
         boton.connect("clicked", self.__realizar_accion)
         self.insert(boton, -1)
 
@@ -56,7 +57,11 @@ class ToolbarAccionListasVideos(Gtk.Toolbar):
 
     def set_accion(self, objetos):
         self.objetos = objetos
-        self.show_all()
+        # FIXME: No funciona
+        if self.get_visible():
+            self.cancelar()
+        else:
+            self.show()
 
     def cancelar(self, widget=None):
         self.objetos = None

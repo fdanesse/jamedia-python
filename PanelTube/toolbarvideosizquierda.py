@@ -32,12 +32,12 @@ class Toolbar_Videos_Izquierda(Gtk.Toolbar):
         self.insert(boton, -1)
 
         boton = get_boton(os.path.join(ICONS_PATH, "play.svg"), flip=False, pixels=24, tooltip_text="Enviar a Descargas")
-        boton.connect("clicked", self.__emit_adescargas)
+        boton.connect("clicked", self.__emit_descargas)
         self.insert(boton, -1)
 
         self.show_all()
 
-    def __emit_adescargas(self, widget):
+    def __emit_descargas(self, widget):
         self.emit('mover_videos')
 
     def __emit_borrar(self, widget):
