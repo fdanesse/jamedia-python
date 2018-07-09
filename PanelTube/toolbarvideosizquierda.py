@@ -27,13 +27,16 @@ class Toolbar_Videos_Izquierda(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        boton = get_boton(os.path.join(ICONS_PATH, "alejar.svg"), flip=False, pixels=24, tooltip_text="Borrar Lista")
-        boton.connect("clicked", self.__emit_borrar)
-        self.insert(boton, -1)
+        self.__boton1 = get_boton(os.path.join(ICONS_PATH, "alejar.svg"), flip=False, pixels=24, tooltip_text="Borrar Lista")
+        self.__boton1.connect("clicked", self.__emit_borrar)
+        self.insert(self.__boton1, -1)
 
-        boton = get_boton(os.path.join(ICONS_PATH, "play.svg"), flip=False, pixels=24, tooltip_text="Enviar a Descargas")
-        boton.connect("clicked", self.__emit_descargas)
-        self.insert(boton, -1)
+        self.__boton2 = get_boton(os.path.join(ICONS_PATH, "play.svg"), flip=False, pixels=24, tooltip_text="Enviar a Descargas")
+        self.__boton2.connect("clicked", self.__emit_descargas)
+        self.insert(self.__boton2, -1)
+
+        self.__boton1.set_sensitive(False)
+        self.__boton2.set_sensitive(False)
 
         self.show_all()
 
@@ -42,3 +45,8 @@ class Toolbar_Videos_Izquierda(Gtk.Toolbar):
 
     def __emit_borrar(self, widget):
         self.emit('borrar')
+
+    def added_removed(self, widget):
+        print (widget, widget.get_children())
+        self.__boton1.set_sensitive(bool(widget.get_children()))
+        self.__boton2.set_sensitive(bool(widget.get_children()))

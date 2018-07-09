@@ -1,9 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-'''
-gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly gstreamer1.0-tools gstreamer1.0-libav
-'''
+# gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly gstreamer1.0-tools gstreamer1.0-libav
 
 import os
 import sys
@@ -25,14 +23,10 @@ from Widgets.toolbarbusquedas import ToolbarBusquedas
 from Widgets.alertabusquedas import AlertaBusqueda
 from Widgets.toolbardescargas import ToolbarDescargas
 from Widgets.toolbarsalir import ToolbarSalir
-
 from PanelTube.widgetvideoitem import WidgetVideoItem
 from PanelTube.paneltube import PanelTube
 from PanelTube.buscar import Buscar, FEED
-
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
-
-from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import ocultar
 
 BASE_PATH = os.path.dirname(__file__)
@@ -127,7 +121,6 @@ class JAMedia(Gtk.Window):
         self.jamediaplayer.connect('salir', self.__switch, 'jamediatube')
         self.toolbar_busqueda.connect("comenzar_busqueda", self.__comenzar_busqueda)
         self.paneltube.connect('download', self.__run_download)
-        #self.paneltube.connect('open_shelve_list', self.__open_shelve_list)
         self.toolbar_descarga.connect('end', self.__run_download)
         self.paneltube.connect("cancel_toolbar", self.__cancel_toolbars)
         self.buscador.connect("encontrado", self.__add_video_encontrado)
@@ -139,25 +132,6 @@ class JAMedia(Gtk.Window):
         self.toolbar_salir.cancelar()
         self.paneltube.cancel_toolbars_flotantes()
 
-    '''
-    def __open_shelve_list(self, widget, shelve_list, toolbarwidget):
-        """
-        Carga una lista de videos almacenada en un archivo en el area del
-        panel correspondiente según que toolbarwidget haya lanzado la señal.
-        """
-        self.paneltube.set_sensitive(False)
-        self.toolbar_busqueda.set_sensitive(False)
-        destino = False
-        if toolbarwidget == self.paneltube.toolbar_encontrados:
-            destino = self.paneltube.encontrados
-        elif toolbarwidget == self.paneltube.toolbar_descargar:
-            destino = self.paneltube.descargar
-        objetos = destino.get_children()
-        for objeto in objetos:
-            objeto.get_parent().remove(objeto)
-            objeto.destroy()
-        GLib.idle_add(self.__add_videos, shelve_list, destino)
-    '''
     def __run_download(self, widget):
         if self.toolbar_descarga.estado:
             return
@@ -165,6 +139,7 @@ class JAMedia(Gtk.Window):
         if videos:
             videos[0].get_parent().remove(videos[0])
             self.toolbar_descarga.download(videos[0])
+            self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
         else:
             self.toolbar_descarga.hide()
     
@@ -173,9 +148,7 @@ class JAMedia(Gtk.Window):
         if videoitem.get_parent() == destino:
             return
         else:
-            # El try siguiente es para evitar problemas cuando:
-            # El drag termina luego de que el origen se ha
-            # comenzado a descargar y por lo tanto, no tiene padre.
+            # NOTA: Para evitar problemas cuando el drag termina luego de que el origen se ha comenzado a descargar y por lo tanto, no tiene padre.
             try:
                 videoitem.get_parent().remove(videoitem)
                 destino.pack_start(videoitem, False, False, 3)
@@ -186,9 +159,10 @@ class JAMedia(Gtk.Window):
             elif destino == self.paneltube.encontrados:
                 text = TipEncontrados
             videoitem.set_tooltip_text(text)
+            self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
+            self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
 
     def __comenzar_busqueda(self, widget, palabras, cantidad):
-        self.paneltube.set_sensitive(False)
         self.toolbar_busqueda.set_sensitive(False)
         self.__cancel_toolbars()
         self.alerta_busqueda.show()
@@ -197,6 +171,7 @@ class JAMedia(Gtk.Window):
         for objeto in objetos:
             objeto.get_parent().remove(objeto)
             objeto.destroy()
+        self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
         # FIXME: Reparar (Si no hay conexión)
         GLib.idle_add(self.buscador.buscar, palabras, cantidad)
 
@@ -204,14 +179,12 @@ class JAMedia(Gtk.Window):
         video = FEED.copy()
         video["id"] = _id
         video["url"] = url
-        self.__add_videos([video], self.paneltube.encontrados, sensitive=False)
+        self.__add_videos([video], self.paneltube.encontrados)
 
-    def __add_videos(self, videos, destino, sensitive=True):
+    def __add_videos(self, videos, destino):
         #FIXME: cambiar, al parecer se pasa solo un video por vez
         if not videos:
             ocultar([self.alerta_busqueda])
-            if sensitive:
-                self.paneltube.set_sensitive(True)
             self.toolbar_busqueda.set_sensitive(True)
             return False
 
@@ -228,9 +201,12 @@ class JAMedia(Gtk.Window):
         videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
         videos.remove(videos[0])
         destino.pack_start(videowidget, False, False, 3)
-
+        if destino == self.paneltube.encontrados:
+            self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
+        elif destino == self.paneltube.descargar:
+            self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
         self.alerta_busqueda.label.set_text(texto)
-        GLib.idle_add(self.__add_videos, videos, destino, sensitive)
+        GLib.idle_add(self.__add_videos, videos, destino)
         return False
 
     def __switch(self, widget, valor):
