@@ -13,15 +13,13 @@ from gi.repository import GdkPixbuf
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
 from JAMediaPlayer.Globales import get_JAMedia_Directory
-from JAMediaPlayer.Globales import ocultar
-from JAMediaPlayer.Globales import mostrar
 from JAMediaPlayer.Globales import ICONS_PATH
 
 
 class PlayerList(Gtk.Frame):
 
     __gsignals__ = {
-    #"accion-list": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, GObject.TYPE_STRING, GObject.TYPE_PYOBJECT))
+        "subtitulos": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING, ))
     }
 
     def __init__(self):
@@ -56,7 +54,11 @@ class PlayerList(Gtk.Frame):
         self.toolbar.openfiles.connect("clicked", self.__openfiles, "load")
         self.toolbar.appendfiles.connect("clicked", self.__openfiles, "add")
         self.toolbar.clearlist.connect("clicked", self.__clearList)
-        #FIXME: self.toolbar.subtitulos.connect("clicked", self.__cargar_subtitulos)
+        # FIXME: Subtítulos no funcionan self.toolbar.subtitulos.connect("clicked", self.__cargar_subtitulos)
+        self.lista.connect("len_items", self.__len_items)
+
+    def __len_items(self, widget, val):
+        self.toolbar.clearlist.set_sensitive(bool(val))
 
     def __clearList(self, widget):
         self.lista.limpiar()
@@ -66,6 +68,24 @@ class PlayerList(Gtk.Frame):
         selector.connect('load-files', self.__load_files, tipo)
         selector.run()
         if selector:selector.destroy()
+
+    ''' # FIXME: Subtítulos no funcionan
+    def __cargar_subtitulos(self, widget):
+        dialog = Gtk.FileChooserDialog(title="Cargar Subtitulos", parent=self.get_toplevel(), action=Gtk.FileChooserAction.OPEN, buttons = (("Cancel"), Gtk.ResponseType.CANCEL, ("Open"), Gtk.ResponseType.ACCEPT))
+        dialog.set_resizable(True)
+        dialog.set_size_request(320, 240)
+        dialog.set_current_folder_uri("file://%s" % self.directorio)
+        dialog.set_select_multiple(False)
+        filtro = Gtk.FileFilter()
+        filtro.set_name("Filtro")
+        filtro.add_pattern("*.srt")
+        dialog.add_filter(filtro)
+        resp = dialog.run()
+        if resp == Gtk.ResponseType.ACCEPT:
+            path = dialog.get_filename()
+            if path: self.emit('subtitulos', path)
+        if dialog: dialog.destroy()
+    '''
 
     def __load_files(self, widget, archivos, tipo):
         items = []
@@ -78,7 +98,7 @@ class PlayerList(Gtk.Frame):
         self.__load_list(items, tipo)
 
     def __load_list(self, items, tipo):
-        if tipo == "load":self.lista.limpiar()
+        if tipo == "load": self.lista.limpiar()
         self.lista.agregar_items(items)
 
 
@@ -243,10 +263,14 @@ class JAMediaToolbarList(Gtk.Toolbar):
         self.insert(self.appendfiles, -1)
         self.clearlist = get_boton(os.path.join(ICONS_PATH, "clear.svg"), flip=False, pixels=18, tooltip_text="Limpiar Lista")
         self.insert(self.clearlist, -1)
+        ''' # FIXME: Subtítulos no funcionan
         self.subtitulos = get_boton(os.path.join(ICONS_PATH, "subtitulo.png"), flip=False, pixels=18, tooltip_text="Cargar Subtítulos")
         self.insert(self.subtitulos, -1)
+        '''
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
         self.show_all()
+        self.clearlist.set_sensitive(False)
+        # self.subtitulos.set_sensitive(False)
 
 
 # FIXME: Estilizar

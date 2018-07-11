@@ -8,6 +8,7 @@ gi.require_version('GstVideo', '1.0')  #NOTA: Necesario => AttributeError: 'GstX
 
 from gi.repository import GObject
 from gi.repository import GLib
+from gi.repository import Pango
 from gi.repository import Gst
 from gi.repository import GstVideo
 
@@ -66,6 +67,12 @@ class JAMediaReproductor(GObject.GObject):
         self.__videoBin.set_name('videobin')
 
         self.__videoqueue = Gst.ElementFactory.make('queue', 'videoqueue')
+
+        # self.__subparse = Gst.ElementFactory.make('subparse', 'subparse')
+        '''FIXME: Subtítulos no funcionan
+        self.__subtitleoverlay = Gst.ElementFactory.make('subtitleoverlay', 'subtitleoverlay')
+        '''
+
         self.__videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
         self.__videorate = Gst.ElementFactory.make('videorate', 'videorate')
         self.__videorate.set_property('skip-to-first', True)
@@ -83,6 +90,7 @@ class JAMediaReproductor(GObject.GObject):
         self.__xvimagesink = Gst.ElementFactory.make('xvimagesink', "xvimagesink")
 
         self.__videoBin.add(self.__videoqueue)
+        # FIXME: Subtítulos no funcionan self.__videoBin.add(self.__subtitleoverlay)
         self.__videoBin.add(self.__videoconvert)
         self.__videoBin.add(self.__videorate)
         self.__videoBin.add(self.__videobalance)
@@ -90,6 +98,8 @@ class JAMediaReproductor(GObject.GObject):
         self.__videoBin.add(self.__videoflip)
         self.__videoBin.add(self.__xvimagesink)
 
+        # FIXME: Subtítulos no funcionan self.__videoqueue.link(self.__subtitleoverlay)
+        # FIXME: Subtítulos no funcionan self.__subtitleoverlay.link(self.__videoconvert)
         self.__videoqueue.link(self.__videoconvert)
         self.__videoconvert.link(self.__videorate)
         self.__videorate.link(self.__videobalance)
@@ -99,7 +109,7 @@ class JAMediaReproductor(GObject.GObject):
 
         pad = self.__videoqueue.get_static_pad("sink")
         self.__videoBin.add_pad(Gst.GhostPad.new("sink", pad))
-        
+
     def __reset(self):
         self.__source = None
         #self.__winId = None
@@ -114,6 +124,13 @@ class JAMediaReproductor(GObject.GObject):
         self.__pipe.set_property('volume', self.__config['volumen'])
         self.__pipe.set_property('force-aspect-ratio', True)
         self.__pipe.set_property('video-sink', self.__videoBin)
+
+        # gst-launch-1.0 filesrc location=cartoon.mp4 ! decodebin ! video/x-raw ! videoconvert ! subtitleoverlay name=over ! autovideosink  filesrc location=subs.srt ! subparse ! over.
+        # self.__pipe.set_property('text-sink', self.__textBin)
+        ''' FIXME: Subtítulos no funcionan
+        self.__pipe.set_property("subtitle-font-desc", Pango.FontDescription("%s %s" % ("Monospace", 12)))
+        self.__subtitleoverlay.set_property("silent", False)'''
+
         self.__xvimagesink.set_window_handle(self.__winId)
         self.__bus = self.__pipe.get_bus()
         self.__bus.enable_sync_message_emission()
@@ -311,9 +328,12 @@ class JAMediaReproductor(GObject.GObject):
             Gst.SeekFlags.KEY_UNIT,
             posicion)
 
+    # FIXME: Subtítulos no funcionan
+    '''
     def set_subtitulos(self, path):
-        self.__pipe.suburi(path)
-        
+        self.__pipe.set_property("suburi", path)
+    '''
+
     def load(self, uri, xid):
         self.stop()
         self.emit("video", False)

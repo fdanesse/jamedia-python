@@ -42,7 +42,7 @@ class BasePanel(Gtk.HPaned):
         self.derecha.playercontrols.connect("accion-controls", self.__accion_controls)
         self.derecha.balance.connect("balance-valor", self.__accion_balance)
         self.derecha.lista.lista.connect("len_items", self.__len_items)
-
+        self.derecha.lista.connect("subtitulos", self.__load_subtitulos)
         self.izquierda.connect("rotar", self.__rotar)
         self.izquierda.connect("seek", self.__user_set_progress)
         self.izquierda.connect("volumen", self.__set_volumen)
@@ -83,6 +83,9 @@ class BasePanel(Gtk.HPaned):
         if self.player:
             self.player.set_position(valor)
 
+    def __load_subtitulos(self, widget, path):
+        self.player.set_subtitulos(path)
+
     def __cargar_reproducir(self, widget, path):
         volumen = 1.0
         volumen = float("{:.1f}".format(self.izquierda.progress.get_volumen()))
@@ -102,6 +105,7 @@ class BasePanel(Gtk.HPaned):
 
     def __set_video(self, widget, valor):
         self.izquierda.toolbar_info.set_video(valor)
+        # FIXME: Subtítulos no funcionan self.derecha.lista.toolbar.subtitulos.set_sensitive(valor)
 
     def __update_progress(self, objetoemisor, pos, label):
         self.izquierda.toolbar_info.label.set_text(label)
