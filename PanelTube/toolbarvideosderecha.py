@@ -31,7 +31,7 @@ class Toolbar_Videos_Derecha(Gtk.Toolbar):
         self.__boton1.connect("clicked", self.__emit_encontrados)
         self.insert(self.__boton1, -1)
 
-        self.__boton2 = get_boton(os.path.join(ICONS_PATH, "alejar.svg"), flip=False, pixels=24, tooltip_text="Borrar Lista")
+        self.__boton2 = get_boton(os.path.join(ICONS_PATH, "Industry-Trash-2-icon.png"), flip=False, pixels=24, tooltip_text="Borrar Lista")
         self.__boton2.connect("clicked", self.__emit_borrar)
         self.insert(self.__boton2, -1)
 

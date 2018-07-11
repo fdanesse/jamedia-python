@@ -28,7 +28,7 @@ class Toolbar(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        self.jamedia = get_boton(os.path.join(ICONS_PATH, "JAMedia.svg"), flip=False, pixels=35, tooltip_text="Cambiar a JAMedia")
+        self.jamedia = get_boton(os.path.join(ICONS_PATH, "jamedia.png"), flip=False, pixels=35, tooltip_text="Cambiar a JAMedia")
         self.jamedia.connect("clicked", self.__emit_switch)
         self.insert(self.jamedia, -1)
 

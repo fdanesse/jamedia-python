@@ -153,8 +153,9 @@ button:checked {
     border: 1px @border solid;
 }
 #toolbarvideos button {
-    margin-left: 2px;
-    margin-right: 2px;
+    margin-left: 1px;
+    margin-right: 1px;
+    padding: 2px;
     border-radius: 100%;
 }
 
@@ -239,6 +240,10 @@ trough highlight{
     opacity: 1;
 }
 
+#jamediabox {
+    border: 2px @jamedia3 solid;
+}
+
 #jamediaplayerpanel {
     background-image: image(@bg_toolbar1);
     background-color: @bg_toolbar1;
@@ -317,6 +322,7 @@ en los video items agregar botones para borrar, descargar, convertir, guardar po
 en la toolbar busquedas, poder descargar una dirección específica
 agregar imagen de arrastre en drag and drop de paneltube
 cambiar minitoolbars por opciones en toolbar videos
+quitarle el borde a jamedia cuando esta fullscreen y con controles ocultos
 */
 .coso {
     color: #778899; /*bg_toolbar1*/

@@ -35,8 +35,16 @@ class ToolbarInfo(Gtk.Toolbar):
         self.boton_derecha.connect("clicked", self.__emit_rotar)
         self.insert(self.boton_derecha, -1)
 
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
-        #FIXME: Agregar información de tiempo y tamaño?
+        item = Gtk.ToolItem()
+        item.set_expand(True)
+        self.label = Gtk.Label("00:00 - 00:00")
+        self.label.set_alignment(xalign=1.0, yalign=0.5)
+        self.label.set_justify(Gtk.Justification.RIGHT)
+        item.add(self.label)
+        self.insert(item, -1)
+
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+
         self.show_all()
     
     def __emit_rotar(self, widget):

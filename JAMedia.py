@@ -36,6 +36,14 @@ TipEncontrados = "Arrastra Hacia La Derecha para Agregarlo a Descargas"
 
 target = [Gtk.TargetEntry.new('Mover', Gtk.TargetFlags.SAME_APP, 0)]
 
+def print_child(widget):
+    try:
+        for child in widget.get_children():
+            print ("\t", child)
+            print_child(child)
+    except:
+        pass
+
 
 class JAMedia(Gtk.Window):
 
@@ -48,7 +56,7 @@ class JAMedia(Gtk.Window):
         self.set_style()
 
         self.set_title("JAMedia")
-        self.set_icon_from_file(os.path.join(BASE_PATH,"Iconos", "JAMedia.svg"))
+        self.set_icon_from_file(os.path.join(BASE_PATH, "Iconos", "JAMedia.svg"))
         self.set_resizable(True)
         self.set_position(Gtk.WindowPosition.CENTER)
 
@@ -127,6 +135,8 @@ class JAMedia(Gtk.Window):
         self.buscador.connect("end", self.paneltube.update_widgets_videos_encontrados)
         
         self.resize(640, 480)
+
+        #FIXME: print_child(self)
 
     def __cancel_toolbars(self, widget=None):
         self.toolbar_salir.cancelar()

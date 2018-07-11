@@ -103,8 +103,9 @@ class BasePanel(Gtk.HPaned):
     def __set_video(self, widget, valor):
         self.izquierda.toolbar_info.set_video(valor)
 
-    def __update_progress(self, objetoemisor, valor):
-        self.izquierda.progress.set_progress(valor)
+    def __update_progress(self, objetoemisor, pos, label):
+        self.izquierda.toolbar_info.label.set_text(label)
+        self.izquierda.progress.set_progress(pos)
 
     def __state_changed(self, widget=None, valor=None):
         if "playing" in valor:
@@ -130,5 +131,6 @@ class BasePanel(Gtk.HPaned):
         return False
 
     def __endfile(self, widget=None, senial=None):
+        GLib.idle_add(self.izquierda.toolbar_info.label.set_text, "00:00 - 00:00")
         GLib.idle_add(self.derecha.playercontrols.set_paused)
         GLib.idle_add(self.derecha.lista.lista.seleccionar_siguiente)

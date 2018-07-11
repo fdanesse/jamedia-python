@@ -25,6 +25,9 @@ class JAMediaPlayer(Gtk.VBox):
 
         Gtk.VBox.__init__(self)
 
+        self.set_css_name('jamediabox')
+        self.set_name('jamediabox')
+
         self.__mouse_in_visor = False
         self.__cursor_root = Gdk.Cursor(Gdk.CursorType.BLANK_CURSOR)
         icono = os.path.join(ICONS_PATH, "jamedia_cursor.svg")

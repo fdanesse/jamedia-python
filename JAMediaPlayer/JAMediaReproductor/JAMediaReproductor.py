@@ -12,12 +12,22 @@ from gi.repository import Gst
 from gi.repository import GstVideo
 
 
+def format_ns(ns):
+    s, ns = divmod(ns, 1000000000)
+    m, s = divmod(s, 60)
+    h, m = divmod(m, 60)
+    if not h:
+        return "%02u:%02u" % (m, s)
+    else:
+        return "%02u:%02u:%02u" % (h, m, s)
+
+
 class JAMediaReproductor(GObject.GObject):
 
     __gsignals__ = {
     "endfile": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, []),
     "estado": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
-    "newposicion": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT,)),
+    "newposicion": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
     "video": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,)),
     #"loading-buffer": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_INT, )),
         }
@@ -185,6 +195,7 @@ class JAMediaReproductor(GObject.GObject):
     def __handle(self):
         bool1, valor1 = self.__pipe.query_duration(Gst.Format.TIME)
         bool2, valor2 = self.__pipe.query_position(Gst.Format.TIME)
+
         duracion = float(valor1)
         posicion = float(valor2)
         pos = 0.0
@@ -197,7 +208,17 @@ class JAMediaReproductor(GObject.GObject):
         if pos != self.__position:
             self.__position = pos
             # Se emite un flotante de 0.0 a 100.?
-            self.emit("newposicion", self.__position)
+            label = "{0} - {1}".format(format_ns(valor2), format_ns(valor1))
+            self.emit("newposicion", self.__position, label)
+            '''
+            NOTA: https://github.com/gkralik/python-gst-tutorial/blob/master/basic-tutorial-4.py
+            query = Gst.Query.new_seeking(Gst.Format.TIME)
+            self.__pipe.query(query)
+            fmt, val, start, end = query.parse_seeking()
+            print(fmt, val, start, end)
+            print("{0} to {1}".format(format_ns(start), format_ns(end)))
+            print("{0} - {1}".format(format_ns(valor2), format_ns(valor1)))
+            '''
         return True
     
     def __pause(self):
@@ -290,6 +311,9 @@ class JAMediaReproductor(GObject.GObject):
             Gst.SeekFlags.KEY_UNIT,
             posicion)
 
+    def set_subtitulos(self, path):
+        self.__pipe.suburi(path)
+        
     def load(self, uri, xid):
         self.stop()
         self.emit("video", False)
