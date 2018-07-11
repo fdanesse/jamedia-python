@@ -15,7 +15,7 @@
 
 window {
     background-image: image(white);
-    background-color: white; 
+    background-color: white;
     color: black;
     font: 10pt "Comic Sans";
     font-weight: normal;
@@ -29,7 +29,7 @@ toolbar {
 }
 
 button {
-    /*background-image: image(@bg_toolbar1);*/
+    background-image: image(@bg_toolbar1);
     background-color: @bg_toolbar1;
     border-radius: 8%;
     border: 0.1em solid @bg_toolbar1;
@@ -38,15 +38,16 @@ button {
     /*FIXME: No funciona. transition: background-color 500ms ease-in-out;*/
 }
 button:hover {
-    /*background-image: image(@green3);*/
+    background-image: image(@green3);
     background-color: @green3;
     border-radius: 8%;
     border: 0.1em solid @green3;
     margin: 0;
     padding: 0;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
 }
 button:checked {
-    /*background-image: image(@green3);*/
+    background-image: image(@green3);
     background-color: @green3;
     border-radius: 8%;
     border: 0.01em solid black;
@@ -99,31 +100,28 @@ button:checked {
     margin:3px;
 }
 
+#vboxdescargas scale trough highlight{
+    background-image: image(cyan);
+    background-color: cyan;
+}
+
 #toolbarbusquedas {
     background-image: image(@jamedia3);
     background-color: @jamedia3;
     border: 1px solid @border;
 }
 #toolbarbusquedas button {
-    background-image: image(@jamedia1);
-    background-color: @jamedia1;
     border-radius: 8%;
     border: 1px solid @border;
     padding-left: 15px;
     padding-right: 15px;
     font-weight: bold;
-    font-size: 10pt;
-    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
 }
 #toolbarbusquedas button:hover {
-    background-image: image(@jamedia2);
-    background-color: @jamedia2;
     border-radius: 8%;
     padding-left: 15px;
     padding-right: 15px;
     font-weight: bold;
-    font-size: 10pt;
-    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
 }
 
 #alertabusquedas {
@@ -159,17 +157,6 @@ button:checked {
     margin-right: 2px;
     border-radius: 100%;
 }
-
-/*.minitoolbar {
-    background-image: image(@bg_toolbar1);
-    background-color: @bg_toolbar1;
-    margin: 0;
-    padding: 3px;
-}
-.minitoolbar button {
-    margin-left: 2px;
-    margin-right: 2px;
-}*/
 
 /* Barra de Progreso */
 scale {
@@ -257,6 +244,39 @@ trough highlight{
     background-color: @bg_toolbar1;
 }
 
+
+#frameplayerlist {
+    background-image: url('Iconos/reciclado_arrugado_azul.png');
+    background-size:cover;
+    background-repeat: no-repeat;
+    font-size: 9pt;
+}
+
+#treeviewlist {
+    background-image: none;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    padding-left: 3px;
+    padding-top: 3px;
+}
+
+#treeviewlist:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+#treeviewlist:selected {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: @jamedia1;
+}
+
+.entradasdetexto:focus {
+    border: 1px @bg_toolbar1 solid;
+}
+/*
+#treeviewlist {}
+#treeviewlist:nth-child(even):hover {}
+#treeviewlist:nth-child(even):selected {}
+*/
 /*
 @keyframes playing_anim {
     0% {
@@ -277,9 +297,10 @@ trough highlight{
 */
 
 /*
-FIME:
+FIXME:
+reparar dialogo abrir archivos
+buscar como agregar imagen en los tag de videos
 agregar terminal con información de rendimiento
-treeview
 help
 credits
 mejorar transiciones en botones
@@ -296,7 +317,6 @@ en los video items agregar botones para borrar, descargar, convertir, guardar po
 en la toolbar busquedas, poder descargar una dirección específica
 agregar imagen de arrastre en drag and drop de paneltube
 cambiar minitoolbars por opciones en toolbar videos
-los botones en toolar videos se activan y desactivan si hay o no elementos en la lista, solo los video items se mantienen insensibles mientras actualizan metadatos
 */
 .coso {
     color: #778899; /*bg_toolbar1*/

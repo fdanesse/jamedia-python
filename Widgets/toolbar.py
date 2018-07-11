@@ -32,15 +32,15 @@ class Toolbar(Gtk.Toolbar):
         self.jamedia.connect("clicked", self.__emit_switch)
         self.insert(self.jamedia, -1)
 
-        boton = get_boton(os.path.join(ICONS_PATH, "help.svg"), flip=False, pixels=24, tooltip_text="Ayuda")
-        boton.connect("clicked", self.__show_help)
-        self.insert(boton, -1)
+        self.help = get_boton(os.path.join(ICONS_PATH, "help.svg"), flip=False, pixels=24, tooltip_text="Ayuda")
+        self.help.connect("clicked", self.__show_help)
+        self.insert(self.help, -1)
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        boton = get_boton(os.path.join(ICONS_PATH, "button-cancel.svg"), flip=False, pixels=12, tooltip_text="Salir")
-        boton.connect("clicked", self.__salir)
-        self.insert(boton, -1)
+        self.salir = get_boton(os.path.join(ICONS_PATH, "button-cancel.svg"), flip=False, pixels=12, tooltip_text="Salir")
+        self.salir.connect("clicked", self.__salir)
+        self.insert(self.salir, -1)
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 

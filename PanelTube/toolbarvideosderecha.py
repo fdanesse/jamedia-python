@@ -35,6 +35,15 @@ class Toolbar_Videos_Derecha(Gtk.Toolbar):
         self.__boton2.connect("clicked", self.__emit_borrar)
         self.insert(self.__boton2, -1)
 
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.__label = Gtk.Label('Descargando: 0')
+        self.__label.get_style_context().add_class("infotext")
+        item = Gtk.ToolItem()
+        item.set_expand(False)
+        item.add(self.__label)
+        self.insert(item, -1)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
         self.__boton3 = get_boton(os.path.join(ICONS_PATH, "play.svg"), flip=False, pixels=24, rotacion=GdkPixbuf.PixbufRotation.CLOCKWISE, tooltip_text="Descargar")
@@ -57,6 +66,8 @@ class Toolbar_Videos_Derecha(Gtk.Toolbar):
         self.emit('borrar')
 
     def added_removed(self, widget):
-        self.__boton1.set_sensitive(bool(widget.get_children()))
-        self.__boton2.set_sensitive(bool(widget.get_children()))
-        self.__boton3.set_sensitive(bool(widget.get_children()))
+        videos = len(widget.get_children())
+        self.__label.set_text("Descargando: %s" % videos)
+        self.__boton1.set_sensitive(bool(videos))
+        self.__boton2.set_sensitive(bool(videos))
+        self.__boton3.set_sensitive(bool(videos))

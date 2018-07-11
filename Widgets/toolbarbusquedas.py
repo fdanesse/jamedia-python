@@ -36,12 +36,13 @@ class ToolbarBusquedas(Gtk.Toolbar):
         item = Gtk.ToolItem()
         item.set_expand(False)
         self.entrycantidad = Gtk.Entry()
+        self.entrycantidad.get_style_context().add_class("entradasdetexto")
         self.entrycantidad.props.placeholder_text = "50"
         self.entrycantidad.set_width_chars(3)
         self.entrycantidad.set_max_length(3)
         self.entrycantidad.set_tooltip_text("Escribe la cantidad de videos que deseas")
         self.entrycantidad.show()
-        self.entrycantidad.connect('changed', self.__changed_entrycantidad)
+        self.entrycantidad.connect('changed', self.__check_data)
         item.add(self.entrycantidad)
         self.insert(item, -1)
 
@@ -59,54 +60,45 @@ class ToolbarBusquedas(Gtk.Toolbar):
         item = Gtk.ToolItem()
         item.set_expand(False)
         self.entrytext = Gtk.Entry()
+        self.entrytext.get_style_context().add_class("entradasdetexto")
         self.entrytext.props.placeholder_text = "Artista, Título o ambos."
         self.entrytext.set_width_chars(20)
         self.entrytext.set_max_length(50)
         self.entrytext.set_tooltip_text("Escribe lo que Buscas")
         self.entrytext.show()
-        self.entrytext.connect('activate', self.__emit_buscar)
+        self.entrytext.connect('changed', self.__check_data)
+        #FIXME: hacer tab self.entrytext.connect('activate', self.__emit_buscar)
         item.add(self.entrytext)
         self.insert(item, -1)
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        boton =  Gtk.ToolButton()
-        boton.set_label("Run")
-        boton.set_tooltip_text("Comenzar Búsqueda")
-        boton.connect("clicked", self.__emit_buscar)
-        self.insert(boton, -1)
+        self.__run =  Gtk.ToolButton()
+        self.__run.set_sensitive(False)
+        self.__run.set_label("Run")
+        self.__run.set_tooltip_text("Comenzar Búsqueda")
+        self.__run.connect("clicked", self.__emit_buscar)
+        self.insert(self.__run, -1)
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
+        lista = [self.entrycantidad, self.entrytext, self.__run]
+        self.set_focus_chain(lista)
         self.show_all()
 
     def __emit_buscar(self, widget=None):
-        try:
-            texto = self.entrytext.get_text().strip()
-            cantidad = int(self.entrycantidad.get_text())
-            if texto and cantidad in range(1, 1000):
-                self.entrytext.set_text("")
-                self.emit("comenzar_busqueda", texto, cantidad)
-            else:
-                self.__alerta_busqueda_invalida()
-        except:
-            self.__alerta_busqueda_invalida()
+        texto = self.entrytext.get_text().strip()
+        cantidad = int(self.entrycantidad.get_text())
+        self.entrytext.set_text("")
+        self.emit("comenzar_busqueda", texto, cantidad)
 
-    def __alerta_busqueda_invalida(self):
-        # FIXME: Recordar dar estilo a este dialog
-        dialog = Gtk.Dialog(parent=self.get_toplevel(), flags=Gtk.DialogFlags.MODAL, buttons=["OK", Gtk.ResponseType.OK])
-        t = "No se puede realizar esta búsqueda.\n"
-        t = "%s%s" % (t, "Revisa la cantidad y el texto para la búsqueda.")
-        label = Gtk.Label(t)
-        label.show()
-        dialog.vbox.pack_start(label, True, True, 5)
-        dialog.run()
-        dialog.destroy()
-
-    def __changed_entrycantidad(self, widget):
-        text = widget.get_text()
+    def __check_data(self, widget):
+        cantidad = self.entrycantidad.get_text()
+        texto = self.entrytext.get_text()
         try:
-            if text and not int(text) in range(1, 1000):
-                widget.set_text("1")
+            cantidad = int(cantidad)
         except:
-            widget.set_text("")
+            cantidad = 0
+            self.entrycantidad.set_text("")
+        self.__run.set_sensitive(cantidad and texto)
+

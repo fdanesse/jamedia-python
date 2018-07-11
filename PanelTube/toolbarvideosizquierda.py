@@ -25,6 +25,15 @@ class Toolbar_Videos_Izquierda(Gtk.Toolbar):
         self.set_css_name('toolbarvideos')
         self.set_name('toolbarvideos')
 
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.__label = Gtk.Label('Encontrados: 0')
+        self.__label.get_style_context().add_class("infotext")
+        item = Gtk.ToolItem()
+        item.set_expand(False)
+        item.add(self.__label)
+        self.insert(item, -1)
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
         self.__boton1 = get_boton(os.path.join(ICONS_PATH, "alejar.svg"), flip=False, pixels=24, tooltip_text="Borrar Lista")
@@ -47,6 +56,7 @@ class Toolbar_Videos_Izquierda(Gtk.Toolbar):
         self.emit('borrar')
 
     def added_removed(self, widget):
-        print (widget, widget.get_children())
-        self.__boton1.set_sensitive(bool(widget.get_children()))
-        self.__boton2.set_sensitive(bool(widget.get_children()))
+        videos = len(widget.get_children())
+        self.__label.set_text("Encontrados: %s" % videos)
+        self.__boton1.set_sensitive(bool(videos))
+        self.__boton2.set_sensitive(bool(videos))

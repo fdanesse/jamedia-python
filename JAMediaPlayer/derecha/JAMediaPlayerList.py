@@ -28,6 +28,9 @@ class PlayerList(Gtk.Frame):
 
         Gtk.Frame.__init__(self)
 
+        self.set_css_name('frameplayerlist')
+        self.set_name('frameplayerlist')
+
         self.directorio = get_JAMedia_Directory()
         self.mime = ['audio/*', 'video/*', 'application/ogg']
 
@@ -53,7 +56,8 @@ class PlayerList(Gtk.Frame):
         self.toolbar.openfiles.connect("clicked", self.__openfiles, "load")
         self.toolbar.appendfiles.connect("clicked", self.__openfiles, "add")
         self.toolbar.clearlist.connect("clicked", self.__clearList)
-        
+        #FIXME: self.toolbar.subtitulos.connect("clicked", self.__cargar_subtitulos)
+
     def __clearList(self, widget):
         self.lista.limpiar()
 
@@ -88,6 +92,9 @@ class Lista(Gtk.TreeView):
     def __init__(self):
 
         Gtk.TreeView.__init__(self, Gtk.ListStore(GdkPixbuf.Pixbuf, GObject.TYPE_STRING, GObject.TYPE_STRING))
+
+        self.set_css_name('treeviewlist')
+        self.set_name('treeviewlist')
 
         self.__valorSelected = None
         #self.set_headers_clickable(True)
@@ -236,6 +243,8 @@ class JAMediaToolbarList(Gtk.Toolbar):
         self.insert(self.appendfiles, -1)
         self.clearlist = get_boton(os.path.join(ICONS_PATH, "clear.svg"), flip=False, pixels=18, tooltip_text="Limpiar Lista")
         self.insert(self.clearlist, -1)
+        self.subtitulos = get_boton(os.path.join(ICONS_PATH, "subtitulo.png"), flip=False, pixels=18, tooltip_text="Cargar Subtítulos")
+        self.insert(self.subtitulos, -1)
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
         self.show_all()
 
