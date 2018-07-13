@@ -3,7 +3,8 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  color: #C5CAE9;
+  color: rgb(187, 189, 196);
+  font-size: 11pt;
 }
 
 html, body {
@@ -12,14 +13,6 @@ html, body {
 
 figure {
     background-image: url('../Iconos/reciclado_arrugado_azul.png');
-}
-
-.container-fluid {
-    margin: 0;
-    padding: 5px;
-    /*font-family: 'Josefin Slab', serif;*/
-    font-size: 14pt;
-    background-color: black;
 }
 
 header {
@@ -41,15 +34,15 @@ header {
 
 header img {
 	display: block;
-	width: 260px;
-	height: 260px;
+	width: 200px;
+	height: 200px;
 	margin: auto;
 }
 
 header figure {
 	display: block;
-	width: 260px;
-	height: 260px;
+	width: 200px;
+	height: 200px;
 	margin: auto;
 	background-repeat: no-repeat;
     background-attachment: fixed;
@@ -86,16 +79,6 @@ header p {
     font-size: 0.85em;
 }
 
-header a:link, header a:visited, header a:active, header a:focus {
-    text-decoration: none;
-    color: cyan;
-}
-
-header a:hover {
-    color: orange;
-}
-
-
 main {
 	width: 98%;
 	height: auto;
@@ -103,59 +86,19 @@ main {
 	padding: 1.0em;
 	background-color: #212121;
 	border: 0.01em black solid;
-	clear: both;
-	display: -webkit-flex;
-	display: flex;
-    -webkit-justify-content: space-around;
-    justify-content: space-around;
-    -webkit-flex-wrap: wrap;
-    flex-wrap: wrap;
-}
-
-main section {
-	width: 240px;
-	height: 200px;
-	margin: 0.5em;
-	padding: 0.5em;
-	border: 0.01em #C5CAE9 solid;
-	border-radius: 0.5em;
-
-	-webkit-transition: background 0.5s, box-shadow 0.5s;
-    transition: background 0.5s, box-shadow 0.5s;
-}
-
-main ul {
-	margin: 0.6em;
+    clear: both;
 }
 
 main li {
-	list-style-type: circle;
-	list-style-position: inside;
+	margin-left: 50px;
 }
 
-main #details {
-	font-style: italic;
-	text-align: right;
-}
-
-main h3 {
-    font-size: 1.0em;
-}
-
-main a:hover, main a:link, main a:visited, main a:active, main a:focus {
+main a, main a:link, main a:visited, main a:active, main a:focus {
 	text-decoration: none;
+    color: cyan;
 }
-
-main section:hover {
-    color: white;
-	cursor: pointer;
-	background: rgb(0,0,0);
-	transform: scale(1.05, 1.05);
-	box-shadow:
-        0.2em 0.2em 0.5em cyan,
-        0.2em -0.2em 0.5em cyan,
-        -0.2em -0.2em 0.5em cyan,
-        -0.2em 0.2em 0.5em cyan;
+main a:hover {
+    color: orange;
 }
 
 /* PHONE */

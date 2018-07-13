@@ -9,7 +9,7 @@
         <script src='bootstrap-4.1.2-dist/js/bootstrap.min.js'></script>
         <link href="estilo.css" rel="stylesheet" />
     </head>
-
+    
     <body>
         <header class='animated bounceInDown'>
             <figure [style.background-image]="'url(' + '../Iconos/reciclado_arrugado_azul.png' + ')'">
@@ -26,69 +26,72 @@
                 <section>
                 <p>
                 JAMedia fue desarrollado originalmente en python durante los primeros meses de 2010, destinado especialmente a las laptos xo del proyecto olpc en Uruguay.
-                La motivación de este desarrollo fue dar la oportunidad de ver el mundial de fútbol de Sudáfrica a todos los niños de uruguay en sus nuevas xo.
-                Fue publicado una semana antes del comienzo del evento y se convirtió inesperadamente en un éxito publicitario que marcó un hito importante en lo personal y en el desarrollo futuro de <a href="https://pythonjoven-c1888.firebaseapp.com" target="_blank">python_joven</a> debido a la relación que nació entre los usuarios de la aplicación y yo.
+                La motivación original de este desarrollo fue dar la oportunidad de ver el mundial de fútbol de Sudáfrica a todos los niños de uruguay en sus nuevas xo.
+                A lo largo de los años la aplicación fue mejorada y reescrita en otros lenguajes como java, vala, c++ y javascript, para adaptarla a diferentes plataformas y sobre todo como medio de aprendizaje personal.
+                A partir de la versión 17, se ha unificado JAMedia con JAMediaTube, por lo cual su principal propósito es ahora la busqueda, descarga y reproducción de videos.
+                La actual versión Nº 18, cuenta con importantes mejoras estéticas y de rendimiento. Se ha refactorizado todo el código y hecho el port de python 2 a python 3, de gtk 2 a gtk 3 y de gstreamer 0.10 a gstreamer 1.0.
+                Se han agregado interfaces gráficas escritas en html, css y javascript y se ha reimplementado todo el estilo en css.
                 </p>
                 <p>
-                Posteriormente se convirtió también en mi mejor pretexto y vehículo de aprendizaje, ya que cada vez que decido acercarme a un nuevo lenguaje, implemento esta aplicación en él, como forma de hacer práctica y obtener experiencia en el desarrollo.
-                Es por este motivo que JAMedia está implementado en varios lenguajes.
+                Se ha descartado las características de grabación de streaming y televisión y la interfaz de radios ha sido remplazada por la versión javascript.
                 </p>
                 </section>
             </section>
         </header>
       
         <main class='animated bounceInUp'>
-            <a routerLink='/jamedia_python' target="_self">
-            <section>
-                <h3><strong>2010</strong></h3>
-                <hr>
-                <ul>
-                <li>python 3.6.3
-                <li>gtk 3.0</li>
-                <li>gstreamer 1.0</li>
-                </ul>
-                <p>Para Sugar y gnome</p>
-            </section>
-            </a>
-        
-            <a routerLink='/jamedia_vala' target="_self">
-            <section>
-                <h3><strong>2013</strong></h3>
-                <hr>
-                <ul>
-                <li>vala 0.26.2</li>
-                <li>gtk 3</li>
-                <li>gstreamer 1.0</li>
-                </ul>
-                <p>Para gnome</p>
-            </section>
-            </a>
-        
-            <a href='https://play.google.com/store/apps/details?id=com.fdanesse.jamedia' target="_blank">
-            <section>
-                <h3><strong>2016</strong></h3>
-                <hr>
-                <ul>
-                <li>java</li>
-                <li>material design</li>
-                <li>android studio</li>
-                </ul>
-                <p>Para android</p>
-            </section>
-            </a>
-        
-            <a routerLink='/jamedia_radio' target="_self">
-            <section>
-                <h3><strong>2017</strong></h3>
-                <hr>
-                <p id="details">Radio online</p>
-                <ul>
-                <li>html css bootstrap</li>
-                <li>javascript</li>
-                <li>angular</li>
-                </ul>
-            </section>
-            </a>
+            <p>
+                <ol>
+                    <h6><strong>JAMedia 18 tiene 3 funcionalidades:</strong></h6>
+                    <hr>
+                    <li>Busqueda y descarga de videos desde youtube.</li>
+                    <li>Reproducción de archivos de Audio y Video.</li>
+                    <li>Reproducción de streaming de radios de JAMedia.</li>
+                </ol>
+            </p>
+            <p>
+                <ol>
+                    <h6><strong>El panel principal tiene dos áreas:</strong></h6>
+                    <hr>
+                    <li>En la izquierda, se muestran los archivos encontrados en youtube luego de realizada una búsqueda.</li>
+                    <li>Los archivos que desees descargar debes pasarlos al área derecha de ese panel.</li>
+                    <li>Al dar click sobre el botón inferior derecho se comenzarán a descargar todos los videos de esta lista.</li>
+                    <li>La estructura de directorios de las versiones anteriores se ha mantenido por lo cual todos los videos se descargan en: <i>/home/tu-usuario/JAMediaDatos/YoutubeVideos</i></li>
+                </ol>
+            </p>
+            <p>
+                Para cambiar a la interfaz del reproductor, debes hacer click en el logo de JAMedia arriba a la izquierda, y para volver al buscador también.
+            </p>
+            <p>
+                Para cambiar a la interfaz de radios, debes hacer click en el ícono de radio, en la toolbar del reproductor.
+            </p>
+            <p>
+                Obviamente: para que el buscador y la interfaz de radios funcionen, debes estar conectado a internet. De lo contrario, solo podrás utilizar el reproductor.
+            </p>
+            <p>
+                <ol>
+                    <h6><strong>Para que esta versión funcione correctamente necesitas tener instalados los siguientes paquetes:</strong></h6>
+                    <hr>
+                    <li>gstreamer1.0</li>
+                    <li>gstreamer1.0-plugins-base</li>
+                    <li>gstreamer1.0-plugins-good</li>
+                    <li>gstreamer1.0-plugins-ugly</li>
+                    <li>gstreamer1.0-tools</li>
+                    <li>gstreamer1.0-libav</li>
+                </ol>
+            </p>
+            <p>Para instalar estos paquetes en ubuntu, copia y pega el siguiente código en la terminal y presiona enter: <br>
+                <i>sudo apt-get install gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly gstreamer1.0-tools gstreamer1.0-libav</i>
+            </p>
+
+            <p>
+                <ol>
+                    <h6><strong>Autor:</strong></h6>
+                    <hr>
+                    <p>Flavio Danesse - fdanesse@gmail.com - <a href="https://fdanesse-f2b2c.firebaseapp.com/home" target="_self">Sitio Web</a> - <a href="https://www.linkedin.com/in/flavio-danesse-6575b719/" target="_self">Linked in</a>
+                    </p>
+                </ol>
+            </p>
         </main>
       
     <body>
