@@ -16,7 +16,7 @@ class Toolbar(Gtk.Toolbar):
 
     __gsignals__ = {
     'salir': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
-    'switch': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, [])}
+    'switch': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_STRING, ))}
 
     def __init__(self):
 
@@ -24,27 +24,27 @@ class Toolbar(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        self.jamedia = get_boton(os.path.join(ICONS_PATH, "jamedia.png"), flip=False, pixels=35, tooltip_text="Cambiar a JAMedia")
-        self.jamedia.connect("clicked", self.__emit_switch)
-        self.insert(self.jamedia, -1)
+        self.__jamedia = get_boton(os.path.join(ICONS_PATH, "jamedia.png"), flip=False, pixels=35, tooltip_text="Cambiar a JAMedia")
+        self.__jamedia.connect("clicked", self.__emit_switch, 'jamedia')
+        self.insert(self.__jamedia, -1)
 
-        self.help = get_boton(os.path.join(ICONS_PATH, "help.svg"), flip=False, pixels=24, tooltip_text="Ayuda")
-        # FIXME: self.help.connect("clicked", self.__show_help)
-        self.insert(self.help, -1)
+        self.__help = get_boton(os.path.join(ICONS_PATH, "help.svg"), flip=False, pixels=24, tooltip_text="Ayuda")
+        self.__help.connect("clicked", self.__emit_switch, 'creditos')
+        self.insert(self.__help, -1)
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        self.salir = get_boton(os.path.join(ICONS_PATH, "button-cancel.svg"), flip=False, pixels=12, tooltip_text="Salir")
-        self.salir.connect("clicked", self.__salir)
-        self.insert(self.salir, -1)
+        self.__salir = get_boton(os.path.join(ICONS_PATH, "button-cancel.svg"), flip=False, pixels=12, tooltip_text="Salir")
+        self.__salir.connect("clicked", self.__emit_salir)
+        self.insert(self.__salir, -1)
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         self.show_all()
         
-    def __emit_switch(self, widget):
-        self.emit('switch')
+    def __emit_switch(self, widget, valor):
+        self.emit('switch', valor)
 
-    def __salir(self, widget):
+    def __emit_salir(self, widget):
         self.emit('salir')
         

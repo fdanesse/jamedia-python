@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es-UY">
+    <head>
+        <title>fdanesse</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="animate.css" rel="stylesheet" />
+        <link href="bootstrap-4.1.2-dist/css/bootstrap.min.css" rel="stylesheet" />
+        <script src='bootstrap-4.1.2-dist/js/bootstrap.min.js'></script>
+        <link href="estilo.css" rel="stylesheet" />
+    </head>
+
+    <body>
+        <header class='animated bounceInDown'>
+            <figure [style.background-image]="'url(' + '../Iconos/reciclado_arrugado_azul.png' + ')'">
+                <img src="../Iconos/jamedia.png" alt="Logo de JAMedia">
+            </figure>
+        
+            <section>
+                <section>
+                <h1><strong>JAMedia</strong></h1>
+                <hr>
+                <h5><strong>Reproductor de audio, video y streamings.</strong></h5>
+                </section>
+        
+                <section>
+                <p>
+                JAMedia fue desarrollado originalmente en python durante los primeros meses de 2010, destinado especialmente a las laptos xo del proyecto olpc en Uruguay.
+                La motivación de este desarrollo fue dar la oportunidad de ver el mundial de fútbol de Sudáfrica a todos los niños de uruguay en sus nuevas xo.
+                Fue publicado una semana antes del comienzo del evento y se convirtió inesperadamente en un éxito publicitario que marcó un hito importante en lo personal y en el desarrollo futuro de <a href="https://pythonjoven-c1888.firebaseapp.com" target="_blank">python_joven</a> debido a la relación que nació entre los usuarios de la aplicación y yo.
+                </p>
+                <p>
+                Posteriormente se convirtió también en mi mejor pretexto y vehículo de aprendizaje, ya que cada vez que decido acercarme a un nuevo lenguaje, implemento esta aplicación en él, como forma de hacer práctica y obtener experiencia en el desarrollo.
+                Es por este motivo que JAMedia está implementado en varios lenguajes.
+                </p>
+                </section>
+            </section>
+        </header>
+      
+        <main class='animated bounceInUp'>
+            <a routerLink='/jamedia_python' target="_self">
+            <section>
+                <h3><strong>2010</strong></h3>
+                <hr>
+                <ul>
+                <li>python 3.6.3
+                <li>gtk 3.0</li>
+                <li>gstreamer 1.0</li>
+                </ul>
+                <p>Para Sugar y gnome</p>
+            </section>
+            </a>
+        
+            <a routerLink='/jamedia_vala' target="_self">
+            <section>
+                <h3><strong>2013</strong></h3>
+                <hr>
+                <ul>
+                <li>vala 0.26.2</li>
+                <li>gtk 3</li>
+                <li>gstreamer 1.0</li>
+                </ul>
+                <p>Para gnome</p>
+            </section>
+            </a>
+        
+            <a href='https://play.google.com/store/apps/details?id=com.fdanesse.jamedia' target="_blank">
+            <section>
+                <h3><strong>2016</strong></h3>
+                <hr>
+                <ul>
+                <li>java</li>
+                <li>material design</li>
+                <li>android studio</li>
+                </ul>
+                <p>Para android</p>
+            </section>
+            </a>
+        
+            <a routerLink='/jamedia_radio' target="_self">
+            <section>
+                <h3><strong>2017</strong></h3>
+                <hr>
+                <p id="details">Radio online</p>
+                <ul>
+                <li>html css bootstrap</li>
+                <li>javascript</li>
+                <li>angular</li>
+                </ul>
+            </section>
+            </a>
+        </main>
+      
+    <body>
+</html>

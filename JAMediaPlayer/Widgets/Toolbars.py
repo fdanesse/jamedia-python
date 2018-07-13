@@ -26,13 +26,8 @@ class Toolbar(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        boton = get_boton(os.path.join(ICONS_PATH, "JAMedia.svg"), flip=False, pixels=35, tooltip_text="Creditos")
-        #FIXME: boton.connect("clicked", self.__show_credits)
-        self.insert(boton, -1)
-
-        boton = get_boton(os.path.join(ICONS_PATH, "help.svg"), flip=False, pixels=24, tooltip_text="Ayuda")
-        #FIXME: boton.connect("clicked", self.__show_help)
-        self.insert(boton, -1)
+        self.salir = get_boton(os.path.join(ICONS_PATH, "JAMedia.svg"), flip=False, pixels=35, tooltip_text="Cambiar JAMediaTube")
+        self.insert(self.salir, -1)
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
@@ -47,11 +42,6 @@ class Toolbar(Gtk.Toolbar):
         self.__full = get_toggle_boton(os.path.join(ICONS_PATH, "fullscreen.png"), flip=True, pixels=24, tooltip_text="Full/UnFull Screen")
         self.__full.connect("toggled", self.__set_full)
         self.insert(self.__full, -1)
-
-        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
-
-        self.salir = get_boton(os.path.join(ICONS_PATH, "button-cancel.svg"), flip=False, pixels=12, tooltip_text="Salir")
-        self.insert(self.salir, -1)
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
@@ -72,10 +62,7 @@ class Toolbar(Gtk.Toolbar):
 
     def __emit_show_config(self, widget):
         self.emit('show_config', widget.get_active())
-
-    #def __show_credits(self, widget):
-    #def __show_help(self, widget):
-
+        
 
 ''' FIXME: Reimplementar ToolbarAccion
 class ToolbarAccion(Gtk.EventBox):

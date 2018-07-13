@@ -28,6 +28,7 @@ from PanelTube.paneltube import PanelTube
 from PanelTube.buscar import Buscar, FEED
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
 from JAMediaPlayer.Globales import ocultar
+from WebKit.Viewer import Viewer
 
 BASE_PATH = os.path.dirname(__file__)
 
@@ -87,9 +88,11 @@ class JAMedia(Gtk.Window):
         self.box_tube.pack_start(self.paneltube, True, True, 0)
 
         self.jamediaplayer = JAMediaPlayer()
+        self.helpCreditsViewer = Viewer()
 
         boxbase.pack_start(self.box_tube, True, True, 0)
         boxbase.pack_start(self.jamediaplayer, True, True, 0)
+        boxbase.pack_start(self.helpCreditsViewer, True, True, 0)
         self.add(boxbase)
 
         self.connect('realize', self.__realized)
@@ -127,8 +130,9 @@ class JAMedia(Gtk.Window):
         self.connect("delete-event", self.__salir)
         self.toolbar.connect('salir', self.__confirmar_salir)
         self.toolbar_salir.connect('salir', self.__salir)
-        self.toolbar.connect('switch', self.__switch, 'jamedia')
+        self.toolbar.connect('switch', self.__switch)
         self.jamediaplayer.connect('salir', self.__switch, 'jamediatube')
+        self.helpCreditsViewer.connect('salir', self.__switch, 'jamediatube')
         self.toolbar_busqueda.connect("comenzar_busqueda", self.__comenzar_busqueda)
         self.paneltube.connect('download', self.__run_download)
         self.toolbar_descarga.connect('end', self.__run_download)
@@ -224,10 +228,16 @@ class JAMedia(Gtk.Window):
         self.__cancel_toolbars()
         if valor == 'jamediatube':
             self.jamediaplayer.hide()
+            self.helpCreditsViewer.hide()
             self.box_tube.show()
         elif valor == 'jamedia':
             self.box_tube.hide()
+            self.helpCreditsViewer.hide()
             self.jamediaplayer.show()
+        elif valor == 'creditos':
+            self.box_tube.hide()
+            self.jamediaplayer.hide()
+            self.helpCreditsViewer.show()
 
     def __confirmar_salir(self, widget=None, senial=None):
         self.paneltube.cancel_toolbars_flotantes()
