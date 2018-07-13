@@ -11,14 +11,12 @@ import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
-from gi.repository import Gdk
+#from gi.repository import Gdk
 from gi.repository import GdkPixbuf
 
 ICONS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
-radios = 'https://sites.google.com/site/sugaractivities/jamediaobjects/jam/lista-de-radios-2014'
-
-# FIXME: Borrar las funciones que no se usan
+# radios = 'https://sites.google.com/site/sugaractivities/jamediaobjects/jam/lista-de-radios-2014'
 
 '''
 def convert_shelve_to_json(path):
@@ -82,7 +80,7 @@ def set_dict(path, _dict):
             sort_keys=True))
     archivo.close()
 '''
-
+'''
 def get_colors(key):
     _dict = {
         "window1": "#f0e6aa",
@@ -98,7 +96,7 @@ def get_colors(key):
         }
     # (True, color=Gdk.Color(red=61680, green=59110, blue=43690))
     return Gdk.Color.parse(_dict.get(key, "#ffffff")).color
-
+'''
 '''
 def get_ip():
     try:
@@ -246,13 +244,13 @@ def make_base_directory():
         os.mkdir(IMAGENES_JAMEDIA_VIDEO)
         os.chmod(IMAGENES_JAMEDIA_VIDEO, stat.S_IXOTH)
 
-
+'''
 def get_data_directory():
     DIRECTORIO_DATOS = os.path.join(os.environ["HOME"], "JAMediaDatos", "Datos")
     if not os.path.exists(DIRECTORIO_DATOS):
         make_base_directory()
     return DIRECTORIO_DATOS
-
+'''
 
 def get_tube_directory():
     DIRECTORIO_YOUTUBE = os.path.join(os.environ["HOME"], "JAMediaDatos", "YoutubeVideos")
@@ -293,20 +291,20 @@ def get_video_directory():
         make_base_directory()
     return VIDEO_JAMEDIA_VIDEO
 '''
-
+'''
 def get_my_files_directory():
     DIRECTORIO_MIS_ARCHIVOS = os.path.join(os.environ["HOME"], "JAMediaDatos", "MisArchivos")
     if not os.path.exists(DIRECTORIO_MIS_ARCHIVOS):
         make_base_directory()
     return DIRECTORIO_MIS_ARCHIVOS
-
-
+'''
+'''
 def get_JAMedia_Directory():
     path = os.path.join(os.environ["HOME"], "JAMediaDatos")
     if not os.path.exists(path):
         make_base_directory()
     return path
-
+'''
 '''
 def eliminar_streaming(url, lista):
     """

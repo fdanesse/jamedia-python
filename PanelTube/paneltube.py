@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 import gi
 gi.require_version("Gtk", "3.0")
 
@@ -8,12 +7,9 @@ from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import GObject
 
-#from PanelTube.minitoolbar import Mini_Toolbar
 from PanelTube.toolbaraccionlistasvideos import ToolbarAccionListasVideos
 from PanelTube.toolbarvideosizquierda import Toolbar_Videos_Izquierda
 from PanelTube.toolbarvideosderecha import Toolbar_Videos_Derecha
-
-from JAMediaPlayer.Globales import get_data_directory
 
 TipDescargas = "Arrastra Hacia La Izquierda para Quitarlo de Descargas."
 TipEncontrados = "Arrastra Hacia La Derecha para Agregarlo a Descargas"
@@ -35,7 +31,6 @@ class PanelTube(Gtk.HPaned):
         self.set_css_name('paneltube')
         self.set_name('paneltube')
 
-        #self.toolbar_encontrados = Mini_Toolbar("Videos Encontrados")
         self.encontrados = Gtk.VBox()  # Contenedor de WidgetVideoItems
         self.encontrados.set_css_name('videocontainer')
         self.encontrados.set_name('videocontainer')
@@ -43,7 +38,6 @@ class PanelTube(Gtk.HPaned):
         self.toolbar_accion_izquierda = ToolbarAccionListasVideos()  # Confirmar borrar lista de videos
         self.toolbar_videos_izquierda = Toolbar_Videos_Izquierda()
         
-        #self.toolbar_descargar = Mini_Toolbar("Videos Para Descargar")
         self.descargar = Gtk.VBox()  # Contenedor de WidgetVideoItems
         self.descargar.set_css_name('videocontainer')
         self.descargar.set_name('videocontainer')
@@ -111,9 +105,9 @@ class PanelTube(Gtk.HPaned):
         elementos.remove(elementos[0])
         GLib.idle_add(self.__ejecutar_mover_videos, origen, destino, text, elementos)
     
-    def __ejecutar_borrar(self, widget, objetos):
+    def __ejecutar_borrar(self, widget, box):
         self.emit("cancel_toolbar")
-        for objeto in objetos:
+        for objeto in box.get_children():
             objeto.destroy()
         if widget == self.toolbar_accion_izquierda:
             self.toolbar_videos_izquierda.added_removed(self.encontrados)
@@ -123,15 +117,9 @@ class PanelTube(Gtk.HPaned):
     def __set_borrar(self, widget):
         self.emit("cancel_toolbar")
         if widget == self.toolbar_videos_izquierda:
-            objetos = self.encontrados.get_children()
-            if not objetos or objetos == None:
-                return  # No se abre confirmacion.
-            self.toolbar_accion_izquierda.set_accion(objetos)
+            self.toolbar_accion_izquierda.set_clear(self.encontrados)
         elif widget == self.toolbar_videos_derecha:
-            objetos = self.descargar.get_children()
-            if not objetos or objetos == None:
-                return  # No se abre confirmacion.
-            self.toolbar_accion_derecha.set_accion(objetos)
+            self.toolbar_accion_derecha.set_clear(self.descargar)
         else:
             print ("Caso imprevisto en run_accion de PanelTube.")
 

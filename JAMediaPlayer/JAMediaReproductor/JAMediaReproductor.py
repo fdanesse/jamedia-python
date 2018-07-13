@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 
+# https://gstreamer.freedesktop.org/documentation/tools/gst-launch.html
+
 import os
 
 import gi
 gi.require_version('Gst', '1.0')
-gi.require_version('GstVideo', '1.0')  #NOTA: Necesario => AttributeError: 'GstXvImageSink' object has no attribute 'set_window_handle'
+gi.require_version('GstVideo', '1.0')  # NOTA: Necesario => AttributeError: 'GstXvImageSink' object has no attribute 'set_window_handle'
 
 from gi.repository import GObject
 from gi.repository import GLib
-from gi.repository import Pango
+# from gi.repository import Pango
 from gi.repository import Gst
 from gi.repository import GstVideo
 
@@ -30,8 +32,7 @@ class JAMediaReproductor(GObject.GObject):
     "estado": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
     "newposicion": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
     "video": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,)),
-    #"loading-buffer": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_INT, )),
-        }
+    }
 
     # Estados: playing, paused, None
 
@@ -69,9 +70,8 @@ class JAMediaReproductor(GObject.GObject):
         self.__videoqueue = Gst.ElementFactory.make('queue', 'videoqueue')
 
         # self.__subparse = Gst.ElementFactory.make('subparse', 'subparse')
-        '''FIXME: Subtítulos no funcionan
-        self.__subtitleoverlay = Gst.ElementFactory.make('subtitleoverlay', 'subtitleoverlay')
-        '''
+        # FIXME: Subtítulos no funcionan
+        # self.__subtitleoverlay = Gst.ElementFactory.make('subtitleoverlay', 'subtitleoverlay')
 
         self.__videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
         self.__videorate = Gst.ElementFactory.make('videorate', 'videorate')
@@ -127,9 +127,9 @@ class JAMediaReproductor(GObject.GObject):
 
         # gst-launch-1.0 filesrc location=cartoon.mp4 ! decodebin ! video/x-raw ! videoconvert ! subtitleoverlay name=over ! autovideosink  filesrc location=subs.srt ! subparse ! over.
         # self.__pipe.set_property('text-sink', self.__textBin)
-        ''' FIXME: Subtítulos no funcionan
-        self.__pipe.set_property("subtitle-font-desc", Pango.FontDescription("%s %s" % ("Monospace", 12)))
-        self.__subtitleoverlay.set_property("silent", False)'''
+        # FIXME: Subtítulos no funcionan
+        # self.__pipe.set_property("subtitle-font-desc", Pango.FontDescription("%s %s" % ("Monospace", 12)))
+        # self.__subtitleoverlay.set_property("silent", False)
 
         self.__xvimagesink.set_window_handle(self.__winId)
         self.__bus = self.__pipe.get_bus()
@@ -162,39 +162,19 @@ class JAMediaReproductor(GObject.GObject):
         elif mensaje.type == Gst.MessageType.TAG:
             taglist = mensaje.parse_tag()
             datos = taglist.to_string()
-            if 'audio-codec' in datos and not 'video-codec' in datos:
-                if self.__hasVideo == True or self.__hasVideo == None:
-                    #self.__hasVideo = False
-                    #self.emit("video", False)
-                    pass
-            elif 'video-codec' in datos:
+            if 'video-codec' in datos:
                 if self.__hasVideo == False or self.__hasVideo == None:
                     self.__hasVideo = True
                     self.emit("video", True)
-        elif mensaje.type == Gst.MessageType.WARNING:
-            pass  #print ("\n Gst.MessageType.WARNING:", mensaje.parse_warning())
         elif mensaje.type == Gst.MessageType.LATENCY:
             # http://cgit.collabora.com/git/farstream.git/tree/examples/gui/fs-gui.py
-            #print "\n Gst.MessageType.LATENCY"
             self.__pipe.recalculate_latency()
         elif mensaje.type == Gst.MessageType.DURATION_CHANGED:
             bool1, valor1 = self.__pipe.query_duration(Gst.Format.TIME)
             bool2, valor2 = self.__pipe.query_position(Gst.Format.TIME)
             self.__duration = valor1
             self.__position = valor2
-        elif mensaje.type == Gst.MessageType.QOS:
-            pass  #print "\n Gst.MessageType.QOS:"
-        elif mensaje.type == Gst.MessageType.BUFFERING:
-            '''
-            print "\n Gst.MessageType.BUFFERING:"
-            print mensaje.parse_buffering()
-            print mensaje.parse_buffering_stats()
-            '''
-            pass
         elif mensaje.type == Gst.MessageType.EOS:
-            #self.video_pipeline.seek_simple(Gst.Format.TIME,
-            #Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, 0)
-            #print ("\n Gst.MessageType.EOS:")
             self.__new_handle(False)
             self.emit("endfile")
         elif mensaje.type == Gst.MessageType.ERROR:
@@ -316,11 +296,6 @@ class JAMediaReproductor(GObject.GObject):
         self.__pipe.set_property('volume', self.__config['volumen'])
 
     def set_position(self, posicion):
-        '''
-        if self.duracion < posicion:
-            self.emit("newposicion", self.posicion)
-            return
-        '''
         posicion = self.__duration * posicion / 100
         self.__pipe.seek_simple(
             Gst.Format.TIME,
@@ -329,10 +304,8 @@ class JAMediaReproductor(GObject.GObject):
             posicion)
 
     # FIXME: Subtítulos no funcionan
-    '''
-    def set_subtitulos(self, path):
-        self.__pipe.set_property("suburi", path)
-    '''
+    #def set_subtitulos(self, path):
+    #    self.__pipe.set_property("suburi", path)
 
     def load(self, uri, xid):
         self.stop()

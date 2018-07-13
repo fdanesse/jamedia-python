@@ -11,9 +11,8 @@ from gi.repository import GObject
 
 from JAMediaPlayer.Globales import get_tube_directory
 
-#BASE_PATH = os.path.dirname(__file__)
-#STDERR = "/dev/null"
-youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")  #os.path.join(#, "youtube-dl")
+# STDERR = "/dev/null"
+youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")
 
 CODECS = [
     [43, "WebM", "360p VP8 N/A 0.5 Vorbis 128"],
@@ -90,12 +89,7 @@ class JAMediaYoutube(GObject.GObject):
         print ("\t En Formato:", CODECS[self.codec])
 
         self.estado = True
-        # http://youtu.be/XWDZMMMbvhA => codigo compartir
-        # url del video => 'http://www.youtube.com/watch?v=XWDZMMMbvhA'
-        # FIXME: HACK: 5 de octubre 2012
-        #self.url = url # https://youtu.be/wgdbZhnFD5g #https://www.youtube.com/watch?t=187&v=wgdbZhnFD5g
-        #self.url = "http://youtu.be/" + url.split(
-        #    "http://www.youtube.com/watch?v=")[1]
+
         self.url = "http://youtu.be/" + url.split("=")[1]
         self.titulo = self.__get_titulo(titulo)
         self.STDOUT = "/tmp/jamediatube%d" % time.time()

@@ -12,7 +12,7 @@ FEED = {
     "id": "",
     "titulo": "",
     "descripcion": "",
-    "categoria": "",
+    "categoria": "", # FIXME: Quitar categoría en el feed
     "url": "",
     "duracion": 0,
     "previews": ""
@@ -30,8 +30,7 @@ class Buscar(GObject.GObject):
         GObject.GObject.__init__(self)
 
     def __get_videos(self, consulta, limite):
-        # Obtener web principal con resultado de busqueda y recorrer todas
-        # las pags de la busqueda obtenida hasta conseguir el id de los videos.
+        # Obtener web principal con resultado de busqueda y recorrer todas las pags de la busqueda obtenida hasta conseguir el id de los videos.
         params = urllib.parse.urlencode({'search_query': consulta})
         urls = {}
         print ("Comezando la búsqueda de %i videos sobre %s" % (limite, consulta))
@@ -62,5 +61,5 @@ class Buscar(GObject.GObject):
             if buscar:
                 self.__get_videos(buscar, cantidad)
         except:
-            #FIXME: La interfaz queda insensitive
+            # FIXME: La interfaz queda insensitive
             print ("No tienes conexión ?")

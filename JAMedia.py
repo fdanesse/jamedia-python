@@ -36,13 +36,16 @@ TipEncontrados = "Arrastra Hacia La Derecha para Agregarlo a Descargas"
 
 target = [Gtk.TargetEntry.new('Mover', Gtk.TargetFlags.SAME_APP, 0)]
 
-def print_child(widget):
-    try:
-        for child in widget.get_children():
-            print ("\t", child)
-            print_child(child)
-    except:
+'''
+NOTA: Activa este código en la función realize para ver la estructura de widgets del programa
+def make_tree_widgets(widget,
+        children = widget.get_children()
+        tab = ('%s\t') % tab
+        for child in children:
+            print (tab, type(child)
+            make_tree_widgets(child
         pass
+'''
 
 
 class JAMedia(Gtk.Window):
@@ -107,10 +110,9 @@ class JAMedia(Gtk.Window):
         ocultar([self.toolbar_descarga, self.alerta_busqueda])
         if self.archivos:
             self.__switch(None, 'jamedia')
-            ''' FIXME: No Implementado
-            self.jamediaplayer.base_panel.derecha.lista.set_nueva_lista(self.archivos)
-            self.archivos = []
-            '''
+            # FIXME: Abrir la aplicación desde nautilus no está Implementado
+            # self.jamediaplayer.base_panel.derecha.lista.set_nueva_lista(self.archivos)
+            # self.archivos = []
         else:
             self.__switch(None, 'jamediatube')
 
@@ -133,10 +135,9 @@ class JAMedia(Gtk.Window):
         self.paneltube.connect("cancel_toolbar", self.__cancel_toolbars)
         self.buscador.connect("encontrado", self.__add_video_encontrado)
         self.buscador.connect("end", self.paneltube.update_widgets_videos_encontrados)
-        
-        self.resize(640, 480)
 
-        #FIXME: print_child(self)
+        self.resize(640, 480)
+        # make_tree_widgets(self)
 
     def __cancel_toolbars(self, widget=None):
         self.toolbar_salir.cancelar()
@@ -192,7 +193,7 @@ class JAMedia(Gtk.Window):
         self.__add_videos([video], self.paneltube.encontrados)
 
     def __add_videos(self, videos, destino):
-        #FIXME: cambiar, al parecer se pasa solo un video por vez
+        # FIXME: cambiar, al parecer se pasa solo un video por vez
         if not videos:
             ocultar([self.alerta_busqueda])
             self.toolbar_busqueda.set_sensitive(True)

@@ -51,7 +51,6 @@ class JAMediaPlayer(Gtk.VBox):
         self.__toolbar.salir.connect("clicked", self.__emit_salir)
         self.__toolbar.connect("show_config", self.__show_config)
         
-        #FIXME: self.base_panel.connect("menu_activo", self.__cancel_toolbars)
         self.base_panel.player.connect("video", self.__set_video)
         self.base_panel.izquierda.video_visor.connect("ocultar_controles", self.__show_controls)
         self.base_panel.izquierda.video_visor.connect("button_press_event", self.__set_fullscreen)
@@ -90,9 +89,7 @@ class JAMediaPlayer(Gtk.VBox):
         self.mouse_listener.new_handler(widget.get_visible())
 
     def __set_mouse(self, widget, estado):
-        """
-        Muestra u oculta el mouse de jamedia según su posición.
-        """
+        # Muestra u oculta el mouse de jamedia según su posición.
         win = self.get_property("window")
         if self.__mouse_in_visor:  # Solo cuando el mouse está sobre el Visor.
             if estado == "moviendose":

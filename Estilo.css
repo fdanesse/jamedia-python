@@ -130,7 +130,7 @@ button:checked {
     border: 1px solid @border;
     padding: 5px;
     font-weight: bold;
-    /* FIXME: No funciona:
+    /* FIXME: Animations No funcionan:
     animation-name: playing_anim;
     animation-duration: 2s;
     animation-iteration-count: infinite;*/
@@ -277,11 +277,7 @@ trough highlight{
 .entradasdetexto:focus {
     border: 1px @bg_toolbar1 solid;
 }
-/*
-#treeviewlist {}
-#treeviewlist:nth-child(even):hover {}
-#treeviewlist:nth-child(even):selected {}
-*/
+
 /*
 @keyframes playing_anim {
     0% {
@@ -302,40 +298,31 @@ trough highlight{
 */
 
 /*
-FIXME:
-reparar dialogo abrir archivos
-buscar como agregar imagen en los tag de videos
-agregar terminal con información de rendimiento
-help
-credits
-mejorar transiciones en botones
-cargar subtítulos
-cargar listas de radio o televisión
-copiar, mover, borrar archivos
-convertir archivos
-informacion de tamaño y codecs
-establecer orden de foco en la toolbar de busqueda
-que en la toolbar de busquedas aparezca: Actualizando metadatos de video ... ?
-reparar toolbar encontrados para que muestre el texto mientras se actualizan los metadatos, quizas sea mejor
-mantener la alerta abierta y actualizar alli estos datos
-en los video items agregar botones para borrar, descargar, convertir, guardar portada, etc ...
-en la toolbar busquedas, poder descargar una dirección específica
-agregar imagen de arrastre en drag and drop de paneltube
-cambiar minitoolbars por opciones en toolbar videos
-quitarle el borde a jamedia cuando esta fullscreen y con controles ocultos
+FIXMEs:
+    Mejorar transiciones en botones (Actualmente no es posible)
+    Implementar controlador de tabulador para pasar el foco entre widgets (Actualmente no es posible)
+    cargar subtítulos (Actualmente gstreamer no lo permite)
+
+    Reimplementar help y credits
+    reparar o reemplazar dialogo abrir archivos
+    buscar como agregar y leer imagen en los tag de videos
+    agregar terminal con información de rendimiento
+    cargar listas de radio o televisión o utilizar jamedia radio
+    copiar, mover, borrar y convertir archivos 
+    informacion de tamaño y codecs
+
+    reparar toolbar encontrados para que muestre el texto mientras se actualizan los metadatos, quizas sea mejor
+    en los video items agregar botones para borrar, descargar, convertir, guardar portada, etc ...
+    en la toolbar busquedas, poder descargar una dirección específica
+    agregar imagen de arrastre en drag and drop de paneltube
+    
+    quitarle el borde a jamedia cuando esta fullscreen y con controles ocultos
 */
-.coso {
-    color: #778899; /*bg_toolbar1*/
-    color: #ff6600; /*jamedia1*/
-    color: #FF9800; /*jamedia2*/
-    color: #FFE0B2; /*jamedia3*/
-    color: #388E3C; /*green1*/
-    color: #4CAF50; /*green2*/
-    color: #C8E6C9; /*green3*/
-    color: rgba(0,0,0, 0.5); /*border*/
-}
 
 /*Notas:
+#treeviewlist {}
+#treeviewlist:nth-child(even):hover {}
+#treeviewlist:nth-child(even):selected {}
 
 def on_button_clicked(self, widget, valid):
     style_context = widget.get_style_context()

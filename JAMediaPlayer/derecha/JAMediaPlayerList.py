@@ -12,7 +12,7 @@ from gi.repository import GdkPixbuf
 
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
-from JAMediaPlayer.Globales import get_JAMedia_Directory
+from JAMediaPlayer.Globales import get_tube_directory
 from JAMediaPlayer.Globales import ICONS_PATH
 
 
@@ -29,7 +29,7 @@ class PlayerList(Gtk.Frame):
         self.set_css_name('frameplayerlist')
         self.set_name('frameplayerlist')
 
-        self.directorio = get_JAMedia_Directory()
+        self.directorio = get_tube_directory()
         self.mime = ['audio/*', 'video/*', 'application/ogg']
 
         vbox = Gtk.VBox()
@@ -117,9 +117,7 @@ class Lista(Gtk.TreeView):
         self.set_name('treeviewlist')
 
         self.__valorSelected = None
-        #self.set_headers_clickable(True)
         self.set_headers_visible(False)
-        #self.set_reorderable(True)
 
         self.__setear_columnas()
         self.get_selection().connect("changed", self.__changedSelection)
@@ -134,7 +132,7 @@ class Lista(Gtk.TreeView):
     def __changedSelection(self, treeSelection):
         modelo, _iter = treeSelection.get_selected()
         if not _iter:
-            #NOTA: Al parecer nunca sucede pero no está de más
+            # NOTA: Al parecer nunca sucede pero no está de más
             self.__valorSelected = None
             self.emit("len_items", 0)
             return
@@ -151,8 +149,6 @@ class Lista(Gtk.TreeView):
 
     def __construir_columa(self, text, index, visible):
         render = Gtk.CellRendererText()
-        #render.set_property("background", get_colors("window"))
-        #render.set_property("foreground", get_colors("drawingplayer"))
         columna = Gtk.TreeViewColumn(text, render, text=index)
         columna.set_sort_column_id(index)
         columna.set_property('visible', visible)
@@ -162,7 +158,6 @@ class Lista(Gtk.TreeView):
 
     def __construir_columna_icono(self, text, index, visible):
         render = Gtk.CellRendererPixbuf()
-        #render.set_property("cell-background", get_colors("toolbars"))
         columna = Gtk.TreeViewColumn(text, render, pixbuf=index)
         columna.set_property('visible', visible)
         columna.set_property('resizable', False)
@@ -178,17 +173,7 @@ class Lista(Gtk.TreeView):
         texto, path = elementos[0]
         icono = os.path.join(ICONS_PATH, "sonido.svg")
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(icono, 24, -1)
-        '''
-        #FIXME: descripcion = describe_uri(path)
-        if descripcion:
-            if descripcion[2]:
-                # Es un Archivo
-                tipo = describe_archivo(path)
-                if 'video' in tipo or 'application/ogg' in tipo:
-                    icono = os.path.join(ICONS_PATH, "video.svg")
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
-                        icono, 24, -1)
-        '''
+
         self.get_model().append([pixbuf, texto, path])
         elementos.remove(elementos[0])
         GLib.idle_add(self.__ejecutar_agregar_elemento, elementos)
@@ -273,7 +258,7 @@ class JAMediaToolbarList(Gtk.Toolbar):
         # self.subtitulos.set_sensitive(False)
 
 
-# FIXME: Estilizar
+# FIXME: Estilizar o reemplazar FileChooserDialog
 class My_FileChooser(Gtk.FileChooserDialog):
 
     __gsignals__ = {'load-files': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, ))}

@@ -25,7 +25,7 @@ class ToolbarAccionListasVideos(Gtk.Toolbar):
         style_context = self.get_style_context()
         style_context.add_class("toolbaraccionvideos")
 
-        self.objetos = None
+        self.__box = None
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
@@ -48,16 +48,14 @@ class ToolbarAccionListasVideos(Gtk.Toolbar):
         self.show_all()
 
     def __realizar_accion(self, widget):
-        objetos = self.objetos
         self.cancelar()
-        GLib.idle_add(self.__emit_ok, objetos)
+        GLib.idle_add(self.__emit_ok)
 
-    def __emit_ok(self, objetos):
-        self.emit('ok', objetos)
+    def __emit_ok(self):
+        self.emit('ok', self.__box)
 
-    def set_accion(self, objetos):
-        self.objetos = objetos
-        # FIXME: No funciona
+    def set_clear(self, box):
+        self.__box = box
         if self.get_visible():
             self.cancelar()
         else:

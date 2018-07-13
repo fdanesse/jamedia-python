@@ -7,20 +7,10 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from gi.repository import GObject
 
-#from JAMediaPlayer.Widgets.credits import Credits
-#from JAMediaPlayer.Widgets.help import Help
-
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
 from JAMediaPlayer.Globales import get_toggle_boton
-from JAMediaPlayer.Globales import get_my_files_directory
-#from JAMediaPlayer.Globales import describe_acceso_uri
-#from JAMediaPlayer.Globales import copiar
-#from JAMediaPlayer.Globales import borrar
-#from JAMediaPlayer.Globales import mover
-
 from JAMediaPlayer.Globales import ICONS_PATH
-# FIXME: Borrar las Toolbars que no se usan
 
 
 class Toolbar(Gtk.Toolbar):
@@ -83,22 +73,11 @@ class Toolbar(Gtk.Toolbar):
     def __emit_show_config(self, widget):
         self.emit('show_config', widget.get_active())
 
-    '''
-    def __show_credits(self, widget):
-        dialog = Credits(parent=self.get_toplevel())
-        dialog.run()
-        dialog.destroy()
-    '''
-    
-    '''
-    def __show_help(self, widget):
-        dialog = Help(parent=self.get_toplevel())
-        dialog.run()
-        dialog.destroy()
-    '''
+    #def __show_credits(self, widget):
+    #def __show_help(self, widget):
 
 
-'''
+''' FIXME: Reimplementar ToolbarAccion
 class ToolbarAccion(Gtk.EventBox):
     """
     Toolbar para que el usuario confirme las acciones que se realizan sobre

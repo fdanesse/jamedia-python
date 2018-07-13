@@ -5,8 +5,7 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 from gi.repository import GLib
-from gi.repository import GObject
-from gi.repository import GdkX11
+from gi.repository import GdkX11 # NOTA: Necesario para obtener el id de la ventana
 
 from JAMediaPlayer.izquierda.Izquierda import Izquierda
 from JAMediaPlayer.derecha.Derecha import Derecha
@@ -34,7 +33,6 @@ class BasePanel(Gtk.HPaned):
         self.player.connect("estado", self.__state_changed)
         self.player.connect("newposicion", self.__update_progress)
         self.player.connect("video", self.__set_video)
-        #FIXME: self.player.connect("loading-buffer", self.__loading_buffer)
         
         self.show_all()
 
@@ -42,10 +40,10 @@ class BasePanel(Gtk.HPaned):
         self.derecha.playercontrols.connect("accion-controls", self.__accion_controls)
         self.derecha.balance.connect("balance-valor", self.__accion_balance)
         self.derecha.lista.lista.connect("len_items", self.__len_items)
-        self.derecha.lista.connect("subtitulos", self.__load_subtitulos)
-        self.izquierda.connect("rotar", self.__rotar)
-        self.izquierda.connect("seek", self.__user_set_progress)
-        self.izquierda.connect("volumen", self.__set_volumen)
+        # FIXME: Subtítulos no funcionan self.derecha.lista.connect("subtitulos", self.__load_subtitulos)
+        self.izquierda.toolbar_info.connect("rotar", self.__rotar)
+        self.izquierda.progress.connect("seek", self.__user_set_progress)
+        self.izquierda.progress.connect("volumen", self.__set_volumen)
 
     def __len_items(self, widget, items):
         if items == 0 and self.player:
@@ -83,8 +81,9 @@ class BasePanel(Gtk.HPaned):
         if self.player:
             self.player.set_position(valor)
 
-    def __load_subtitulos(self, widget, path):
-        self.player.set_subtitulos(path)
+    # FIXME: Subtítulos no funcionan
+    #def __load_subtitulos(self, widget, path):
+    #    self.player.set_subtitulos(path)
 
     def __cargar_reproducir(self, widget, path):
         volumen = 1.0
@@ -93,11 +92,6 @@ class BasePanel(Gtk.HPaned):
         xid = self.izquierda.video_visor.get_property('window').get_xid()
         self.player.load(path, xid)
         self.player.set_volumen(volumen)
-
-    '''
-    def __loading_buffer(self, player, buf):
-        pass #self.izquierda.buffer_info.set_progress(float(buf))
-    '''
     
     def __rotar(self, widget, valor):
         if self.player:

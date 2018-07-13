@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 import gi
 gi.require_version("Gtk", "3.0")
 
@@ -58,17 +57,6 @@ class ToolbarDescargas(Gtk.VBox):
         self.label_progreso.show()
         item.add(self.label_progreso)
         self.toolbar.insert(item, -1)
-
-        #self.toolbar.insert(G.get_separador(draw = False, ancho = 0, expand = True), -1)
-
-        # FIXME: BUG. Las descargas no se cancelan.
-        #archivo = os.path.join(BASE_PATH, "Iconos","stop.svg")
-        #boton = G.get_boton(archivo, flip = False, pixels = G.get_pixels(1))
-        #boton.set_tooltip_text("Cancelar")
-        #boton.connect("clicked", self.cancel_download)
-        #self.toolbar.insert(boton, -1)
-
-        #self.toolbar.insert(G.get_separador(draw = False, ancho = 3, expand = False), -1)
 
         self.barra_progreso = BarraProgreso()
         self.barra_progreso.show()
@@ -152,37 +140,3 @@ class ToolbarDescargas(Gtk.VBox):
 
         self.actualizador = GLib.timeout_add(1000, self.__handle)
         self.show_all()
-
-'''print
-class Progreso_Descarga(Gtk.EventBox):
-    """
-    Barra de progreso para mostrar estado de descarga.
-    """
-
-    def __init__(self):
-
-        Gtk.EventBox.__init__(self)
-
-        self.modify_bg(Gtk.StateType.NORMAL,
-            get_colors("download"))
-
-        self.escala = ProgressBar(
-            Gtk.Adjustment(0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
-
-        self.valor = 0
-
-        self.add(self.escala)
-        self.show_all()
-
-        self.set_size_request(-1, 28)
-        self.set_progress(0)
-
-    def set_progress(self, valor=0):
-        """
-        El reproductor modifica la escala.
-        """
-        if self.valor != valor:
-            self.valor = valor
-            self.escala.ajuste.set_value(valor)
-            self.escala.queue_draw()
-'''

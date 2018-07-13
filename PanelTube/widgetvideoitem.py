@@ -19,9 +19,7 @@ youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")  #"/usr/bin/yo
 class WidgetVideoItem(Gtk.EventBox):
 
     __gsignals__ = {
-    #"clicked": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
     "end-update": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
-    #"click_derecho": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,))
     }
 
     def __init__(self, videodict):
@@ -39,38 +37,6 @@ class WidgetVideoItem(Gtk.EventBox):
         hbox.set_name('videoitemHB')
         self.imagen = Gtk.Image()
         hbox.pack_start(self.imagen, False, False, 3)
-
-        # FIXME: Código Duplicado
-        '''
-        if self.videodict.get("previews", False):
-            if type(self.videodict["previews"]) == list:
-                # 1 lista con 1 url, o base64 en un archivo de busquedas.
-                url = self.videodict["previews"][0]
-                archivo = "/tmp/preview%s" % self.videodict["id"]
-                try:
-                    # FIXME: Porque Falla si no hay Conexión.
-                    fileimage, headers = urllib.request.urlretrieve(url, archivo)
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(fileimage, 200, 150)
-                    self.imagen.set_from_pixbuf(pixbuf)
-                    # Convertir imagen a string por si se quiere guardar.
-                    pixbuf_file = open(fileimage, 'rb')
-                    image_string = base64.b64encode(pixbuf_file.read())
-                    pixbuf_file.close()
-                    self.videodict["previews"] = image_string
-                except:
-                    #FIXME: Verificar que sucede si no hay conexión
-                    print ("ERROR: Quizas no hay conexión", self.__init__)
-                if os.path.exists(archivo):
-                    os.remove(archivo)
-            else:
-                loader = Gtk.gdk.PixbufLoader()
-                loader.set_size(200, 150)
-                image_string = base64.b64decode(self.videodict["previews"])
-                loader.write(image_string)
-                loader.close()
-                pixbuf = loader.get_pixbuf()
-                self.imagen.set_from_pixbuf(pixbuf)
-        '''
         
         self.id_label = Gtk.Label("%s: %s" % ("id", self.videodict["id"]))
         self.id_titulo = Gtk.Label("%s: %s" % ("Título", self.videodict["titulo"]))
@@ -92,17 +58,6 @@ class WidgetVideoItem(Gtk.EventBox):
         self.add(hbox)
 
         self.show_all()
-        #self.connect("button_press_event", self.__button_press)
-    
-    '''
-    # FIXME: Reparar
-    def __button_press(self, widget, event):
-        #self.modify_bg(Gtk.StateType.NORMAL, self.colorclicked)
-        #if event.button == 1:
-        #   self.emit("clicked", event)
-        #elif event.button == 3:
-        self.emit("click_derecho", event)
-    '''
 
     def __get_progress(self, salida, STDOUT, process, error, STERR):
         progress = salida.readline().strip()
@@ -139,7 +94,6 @@ class WidgetVideoItem(Gtk.EventBox):
         GLib.timeout_add(100, self.__update)
 
     def __update(self):
-        # FIXME: Código Duplicado
         if self.videodict.get("previews", False):
             # 1 lista con 1 url
             if self.videodict["previews"]:
@@ -150,7 +104,7 @@ class WidgetVideoItem(Gtk.EventBox):
                 fileimage, headers = urllib.request.urlretrieve(url, archivo)
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(fileimage, 200, 150)
                 self.imagen.set_from_pixbuf(pixbuf)
-                # FIXME: Convertir imagen a string por si se quiere guardar.
+                # NOTA: Convertir imagen a string por si se quiere guardar.
                 '''pixbuf_file = open(fileimage, 'rb')
                 image_string = base64.b64encode(pixbuf_file.read())
                 pixbuf_file.close()
@@ -169,7 +123,7 @@ class WidgetVideoItem(Gtk.EventBox):
         return False
 
     def update(self):
-        #NOTA: desde PanelTube
+        # NOTA: desde PanelTube
         _url = self.videodict["url"]
         STDOUT = "/tmp/jamediatube-dl%s" % self.videodict["id"]
         STERR = "/tmp/jamediatube-dlERR%s" % self.videodict["id"]

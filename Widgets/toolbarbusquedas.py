@@ -43,6 +43,7 @@ class ToolbarBusquedas(Gtk.Toolbar):
         self.entrycantidad.set_tooltip_text("Escribe la cantidad de videos que deseas")
         self.entrycantidad.show()
         self.entrycantidad.connect('changed', self.__check_data)
+        self.entrycantidad.connect('activate', self.__emit_buscar)
         item.add(self.entrycantidad)
         self.insert(item, -1)
 
@@ -67,7 +68,7 @@ class ToolbarBusquedas(Gtk.Toolbar):
         self.entrytext.set_tooltip_text("Escribe lo que Buscas")
         self.entrytext.show()
         self.entrytext.connect('changed', self.__check_data)
-        #FIXME: hacer tab self.entrytext.connect('activate', self.__emit_buscar)
+        self.entrytext.connect('activate', self.__emit_buscar)
         item.add(self.entrytext)
         self.insert(item, -1)
 
@@ -88,9 +89,15 @@ class ToolbarBusquedas(Gtk.Toolbar):
 
     def __emit_buscar(self, widget=None):
         texto = self.entrytext.get_text().strip()
-        cantidad = int(self.entrycantidad.get_text())
+        cantidad = self.entrycantidad.get_text()
+        try:
+            cantidad = int(cantidad)
+        except:
+            cantidad = 0
         self.entrytext.set_text("")
-        self.emit("comenzar_busqueda", texto, cantidad)
+        self.entrycantidad.set_text("")
+        if texto and cantidad:
+            self.emit("comenzar_busqueda", texto, cantidad)
 
     def __check_data(self, widget):
         cantidad = self.entrycantidad.get_text()
@@ -100,5 +107,5 @@ class ToolbarBusquedas(Gtk.Toolbar):
         except:
             cantidad = 0
             self.entrycantidad.set_text("")
+            self.entrycantidad.set_text("")
         self.__run.set_sensitive(cantidad and texto)
-

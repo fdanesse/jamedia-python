@@ -27,7 +27,6 @@ class Toolbar_Videos_Izquierda(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
         self.__label = Gtk.Label('Encontrados: 0')
-        self.__label.get_style_context().add_class("infotext")
         item = Gtk.ToolItem()
         item.set_expand(False)
         item.add(self.__label)
@@ -60,3 +59,4 @@ class Toolbar_Videos_Izquierda(Gtk.Toolbar):
         self.__label.set_text("Encontrados: %s" % videos)
         self.__boton1.set_sensitive(bool(videos))
         self.__boton2.set_sensitive(bool(videos))
+        

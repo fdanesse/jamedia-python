@@ -7,12 +7,8 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from gi.repository import GObject
 
-# FIXME: from Widgets.help import Help
-
-from JAMediaPlayer.Globales import get_colors
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
-
 from JAMediaPlayer.Globales import ICONS_PATH
 
 
@@ -33,7 +29,7 @@ class Toolbar(Gtk.Toolbar):
         self.insert(self.jamedia, -1)
 
         self.help = get_boton(os.path.join(ICONS_PATH, "help.svg"), flip=False, pixels=24, tooltip_text="Ayuda")
-        self.help.connect("clicked", self.__show_help)
+        # FIXME: self.help.connect("clicked", self.__show_help)
         self.insert(self.help, -1)
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
@@ -45,14 +41,6 @@ class Toolbar(Gtk.Toolbar):
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         self.show_all()
-
-    def __show_help(self, widget):
-        print ('FIXME:', self.__show_help)
-        '''
-        dialog = Help(parent=self.get_toplevel())
-        dialog.run()
-        dialog.destroy()
-        '''
         
     def __emit_switch(self, widget):
         self.emit('switch')
