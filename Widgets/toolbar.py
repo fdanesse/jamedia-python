@@ -28,6 +28,14 @@ class Toolbar(Gtk.Toolbar):
         self.__jamedia.connect("clicked", self.__emit_switch, 'jamedia')
         self.insert(self.__jamedia, -1)
 
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+
+        self.radio = get_boton(os.path.join(ICONS_PATH, "Music-Radio-1-icon.png"), flip=False, pixels=24, tooltip_text="Cambiar JAMediaRadio")
+        self.radio.connect("clicked", self.__emit_switch, 'jamediaradio')
+        self.insert(self.radio, -1)
+
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+
         self.__help = get_boton(os.path.join(ICONS_PATH, "help.svg"), flip=False, pixels=24, tooltip_text="Ayuda")
         self.__help.connect("clicked", self.__emit_switch, 'creditos')
         self.insert(self.__help, -1)

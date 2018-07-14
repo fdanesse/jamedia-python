@@ -200,9 +200,6 @@ trough highlight{
     background-image: image(rgb(240,240,240));
     background-color: rgb(240,240,240);
 }
-#boxtube {
-    border: 2px @jamedia3 solid;
-}
 
 #videoitem {
     background-image: image(@green3);
@@ -240,7 +237,7 @@ trough highlight{
     opacity: 1;
 }
 
-#jamediabox {
+#boxtube, #jamediabox, #radio, #credits {
     border: 2px @jamedia3 solid;
 }
 
@@ -303,11 +300,9 @@ FIXMEs:
     Implementar controlador de tabulador para pasar el foco entre widgets (Actualmente no es posible)
     cargar subtítulos (Actualmente gstreamer no lo permite)
 
-    Reimplementar help y credits
     reparar o reemplazar dialogo abrir archivos
     buscar como agregar y leer imagen en los tag de videos
     agregar terminal con información de rendimiento
-    cargar listas de radio o televisión o utilizar jamedia radio
     copiar, mover, borrar y convertir archivos 
     informacion de tamaño y codecs
 

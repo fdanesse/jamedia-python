@@ -19,7 +19,7 @@ from JAMediaPlayer.Globales import ICONS_PATH
 
 class JAMediaPlayer(Gtk.VBox):
 
-    __gsignals__ = {"salir": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
+    __gsignals__ = {"switch": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING, ))}
 
     def __init__(self):
 
@@ -48,7 +48,7 @@ class JAMediaPlayer(Gtk.VBox):
         self.mouse_listener = MouseSpeedDetector(self)
         self.mouse_listener.new_handler(True)
 
-        self.__toolbar.salir.connect("clicked", self.__emit_salir)
+        self.__toolbar.salir.connect("clicked", self.__emit_switch, 'jamediatube')
         self.__toolbar.connect("show_config", self.__show_config)
         
         self.base_panel.player.connect("video", self.__set_video)
@@ -79,8 +79,8 @@ class JAMediaPlayer(Gtk.VBox):
         self.base_panel.derecha.setup_init()
         return False
 
-    def __emit_salir(self, widget):
-        self.emit('salir')
+    def __emit_switch(self, widget, text):
+        self.emit('switch', text)
 
     def __show_config(self, widget, val):
         self.base_panel.derecha.show_config(val)

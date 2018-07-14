@@ -26,4 +26,9 @@ class Toolbar(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
+        self.home = get_boton(os.path.join(ICONS_PATH, "reload.png"), flip=False, pixels=24, tooltip_text="Recargar")
+        self.insert(self.home, -1)
+
+        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+
         self.show_all()
