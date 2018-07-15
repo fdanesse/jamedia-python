@@ -22,7 +22,6 @@ class PanelTube(Gtk.HPaned):
 
     __gsignals__ = {
     'download': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
-    'open_shelve_list': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, GObject.TYPE_PYOBJECT)),
     'cancel_toolbar': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, [])}
 
     def __init__(self):
@@ -88,6 +87,13 @@ class PanelTube(Gtk.HPaned):
         self.emit("cancel_toolbar")
         self.emit('download')
 
+    def __filter2Items(self, item, items):
+        for i in items:
+            if i.videodict["url"] == item.videodict["url"]:
+                item.destroy()
+                return False
+        return True
+
     def __mover_videos(self, widget):
         self.emit("cancel_toolbar")
         if widget == self.toolbar_videos_izquierda.mover:
@@ -98,11 +104,10 @@ class PanelTube(Gtk.HPaned):
             origen = self.descargar
             destino = self.encontrados
             text = TipEncontrados
-        elementos = origen.get_children()
+        elementos = [item for item in origen.get_children() if self.__filter2Items(item, destino.get_children())]
         GLib.idle_add(self.__ejecutar_mover_videos, origen, destino, text, elementos)
 
     def __ejecutar_mover_videos(self, origen, destino, text, elementos):
-        #FIXME: Eliminar Repetidos
         if not elementos:
             self.toolbar_videos_izquierda.added_removed(self.encontrados)
             self.toolbar_videos_derecha.added_removed(self.descargar)

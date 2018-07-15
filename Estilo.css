@@ -1,8 +1,11 @@
-/*http://wiki.xfce.org/howto/gtk_theme*/
-/*https://developer.gnome.org/gtk3/3.0/GtkCssProvider.html*/
-/*background: url{../images/imagen.png} no-repeat;*/
-/*https://gist.github.com/carlos-jenkins/8923124#file-gtk-dark-css*/
-/*https://developer.gnome.org/gtk3/stable/chap-css-properties.html*/
+/*
+http://wiki.xfce.org/howto/gtk_theme
+https://developer.gnome.org/gtk3/3.0/GtkCssProvider.html
+background: url{../images/imagen.png} no-repeat;
+https://gist.github.com/carlos-jenkins/8923124#file-gtk-dark-css
+https://developer.gnome.org/gtk3/stable/chap-css-overview.html
+https://developer.gnome.org/gtk3/stable/chap-css-properties.html
+*/
 
 @define-color bg_toolbar1 #778899;
 @define-color jamedia1 #ff6600;
@@ -347,23 +350,19 @@ trough highlight{
 
 /*
 FIXMEs:
-    Mejorar transiciones en botones (Actualmente no es posible)
+    Mejorar transiciones en botones
     Implementar controlador de tabulador para pasar el foco entre widgets (Actualmente no es posible)
     cargar subtítulos (Actualmente gstreamer no lo permite)
-
-    que los videoiems tengan un spin hasta cargar los metadatos
-    # FIXME: Cuando el usuario ingresa mal una dirección: en err viene: is not a valid URL en WidgetVideoItem.__get_progress
+    Que los videoitems tengan un spin hasta cargar los metadatos (Actualmente css no lo permite)
 
     buscar como agregar y leer imagen en los tag de videos
     agregar terminal con información de rendimiento
-    copiar, mover, borrar y convertir archivos 
+    en los video items agregar botones para borrar, descargar, convertir, guardar portada, etc ...
+    en el reproductor copiar, mover, borrar y convertir archivos 
     informacion de tamaño y codecs
 
     reparar toolbar encontrados para que muestre el texto mientras se actualizan los metadatos, quizas sea mejor
-    en los video items agregar botones para borrar, descargar, convertir, guardar portada, etc ...
-    en la toolbar busquedas, poder descargar una dirección específica
     agregar imagen de arrastre en drag and drop de paneltube
-    
     quitarle el borde a jamedia cuando esta fullscreen y con controles ocultos
 */
 

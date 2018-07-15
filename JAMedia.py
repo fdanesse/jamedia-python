@@ -102,7 +102,6 @@ class JAMedia(Gtk.Window):
 
         self.connect('realize', self.__realized)
         self.show_all()
-        #self.realize()
 
         print ("JAMedia process:", os.getpid())
 
@@ -205,14 +204,12 @@ class JAMedia(Gtk.Window):
         self.__add_videos([video], self.paneltube.encontrados)
 
     def __user_add_video(self, widget, url):
-        # FIXME: Puede que la dirección esté mal
         video = FEED.copy()
         video["url"] = url
         self.__add_videos([video], self.paneltube.descargar)
         self.paneltube.update_widget_video(video)
 
     def __add_videos(self, videos, destino):
-        # FIXME: cambiar, al parecer se pasa solo un video por vez
         if not videos:
             ocultar([self.alerta_busqueda])
             self.toolbar_busqueda.set_sensitive(True)

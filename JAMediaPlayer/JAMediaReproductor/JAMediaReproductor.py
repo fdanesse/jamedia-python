@@ -292,7 +292,8 @@ class JAMediaReproductor(GObject.GObject):
         self.__config['rotation'] = rot
 
     def set_volumen(self, valor):
-        self.__config['volumen'] = float(valor/50)  # 0.0 - 10.0
+        # recibe de 1.0 a 10.0
+        self.__config['volumen'] = float(valor/10.0) # FIXME: Con valores sin modificar, en mis parlantes satura mucho por encima de 5.0
         self.__pipe.set_property('volume', self.__config['volumen'])
 
     def set_position(self, posicion):

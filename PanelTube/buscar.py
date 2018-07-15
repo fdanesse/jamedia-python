@@ -12,7 +12,6 @@ FEED = {
     "id": "",
     "titulo": "",
     "descripcion": "",
-    "categoria": "", # FIXME: Quitar categoría en el feed
     "url": "",
     "duracion": 0,
     "previews": ""

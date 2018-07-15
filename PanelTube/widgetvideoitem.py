@@ -40,14 +40,12 @@ class WidgetVideoItem(Gtk.EventBox):
         
         self.id_label = Gtk.Label("%s: %s" % ("id", self.videodict["id"]))
         self.id_titulo = Gtk.Label("%s: %s" % ("Título", self.videodict["titulo"]))
-        self.id_categoria = Gtk.Label("%s: %s" % ("Categoría", self.videodict["categoria"]))
-        self.id_duracion = Gtk.Label("%s: %s %s" % ("Duración", self.videodict["duracion"], "Minutos"))
+        self.id_duracion = Gtk.Label("%s: %s" % ("Duración", self.videodict["duracion"]))
         self.id_url = Gtk.Label("%s: %s" % ("url", self.videodict["url"]))
 
         vbox = Gtk.VBox()
         vbox.pack_start(self.id_label, True, True, 0)
         vbox.pack_start(self.id_titulo, True, True, 0)
-        vbox.pack_start(self.id_categoria, True, True, 0)
         vbox.pack_start(self.id_duracion, True, True, 0)
         vbox.pack_start(self.id_url, True, True, 0)
 
@@ -118,8 +116,7 @@ class WidgetVideoItem(Gtk.EventBox):
                 os.remove(archivo)
         self.id_label.set_text("%s: %s" % ("id", self.videodict["id"]))
         self.id_titulo.set_text("%s: %s" % ("Título", self.videodict["titulo"]))
-        self.id_categoria.set_text("%s: %s" % ("Categoría", self.videodict["categoria"]))
-        self.id_duracion.set_text("%s: %s %s" % ("Duración", self.videodict["duracion"], "Minutos"))
+        self.id_duracion.set_text("%s: %s" % ("Duración", self.videodict["duracion"]))
         self.id_url.set_text("%s: %s" % ("url", self.videodict["url"]))
         return False
 
