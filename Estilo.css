@@ -227,8 +227,7 @@ trough highlight{
     border-radius: 0;
     opacity: 1;
 }
-#scrolllist slider,
-#scrolllist button {
+#scrolllist slider {
     background-image: image(@jamedia1);
     background-color: @jamedia1;
     border-color: black;
@@ -246,7 +245,6 @@ trough highlight{
     background-color: @bg_toolbar1;
 }
 
-
 #frameplayerlist {
     background-image: url('Iconos/reciclado_arrugado_azul.png');
     background-size:cover;
@@ -261,11 +259,9 @@ trough highlight{
     padding-left: 3px;
     padding-top: 3px;
 }
-
 #treeviewlist:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
-
 #treeviewlist:selected {
     background-color: rgba(255, 255, 255, 0.2);
     color: @jamedia1;
@@ -273,6 +269,61 @@ trough highlight{
 
 .entradasdetexto:focus {
     border: 1px @bg_toolbar1 solid;
+}
+
+#filechooser {
+    background-image: image(rgb(240,240,240));
+    background-color: rgb(240,240,240);
+}
+#filechooser button {
+    padding: 5px;
+    background-image: image(rgb(240,240,240));
+    background-color: rgb(240,240,240);
+}
+#filechooser button:hover {
+    background-image: image(@green3);
+    background-color: @green3;
+    border: 0.1em solid @green3;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
+}
+#filechooser button:checked {
+    background-image: image(@green3);
+    background-color: @green3;
+    border: 0.1em solid black;
+}
+
+#filechooser treeview {
+    background-image: image(rgb(240,240,240));
+    background-color: rgb(240,240,240);
+    color: black;
+    padding-left: 3px;
+    padding-top: 3px;
+}
+#filechooser treeview:hover {
+    background-image: Image(@green3);
+    background-color: @green3;
+}
+#filechooser treeview:selected {
+    background-image: Image(@jamedia3);
+    background-color: @jamedia3;
+    color: black;
+}
+
+#filechooser trough {
+    background-image: image(@jamedia3);
+    background-color: @jamedia3;
+    border-width: 1px;
+    border-color: black;
+    border-radius: 0;
+    opacity: 1;
+}
+#filechooser slider {
+    background-image: image(@jamedia1);
+    background-color: @jamedia1;
+    border-color: black;
+    border-radius: 3px;
+    border-width: 1px;
+    opacity: 1;
 }
 
 /*
@@ -300,7 +351,9 @@ FIXMEs:
     Implementar controlador de tabulador para pasar el foco entre widgets (Actualmente no es posible)
     cargar subtítulos (Actualmente gstreamer no lo permite)
 
-    reparar o reemplazar dialogo abrir archivos
+    que los videoiems tengan un spin hasta cargar los metadatos
+    # FIXME: Cuando el usuario ingresa mal una dirección: en err viene: is not a valid URL en WidgetVideoItem.__get_progress
+
     buscar como agregar y leer imagen en los tag de videos
     agregar terminal con información de rendimiento
     copiar, mover, borrar y convertir archivos 

@@ -38,6 +38,7 @@ class RadioViewer(Gtk.VBox):
 
         self.show_all()
         self.run('jamediaradio')
+        self.hide()
 
     def __error_load(self, web_view, load_event, failing_uri, error):
         self.run('error')
@@ -57,7 +58,6 @@ class RadioViewer(Gtk.VBox):
         elif valor == 'error':
             uri = 'file://' + os.path.join(BASE_PATH, "onerror/onerror.html")
         GLib.idle_add(self.__viewer.load_uri, uri)
-        self.show()
 
 
 class Webview(WebKit2.WebView):

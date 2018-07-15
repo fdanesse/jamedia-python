@@ -10,6 +10,7 @@ from gi.repository import GObject
 from PanelTube.toolbaraccionlistasvideos import ToolbarAccionListasVideos
 from PanelTube.toolbarvideosizquierda import Toolbar_Videos_Izquierda
 from PanelTube.toolbarvideosderecha import Toolbar_Videos_Derecha
+from PanelTube.toolbaraddvideo import ToolbarAddVideo
 
 TipDescargas = "Arrastra Hacia La Izquierda para Quitarlo de Descargas."
 TipEncontrados = "Arrastra Hacia La Derecha para Agregarlo a Descargas"
@@ -45,6 +46,8 @@ class PanelTube(Gtk.HPaned):
         self.toolbar_accion_derecha = ToolbarAccionListasVideos()  # Confirmar borrar lista de videos
         self.toolbar_videos_derecha = Toolbar_Videos_Derecha()
         
+        self.toolbar_add_video = ToolbarAddVideo()
+
         # Izquierda       
         box = Gtk.VBox()
         scroll = self.__get_scroll()
@@ -60,20 +63,26 @@ class PanelTube(Gtk.HPaned):
         scroll.add_with_viewport(self.descargar)
         box.pack_start(scroll, True, True, 0)
         box.pack_start(self.toolbar_accion_derecha, False, False, 0)
+        box.pack_start(self.toolbar_add_video, False, False, 0)
         box.pack_start(self.toolbar_videos_derecha, False, False, 0)
         self.pack2(box, resize=False, shrink=False)
 
         self.show_all()
         
-        self.toolbar_videos_izquierda.connect('mover_videos', self.__mover_videos)
-        self.toolbar_videos_derecha.connect('mover_videos', self.__mover_videos)
-        self.toolbar_videos_izquierda.connect('borrar', self.__set_borrar)
-        self.toolbar_videos_derecha.connect('borrar', self.__set_borrar)
+        self.toolbar_videos_izquierda.mover.connect('clicked', self.__mover_videos)
+        self.toolbar_videos_izquierda.borrar.connect('clicked', self.__set_borrar)
+        self.toolbar_videos_derecha.mover.connect('clicked', self.__mover_videos)
+        self.toolbar_videos_derecha.borrar.connect('clicked', self.__set_borrar)
+        self.toolbar_videos_derecha.descargar.connect("clicked", self.__comenzar_descarga)
+        self.toolbar_videos_derecha.addvideo.connect('clicked', self.__run_add_video)
         self.toolbar_accion_izquierda.connect('ok', self.__ejecutar_borrar)
         self.toolbar_accion_derecha.connect('ok', self.__ejecutar_borrar)
-        self.toolbar_videos_derecha.connect("comenzar_descarga", self.__comenzar_descarga)
+        
+        self.toolbars_flotantes = [self.toolbar_accion_izquierda, self.toolbar_add_video, self.toolbar_accion_derecha]
 
-        self.toolbars_flotantes = [self.toolbar_accion_izquierda, self.toolbar_accion_derecha]
+    def __run_add_video(self, widget):
+        self.emit("cancel_toolbar")
+        self.toolbar_add_video.run()
 
     def __comenzar_descarga(self, widget):
         self.emit("cancel_toolbar")
@@ -81,11 +90,11 @@ class PanelTube(Gtk.HPaned):
 
     def __mover_videos(self, widget):
         self.emit("cancel_toolbar")
-        if widget == self.toolbar_videos_izquierda:
+        if widget == self.toolbar_videos_izquierda.mover:
             origen = self.encontrados
             destino = self.descargar
             text = TipDescargas
-        elif widget == self.toolbar_videos_derecha:
+        elif widget == self.toolbar_videos_derecha.mover:
             origen = self.descargar
             destino = self.encontrados
             text = TipEncontrados
@@ -116,9 +125,9 @@ class PanelTube(Gtk.HPaned):
     
     def __set_borrar(self, widget):
         self.emit("cancel_toolbar")
-        if widget == self.toolbar_videos_izquierda:
+        if widget == self.toolbar_videos_izquierda.borrar:
             self.toolbar_accion_izquierda.set_clear(self.encontrados)
-        elif widget == self.toolbar_videos_derecha:
+        elif widget == self.toolbar_videos_derecha.borrar:
             self.toolbar_accion_derecha.set_clear(self.descargar)
         else:
             print ("Caso imprevisto en run_accion de PanelTube.")
@@ -158,3 +167,12 @@ class PanelTube(Gtk.HPaned):
         for item in items:
             item.set_sensitive(False)
         self.__update_next(False, items)
+
+    def __filterItems(self, item, url):
+        return item.videodict["url"] == url
+
+    def update_widget_video(self, video):
+        # usuario agrega una dirección específica
+        items = [item for item in self.descargar.get_children() if self.__filterItems(item, video['url'])]
+        self.__update_next(False, items)
+        

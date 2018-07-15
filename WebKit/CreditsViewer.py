@@ -37,6 +37,7 @@ class CreditsViewer(Gtk.VBox):
         self.__viewer.connect('load_failed', self.__error_load)
 
         self.show_all()
+        self.hide()
 
     def __error_load(self, web_view, load_event, failing_uri, error):
         self.run('error')

@@ -12,7 +12,6 @@ from gi.repository import GdkPixbuf
 
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import get_boton
-from JAMediaPlayer.Globales import get_tube_directory
 from JAMediaPlayer.Globales import ICONS_PATH
 
 
@@ -28,9 +27,6 @@ class PlayerList(Gtk.Frame):
 
         self.set_css_name('frameplayerlist')
         self.set_name('frameplayerlist')
-
-        self.directorio = get_tube_directory()
-        self.mime = ['audio/*', 'video/*', 'application/ogg']
 
         vbox = Gtk.VBox()
 
@@ -51,8 +47,6 @@ class PlayerList(Gtk.Frame):
 
         self.set_size_request(150, -1)
 
-        self.toolbar.openfiles.connect("clicked", self.__openfiles, "load")
-        self.toolbar.appendfiles.connect("clicked", self.__openfiles, "add")
         self.toolbar.clearlist.connect("clicked", self.__clearList)
         # FIXME: Subtítulos no funcionan self.toolbar.subtitulos.connect("clicked", self.__cargar_subtitulos)
         self.lista.connect("len_items", self.__len_items)
@@ -62,12 +56,6 @@ class PlayerList(Gtk.Frame):
 
     def __clearList(self, widget):
         self.lista.limpiar()
-
-    def __openfiles(self, widget, tipo):
-        selector = My_FileChooser(parent=self.get_toplevel(),filter_type=[], action=Gtk.FileChooserAction.OPEN,mime=self.mime, title="Abrir Archivos", path=self.directorio)
-        selector.connect('load-files', self.__load_files, tipo)
-        selector.run()
-        if selector:selector.destroy()
 
     ''' # FIXME: Subtítulos no funcionan
     def __cargar_subtitulos(self, widget):
@@ -86,20 +74,6 @@ class PlayerList(Gtk.Frame):
             if path: self.emit('subtitulos', path)
         if dialog: dialog.destroy()
     '''
-
-    def __load_files(self, widget, archivos, tipo):
-        items = []
-        archivos.sort()
-        for path in archivos:
-            if not os.path.isfile(path):continue
-            archivo = os.path.basename(path)
-            items.append([archivo, path])
-            self.directorio = os.path.dirname(path)
-        self.__load_list(items, tipo)
-
-    def __load_list(self, items, tipo):
-        if tipo == "load": self.lista.limpiar()
-        self.lista.agregar_items(items)
 
 
 class Lista(Gtk.TreeView):
@@ -256,67 +230,3 @@ class JAMediaToolbarList(Gtk.Toolbar):
         self.show_all()
         self.clearlist.set_sensitive(False)
         # self.subtitulos.set_sensitive(False)
-
-
-# FIXME: Estilizar o reemplazar FileChooserDialog
-class My_FileChooser(Gtk.FileChooserDialog):
-
-    __gsignals__ = {'load-files': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT, ))}
-
-    def __init__(self, parent=None, action=None, filter_type=[], title=None, path=None, mime=[]):
-
-        Gtk.FileChooserDialog.__init__(self, title=title, parent=parent, action=action)
-
-        self.set_resizable(True)
-        self.set_size_request(320, 240)
-
-        self.set_current_folder_uri("file://%s" % path)
-        self.set_select_multiple(True)
-
-        hbox = Gtk.HBox()
-
-        boton_abrir_directorio = Gtk.Button("Abrir")
-        boton_seleccionar_todo = Gtk.Button("Seleccionar Todos")
-        boton_salir = Gtk.Button("Salir")
-        boton_salir.connect("clicked", self.__salir)
-
-        boton_abrir_directorio.connect("clicked", self.__file_activated)
-        boton_seleccionar_todo.connect("clicked", self.__select_all)
-
-        hbox.pack_end(boton_salir, True, True, 5)
-        hbox.pack_end(boton_seleccionar_todo, True, True, 5)
-        hbox.pack_end(boton_abrir_directorio, True, True, 5)
-
-        self.set_extra_widget(hbox)
-
-        hbox.show_all()
-
-        if filter_type:
-            filtro = Gtk.FileFilter()
-            filtro.set_name("Filtro")
-            for fil in filter_type:
-                filtro.add_pattern(fil)
-            self.add_filter(filtro)
-        elif mime:
-            filtro = Gtk.FileFilter()
-            filtro.set_name("Filtro")
-            for mi in mime:
-                filtro.add_mime_type(mi)
-            self.add_filter(filtro)
-
-        self.add_shortcut_folder_uri("file:///media/")
-        self.connect("file-activated", self.__file_activated)
-        self.connect("realize", self.__resize)
-
-    def __resize(self, widget):
-        self.resize(437, 328)
-
-    def __file_activated(self, widget):
-        self.emit('load-files', self.get_filenames())
-        self.__salir(None)
-
-    def __select_all(self, widget):
-        self.select_all()
-
-    def __salir(self, widget):
-        self.destroy()

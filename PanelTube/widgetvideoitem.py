@@ -64,6 +64,7 @@ class WidgetVideoItem(Gtk.EventBox):
         err = error.readline().strip()
         if err:
             print ("Error al actualizar metadatos de:", self.videodict["url"], err)
+            # FIXME: Cuando el usuario ingresa mal una dirección: en err viene: is not a valid URL
             process.kill()
             for arch in [salida, error]:
                 arch.close()

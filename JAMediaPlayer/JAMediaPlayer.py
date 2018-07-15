@@ -13,6 +13,7 @@ from gi.repository import GdkPixbuf
 from JAMediaPlayer.Widgets.Toolbars import Toolbar
 from JAMediaPlayer.Widgets.mousespeeddetector import MouseSpeedDetector
 from JAMediaPlayer.BasePanel import BasePanel
+from JAMediaPlayer.FileChooser import FileChooser
 
 from JAMediaPlayer.Globales import ICONS_PATH
 
@@ -25,6 +26,8 @@ class JAMediaPlayer(Gtk.VBox):
 
         Gtk.VBox.__init__(self)
 
+        self.directorio = ''
+
         self.set_css_name('jamediabox')
         self.set_name('jamediabox')
 
@@ -36,12 +39,13 @@ class JAMediaPlayer(Gtk.VBox):
 
         self.__toolbar = Toolbar()
         self.base_panel = BasePanel()
+        self.__filechooser = FileChooser()
 
         self.pack_start(self.__toolbar, False, False, 0)
         self.pack_start(self.base_panel, True, True, 0)
+        self.pack_start(self.__filechooser, True, True, 0)
 
         self.connect("realize", self.__realize)
-
         self.show_all()
 
         # Controlador del mouse. http://www.pyGtk.org/pyGtk2reference/class-gdkdisplay.html
@@ -54,12 +58,41 @@ class JAMediaPlayer(Gtk.VBox):
         self.base_panel.player.connect("video", self.__set_video)
         self.base_panel.izquierda.video_visor.connect("ocultar_controles", self.__show_controls)
         self.base_panel.izquierda.video_visor.connect("button_press_event", self.__set_fullscreen)
+        self.base_panel.derecha.lista.toolbar.openfiles.connect("clicked", self.__openfiles, 'load')
+        self.base_panel.derecha.lista.toolbar.appendfiles.connect("clicked", self.__openfiles, 'add')
+
+        self.__filechooser.open.connect("clicked", self.__load_files)
+        self.__filechooser.connect("file-activated", self.__load_files)
+        self.__filechooser.salir.connect("clicked", self.__return_to_player)
 
         self.mouse_listener.connect("estado", self.__set_mouse)
         self.connect("hide", self.__hide_show)
         self.connect("show", self.__hide_show)
 
         GLib.idle_add(self.__setup_init)
+
+    def __load_files(self, widget):
+        archivos = self.__filechooser.get_filenames()
+        items = []
+        archivos.sort()
+        for path in archivos:
+            if not os.path.isfile(path):continue
+            archivo = os.path.basename(path)
+            items.append([archivo, path])
+            self.directorio = os.path.dirname(path)
+        self.__return_to_player(None)
+        if self.__filechooser.tipo == "load": self.base_panel.derecha.lista.lista.limpiar()
+        self.base_panel.derecha.lista.lista.agregar_items(items)
+
+    def __return_to_player(self, widget):
+        self.__filechooser.hide()
+        self.__toolbar.show()
+        self.base_panel.show()
+
+    def __openfiles(self, widget, tipo):
+        self.__toolbar.hide()
+        self.base_panel.hide()
+        self.__filechooser.run(self.directorio, tipo)
 
     def __set_fullscreen(self, widget, event):
         if event.type.value_name == "GDK_2BUTTON_PRESS":
@@ -77,6 +110,7 @@ class JAMediaPlayer(Gtk.VBox):
         self.__toolbar.configurar.set_sensitive(False)
         self.base_panel.izquierda.setup_init()
         self.base_panel.derecha.setup_init()
+        self.__filechooser.hide()
         return False
 
     def __emit_switch(self, widget, text):

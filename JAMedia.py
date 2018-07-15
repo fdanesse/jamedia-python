@@ -40,13 +40,15 @@ target = [Gtk.TargetEntry.new('Mover', Gtk.TargetFlags.SAME_APP, 0)]
 
 '''
 NOTA: Activa este código en la función realize para ver la estructura de widgets del programa
-def make_tree_widgets(widget,
+def make_tree_widgets(widget, tab):
+    try:
         children = widget.get_children()
-        tab = ('%s\t') % tab
-        for child in children:
-            print (tab, type(child)
-            make_tree_widgets(child
-        pass
+    except:
+        return
+    tab = ('%s\t') % tab
+    for child in children:
+        print (tab, type(child))
+        make_tree_widgets(child, tab)
 '''
 
 
@@ -100,7 +102,7 @@ class JAMedia(Gtk.Window):
 
         self.connect('realize', self.__realized)
         self.show_all()
-        self.realize()
+        #self.realize()
 
         print ("JAMedia process:", os.getpid())
 
@@ -114,13 +116,6 @@ class JAMedia(Gtk.Window):
 
     def __realized(self, widget):
         ocultar([self.toolbar_descarga, self.alerta_busqueda])
-        if self.archivos:
-            self.__switch(None, 'jamedia')
-            # FIXME: Abrir la aplicación desde nautilus no está Implementado
-            # self.jamediaplayer.base_panel.derecha.lista.set_nueva_lista(self.archivos)
-            # self.archivos = []
-        else:
-            self.__switch(None, 'jamediatube')
 
         self.paneltube.encontrados.drag_dest_set(Gtk.DestDefaults.ALL, target, Gdk.DragAction.MOVE)
         self.paneltube.encontrados.connect("drag-drop", self.__drag_drop)
@@ -141,9 +136,18 @@ class JAMedia(Gtk.Window):
         self.paneltube.connect('download', self.__run_download)
         self.toolbar_descarga.connect('end', self.__run_download)
         self.paneltube.connect("cancel_toolbar", self.__cancel_toolbars)
+        self.paneltube.toolbar_add_video.connect('ok', self.__user_add_video)
         self.buscador.connect("encontrado", self.__add_video_encontrado)
         self.buscador.connect("end", self.paneltube.update_widgets_videos_encontrados)
 
+        if self.archivos:
+            self.__switch(None, 'jamedia')
+            # FIXME: Abrir la aplicación desde nautilus no está Implementado
+            # self.jamediaplayer.base_panel.derecha.lista.set_nueva_lista(self.archivos)
+            # self.archivos = []
+        else:
+            self.__switch(None, 'jamediatube')
+            
         self.resize(640, 480)
         # make_tree_widgets(self)
 
@@ -199,6 +203,13 @@ class JAMedia(Gtk.Window):
         video["id"] = _id
         video["url"] = url
         self.__add_videos([video], self.paneltube.encontrados)
+
+    def __user_add_video(self, widget, url):
+        # FIXME: Puede que la dirección esté mal
+        video = FEED.copy()
+        video["url"] = url
+        self.__add_videos([video], self.paneltube.descargar)
+        self.paneltube.update_widget_video(video)
 
     def __add_videos(self, videos, destino):
         # FIXME: cambiar, al parecer se pasa solo un video por vez
