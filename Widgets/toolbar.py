@@ -24,15 +24,21 @@ class Toolbar(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        self.__jamedia = get_boton(os.path.join(ICONS_PATH, "jamedia.png"), flip=False, pixels=35, tooltip_text="Cambiar a JAMedia")
+        self.__jamedia = get_boton(os.path.join(ICONS_PATH, "jamedia.png"), flip=False, pixels=35, tooltip_text="JAMedia")
         self.__jamedia.connect("clicked", self.__emit_switch, 'jamedia')
         self.insert(self.__jamedia, -1)
 
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        # self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        self.radio = get_boton(os.path.join(ICONS_PATH, "Music-Radio-1-icon.png"), flip=False, pixels=24, tooltip_text="Cambiar JAMediaRadio")
+        self.radio = get_boton(os.path.join(ICONS_PATH, "Music-Radio-1-icon.png"), flip=False, pixels=24, tooltip_text="JAMediaRadio")
         self.radio.connect("clicked", self.__emit_switch, 'jamediaradio')
         self.insert(self.radio, -1)
+
+        #self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+
+        self.converter = get_boton(os.path.join(ICONS_PATH, "convert.svg"), flip=False, pixels=24, tooltip_text="JAMediaConverter")
+        self.converter.connect("clicked", self.__emit_switch, 'jamediaconverter')
+        self.insert(self.converter, -1)
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 

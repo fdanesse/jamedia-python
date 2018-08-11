@@ -21,7 +21,7 @@ class Toolbar(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        self.salir = get_boton(os.path.join(ICONS_PATH, "JAMedia.svg"), flip=False, pixels=35, tooltip_text="Cambiar JAMediaTube")
+        self.salir = get_boton(os.path.join(ICONS_PATH, "home.svg"), flip=False, pixels=24, tooltip_text="JAMediaTube")
         self.insert(self.salir, -1)
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)

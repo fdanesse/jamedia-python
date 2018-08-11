@@ -260,6 +260,8 @@ class JAMedia(Gtk.Window):
             self.jamediaplayer.hide()
             self.helpCreditsViewer.hide()
             self.jamediaradioViewer.show()
+        elif valor == 'jamediaconverter':
+            pass
 
     def __confirmar_salir(self, widget=None, senial=None):
         self.paneltube.cancel_toolbars_flotantes()
