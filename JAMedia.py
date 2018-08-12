@@ -30,6 +30,7 @@ from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
 from JAMediaPlayer.Globales import ocultar
 from WebKit.CreditsViewer import CreditsViewer
 from WebKit.RadioViewer import RadioViewer
+from JAMediaConverter.JAMediaConverter import JAMediaConverter
 
 BASE_PATH = os.path.dirname(__file__)
 
@@ -91,11 +92,13 @@ class JAMedia(Gtk.Window):
         self.box_tube.pack_start(self.paneltube, True, True, 0)
 
         self.jamediaplayer = JAMediaPlayer()
+        self.jamediaconverter = JAMediaConverter()
         self.helpCreditsViewer = CreditsViewer()
         self.jamediaradioViewer = RadioViewer()
 
         boxbase.pack_start(self.box_tube, True, True, 0)
         boxbase.pack_start(self.jamediaplayer, True, True, 0)
+        boxbase.pack_start(self.jamediaconverter, True, True, 0)
         boxbase.pack_start(self.helpCreditsViewer, True, True, 0)
         boxbase.pack_start(self.jamediaradioViewer, True, True, 0)
         self.add(boxbase)
@@ -129,6 +132,7 @@ class JAMedia(Gtk.Window):
         self.toolbar_salir.connect('salir', self.__salir)
         self.toolbar.connect('switch', self.__switch)
         self.jamediaplayer.connect('switch', self.__switch)
+        self.jamediaconverter.connect('switch', self.__switch)
         self.helpCreditsViewer.connect('salir', self.__switch, 'jamediatube')
         self.jamediaradioViewer.connect('salir', self.__switch, 'jamediatube')
         self.toolbar_busqueda.connect("comenzar_busqueda", self.__comenzar_busqueda)
@@ -240,6 +244,7 @@ class JAMedia(Gtk.Window):
         self.__cancel_toolbars()
         if valor == 'jamediatube':
             self.jamediaplayer.hide()
+            self.jamediaconverter.hide()
             self.helpCreditsViewer.hide()
             self.jamediaradioViewer.hide()
             self.box_tube.show()
@@ -248,20 +253,27 @@ class JAMedia(Gtk.Window):
             self.helpCreditsViewer.hide()
             self.jamediaradioViewer.run('jamediaradio')
             self.jamediaradioViewer.hide()
+            self.jamediaconverter.hide()
             self.jamediaplayer.show()
         elif valor == 'creditos':
             self.box_tube.hide()
             self.jamediaplayer.hide()
+            self.jamediaconverter.hide()
             self.jamediaradioViewer.hide()
             self.helpCreditsViewer.run('creditos')
         elif valor == 'jamediaradio':
             self.box_tube.hide()
             self.jamediaplayer.base_panel.player.stop()
             self.jamediaplayer.hide()
+            self.jamediaconverter.hide()
             self.helpCreditsViewer.hide()
             self.jamediaradioViewer.show()
         elif valor == 'jamediaconverter':
-            pass
+            self.jamediaplayer.hide()
+            self.jamediaconverter.show()
+            self.helpCreditsViewer.hide()
+            self.jamediaradioViewer.hide()
+            self.box_tube.hide()
 
     def __confirmar_salir(self, widget=None, senial=None):
         self.paneltube.cancel_toolbars_flotantes()

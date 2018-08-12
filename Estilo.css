@@ -17,8 +17,8 @@ https://developer.gnome.org/gtk3/stable/chap-css-properties.html
 @define-color border rgba(0,0,0, 0.5);
 
 window {
-    background-image: image(white);
-    background-color: white;
+    background-image: image(@bg_toolbar1);
+    background-color: @bg_toolbar1;
     color: black;
     font: 10pt "Comic Sans";
     font-weight: normal;
@@ -56,6 +56,13 @@ button:checked {
     border: 0.01em solid black;
     margin: 0;
     padding: 0;
+}
+
+#toolbarlist {
+    background-image: image(@bg_toolbar1);
+    background-color: @bg_toolbar1;
+    margin: 0;
+    padding: 3px;
 }
 
 #toolbarsalir, .toolbaraccionvideos{
@@ -239,7 +246,7 @@ trough highlight{
     opacity: 1;
 }
 
-#boxtube, #jamediabox, #radio, #credits {
+#boxtube, #jamediabox, #radio, #credits, #converterbox {
     border: 2px @jamedia3 solid;
 }
 
@@ -277,9 +284,14 @@ trough highlight{
 #filechooser {
     background-image: image(rgb(240,240,240));
     background-color: rgb(240,240,240);
+    padding: 5px;
+    margin: 20px;
+    border: 0.1em solid @green3;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
 }
 #filechooser button {
     padding: 5px;
+    border-radius: 5px;
     background-image: image(rgb(240,240,240));
     background-color: rgb(240,240,240);
 }

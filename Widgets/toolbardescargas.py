@@ -25,6 +25,7 @@ class ToolbarDescargas(Gtk.VBox):
         self.set_css_name('vboxdescargas')
         self.set_name('vboxdescargas')
 
+        # FIXME: Agregar preview del video
         self.toolbar = Gtk.Toolbar()
         self.toolbar.set_css_name('toolbardescargas')
         self.toolbar.set_name('toolbardescargas')
