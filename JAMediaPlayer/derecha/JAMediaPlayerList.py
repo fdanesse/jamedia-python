@@ -153,7 +153,7 @@ class Lista(Gtk.TreeView):
         GLib.idle_add(self.__ejecutar_agregar_elemento, elementos)
         return False
 
-    def __getItems(self):
+    def getItems(self):
         modelo = self.get_model()
         item = modelo.get_iter_first()
         items = []
@@ -168,7 +168,7 @@ class Lista(Gtk.TreeView):
         return not item in items
 
     def agregar_items(self, elementos):
-        elementos = [item for item in elementos if self.__filterItems(item, self.__getItems())]
+        elementos = [item for item in elementos if self.__filterItems(item, self.getItems())]
         GLib.idle_add(self.__ejecutar_agregar_elemento, elementos)
 
     def seleccionar_siguiente(self, widget=None):

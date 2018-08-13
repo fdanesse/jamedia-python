@@ -18,13 +18,8 @@ class Toolbar(Gtk.Toolbar):
         Gtk.Toolbar.__init__(self)
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
-
         self.home = get_boton(os.path.join(ICONS_PATH, "home.svg"), flip=False, pixels=24, tooltip_text="JAMediaTube")
         self.insert(self.home, -1)
-
-        # self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
-
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
-
         self.show_all()
         

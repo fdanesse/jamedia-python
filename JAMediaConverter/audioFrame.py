@@ -27,23 +27,27 @@ class AudioFrame(Gtk.Frame):
         self._dirOut = HOME
         self._initialFilesCount = 0
         self._progressbar = Gtk.ProgressBar()
+        self._progressbar.set_css_name('converprogress')
+        self._progressbar.set_name('converprogress')
         self._checks = []
 
         self._progress = {"ogg":None, "mp3":None, "wav":None}
 
         self.set_label(" Elige los formatos de extracción: ")
-        self.set_border_width(5)
 
         table = Gtk.Table(rows=5, columns=5, homogeneous=False)
         table.set_col_spacings(0)
-        table.set_row_spacing(row=2, spacing=5)
-        table.set_row_spacing(row=3, spacing=10)
+        table.set_row_spacing(row=2, spacing=15)
         row = 0
         for formato in sorted(self._progress.keys()):
             # http://python-gtk-3-tutorial.readthedocs.io/en/latest/button_widgets.html
             check = Gtk.CheckButton(formato)
+            check.set_css_name('convercheck')
+            check.set_name('convercheck')
             self._checks.append(check)
             progress = Gtk.ProgressBar()
+            progress.set_css_name('converprogress')
+            progress.set_name('converprogress')
             # http://www.mono-project.com/docs/gui/gtksharp/widgets/packing-with-tables/
             table.attach(check, 0, 1, row, row+1,
                 Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
@@ -57,27 +61,25 @@ class AudioFrame(Gtk.Frame):
 
         frame = Gtk.Frame()
         frame.set_label(' Total: ')
-        frame.set_border_width(5)
-        event = Gtk.EventBox()
-        event.set_border_width(5)
-        event.add(self._progressbar)
-        frame.add(event)
+        frame.set_shadow_type(Gtk.ShadowType.NONE)
+        frame.add(self._progressbar)
         table.attach(frame, 0, 4, 3, 4)
 
-        self.start = Gtk.Button('Comenzar Extracción')
+        self.start = Gtk.Button('Convertir')
+        self.start.set_css_name('startbutton')
+        self.start.set_name('startbutton')
         self.start.set_sensitive(False)
-        table.attach(self.start, 3, 4, 4, 5)
-        event = Gtk.EventBox()
-        event.set_border_width(5)
-        event.add(table)
+        table.attach(self.start, 0, 4, 4, 5)
 
-        self.add(event)
+        self.add(table)
         self.show_all()
 
-    '''def set_files(self, _files):
-        self._files = _files
+    def set_files(self, _files):
+        self._files = []
+        for f in _files:
+            self._files.append(f[1])
         self._initialFilesCount = len(self._files)
-        self.start.set_sensitive(bool(self._files) and bool(self._codecs))'''
+        self.start.set_sensitive(bool(self._files) and bool(self._codecs))
 
     def __toggledButton(self, widget):
         if widget.get_active():
@@ -87,12 +89,10 @@ class AudioFrame(Gtk.Frame):
             self._codecs.remove(widget.get_label())
         self.start.set_sensitive(bool(self._files) and bool(self._codecs))
 
-    '''def run(self, widget=None):
-        for check in self._checks:
-            check.set_sensitive(False)
+    def run(self, widget=None):
         _file = self._files[0]
         # FIXME: Informar de archivo en proceso
-        for codec in self._codecs:
+        '''for codec in self._codecs:
             index = self._codecs.index(codec)
             convert = Converter(_file, codec, self._dirOut)
             convert.connect('progress', self.__progress)

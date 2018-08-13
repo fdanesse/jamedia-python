@@ -8,6 +8,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 from JAMediaPlayer.Globales import get_boton
+from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import ICONS_PATH
 from JAMediaConverter.audioFrame import AudioFrame
 
@@ -20,59 +21,40 @@ class ScrollTareas(Gtk.ScrolledWindow):
 
         Gtk.ScrolledWindow.__init__(self)
 
+        self.set_css_name('scrolltareas')
+        self.set_name('scrolltareas')
+
         self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        self.__currentDir = HOME
+        self.currentDir = HOME
+
         vbox = Gtk.VBox()
 
-        self.__widgetDirectory = Gtk.Frame()
-        #self.__widgetDirectory.set_border_width(5)
-        self.__widgetDirectory.set_label(" Selecciona el directorio de destino: ")
+        frame = Gtk.Frame()
+        frame.set_label(" Selecciona el directorio de destino: ")
+        toolbar = Gtk.Toolbar()
+        toolbar.set_css_name('toolbarconverter')
+        toolbar.set_name('toolbarconverter')
+        
+        self.dirLabel = Gtk.Label(self.currentDir)
+        self.dirLabel.set_justify(Gtk.Justification.LEFT)
+        item = Gtk.ToolItem()
+        item.set_expand(False)
+        item.add(self.dirLabel)
 
-        self.__openfiles = get_boton(os.path.join(ICONS_PATH, "document-open.svg"), flip=False, pixels=18, tooltip_text="Cargar Archivos")
-        self.__openfiles.connect('clicked', self.__getDir)
+        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.selectFolder = get_boton(os.path.join(ICONS_PATH, "document-open.svg"), flip=False, pixels=18, tooltip_text="Seleccionar Destino")
+        toolbar.insert(self.selectFolder, -1)
+        toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        toolbar.insert(item, -1)
+        toolbar.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
-        self.__dirLabel = Gtk.Label(self.__currentDir)
-        event = Gtk.EventBox()
-        event.set_border_width(5)
-        hbox = Gtk.HBox()
-        hbox.pack_start(self.__openfiles, False, False, 5)
-        hbox.pack_start(self.__dirLabel, False, False, 5)
-        event.add(hbox)
-        self.__widgetDirectory.add(event)
+        frame.add(toolbar)
 
-        self.__audioframe = AudioFrame()
+        self.audioframe = AudioFrame()
 
-        vbox.pack_start(self.__widgetDirectory, False, False, 5)
-        vbox.pack_start(self.__audioframe, False, False, 5)
+        vbox.pack_start(frame, False, False, 5)
+        vbox.pack_start(self.audioframe, False, False, 5)
         # FIXME: info de archivo
 
         self.add(vbox)
         self.show_all()
-
-    def __getDir(self, widget):
-        # FIXME: Agregar FileChoooser al estilo de JAMediaPlayer
-        '''
-        # https://people.gnome.org/~gcampagna/docs/Gtk-3.0/Gtk.FileChooserAction.html
-        dialog = Gtk.FileChooserDialog(
-            title="Abrir Directorio",
-            parent=self.get_toplevel(),
-            flags=Gtk.DialogFlags.MODAL,
-            action=Gtk.FileChooserAction.SELECT_FOLDER,
-            buttons=[
-                "Aceptar", Gtk.ResponseType.ACCEPT,
-                "Cancelar", Gtk.ResponseType.CANCEL])
-
-        dialog.set_default_size(400, 150)
-        dialog.set_border_width(15)
-        dialog.set_select_multiple(False)
-        dialog.set_current_folder(self.__currentDir)
-
-        result = dialog.run()
-
-        if result == Gtk.ResponseType.ACCEPT:
-            self.__currentDir = dialog.get_filename()
-        dialog.destroy()
-        self.__dirLabel.set_text(self.__currentDir)
-        self.__audioframe._dirOut = self.__currentDir
-        '''
-        pass

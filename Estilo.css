@@ -341,6 +341,39 @@ trough highlight{
     opacity: 1;
 }
 
+#scrolltareas {
+    padding: 10px;
+}
+
+#toolbarconverter {
+    padding: 5px;
+}
+
+#convercheck {
+    margin-left: 5px;
+    margin-top: 5px;
+}
+
+#converprogress{
+    margin: 5px;
+}
+
+#startbutton{
+    background-image: image(@green2);
+    background-color: @green2;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin: 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    border: 1px solid @border;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
+}
+#startbutton:hover {
+    background-image: image(@green3);
+    background-color: @green3;
+}
+
 /*
 @keyframes playing_anim {
     0% {
