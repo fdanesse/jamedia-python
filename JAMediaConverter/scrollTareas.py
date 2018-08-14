@@ -24,7 +24,7 @@ class ScrollTareas(Gtk.ScrolledWindow):
         self.set_css_name('scrolltareas')
         self.set_name('scrolltareas')
 
-        self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.currentDir = HOME
 
         vbox = Gtk.VBox()

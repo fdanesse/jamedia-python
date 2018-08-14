@@ -60,6 +60,7 @@ class ToolbarDescargas(Gtk.VBox):
         self.toolbar.insert(item, -1)
 
         self.barra_progreso = BarraProgreso()
+        self.barra_progreso.set_sensitive(False)
         self.barra_progreso.show()
 
         self.pack_start(self.toolbar, False, False, 0)

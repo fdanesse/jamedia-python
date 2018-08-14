@@ -79,8 +79,8 @@ class BarraProgreso(Gtk.EventBox):
         Gtk.EventBox.__init__(self)
 
         # NOTA: tambien se puede hacer: __gtype_name__ = 'BarraProgreso'
-        self.set_css_name('progressplayerscale')
-        self.set_name('progressplayerscale')
+        # self.set_css_name('progressplayerscale')
+        # self.set_name('progressplayerscale')
 
         self.escala = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL)
         # FIXME: Mejorar saltos del ajuste

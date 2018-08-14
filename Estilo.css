@@ -34,25 +34,22 @@ toolbar {
 button {
     background-image: image(@bg_toolbar1);
     background-color: @bg_toolbar1;
-    border-radius: 8%;
+    border-radius: 5px;
     border: 0.1em solid @bg_toolbar1;
-    margin: 0;
-    padding: 0;
+    margin: 3px;
+    padding: 3px;
     /*FIXME: No funciona. transition: background-color 500ms ease-in-out;*/
 }
 button:hover {
     background-image: image(@green3);
     background-color: @green3;
-    border-radius: 8%;
     border: 0.1em solid @green3;
-    margin: 0;
-    padding: 0;
     box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
 }
 button:checked {
     background-image: image(@green3);
     background-color: @green3;
-    border-radius: 8%;
+    border-radius: 5px;
     border: 0.01em solid black;
     margin: 0;
     padding: 0;
@@ -121,17 +118,18 @@ button:checked {
     border: 1px solid @border;
 }
 #toolbarbusquedas button {
-    border-radius: 8%;
-    border: 1px solid @border;
+    background-image: image(@green2);
+    background-color: @green2;
     padding-left: 15px;
     padding-right: 15px;
     font-weight: bold;
 }
 #toolbarbusquedas button:hover {
-    border-radius: 8%;
-    padding-left: 15px;
-    padding-right: 15px;
-    font-weight: bold;
+    background-image: image(@green3);
+    background-color: @green3;
+}
+#toolbarbusquedas *:disabled {
+    color:rgba(0,0,0,0.4);
 }
 
 #alertabusquedas {
@@ -147,6 +145,7 @@ button:checked {
 }
 
 #toolbarcontrols button, #toolbarinfo button {
+    margin: 0;
     margin-left: 3px;
     border-radius: 100%;
 }
@@ -229,7 +228,7 @@ trough highlight{
     padding: 8px;
 }
 
-#scrolllist trough {
+#scrolllist trough, #scrolltareas trough {
     background-image: image(@jamedia3);
     background-color: @jamedia3;
     border-width: 1px;
@@ -237,7 +236,7 @@ trough highlight{
     border-radius: 0;
     opacity: 1;
 }
-#scrolllist slider {
+#scrolllist slider, #scrolltareas slider {
     background-image: image(@jamedia1);
     background-color: @jamedia1;
     border-color: black;
@@ -354,10 +353,6 @@ trough highlight{
     margin-top: 5px;
 }
 
-#converprogress{
-    margin: 5px;
-}
-
 #startbutton{
     background-image: image(@green2);
     background-color: @green2;
@@ -372,6 +367,56 @@ trough highlight{
 #startbutton:hover {
     background-image: image(@green3);
     background-color: @green3;
+}
+#scrolltareas *:disabled {
+    color:rgba(0,0,0,0.4);
+}
+
+#principaltoolbar button {
+    margin: 0;
+    padding: 0;
+}
+
+#converprogress{
+    margin: 5px;
+}
+
+/* Barra de Progreso */
+#converprogress scale {
+    background-image: image(@bg_toolbar1);
+    background-color: @bg_toolbar1;
+    border-radius: 0;
+    border: none;
+    padding: 5px;
+    margin: 0;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+/* El icono de la escala https://developer.gnome.org/gtk3/stable/chap-css-overview.html */
+#converprogress slider {
+    background-image: image(white);
+    background-color: white;
+    outline-style: outset;
+    border: 0.1em solid black;
+    border-radius: 100%;
+}
+/* canal sin reproducir */
+#converprogress trough {
+    background-image: image(@border);
+    background-color: @border;
+    outline-style: outset;
+    border: 0.1em solid @border;
+    border-radius: 2px;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.3), 0 3px 6px 0 rgba(0, 0, 0, 0);
+}
+
+/* canal reproducido */
+#converprogress trough highlight{
+    background-image: image(white);
+    background-color: white;
+    outline-style: outset;
+    border: 0.1em solid white;
+    border-radius: 2px;
 }
 
 /*

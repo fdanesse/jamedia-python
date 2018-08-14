@@ -7,8 +7,10 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 from gi.repository import GObject
+from gi.repository import GLib
 
-#from Gstreamer.Converter import Converter
+from JAMediaConverter.Gstreamer.Converter import Converter
+from JAMediaPlayer.Widgets.ProgressPlayer import BarraProgreso
 
 HOME = os.environ['HOME']
 
@@ -26,7 +28,8 @@ class AudioFrame(Gtk.Frame):
         self._converters = [None, None, None]
         self._dirOut = HOME
         self._initialFilesCount = 0
-        self._progressbar = Gtk.ProgressBar()
+        self._progressbar = BarraProgreso() #Gtk.ProgressBar()
+        self._progressbar.set_sensitive(False)
         self._progressbar.set_css_name('converprogress')
         self._progressbar.set_name('converprogress')
         self._checks = []
@@ -35,7 +38,7 @@ class AudioFrame(Gtk.Frame):
 
         self.set_label(" Elige los formatos de extracción: ")
 
-        table = Gtk.Table(rows=5, columns=5, homogeneous=False)
+        table = Gtk.Table(rows=5, columns=12, homogeneous=False)
         table.set_col_spacings(0)
         table.set_row_spacing(row=2, spacing=15)
         row = 0
@@ -45,14 +48,15 @@ class AudioFrame(Gtk.Frame):
             check.set_css_name('convercheck')
             check.set_name('convercheck')
             self._checks.append(check)
-            progress = Gtk.ProgressBar()
+            progress = BarraProgreso() #Gtk.ProgressBar()
+            progress.set_sensitive(False)
             progress.set_css_name('converprogress')
             progress.set_name('converprogress')
             # http://www.mono-project.com/docs/gui/gtksharp/widgets/packing-with-tables/
             table.attach(check, 0, 1, row, row+1,
                 Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
                 Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
-            table.attach(progress, 1, 4, row, row+1,
+            table.attach(progress, 1, 12, row, row+1,
                 Gtk.AttachOptions.FILL | Gtk.AttachOptions.EXPAND,
                 Gtk.AttachOptions.EXPAND, 0, 0)
             row += 1
@@ -63,13 +67,17 @@ class AudioFrame(Gtk.Frame):
         frame.set_label(' Total: ')
         frame.set_shadow_type(Gtk.ShadowType.NONE)
         frame.add(self._progressbar)
-        table.attach(frame, 0, 4, 3, 4)
+        table.attach(frame, 0, 12, 3, 4,
+            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
+            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
 
         self.start = Gtk.Button('Convertir')
         self.start.set_css_name('startbutton')
         self.start.set_name('startbutton')
         self.start.set_sensitive(False)
-        table.attach(self.start, 0, 4, 4, 5)
+        table.attach(self.start, 0, 5, 4, 5,
+            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
+            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
 
         self.add(table)
         self.show_all()
@@ -92,7 +100,7 @@ class AudioFrame(Gtk.Frame):
     def run(self, widget=None):
         _file = self._files[0]
         # FIXME: Informar de archivo en proceso
-        '''for codec in self._codecs:
+        for codec in self._codecs:
             index = self._codecs.index(codec)
             convert = Converter(_file, codec, self._dirOut)
             convert.connect('progress', self.__progress)
@@ -102,32 +110,37 @@ class AudioFrame(Gtk.Frame):
             self._converters[index] = convert
         for convert in self._converters:
             if convert:
-                convert.play()'''
+                convert.play()
 
-    '''def __progress(self, convert, val, codec):
-        self._progress[codec].set_fraction(val/100.0)
+    def __progress(self, convert, val, codec):
+        #self._progress[codec].set_fraction(val/100.0)
         # FIXME: Actualizar progress general
         # duration = self._initialFilesCount * codecs * 100.0
         # self._files * codecs * 100.0 = position
         dif = self._initialFilesCount - len(self._files)
         total = (dif) * 100 / self._initialFilesCount 
-        self._progressbar.set_fraction(total/100.0)'''
+        #self._progressbar.set_fraction(total/100.0)
+        
+        adj = self._progress[codec].escala.get_adjustment()
+        GLib.idle_add(adj.set_value, float(val))
+        adj = self._progressbar.escala.get_adjustment()
+        GLib.idle_add(adj.set_value, float(total))
 
-    '''def __error(self, convert, error):
-        dialog = Gtk.MessageDialog(self.get_toplevel(), 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "ERROR")
+    def __error(self, convert, error):
+        '''dialog = Gtk.MessageDialog(self.get_toplevel(), 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "ERROR")
         dialog.format_secondary_text(error)
         dialog.run()
-        dialog.destroy()
-        self.__next(convert)'''
+        dialog.destroy()'''
+        self.__next(convert)
 
-    '''def __info(self, convert, info):
+    def __info(self, convert, info):
         # FIXME: 'INFO', convert, info
-        pass'''
+        pass
 
-    '''def __end(self, convert):
-        self.__next(convert)'''
+    def __end(self, convert):
+        self.__next(convert)
 
-    '''def __next(self, convert):
+    def __next(self, convert):
         convert.disconnect_by_func(self.__progress)
         convert.disconnect_by_func(self.__error)
         convert.disconnect_by_func(self.__info)
@@ -149,11 +162,11 @@ class AudioFrame(Gtk.Frame):
             else:
                 self.__dialogEnd()
         else:
-            self.__dialogEnd()'''
+            self.__dialogEnd()
 
-    '''def __dialogEnd(self):
+    def __dialogEnd(self):
         # http://python-gtk-3-tutorial.readthedocs.io/en/latest/dialogs.html
-        dialog = Gtk.MessageDialog(
+        '''dialog = Gtk.MessageDialog(
             self.get_toplevel(), 0, Gtk.MessageType.INFO,
             Gtk.ButtonsType.OK, "Tareas culminadas")
         dialog.format_secondary_text("Han culminado todas las tareas")
@@ -165,5 +178,7 @@ class AudioFrame(Gtk.Frame):
             progress.set_fraction(0.0)
         for check in self._checks:
             check.set_sensitive(True)
-        self.emit('end')'''
+        '''
+        self.emit('end')
+        print("FIXME: END")
         
