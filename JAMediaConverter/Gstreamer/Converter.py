@@ -33,7 +33,10 @@ class Converter(Gtk.Widget):
         self._player = None
         self._duration = 0
         self._position = 0
+        self._bus = None
         self._pipe = Gst.Pipeline()
+        self._video_sink = None
+        self._audio_sink = None
 
         # path de salida
         location = os.path.basename(self._origen)
@@ -46,8 +49,7 @@ class Converter(Gtk.Widget):
         self._origen = Gst.filename_to_uri(self._origen)
         # Formato de salida
         if self._codec == "wav":
-            #self.__run_wav_out()
-            pass
+            self.__run_wav_out()
         elif self._codec == "mp3":
             self.__run_mp3_out()
         elif self._codec == "ogg":
@@ -59,6 +61,8 @@ class Converter(Gtk.Widget):
             GLib.source_remove(self._controller)
             self._controller = None
         #self._pipe.set_state(Gst.State.NULL)
+        self._bus.disconnect_by_func(self.__sync_message)
+        self._player.disconnect_by_func(self.__on_pad_added)
         self._origen = None
         self._codec = None
         self._newpath = None
@@ -66,28 +70,46 @@ class Converter(Gtk.Widget):
         self._player = None
         self._duration = None
         self._position = None
+        self._bus = None
+        self._video_sink = None
+        self._audio_sink = None
         self._pipe = None
 
-    '''
     def __run_wav_out(self):
-        from Bins import wav_bin
-        self._player = gst.element_factory_make("playbin2", "playbin2")
-        videoconvert = gst.element_factory_make("fakesink", "video-out")
-        self._player.set_property('video-sink', videoconvert)
+        self._player = Gst.ElementFactory.make("uridecodebin", "uridecodebin")
+        videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
+        fakesink = Gst.ElementFactory.make('fakesink', 'fakesink')
+        
+        audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
+        audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
+        audioresample.set_property('quality', 10)
+        wavenc = Gst.ElementFactory.make('wavenc', 'wavenc')
+        filesink = Gst.ElementFactory.make('filesink', 'filesink')
 
-        wavenc = wav_bin(self._newpath)
-        wavenc.set_name("audio-out")
-        self._player.set_property('audio-sink', wavenc)
+        self._pipe.add(self._player)
+        self._pipe.add(audioconvert)
+        self._pipe.add(audioresample)
+        self._pipe.add(wavenc)
+        self._pipe.add(filesink)
+        self._pipe.add(videoconvert)
+        self._pipe.add(fakesink)
 
-        self._player.set_property("uri", "file://" + self.origen)
+        audioconvert.link(audioresample)
+        audioresample.link(wavenc)
+        wavenc.link(filesink)
 
-        self.bus = self._player.get_bus()
-        #self.bus.set_sync_handler(self.__bus_handler)
-        self.bus.add_signal_watch()                             # ****
-        self.bus.connect('message', self.__on_mensaje)          # ****
-        #self.bus.enable_sync_message_emission()                 # ****
-        #self.bus.connect('sync-message', self.__sync_message)   # ****
-    '''
+        videoconvert.link(fakesink)
+
+        self._video_sink = videoconvert.get_static_pad('sink')
+        self._audio_sink = audioconvert.get_static_pad('sink')
+
+        filesink.set_property("location", self._newpath)
+        self._player.set_property("uri", self._origen)
+        
+        self._bus = self._pipe.get_bus()
+        self._bus.enable_sync_message_emission()
+        self._bus.connect('sync-message', self.__sync_message)
+        self._player.connect('pad-added', self.__on_pad_added)
 
     def __run_mp3_out(self):
         self._player = Gst.ElementFactory.make("uridecodebin", "uridecodebin")
@@ -114,18 +136,16 @@ class Converter(Gtk.Widget):
 
         videoconvert.link(fakesink)
 
-        self.video_sink = videoconvert.get_static_pad('sink')
-        self.audio_sink = audioconvert.get_static_pad('sink')
+        self._video_sink = videoconvert.get_static_pad('sink')
+        self._audio_sink = audioconvert.get_static_pad('sink')
 
-        BASE_PATH = os.path.dirname(__file__)
         filesink.set_property("location", self._newpath)
         self._player.set_property("uri", self._origen)
         
-        self.bus = self._pipe.get_bus()
-        self.bus.enable_sync_message_emission()
-        self.bus.connect('sync-message', self.__sync_message)
+        self._bus = self._pipe.get_bus()
+        self._bus.enable_sync_message_emission()
+        self._bus.connect('sync-message', self.__sync_message)
         self._player.connect('pad-added', self.__on_pad_added)
-        self._player.connect("source-setup", self.__source_setup)
         
     def __on_pad_added(self, uridecodebin, pad):
         """
@@ -134,10 +154,10 @@ class Converter(Gtk.Widget):
         """
         string = pad.query_caps(None).to_string()
         if string.startswith('audio/'):
-            pad.link(self.audio_sink)
+            pad.link(self._audio_sink)
             self.emit('info', string)
         elif string.startswith('video/'):
-            pad.link(self.video_sink)
+            pad.link(self._video_sink)
             self.emit('info', string)
 
     def play(self):
@@ -208,7 +228,3 @@ class Converter(Gtk.Widget):
             self._position = pos
             self.emit("progress", self._position, self._codec)
         return True
-
-    def __source_setup(self, player, source):
-        #print '***', source.get_property('location')
-        pass
