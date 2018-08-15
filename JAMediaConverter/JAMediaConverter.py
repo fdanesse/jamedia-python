@@ -58,15 +58,11 @@ class JAMediaConverter(Gtk.VBox):
         self.__filechooser.salir.connect("clicked", self.__setup_init)
         self.__scrollTareas.selectFolder.connect('clicked', self.__run_selectFolder)
         self.__scrollTareas.audioframe.start.connect("clicked", self.__run)
-        self.__scrollTareas.audioframe.connect("running", self.__new_file_in_progress)
         self.__scrollTareas.audioframe.connect('end', self.__end_all_process)
         self.__filechooser2.salir.connect("clicked", self.__setup_init)
         self.__filechooser2.open.connect("clicked", self.__folder_selected)
 
         GLib.idle_add(self.__setup_init)
-
-    def __new_file_in_progress(self, widget, path):
-        self.__scrollTareas.set_info_file_in_process(path)
 
     def __end_all_process(self, widget):
         self.__scrollTareas.set_info_file_in_process('')
@@ -74,6 +70,7 @@ class JAMediaConverter(Gtk.VBox):
         self.__playerList.set_sensitive(True)
 
     def __run(self, widget):
+        self.__scrollTareas.set_errors('')
         self.__scrollTareas.selectFolder.set_sensitive(False)
         self.__playerList.set_sensitive(False)  # FIXME: Es necesario ?
         self.__scrollTareas.audioframe.run()

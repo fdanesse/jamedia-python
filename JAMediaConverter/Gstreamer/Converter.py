@@ -141,7 +141,6 @@ class Converter(Gtk.Widget):
             self.emit('info', string)
 
     def play(self):
-        print("FIXME:", self._origen, self._codec, self._newpath)
         self._pipe.set_state(Gst.State.PLAYING)
         self._controller = GLib.timeout_add(300, self.__handle)
     
@@ -174,8 +173,8 @@ class Converter(Gtk.Widget):
                 name = os.path.basename(self._origen)
             except:
                 pass
-            print("ERROR:", name + ' ' + str(mensaje.parse_error()))
-            self.emit("error", name + ' ' + str(mensaje.parse_error()))
+            print("ERROR en: " + name + ' => ' + str(mensaje.parse_error()))
+            self.emit("error", "ERROR en: " + name + ' => ' + str(mensaje.parse_error()))
             
     def __handle(self):
         '''

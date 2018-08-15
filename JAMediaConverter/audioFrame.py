@@ -18,7 +18,8 @@ class AudioFrame(Gtk.Frame):
 
     __gsignals__ = {
         "end": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, []),
-        "running": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_STRING, ))}
+        "running": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
+        "error": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_STRING, ))}
 
     def __init__(self):
 
@@ -100,7 +101,7 @@ class AudioFrame(Gtk.Frame):
 
     def run(self, widget=None):
         # Se ejecuta para iniciar todas las conversiones de cada archivo
-        self.emit("running", self._files[0])
+        self.emit("running", self._files[0])  # FIXME: Error cuando ejecutamos por segunda vez sobre la misma lista.
         self._codecsprogress = {}
         for check in self._checks:
             check.set_sensitive(False)
@@ -130,7 +131,7 @@ class AudioFrame(Gtk.Frame):
         GLib.idle_add(self._progressbar.set_fraction, n)
 
     def __error(self, convert, error):
-        print("FIXME: ERROR: ", self.__error, error)
+        self.emit("error", error)  # FIXME: Agregar codec ?
         self.__next(convert)
 
     def __info(self, convert, info):

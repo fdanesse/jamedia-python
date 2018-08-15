@@ -59,10 +59,45 @@ class ScrollTareas(Gtk.ScrolledWindow):
         vbox.pack_start(self.audioframe, False, False, 5)
         # FIXME: info de archivo
 
+        self.__errorsFrame = Gtk.Frame()
+        self.__errorsFrame.set_label(" Errores: ")
+        self.__error_box = Gtk.VBox()
+        self.__error_box.get_style_context().add_class("errorbox")
+        self.__errorsFrame.add(self.__error_box)
+        vbox.pack_start(self.__errorsFrame, True, True, 5)
+    
         self.add(vbox)
+        self.connect('realize', self.setup_init)
         self.show_all()
+
+        self.audioframe.connect("running", self.__new_file_in_progress)
+        self.audioframe.connect('error', self.__new_error)
+
+    def setup_init(self, widget=None):
+        self.__errorsFrame.hide()
+
+    def __new_file_in_progress(self, widget, path):
+        self.set_info_file_in_process(path)
+
+    def __new_error(self, widget, error):
+        self.set_errors(error)
 
     def set_info_file_in_process(self, path=''):
         text = 'No hay tareas pendientes'
         if path: text = "Procesando: %s" % os.path.basename(path)
         self.__info_file_in_process.set_text(text)
+
+    def set_errors(self, text=''):
+        # FIXME: No se ve bien con un solo error
+        if text:
+            label = Gtk.Label(text)
+            label.set_line_wrap(True)
+            label.set_justify(Gtk.Justification.LEFT)
+            label.get_style_context().add_class("errorlabel")
+            self.__error_box.pack_start(label, True, True, 2)
+            self.__errorsFrame.show_all()
+        else:
+            for widget in self.__error_box.get_children():
+                self.__error_box.remove(widget)
+                widget.destroy()
+            self.__errorsFrame.hide()
