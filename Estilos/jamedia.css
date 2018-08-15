@@ -1,0 +1,51 @@
+/* JAMedia */
+#jamediabox {
+    border: 2px @jamedia3 solid;
+}
+.progressplayer button { /* FIXME: el boton del volumen queda alargado */
+    margin-left: 3px;
+    margin-right: 3px;
+    padding-left: 3px;
+    padding-right: 3px;
+    border-radius: 100%;
+}
+#jamediaplayerpanel {
+    background-image: image(@bg_toolbar1);
+    background-color: @bg_toolbar1;
+}
+#toolbarinfo button {
+    margin: 0;
+    margin-left: 3px;
+    border-radius: 100%;
+}
+.frameplayerlist {
+    background-image: url('../Iconos/reciclado_arrugado_azul.png');
+    background-size:cover;
+    background-repeat: no-repeat;
+    font-size: 9pt;
+}
+.toolbarcontrols button {
+    margin: 0;
+    margin-left: 3px;
+    border-radius: 100%;
+}
+.treeviewlist {
+    background-image: none;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    padding-left: 3px;
+    padding-top: 3px;
+}
+.treeviewlist:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.treeviewlist:selected {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: @jamedia1;
+}
+.toolbarlist {
+    background-image: image(@bg_toolbar1);
+    background-color: @bg_toolbar1;
+    margin: 0;
+    padding: 3px;
+}

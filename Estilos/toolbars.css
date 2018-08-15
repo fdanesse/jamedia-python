@@ -1,0 +1,93 @@
+
+#principaltoolbar button {
+    margin: 0;
+    padding: 0;
+}
+
+/* Anuncia lo que se va encntrando */
+#alertabusquedas {
+    background-image: image(@jamedia1);
+    background-color: @jamedia1;
+    border: 1px solid @border;
+    padding: 5px;
+    font-weight: bold;
+    /* FIXME: Animations No funcionan:
+    animation-name: playing_anim;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;*/
+}
+
+/* Donde se lanzan las busquedas */
+#toolbarbusquedas {
+    background-image: image(@jamedia3);
+    background-color: @jamedia3;
+    border: 1px solid @border;
+}
+#toolbarbusquedas button {
+    background-image: image(@green2);
+    background-color: @green2;
+    padding-left: 15px;
+    padding-right: 15px;
+    font-weight: bold;
+}
+#toolbarbusquedas button:hover {
+    background-image: image(@green3);
+    background-color: @green3;
+}
+#toolbarbusquedas *:disabled {
+    color:rgba(0,0,0,0.4);
+}
+.entradasdetexto:focus {
+    border: 1px @bg_toolbar1 solid;
+}
+
+/* Progreso de descargas */
+#vboxdescargas {
+    background-image: image(@jamedia2);
+    background-color: @jamedia2;
+    border: 1px solid @border;
+    padding: 5px;
+}
+#vboxdescargas scale { /* FIXME: Cambiar Scale por ProgressBar ? */
+    background-image: image(@jamedia2);
+    background-color: @jamedia2;
+    margin: 0;
+    padding:5px;
+    margin:3px;
+}
+#vboxdescargas scale trough highlight{
+    background-image: image(cyan);
+    background-color: cyan;
+}
+#toolbardescargas {
+    background-image: image(@jamedia2);
+    background-color: @jamedia2;
+    border: 0;
+}
+
+/* Confirmar salir */
+#toolbarsalir {
+    background-image: image(@jamedia2);
+    background-color: @jamedia2;
+    padding: 10px;
+    border: 1px solid @border;
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.8), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
+}
+#toolbarsalir button {
+    background-image: image(@green2);
+    background-color: @green2;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-weight: bold;
+    border: 1px solid @border;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
+}
+#toolbarsalir button:hover {
+    background-image: image(@green3);
+    background-color: @green3;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-weight: bold;
+    border: 1px solid @border;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
+}

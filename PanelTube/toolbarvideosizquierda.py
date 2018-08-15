@@ -18,8 +18,7 @@ class Toolbar_Videos_Izquierda(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.set_css_name('toolbarvideos')
-        self.set_name('toolbarvideos')
+        self.get_style_context().add_class("toolbarvideos")
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
         self.__label = Gtk.Label('Encontrados: 0')

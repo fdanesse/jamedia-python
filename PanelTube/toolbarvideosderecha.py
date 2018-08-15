@@ -19,8 +19,7 @@ class Toolbar_Videos_Derecha(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.set_css_name('toolbarvideos')
-        self.set_name('toolbarvideos')
+        self.get_style_context().add_class("toolbarvideos")
         
         self.mover = get_boton(os.path.join(ICONS_PATH, "play.svg"), flip=True, pixels=24, tooltip_text="Quitar de Descargas")
         self.insert(self.mover, -1)

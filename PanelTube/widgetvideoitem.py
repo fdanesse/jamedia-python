@@ -26,15 +26,13 @@ class WidgetVideoItem(Gtk.EventBox):
 
         Gtk.EventBox.__init__(self)
 
-        self.set_css_name('videoitem')
-        self.set_name('videoitem')
+        self.get_style_context().add_class("videoitem")
         
         self._temp_dat = []
         self.videodict = videodict
 
         hbox = Gtk.HBox()
-        hbox.set_css_name('videoitemHB')
-        hbox.set_name('videoitemHB')
+        hbox.get_style_context().add_class("videoitemHB")
         self.imagen = Gtk.Image()
         hbox.pack_start(self.imagen, False, False, 3)
         

@@ -10,7 +10,6 @@ from gi.repository import GObject
 from gi.repository import GLib
 
 from JAMediaConverter.Gstreamer.Converter import Converter
-from JAMediaPlayer.Widgets.ProgressPlayer import BarraProgreso
 
 HOME = os.environ['HOME']
 
@@ -28,10 +27,8 @@ class AudioFrame(Gtk.Frame):
         self._converters = [None, None, None]
         self._dirOut = HOME
         self._initialFilesCount = 0
-        self._progressbar = BarraProgreso() #Gtk.ProgressBar()
-        self._progressbar.set_sensitive(False)
-        self._progressbar.set_css_name('converprogress')
-        self._progressbar.set_name('converprogress')
+        self._progressbar = Gtk.ProgressBar()
+        self._progressbar.get_style_context().add_class("convertprogress")
         self._checks = []
 
         self._progress = {"ogg":None, "mp3":None, "wav":None}
@@ -45,13 +42,13 @@ class AudioFrame(Gtk.Frame):
         for formato in sorted(self._progress.keys()):
             # http://python-gtk-3-tutorial.readthedocs.io/en/latest/button_widgets.html
             check = Gtk.CheckButton(formato)
-            check.set_css_name('convercheck')
-            check.set_name('convercheck')
+            check.get_style_context().add_class("convertcheck")
+            if formato != "mp3": check.set_sensitive(False)
             self._checks.append(check)
-            progress = BarraProgreso() #Gtk.ProgressBar()
-            progress.set_sensitive(False)
-            progress.set_css_name('converprogress')
-            progress.set_name('converprogress')
+            progress = Gtk.ProgressBar()
+            progress.set_show_text(True)
+            style_context = progress.get_style_context()
+            style_context.add_class("convertprogress")
             # http://www.mono-project.com/docs/gui/gtksharp/widgets/packing-with-tables/
             table.attach(check, 0, 1, row, row+1,
                 Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
@@ -113,18 +110,19 @@ class AudioFrame(Gtk.Frame):
                 convert.play()
 
     def __progress(self, convert, val, codec):
-        #self._progress[codec].set_fraction(val/100.0)
+        self._progress[codec].set_fraction(float(val/100.0))
+        # GLib.idle_add(self._progress[codec].set_text, str(val/100.0))
         # FIXME: Actualizar progress general
         # duration = self._initialFilesCount * codecs * 100.0
         # self._files * codecs * 100.0 = position
         dif = self._initialFilesCount - len(self._files)
         total = (dif) * 100 / self._initialFilesCount 
-        #self._progressbar.set_fraction(total/100.0)
-        
+        GLib.idle_add(self._progressbar.set_fraction, float(total/100.0))
+        '''
         adj = self._progress[codec].escala.get_adjustment()
         GLib.idle_add(adj.set_value, float(val))
         adj = self._progressbar.escala.get_adjustment()
-        GLib.idle_add(adj.set_value, float(total))
+        GLib.idle_add(adj.set_value, float(total))'''
 
     def __error(self, convert, error):
         '''dialog = Gtk.MessageDialog(self.get_toplevel(), 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "ERROR")

@@ -32,15 +32,13 @@ class PanelTube(Gtk.HPaned):
         self.set_name('paneltube')
 
         self.encontrados = Gtk.VBox()  # Contenedor de WidgetVideoItems
-        self.encontrados.set_css_name('videocontainer')
-        self.encontrados.set_name('videocontainer')
+        self.encontrados.get_style_context().add_class("videocontainer")
 
         self.toolbar_accion_izquierda = ToolbarAccionListasVideos()  # Confirmar borrar lista de videos
         self.toolbar_videos_izquierda = Toolbar_Videos_Izquierda()
         
         self.descargar = Gtk.VBox()  # Contenedor de WidgetVideoItems
-        self.descargar.set_css_name('videocontainer')
-        self.descargar.set_name('videocontainer')
+        self.descargar.get_style_context().add_class("videocontainer")
 
         self.toolbar_accion_derecha = ToolbarAccionListasVideos()  # Confirmar borrar lista de videos
         self.toolbar_videos_derecha = Toolbar_Videos_Derecha()
@@ -139,8 +137,7 @@ class PanelTube(Gtk.HPaned):
 
     def __get_scroll(self):
         scroll = Gtk.ScrolledWindow()
-        scroll.set_css_name('scrolllist')
-        scroll.set_name('scrolllist')
+        scroll.get_style_context().add_class("scrolllist")
         scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         return scroll
 

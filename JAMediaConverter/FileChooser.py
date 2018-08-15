@@ -14,8 +14,7 @@ class FileChooser(Gtk.FileChooserWidget):
 
         Gtk.FileChooserWidget.__init__(self)
 
-        self.set_css_name('filechooser')
-        self.set_name('filechooser')
+        self.get_style_context().add_class('filechooser')
 
         self.set_action(Gtk.FileChooserAction.SELECT_FOLDER)
         

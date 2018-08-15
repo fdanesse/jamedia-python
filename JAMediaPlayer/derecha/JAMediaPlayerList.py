@@ -25,8 +25,7 @@ class PlayerList(Gtk.Frame):
 
         Gtk.Frame.__init__(self)
 
-        self.set_css_name('frameplayerlist')
-        self.set_name('frameplayerlist')
+        self.get_style_context().add_class('frameplayerlist')
 
         vbox = Gtk.VBox()
 
@@ -34,8 +33,7 @@ class PlayerList(Gtk.Frame):
         self.lista = Lista()
 
         scroll = Gtk.ScrolledWindow()
-        scroll.set_css_name('scrolllist')
-        scroll.set_name('scrolllist')
+        scroll.get_style_context().add_class('scrolllist')
         scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll.add(self.lista)
 
@@ -87,8 +85,7 @@ class Lista(Gtk.TreeView):
 
         Gtk.TreeView.__init__(self, Gtk.ListStore(GdkPixbuf.Pixbuf, GObject.TYPE_STRING, GObject.TYPE_STRING))
 
-        self.set_css_name('treeviewlist')
-        self.set_name('treeviewlist')
+        self.get_style_context().add_class('treeviewlist')
 
         self.__valorSelected = None
         self.set_headers_visible(False)
@@ -214,8 +211,7 @@ class Lista(Gtk.TreeView):
 class JAMediaToolbarList(Gtk.Toolbar):
     def __init__(self):
         Gtk.Toolbar.__init__(self)
-        self.set_css_name('toolbarlist')
-        self.set_name('toolbarlist')
+        self.get_style_context().add_class('toolbarlist')
         self.openfiles = get_boton(os.path.join(ICONS_PATH, "document-open.svg"), flip=False, pixels=18, tooltip_text="Cargar Archivos")
         self.insert(self.openfiles, -1)
         self.appendfiles = get_boton(os.path.join(ICONS_PATH, "document-new.svg"), flip=False, pixels=18, tooltip_text="Agregar Archivos")

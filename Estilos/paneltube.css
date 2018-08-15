@@ -1,0 +1,65 @@
+/* el viejo JAMediaTube */
+#boxtube {
+    border: 2px @jamedia3 solid;
+}
+#paneltube {
+    background-image: image(rgb(240,240,240));
+    background-color: rgb(240,240,240);
+}
+
+/* Contenedor de VideoItem */
+.videocontainer, .videoitemHB {
+    padding: 8px;
+}
+.videoitem {
+    background-image: image(@green3);
+    background-color: @green3;
+    border: 1px @bg_toolbar1 solid;
+    outline-style: outset;
+    border-radius: 8px;
+}
+.videoitem image {
+    border: 1px @jamedia3 solid;
+    outline-style: outset;
+    border-radius: 8px;
+    margin: 4px;
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.8), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
+}
+
+/* Confirma borrar lista de videos encontrados o agrega un video por su url */
+.toolbaraccionvideos{
+    background-image: image(@jamedia2);
+    background-color: @jamedia2;
+    padding: 10px;
+    border: 1px solid @border;
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.8), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
+}
+.toolbaraccionvideos button {
+    background-image: image(@green2);
+    background-color: @green2;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-weight: bold;
+    border: 1px solid @border;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
+}
+.toolbaraccionvideos button:hover {
+    background-image: image(@green3);
+    background-color: @green3;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-weight: bold;
+    border: 1px solid @border;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
+}
+
+/* Para gestionar videos encontrados */
+.toolbarvideos {
+    border: 1px @border solid;
+}
+.toolbarvideos button {
+    margin-left: 1px;
+    margin-right: 1px;
+    padding: 2px;
+    border-radius: 100%;
+}

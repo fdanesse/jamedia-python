@@ -21,8 +21,7 @@ class ProgressPlayer(Gtk.Toolbar):
         Gtk.Toolbar.__init__(self)
 
         self.__presed = False
-        self.set_css_name('progressplayer')
-        self.set_name('progressplayer')
+        self.get_style_context().add_class("progressplayer")
 
         self.__progressBar = BarraProgreso()
         self.__volumen = Gtk.VolumeButton()

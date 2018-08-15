@@ -23,8 +23,7 @@ class PlayerControls(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.set_css_name('toolbarcontrols')
-        self.set_name('toolbarcontrols')
+        self.get_style_context().add_class('toolbarcontrols')
 
         self.pix_play = GdkPixbuf.Pixbuf.new_from_file_at_size(os.path.join(ICONS_PATH, "play.svg"), 24, 24)
         self.pix_paused = GdkPixbuf.Pixbuf.new_from_file_at_size(os.path.join(ICONS_PATH, "pausa.svg"), 24, 24)

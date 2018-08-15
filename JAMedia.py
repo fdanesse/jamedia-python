@@ -111,7 +111,7 @@ class JAMedia(Gtk.Window):
     def set_style(self):
         screen = Gdk.Screen.get_default()
         css_provider = Gtk.CssProvider()
-        style_path = os.path.join(BASE_PATH, "Estilo.css")
+        style_path = os.path.join(BASE_PATH, "Estilos", "Estilo.css")
         css_provider.load_from_path(style_path)
         context = Gtk.StyleContext()
         context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_SETTINGS)

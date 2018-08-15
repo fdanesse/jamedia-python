@@ -22,8 +22,7 @@ class ToolbarAddVideo(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        style_context = self.get_style_context()
-        style_context.add_class("toolbaraccionvideos")
+        self.get_style_context().add_class("toolbaraccionvideos")
 
         self.__box = None
 
