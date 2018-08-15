@@ -17,14 +17,14 @@
     color: black;
 }
 .convertprogress trough progress {
-    background-image: image(black);
-    background-color: black;
+    background-image: image(@jamedia1);
+    background-color: @jamedia1;
     border-width: 1px;
-    border-color: black;
-    border: 0.1em red solid;
+    border: 0.1em black solid;
     border-radius: 0;
     opacity: 1;
 }
+/* FIXME: No funciona
 .convertprogress trough {
     background-image: image(blue);
     background-color: blue;
@@ -32,7 +32,7 @@
     border: 0.1em solid blue;
     border-radius: 2px;
     opacity: 1;
-}
+}*/
 .convertcheck {
     margin-left: 5px;
     margin-top: 5px;
