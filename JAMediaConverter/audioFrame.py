@@ -23,11 +23,13 @@ class AudioFrame(Gtk.Frame):
         Gtk.Frame.__init__(self)
 
         self._codecs = []
+        self._codecsprogress = {}  # Progreso de cada codec
         self._files = []
         self._converters = [None, None, None]
         self._dirOut = HOME
         self._initialFilesCount = 0
         self._progressbar = Gtk.ProgressBar()
+        self._progressbar.set_show_text(True)
         self._progressbar.get_style_context().add_class("convertprogress")
         self._checks = []
 
@@ -47,8 +49,7 @@ class AudioFrame(Gtk.Frame):
             self._checks.append(check)
             progress = Gtk.ProgressBar()
             progress.set_show_text(True)
-            style_context = progress.get_style_context()
-            style_context.add_class("convertprogress")
+            progress.get_style_context().add_class("convertprogress")
             # http://www.mono-project.com/docs/gui/gtksharp/widgets/packing-with-tables/
             table.attach(check, 0, 1, row, row+1,
                 Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
@@ -85,6 +86,7 @@ class AudioFrame(Gtk.Frame):
             self._files.append(f[1])
         self._initialFilesCount = len(self._files)
         self.start.set_sensitive(bool(self._files) and bool(self._codecs))
+        # FIXME: Que los check se activen según los tipos de archivos que se carguen
 
     def __toggledButton(self, widget):
         if widget.get_active():
@@ -95,88 +97,81 @@ class AudioFrame(Gtk.Frame):
         self.start.set_sensitive(bool(self._files) and bool(self._codecs))
 
     def run(self, widget=None):
-        _file = self._files[0]
+        # Se ejecuta para iniciar todas las conversiones de cada archivo
         # FIXME: Informar de archivo en proceso
+        self._codecsprogress = {}
+        for check in self._checks:
+            check.set_sensitive(False)
+        self.start.set_sensitive(False)
         for codec in self._codecs:
+            self._codecsprogress[codec] = 0.0
             index = self._codecs.index(codec)
-            convert = Converter(_file, codec, self._dirOut)
-            convert.connect('progress', self.__progress)
-            convert.connect('error', self.__error)
-            convert.connect('info', self.__info)
-            convert.connect('end', self.__end)
-            self._converters[index] = convert
+            self._converters[index] = Converter(self._files[0], codec, self._dirOut)
+            self._converters[index].connect('progress', self.__progress)
+            self._converters[index].connect('error', self.__error)
+            self._converters[index].connect('info', self.__info)
+            self._converters[index].connect('end', self.__end)
         for convert in self._converters:
             if convert:
-                convert.play()
+                GLib.idle_add(convert.play)
 
     def __progress(self, convert, val, codec):
-        self._progress[codec].set_fraction(float(val/100.0))
-        # GLib.idle_add(self._progress[codec].set_text, str(val/100.0))
-        # FIXME: Actualizar progress general
-        # duration = self._initialFilesCount * codecs * 100.0
-        # self._files * codecs * 100.0 = position
-        dif = self._initialFilesCount - len(self._files)
-        total = (dif) * 100 / self._initialFilesCount 
-        GLib.idle_add(self._progressbar.set_fraction, float(total/100.0))
-        '''
-        adj = self._progress[codec].escala.get_adjustment()
-        GLib.idle_add(adj.set_value, float(val))
-        adj = self._progressbar.escala.get_adjustment()
-        GLib.idle_add(adj.set_value, float(total))'''
+        # NOTA: Cada instancia de Converter está conectada a esta función
+        GLib.idle_add(self._progress[codec].set_fraction, float(val/100.0))
+        self._codecsprogress[codec] = val
+        progreso = 0
+        for val in self._codecsprogress.values():
+            progreso += val
+        progreso = progreso / len(self._codecs)
+        totalesperado = self._initialFilesCount * 100.0
+        totalterminado = ((self._initialFilesCount - len(self._files))) * 100.0 + progreso
+        n = (totalterminado * 100.0 / totalesperado ) / 100.0
+        GLib.idle_add(self._progressbar.set_fraction, n)
 
     def __error(self, convert, error):
-        '''dialog = Gtk.MessageDialog(self.get_toplevel(), 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "ERROR")
-        dialog.format_secondary_text(error)
-        dialog.run()
-        dialog.destroy()'''
+        # NOTA: Cada instancia de Converter está conectada a esta función
+        print("FIXME: ERROR: ", self.__error, error)
         self.__next(convert)
 
     def __info(self, convert, info):
+        # NOTA: Cada instancia de Converter está conectada a esta función
         # FIXME: 'INFO', convert, info
         pass
 
     def __end(self, convert):
+        # NOTA: Cada instancia de Converter está conectada a esta función
         self.__next(convert)
 
     def __next(self, convert):
-        convert.disconnect_by_func(self.__progress)
-        convert.disconnect_by_func(self.__error)
-        convert.disconnect_by_func(self.__info)
-        convert.disconnect_by_func(self.__end)
+        # Va quitando los converters a medida que terminan y cuando no quedan más pasa el siguiente archivo
         index = self._converters.index(convert)
+        self._converters[index].disconnect_by_func(self.__progress)
+        self._converters[index].disconnect_by_func(self.__error)
+        self._converters[index].disconnect_by_func(self.__info)
+        self._converters[index].disconnect_by_func(self.__end)
+        GLib.idle_add(self._converters[index].free)
         self._converters[index] = None
-        convert.free()
-        convert.destroy()
+        #convert.destroy()
         for convert in self._converters:
             if convert:
-                # Esperamos que terminen todas
-                # las conversiones para este archivo
+                # Para esperar a que terminen todas las conversiones de este archivo
                 return
         if self._files:
-            _file = self._files[0]
-            self._files.remove(_file)
+            self._files.remove(self._files[0])
             if self._files:
                 self.run()
             else:
-                self.__dialogEnd()
+                self.__end_all()
         else:
-            self.__dialogEnd()
+            self.__end_all()
 
-    def __dialogEnd(self):
+    def __end_all(self):
         # http://python-gtk-3-tutorial.readthedocs.io/en/latest/dialogs.html
-        '''dialog = Gtk.MessageDialog(
-            self.get_toplevel(), 0, Gtk.MessageType.INFO,
-            Gtk.ButtonsType.OK, "Tareas culminadas")
-        dialog.format_secondary_text("Han culminado todas las tareas")
-        dialog.set_border_width(15)
-        dialog.run()
-        dialog.destroy() # FIXME Warning: g_array_remove_range: assertion 'index_ + length <= array->len' failed
         self._progressbar.set_fraction(0.0)
         for progress in self._progress.values():
             progress.set_fraction(0.0)
         for check in self._checks:
             check.set_sensitive(True)
-        '''
+        self.start.set_sensitive(False)
         self.emit('end')
-        print("FIXME: END")
         

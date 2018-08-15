@@ -13,6 +13,7 @@
 }
 .convertprogress {
     margin: 5px;
+    color: black;
 }
 .convertprogress trough progress {
     background-image: image(black);

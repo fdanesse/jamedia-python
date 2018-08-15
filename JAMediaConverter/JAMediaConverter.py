@@ -62,20 +62,20 @@ class JAMediaConverter(Gtk.VBox):
         self.__filechooser2.salir.connect("clicked", self.__setup_init)
         self.__filechooser2.open.connect("clicked", self.__folder_selected)
 
-        # FIXME: self.__outBox.set_sensitive(False)
         GLib.idle_add(self.__setup_init)
 
     def __reset(self, widget):
-        # FIXME: self.__outBox.set_sensitive(True)
+        # Terminaron todas las conversiones
+        # FIXME: Avisar
+        self.__scrollTareas.selectFolder.set_sensitive(True)
         self.__playerList.set_sensitive(True)
 
     def __run(self, widget):
-        # FIXME: self.__outBox.set_sensitive(False)
-        self.__playerList.set_sensitive(False)
+        self.__scrollTareas.selectFolder.set_sensitive(False)
+        self.__playerList.set_sensitive(False)  # FIXME: Es necesario ?
         self.__scrollTareas.audioframe.run()
 
     def __file_list_changed(self, widget, cantidad):
-        # FIXME: self.__outBox.set_sensitive(bool(cantidad))
         self.__scrollTareas.audioframe.set_files(list(self.__playerList.lista.getItems()))
 
     def __folder_selected(self, widget):
