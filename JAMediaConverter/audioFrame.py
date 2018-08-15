@@ -16,7 +16,9 @@ HOME = os.environ['HOME']
 
 class AudioFrame(Gtk.Frame):
 
-    __gsignals__ = {"end": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, [])}
+    __gsignals__ = {
+        "end": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, []),
+        "running": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_STRING, ))}
 
     def __init__(self):
 
@@ -98,7 +100,7 @@ class AudioFrame(Gtk.Frame):
 
     def run(self, widget=None):
         # Se ejecuta para iniciar todas las conversiones de cada archivo
-        # FIXME: Informar de archivo en proceso
+        self.emit("running", self._files[0])
         self._codecsprogress = {}
         for check in self._checks:
             check.set_sensitive(False)
@@ -107,16 +109,15 @@ class AudioFrame(Gtk.Frame):
             self._codecsprogress[codec] = 0.0
             index = self._codecs.index(codec)
             self._converters[index] = Converter(self._files[0], codec, self._dirOut)
+            # NOTA: Cada instancia de Converter estará conectada a estas funciones
             self._converters[index].connect('progress', self.__progress)
             self._converters[index].connect('error', self.__error)
             self._converters[index].connect('info', self.__info)
             self._converters[index].connect('end', self.__end)
         for convert in self._converters:
-            if convert:
-                GLib.idle_add(convert.play)
+            if convert: GLib.idle_add(convert.play)
 
     def __progress(self, convert, val, codec):
-        # NOTA: Cada instancia de Converter está conectada a esta función
         GLib.idle_add(self._progress[codec].set_fraction, float(val/100.0))
         self._codecsprogress[codec] = val
         progreso = 0
@@ -129,17 +130,14 @@ class AudioFrame(Gtk.Frame):
         GLib.idle_add(self._progressbar.set_fraction, n)
 
     def __error(self, convert, error):
-        # NOTA: Cada instancia de Converter está conectada a esta función
         print("FIXME: ERROR: ", self.__error, error)
         self.__next(convert)
 
     def __info(self, convert, info):
-        # NOTA: Cada instancia de Converter está conectada a esta función
         # FIXME: 'INFO', convert, info
         pass
 
     def __end(self, convert):
-        # NOTA: Cada instancia de Converter está conectada a esta función
         self.__next(convert)
 
     def __next(self, convert):
@@ -166,12 +164,11 @@ class AudioFrame(Gtk.Frame):
             self.__end_all()
 
     def __end_all(self):
-        # http://python-gtk-3-tutorial.readthedocs.io/en/latest/dialogs.html
         self._progressbar.set_fraction(0.0)
         for progress in self._progress.values():
             progress.set_fraction(0.0)
         for check in self._checks:
             check.set_sensitive(True)
-        self.start.set_sensitive(False)
+        self.start.set_sensitive(True)
         self.emit('end')
         

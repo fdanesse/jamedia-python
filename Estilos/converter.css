@@ -52,3 +52,11 @@
     background-image: image(@green3);
     background-color: @green3;
 }
+#converterbox .infolabel {
+    background-color: @green3;
+    color: @green1;
+    padding: 5px;
+    border: 1px solid @border;
+    border-radius: 5px;
+    font-weight: bold;
+}

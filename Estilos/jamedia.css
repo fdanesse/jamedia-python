@@ -49,3 +49,7 @@
     margin: 0;
     padding: 3px;
 }
+.toolbarlist button {
+    margin: 0;
+    padding: 1px;
+}

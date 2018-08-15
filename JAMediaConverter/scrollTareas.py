@@ -50,11 +50,19 @@ class ScrollTareas(Gtk.ScrolledWindow):
 
         frame.add(toolbar)
 
+        self.__info_file_in_process = Gtk.Label('No hay tareas pendientes')
+        self.__info_file_in_process.get_style_context().add_class("infolabel")
         self.audioframe = AudioFrame()
 
         vbox.pack_start(frame, False, False, 5)
+        vbox.pack_start(self.__info_file_in_process, False, False, 5)
         vbox.pack_start(self.audioframe, False, False, 5)
         # FIXME: info de archivo
 
         self.add(vbox)
         self.show_all()
+
+    def set_info_file_in_process(self, path=''):
+        text = 'No hay tareas pendientes'
+        if path: text = "Procesando: %s" % os.path.basename(path)
+        self.__info_file_in_process.set_text(text)
