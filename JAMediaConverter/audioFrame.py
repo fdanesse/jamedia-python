@@ -19,6 +19,7 @@ class AudioFrame(Gtk.Frame):
     __gsignals__ = {
         "end": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, []),
         "running": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
+        "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
         "error": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_STRING, ))}
 
     def __init__(self):
@@ -27,6 +28,7 @@ class AudioFrame(Gtk.Frame):
 
         self._codecs = []
         self._codecsprogress = {}  # Progreso de cada codec
+        self._inicial_files = []
         self._files = []
         self._converters = [None, None, None]
         self._dirOut = HOME
@@ -48,7 +50,6 @@ class AudioFrame(Gtk.Frame):
             # http://python-gtk-3-tutorial.readthedocs.io/en/latest/button_widgets.html
             check = Gtk.CheckButton(formato)
             check.get_style_context().add_class("convertcheck")
-            if formato != "mp3": check.set_sensitive(False)
             self._checks.append(check)
             progress = Gtk.ProgressBar()
             progress.set_show_text(True)
@@ -87,6 +88,7 @@ class AudioFrame(Gtk.Frame):
         self._files = []
         for f in _files:
             self._files.append(f[1])
+        self._inicial_files = self._files.copy()
         self._initialFilesCount = len(self._files)
         self.start.set_sensitive(bool(self._files) and bool(self._codecs))
         # FIXME: Que los check se activen según los tipos de archivos que se carguen
@@ -132,11 +134,11 @@ class AudioFrame(Gtk.Frame):
 
     def __error(self, convert, error):
         self.emit("error", error)  # FIXME: Agregar codec ?
+        # FIXME: Borrar archivos vacíos
         self.__next(convert)
 
     def __info(self, convert, info):
-        # FIXME: 'INFO', convert, info
-        pass
+        self.emit('info', info)
 
     def __end(self, convert):
         self.__next(convert)
@@ -171,5 +173,6 @@ class AudioFrame(Gtk.Frame):
         for check in self._checks:
             check.set_sensitive(True)
         self.start.set_sensitive(True)
+        self._files = self._inicial_files.copy()
         self.emit('end')
         

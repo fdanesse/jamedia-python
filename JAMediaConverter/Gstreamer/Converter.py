@@ -173,10 +173,20 @@ class Converter(Gtk.Widget):
                 name = os.path.basename(self._origen)
             except:
                 pass
-            print("ERROR en: " + name + ' => ' + str(mensaje.parse_error()))
             self.emit("error", "ERROR en: " + name + ' => ' + str(mensaje.parse_error()))
             
     def __handle(self):
+        if not self._player:
+            if self._controller:
+                GLib.source_remove(self._controller)
+                self._controller = None
+            name = ''
+            try:
+                name = os.path.basename(self._origen)
+            except:
+                pass
+            self.emit("error", "ERROR en: " + name + " - No se puede convertir a " + self._codec)
+            return False
         '''
         if os.path.exists(self._newpath):
             tamanio = os.path.getsize(self._newpath)

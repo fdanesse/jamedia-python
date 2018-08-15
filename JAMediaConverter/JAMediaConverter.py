@@ -66,6 +66,7 @@ class JAMediaConverter(Gtk.VBox):
 
     def __end_all_process(self, widget):
         self.__scrollTareas.set_info_file_in_process('')
+        self.__scrollTareas.set_info('')
         self.__scrollTareas.selectFolder.set_sensitive(True)
         self.__playerList.set_sensitive(True)
 
