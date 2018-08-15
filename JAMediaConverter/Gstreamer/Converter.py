@@ -53,7 +53,7 @@ class Converter(Gtk.Widget):
         elif self._codec == "mp3":
             self.__run_mp3_out()
         elif self._codec == "ogg":
-            #self.__run_ogg_out()
+            # self.__run_ogg_out() # FIXME: Violación de segmento (`core' generado)
             pass
 
     def free(self):
@@ -61,8 +61,9 @@ class Converter(Gtk.Widget):
             GLib.source_remove(self._controller)
             self._controller = None
         #self._pipe.set_state(Gst.State.NULL)
-        self._bus.disconnect_by_func(self.__sync_message)
-        self._player.disconnect_by_func(self.__on_pad_added)
+        if self._bus:
+            self._bus.disconnect_by_func(self.__sync_message)
+            self._player.disconnect_by_func(self.__on_pad_added)
         self._origen = None
         self._codec = None
         self._newpath = None
@@ -74,6 +75,44 @@ class Converter(Gtk.Widget):
         self._video_sink = None
         self._audio_sink = None
         self._pipe = None
+
+    def __run_ogg_out(self):
+        self._player = Gst.ElementFactory.make("uridecodebin", "uridecodebin")
+        videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
+        fakesink = Gst.ElementFactory.make('fakesink', 'fakesink')
+        
+        audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
+        audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
+        audioresample.set_property('quality', 10)
+        vorbisenc = Gst.ElementFactory.make('vorbisenc', 'vorbisenc')
+        oggmux = Gst.ElementFactory.make('oggmux', 'oggmux')
+        filesink = Gst.ElementFactory.make('filesink', 'filesink')
+
+        self._pipe.add(self._player)
+        self._pipe.add(audioconvert)
+        self._pipe.add(audioresample)
+        self._pipe.add(vorbisenc)
+        self._pipe.add(oggmux)
+        self._pipe.add(filesink)
+        self._pipe.add(videoconvert)
+        self._pipe.add(fakesink)
+
+        audioconvert.link(vorbisenc)
+        vorbisenc.link(oggmux)
+        oggmux.link(filesink)
+
+        videoconvert.link(fakesink)
+
+        self._video_sink = videoconvert.get_static_pad('sink')
+        self._audio_sink = audioconvert.get_static_pad('sink')
+
+        filesink.set_property("location", self._newpath)
+        self._player.set_property("uri", self._origen)
+        
+        self._bus = self._pipe.get_bus()
+        self._bus.enable_sync_message_emission()
+        self._bus.connect('sync-message', self.__sync_message)
+        self._player.connect('pad-added', self.__on_pad_added)
 
     def __run_wav_out(self):
         self._player = Gst.ElementFactory.make("uridecodebin", "uridecodebin")

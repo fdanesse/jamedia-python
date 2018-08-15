@@ -133,11 +133,15 @@ class AudioFrame(Gtk.Frame):
         GLib.idle_add(self._progressbar.set_fraction, n)
 
     def __error(self, convert, error):
+        if os.path.exists(convert._newpath):
+            statinfo = os.stat(convert._newpath)
+            if not statinfo.st_size:
+                os.remove(convert._newpath)
         self.emit("error", error)  # FIXME: Agregar codec ?
-        # FIXME: Borrar archivos vacíos
         self.__next(convert)
 
     def __info(self, convert, info):
+        # FIXME: esta señal se recibe mas de una vez por archivo con diferentes datos
         self.emit('info', info)
 
     def __end(self, convert):
