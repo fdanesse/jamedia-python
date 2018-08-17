@@ -26,6 +26,7 @@ class ProgressPlayer(Gtk.Toolbar):
         self.__progressBar = BarraProgreso()
         self.__volumen = Gtk.VolumeButton()
         self.__volumen.set_css_name('volumen')
+        self.__volumen.set_name('volumen')
         self.__volumen.set_value(0.1)
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)

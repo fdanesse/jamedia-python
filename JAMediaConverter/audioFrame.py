@@ -91,7 +91,7 @@ class AudioFrame(Gtk.Frame):
         self._inicial_files = self._files.copy()
         self._initialFilesCount = len(self._files)
         self.start.set_sensitive(bool(self._files) and bool(self._codecs))
-        # FIXME: Que los check se activen según los tipos de archivos que se carguen
+        # FIXME: Que los check se activen según los tipos de archivos que se carguen ?
 
     def __toggledButton(self, widget):
         if widget.get_active():
@@ -103,7 +103,7 @@ class AudioFrame(Gtk.Frame):
 
     def run(self, widget=None):
         # Se ejecuta para iniciar todas las conversiones de cada archivo
-        self.emit("running", self._files[0])  # FIXME: Error cuando ejecutamos por segunda vez sobre la misma lista.
+        self.emit("running", self._files[0])
         self._codecsprogress = {}
         for check in self._checks:
             check.set_sensitive(False)
@@ -141,7 +141,7 @@ class AudioFrame(Gtk.Frame):
         self.__next(convert)
 
     def __info(self, convert, info):
-        # FIXME: esta señal se recibe mas de una vez por archivo con diferentes datos
+        # NOTA: Recordar que esta señal se recibe mas de una vez por archivo con diferentes datos
         self.emit('info', info)
 
     def __end(self, convert):
@@ -150,13 +150,13 @@ class AudioFrame(Gtk.Frame):
     def __next(self, convert):
         # Va quitando los converters a medida que terminan y cuando no quedan más pasa el siguiente archivo
         index = self._converters.index(convert)
-        self._converters[index].disconnect_by_func(self.__progress)
-        self._converters[index].disconnect_by_func(self.__error)
-        self._converters[index].disconnect_by_func(self.__info)
-        self._converters[index].disconnect_by_func(self.__end)
-        GLib.idle_add(self._converters[index].free)
+        convert.disconnect_by_func(self.__progress)
+        convert.disconnect_by_func(self.__error)
+        convert.disconnect_by_func(self.__info)
+        convert.disconnect_by_func(self.__end)
         self._converters[index] = None
-        #convert.destroy()
+        convert.free()
+        # del(convert)  FIXME: Violación de segmento (`core' generado)
         for convert in self._converters:
             if convert:
                 # Para esperar a que terminen todas las conversiones de este archivo

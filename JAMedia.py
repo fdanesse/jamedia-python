@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+# API: https://lazka.github.io/pgi-docs
 # gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly gstreamer1.0-tools gstreamer1.0-libav
 
 import os
@@ -285,8 +286,8 @@ class JAMedia(Gtk.Window):
 
 
 if __name__ == "__main__":
+    Gst.init(None)
     GObject.threads_init()
     Gdk.threads_init()
-    Gst.init([])
     jamedia = JAMedia()
     Gtk.main()

@@ -94,7 +94,8 @@ class ScrollTareas(Gtk.ScrolledWindow):
 
     def set_info(self, info=''):
         if info:
-            self.__infoLabel.set_text(info)
+            if info != self.__infoLabel.get_text():
+                self.__infoLabel.set_text(info)
             self.__infoFrame.show_all()
         else:
             self.__infoFrame.hide()
@@ -108,7 +109,6 @@ class ScrollTareas(Gtk.ScrolledWindow):
         self.__info_file_in_process.set_text(text)
 
     def set_errors(self, text=''):
-        # FIXME: No se ve bien con un solo error
         if text:
             label = Gtk.Label(text)
             label.set_line_wrap(True)

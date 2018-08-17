@@ -3,11 +3,15 @@
     border: 2px @jamedia3 solid;
 }
 .progressplayer button { /* FIXME: el boton del volumen queda alargado */
+    margin: 0;
     margin-left: 3px;
     margin-right: 3px;
-    padding-left: 3px;
-    padding-right: 3px;
+    padding: 3px;
     border-radius: 100%;
+}
+#volumen {
+    padding-left: 6px;
+    padding-right: 6px;
 }
 #jamediaplayerpanel {
     background-image: image(@bg_toolbar1);

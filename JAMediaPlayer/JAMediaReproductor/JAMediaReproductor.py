@@ -133,8 +133,10 @@ class JAMediaReproductor(GObject.GObject):
 
         self.__xvimagesink.set_window_handle(self.__winId)
         self.__bus = self.__pipe.get_bus()
-        self.__bus.enable_sync_message_emission()
-        self.__bus.connect('sync-message', self.__sync_message)
+        #self.__bus.enable_sync_message_emission()
+        #self.__bus.connect('sync-message', self.__sync_message)
+        self.__bus.add_signal_watch()
+        self.__bus.connect("message", self.__sync_message)
 
     def __sync_message(self, bus, mensaje):
         if mensaje.type == Gst.MessageType.STATE_CHANGED:
@@ -250,23 +252,19 @@ class JAMediaReproductor(GObject.GObject):
             'rotacion': 0}
         return conf
         
-    def set_balance(self, brillo=False, contraste=False,
-        saturacion=False, hue=False, gamma=False):
+    def set_balance(self, brillo=False, contraste=False, saturacion=False, hue=False, gamma=False):
         if saturacion:
             # Double. Range: 0 - 2 Default: 1
             self.__config['saturacion'] = 2.0 * saturacion / 100.0
-            self.__videobalance.set_property(
-                'saturation', self.__config['saturacion'])
+            self.__videobalance.set_property('saturation', self.__config['saturacion'])
         if contraste:
             # Double. Range: 0 - 2 Default: 1
             self.__config['contraste'] = 2.0 * contraste / 100.0
-            self.__videobalance.set_property(
-                'contrast', self.__config['contraste'])
+            self.__videobalance.set_property('contrast', self.__config['contraste'])
         if brillo:
             # Double. Range: -1 - 1 Default: 0
             self.__config['brillo'] = (2.0 * brillo / 100.0) - 1.0
-            self.__videobalance.set_property(
-                'brightness', self.__config['brillo'])
+            self.__videobalance.set_property('brightness', self.__config['brillo'])
         if hue:
             # Double. Range: -1 - 1 Default: 0
             self.__config['hue'] = (2.0 * hue / 100.0) - 1.0
@@ -322,3 +320,5 @@ class JAMediaReproductor(GObject.GObject):
             self.__play()
         else:
             print ("Dirección no válida", temp)
+
+GObject.type_register(JAMediaReproductor)

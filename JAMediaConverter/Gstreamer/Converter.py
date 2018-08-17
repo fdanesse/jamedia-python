@@ -14,7 +14,7 @@ from gi.repository import GstVideo
 from gi.repository import GdkX11
 
 
-class Converter(Gtk.Widget):
+class Converter(GObject.Object):
 
     __gsignals__ = {
     "progress": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
@@ -24,7 +24,7 @@ class Converter(Gtk.Widget):
 
     def __init__(self, origen, codec, dirpath_destino):
 
-        Gtk.Widget.__init__(self)
+        GObject.Object.__init__(self)
 
         self._origen = origen
         self._codec = codec
@@ -37,6 +37,7 @@ class Converter(Gtk.Widget):
         self._pipe = Gst.Pipeline()
         self._video_sink = None
         self._audio_sink = None
+        self._info = {'Audio': '', 'Video': ''}
 
         # path de salida
         location = os.path.basename(self._origen)
@@ -56,24 +57,28 @@ class Converter(Gtk.Widget):
             # self.__run_ogg_out() # FIXME: Violación de segmento (`core' generado)
             pass
 
+    def __del__(self):
+        print("DESTROY OK")
+
     def free(self):
         if self._controller:
             GLib.source_remove(self._controller)
-            self._controller = None
-        #self._pipe.set_state(Gst.State.NULL)
+            self._controller = None        
         if self._bus:
             self._bus.disconnect_by_func(self.__sync_message)
             self._player.disconnect_by_func(self.__on_pad_added)
+        if self._pipe:
+            print("STATUS", self._pipe.set_state(Gst.State.NULL))
         self._origen = None
         self._codec = None
         self._newpath = None
         self._controller = None
-        self._player = None
         self._duration = None
         self._position = None
         self._bus = None
         self._video_sink = None
         self._audio_sink = None
+        self._player = None
         self._pipe = None
 
     def __run_ogg_out(self):
@@ -110,8 +115,10 @@ class Converter(Gtk.Widget):
         self._player.set_property("uri", self._origen)
         
         self._bus = self._pipe.get_bus()
-        self._bus.enable_sync_message_emission()
-        self._bus.connect('sync-message', self.__sync_message)
+        #self._bus.enable_sync_message_emission()
+        #self._bus.connect('sync-message', self.__sync_message)
+        self._bus.add_signal_watch()
+        self._bus.connect("message", self.__sync_message)
         self._player.connect('pad-added', self.__on_pad_added)
 
     def __run_wav_out(self):
@@ -146,8 +153,10 @@ class Converter(Gtk.Widget):
         self._player.set_property("uri", self._origen)
         
         self._bus = self._pipe.get_bus()
-        self._bus.enable_sync_message_emission()
-        self._bus.connect('sync-message', self.__sync_message)
+        #self._bus.enable_sync_message_emission()
+        #self._bus.connect('sync-message', self.__sync_message)
+        self._bus.add_signal_watch()
+        self._bus.connect("message", self.__sync_message)
         self._player.connect('pad-added', self.__on_pad_added)
 
     def __run_mp3_out(self):
@@ -182,22 +191,25 @@ class Converter(Gtk.Widget):
         self._player.set_property("uri", self._origen)
         
         self._bus = self._pipe.get_bus()
-        self._bus.enable_sync_message_emission()
-        self._bus.connect('sync-message', self.__sync_message)
+        #self._bus.enable_sync_message_emission()
+        #self._bus.connect('sync-message', self.__sync_message)
+        self._bus.add_signal_watch()
+        self._bus.connect("message", self.__sync_message)
         self._player.connect('pad-added', self.__on_pad_added)
         
     def __on_pad_added(self, uridecodebin, pad):
-        """
-        Agregar elementos en forma dinámica
-        https://wiki.ubuntu.com/Novacut/GStreamer1.0
-        """
+        # Agregar elementos en forma dinámica: https://wiki.ubuntu.com/Novacut/GStreamer1.0
         string = pad.query_caps(None).to_string()
         if string.startswith('audio/'):
             pad.link(self._audio_sink)
-            self.emit('info', string)
+            self._info['Audio'] = string
         elif string.startswith('video/'):
             pad.link(self._video_sink)
-            self.emit('info', string)
+            self._info['Video'] = string
+        
+        info = 'AUDIO => %s\n\n' % str(self._info['Audio'])
+        info += 'VIDEO => %s' % str(self._info['Video'])
+        self.emit('info', info)
 
     def play(self):
         self._pipe.set_state(Gst.State.PLAYING)
@@ -267,3 +279,5 @@ class Converter(Gtk.Widget):
             self._position = pos
             self.emit("progress", self._position, self._codec)
         return True
+
+GObject.type_register(Converter)
