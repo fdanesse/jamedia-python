@@ -54,21 +54,27 @@ class Converter(GObject.Object):
         elif self._codec == "mp3":
             self.__run_mp3_out()
         elif self._codec == "ogg":
-            # self.__run_ogg_out() # FIXME: Violación de segmento (`core' generado)
-            pass
+            self.__run_ogg_out() # FIXME: Violación de segmento (`core' generado)
+
+        self._player.set_property("uri", self._origen)
+        
+        self._bus = self._pipe.get_bus()
+        #self._bus.enable_sync_message_emission()
+        #self._bus.connect('sync-message', self.__sync_message)
+        self._bus.add_signal_watch()
+        self._bus.connect("message", self.__sync_message)
+        self._player.connect('pad-added', self.__on_pad_added)
 
     def __del__(self):
         print("DESTROY OK")
 
-    def free(self):
-        if self._controller:
-            GLib.source_remove(self._controller)
-            self._controller = None        
+    '''def free(self):
+        if self._player:
+            self._player.disconnect_by_func(self.__on_pad_added)
         if self._bus:
             self._bus.disconnect_by_func(self.__sync_message)
-            self._player.disconnect_by_func(self.__on_pad_added)
-        if self._pipe:
-            print("STATUS", self._pipe.set_state(Gst.State.NULL))
+            self._bus.remove_signal_watch()
+        self.stop()
         self._origen = None
         self._codec = None
         self._newpath = None
@@ -79,13 +85,15 @@ class Converter(GObject.Object):
         self._video_sink = None
         self._audio_sink = None
         self._player = None
-        self._pipe = None
+        self._pipe = None'''
 
     def __run_ogg_out(self):
         self._player = Gst.ElementFactory.make("uridecodebin", "uridecodebin")
+        queuev = Gst.ElementFactory.make('queue', 'queuev')
         videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
         fakesink = Gst.ElementFactory.make('fakesink', 'fakesink')
         
+        queuea = Gst.ElementFactory.make('queue', 'queuea')
         audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
         audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
         audioresample.set_property('quality', 10)
@@ -94,38 +102,36 @@ class Converter(GObject.Object):
         filesink = Gst.ElementFactory.make('filesink', 'filesink')
 
         self._pipe.add(self._player)
+        self._pipe.add(queuea)
         self._pipe.add(audioconvert)
         self._pipe.add(audioresample)
         self._pipe.add(vorbisenc)
         self._pipe.add(oggmux)
         self._pipe.add(filesink)
+        self._pipe.add(queuev)
         self._pipe.add(videoconvert)
         self._pipe.add(fakesink)
 
+        queuea.link(audioconvert)
         audioconvert.link(vorbisenc)
         vorbisenc.link(oggmux)
         oggmux.link(filesink)
 
+        queuev.link(videoconvert)
         videoconvert.link(fakesink)
 
-        self._video_sink = videoconvert.get_static_pad('sink')
-        self._audio_sink = audioconvert.get_static_pad('sink')
+        self._video_sink = queuev.get_static_pad('sink')
+        self._audio_sink = queuea.get_static_pad('sink')
 
         filesink.set_property("location", self._newpath)
-        self._player.set_property("uri", self._origen)
-        
-        self._bus = self._pipe.get_bus()
-        #self._bus.enable_sync_message_emission()
-        #self._bus.connect('sync-message', self.__sync_message)
-        self._bus.add_signal_watch()
-        self._bus.connect("message", self.__sync_message)
-        self._player.connect('pad-added', self.__on_pad_added)
 
     def __run_wav_out(self):
         self._player = Gst.ElementFactory.make("uridecodebin", "uridecodebin")
+        queuev = Gst.ElementFactory.make('queue', 'queuev')
         videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
         fakesink = Gst.ElementFactory.make('fakesink', 'fakesink')
         
+        queuea = Gst.ElementFactory.make('queue', 'queuea')
         audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
         audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
         audioresample.set_property('quality', 10)
@@ -133,37 +139,35 @@ class Converter(GObject.Object):
         filesink = Gst.ElementFactory.make('filesink', 'filesink')
 
         self._pipe.add(self._player)
+        self._pipe.add(queuea)
         self._pipe.add(audioconvert)
         self._pipe.add(audioresample)
         self._pipe.add(wavenc)
         self._pipe.add(filesink)
+        self._pipe.add(queuev)
         self._pipe.add(videoconvert)
         self._pipe.add(fakesink)
 
+        queuea.link(audioconvert)
         audioconvert.link(audioresample)
         audioresample.link(wavenc)
         wavenc.link(filesink)
 
+        queuev.link(videoconvert)
         videoconvert.link(fakesink)
 
-        self._video_sink = videoconvert.get_static_pad('sink')
-        self._audio_sink = audioconvert.get_static_pad('sink')
+        self._video_sink = queuev.get_static_pad('sink')
+        self._audio_sink = queuea.get_static_pad('sink')
 
         filesink.set_property("location", self._newpath)
-        self._player.set_property("uri", self._origen)
-        
-        self._bus = self._pipe.get_bus()
-        #self._bus.enable_sync_message_emission()
-        #self._bus.connect('sync-message', self.__sync_message)
-        self._bus.add_signal_watch()
-        self._bus.connect("message", self.__sync_message)
-        self._player.connect('pad-added', self.__on_pad_added)
 
     def __run_mp3_out(self):
         self._player = Gst.ElementFactory.make("uridecodebin", "uridecodebin")
+        queuev = Gst.ElementFactory.make('queue', 'queuev')
         videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
         fakesink = Gst.ElementFactory.make('fakesink', 'fakesink')
         
+        queuea = Gst.ElementFactory.make('queue', 'queuea')
         audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
         audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
         audioresample.set_property('quality', 10)
@@ -171,31 +175,27 @@ class Converter(GObject.Object):
         filesink = Gst.ElementFactory.make('filesink', 'filesink')
 
         self._pipe.add(self._player)
+        self._pipe.add(queuea)
         self._pipe.add(audioconvert)
         self._pipe.add(audioresample)
         self._pipe.add(lamemp3enc)
         self._pipe.add(filesink)
+        self._pipe.add(queuev)
         self._pipe.add(videoconvert)
         self._pipe.add(fakesink)
 
+        queuea.link(audioconvert)
         audioconvert.link(audioresample)
         audioresample.link(lamemp3enc)
         lamemp3enc.link(filesink)
 
+        queuev.link(videoconvert)
         videoconvert.link(fakesink)
 
-        self._video_sink = videoconvert.get_static_pad('sink')
-        self._audio_sink = audioconvert.get_static_pad('sink')
+        self._video_sink = queuev.get_static_pad('sink')
+        self._audio_sink = queuea.get_static_pad('sink')
 
         filesink.set_property("location", self._newpath)
-        self._player.set_property("uri", self._origen)
-        
-        self._bus = self._pipe.get_bus()
-        #self._bus.enable_sync_message_emission()
-        #self._bus.connect('sync-message', self.__sync_message)
-        self._bus.add_signal_watch()
-        self._bus.connect("message", self.__sync_message)
-        self._player.connect('pad-added', self.__on_pad_added)
         
     def __on_pad_added(self, uridecodebin, pad):
         # Agregar elementos en forma dinámica: https://wiki.ubuntu.com/Novacut/GStreamer1.0
@@ -214,15 +214,15 @@ class Converter(GObject.Object):
     def play(self):
         self._pipe.set_state(Gst.State.PLAYING)
         self._controller = GLib.timeout_add(300, self.__handle)
+        return False
     
-    '''
     def stop(self):
-        self._pipe.set_state(Gst.State.PAUSED)
-        self._pipe.set_state(Gst.State.NULL)
+        if self._pipe:
+            self._pipe.set_state(Gst.State.PAUSED)
+            self._pipe.set_state(Gst.State.NULL)
         if self._controller:
             GLib.source_remove(self._controller)
             self._controller = None
-    '''
 
     def __sync_message(self, bus, mensaje):
         if mensaje.type == Gst.MessageType.EOS:

@@ -116,10 +116,11 @@ class AudioFrame(Gtk.Frame):
             self._converters[index].connect('progress', self.__progress)
             self._converters[index].connect('error', self.__error)
             self._converters[index].connect('info', self.__info)
-            self._converters[index].connect('end', self.__end)
+            self._converters[index].connect('end', self.__next)
         for convert in self._converters:
-            if convert: GLib.idle_add(convert.play)
-
+            if convert:
+                GLib.idle_add(convert.play)
+        
     def __progress(self, convert, val, codec):
         GLib.idle_add(self._progress[codec].set_fraction, float(val/100.0))
         self._codecsprogress[codec] = val
@@ -144,23 +145,20 @@ class AudioFrame(Gtk.Frame):
         # NOTA: Recordar que esta señal se recibe mas de una vez por archivo con diferentes datos
         self.emit('info', info)
 
-    def __end(self, convert):
-        self.__next(convert)
-
     def __next(self, convert):
         # Va quitando los converters a medida que terminan y cuando no quedan más pasa el siguiente archivo
         index = self._converters.index(convert)
         convert.disconnect_by_func(self.__progress)
         convert.disconnect_by_func(self.__error)
         convert.disconnect_by_func(self.__info)
-        convert.disconnect_by_func(self.__end)
+        convert.disconnect_by_func(self.__next)
         self._converters[index] = None
-        convert.free()
-        # del(convert)  FIXME: Violación de segmento (`core' generado)
+        convert.stop()
+        # convert.free()
+        del(convert)
         for convert in self._converters:
             if convert:
-                # Para esperar a que terminen todas las conversiones de este archivo
-                return
+                return False
         if self._files:
             self._files.remove(self._files[0])
             if self._files:
