@@ -286,8 +286,8 @@ class JAMedia(Gtk.Window):
 
 
 if __name__ == "__main__":
-    Gst.init(None)
     GObject.threads_init()
     Gdk.threads_init()
+    Gst.init(None)
     jamedia = JAMedia()
     Gtk.main()

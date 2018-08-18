@@ -25,7 +25,7 @@ def format_ns(ns):
         return "%02u:%02u:%02u" % (h, m, s)
 
 
-class JAMediaReproductor(GObject.GObject):
+class JAMediaReproductor(GObject.Object):
 
     __gsignals__ = {
     "endfile": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, []),
@@ -38,7 +38,7 @@ class JAMediaReproductor(GObject.GObject):
 
     def __init__(self):
 
-        GObject.GObject.__init__(self)
+        GObject.Object.__init__(self)
         
         self.__source = None
         self.__winId = None
