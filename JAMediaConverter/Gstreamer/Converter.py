@@ -45,10 +45,11 @@ class Converter(GObject.Object):
 
         # Formato de salida
         if self._codec == "wav":
-            #self.__run_wav_out()
-            pass
+            self.__pipe.set_property('video-sink', self.__get_video_fakesink())
+            audioBin = self.__get_wav_audio_out()
+            self.__pipe.set_property('audio-sink', audioBin)
+            audioBin.get_by_name('filesink').set_property("location", self._newpath)
         elif self._codec == "mp3":
-            #self.__pipe = Gst.ElementFactory.make("playbin", "player")
             self.__pipe.set_property('video-sink', self.__get_video_fakesink())
             audioBin = self.__get_mp3_audio_out()
             self.__pipe.set_property('audio-sink', audioBin)
@@ -92,6 +93,24 @@ class Converter(GObject.Object):
         audioconvert.link(audioresample)
         audioresample.link(lamemp3enc)
         lamemp3enc.link(filesink)
+        audioBin.add_pad(Gst.GhostPad.new("sink", audioconvert.get_static_pad("sink")))
+        return audioBin
+
+    def __get_wav_audio_out(self):
+        audioBin = Gst.Bin()
+        audioBin.set_name('audiobin')
+        audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
+        audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
+        audioresample.set_property('quality', 10)
+        wavenc = Gst.ElementFactory.make('wavenc', 'wavenc')
+        filesink = Gst.ElementFactory.make('filesink', 'filesink')
+        audioBin.add(audioconvert)
+        audioBin.add(audioresample)
+        audioBin.add(wavenc)
+        audioBin.add(filesink)
+        audioconvert.link(audioresample)
+        audioresample.link(wavenc)
+        wavenc.link(filesink)
         audioBin.add_pad(Gst.GhostPad.new("sink", audioconvert.get_static_pad("sink")))
         return audioBin
 
