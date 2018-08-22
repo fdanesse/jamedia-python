@@ -51,6 +51,7 @@ class ScrollTareas(Gtk.ScrolledWindow):
         frame.add(toolbar)
 
         self.__info_file_in_process = Gtk.Label('No hay tareas pendientes')
+        self.__info_file_in_process.set_line_wrap(True)
         self.__info_file_in_process.get_style_context().add_class("infolabel")
         self.audioframe = AudioFrame()
 

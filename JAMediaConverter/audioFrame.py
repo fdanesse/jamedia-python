@@ -154,7 +154,6 @@ class AudioFrame(Gtk.Frame):
         convert.disconnect_by_func(self.__next)
         self._converters[index] = None
         convert.stop()
-        # convert.free()
         del(convert)
         for convert in self._converters:
             if convert:
