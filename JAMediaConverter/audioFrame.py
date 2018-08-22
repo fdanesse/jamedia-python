@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-
+import time
 import gi
 gi.require_version("Gtk", "3.0")
 
@@ -111,6 +111,7 @@ class AudioFrame(Gtk.Frame):
         for codec in self._codecs:
             self._codecsprogress[codec] = 0.0
             index = self._codecs.index(codec)
+            # FIXME: Parece necesarios armar un Convert único, es demasiado reproducir el archivo para cada conversión al mismo tiempo
             self._converters[index] = Converter(self._files[0], codec, self._dirOut)
             # NOTA: Cada instancia de Converter estará conectada a estas funciones
             self._converters[index].connect('progress', self.__progress)
@@ -119,7 +120,9 @@ class AudioFrame(Gtk.Frame):
             self._converters[index].connect('end', self.__next)
         for convert in self._converters:
             if convert:
-                GLib.idle_add(convert.play)
+                time.sleep(0.5)
+                #GLib.idle_add(convert.play)
+                convert.play()
         
     def __progress(self, convert, val, codec):
         GLib.idle_add(self._progress[codec].set_fraction, float(val/100.0))
