@@ -55,8 +55,10 @@ class Converter(GObject.Object):
             self.__pipe.set_property('audio-sink', audioBin)
             audioBin.get_by_name('filesink').set_property("location", self._newpath)
         elif self._codec == "ogg":
-            #self.__run_ogg_out() # FIXME: Violación de segmento (`core' generado)
-            pass
+            self.__pipe.set_property('video-sink', self.__get_video_fakesink())
+            audioBin = self.__get_ogg_audio_out()
+            self.__pipe.set_property('audio-sink', audioBin)
+            audioBin.get_by_name('filesink').set_property("location", self._newpath)
 
         self.__pipe.set_property("uri", self._origen)
         
@@ -111,6 +113,27 @@ class Converter(GObject.Object):
         audioconvert.link(audioresample)
         audioresample.link(wavenc)
         wavenc.link(filesink)
+        audioBin.add_pad(Gst.GhostPad.new("sink", audioconvert.get_static_pad("sink")))
+        return audioBin
+
+    def __get_ogg_audio_out(self):
+        audioBin = Gst.Bin()
+        audioBin.set_name('audiobin')
+        audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
+        audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
+        audioresample.set_property('quality', 10)
+        vorbisenc = Gst.ElementFactory.make('vorbisenc', 'vorbisenc')
+        oggmux = Gst.ElementFactory.make('oggmux', 'oggmux')
+        filesink = Gst.ElementFactory.make('filesink', 'filesink')
+        audioBin.add(audioconvert)
+        audioBin.add(audioresample)
+        audioBin.add(vorbisenc)
+        audioBin.add(oggmux)
+        audioBin.add(filesink)
+        audioconvert.link(audioresample)
+        audioresample.link(vorbisenc)
+        vorbisenc.link(oggmux)
+        oggmux.link(filesink)
         audioBin.add_pad(Gst.GhostPad.new("sink", audioconvert.get_static_pad("sink")))
         return audioBin
 
