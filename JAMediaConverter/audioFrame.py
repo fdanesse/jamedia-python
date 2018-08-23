@@ -6,6 +6,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository import GObject
 from gi.repository import GLib
 
@@ -30,7 +31,7 @@ class AudioFrame(Gtk.Frame):
         self._codecsprogress = {}  # Progreso de cada codec
         self._inicial_files = []
         self._files = []
-        self._converters = [None, None, None, None, None]
+        self._converters = [None, None, None, None, None, None]
         self._dirOut = HOME
         self._initialFilesCount = 0
         self._progressbar = Gtk.ProgressBar()
@@ -38,13 +39,13 @@ class AudioFrame(Gtk.Frame):
         self._progressbar.get_style_context().add_class("convertprogress")
         self._checks = []
 
-        self._progress = {"ogg":None, "mp3":None, "wav":None, "ogv":None, "webm":None}
+        self._progress = {"ogg":None, "mp3":None, "wav":None, "ogv":None, "webm":None, "mp4":None}
 
         self.set_label(" Elige los formatos de extracción: ")
 
-        table = Gtk.Table(rows=7, columns=12, homogeneous=False)
+        table = Gtk.Table(rows=8, columns=12, homogeneous=False)
         table.set_col_spacings(0)
-        table.set_row_spacing(row=4, spacing=15)
+        table.set_row_spacing(row=5, spacing=15)
         row = 0
         for formato in sorted(self._progress.keys()):
             # http://python-gtk-3-tutorial.readthedocs.io/en/latest/button_widgets.html
@@ -69,7 +70,7 @@ class AudioFrame(Gtk.Frame):
         frame.set_label(' Total: ')
         frame.set_shadow_type(Gtk.ShadowType.NONE)
         frame.add(self._progressbar)
-        table.attach(frame, 0, 12, 5, 6,
+        table.attach(frame, 0, 12, 6, 7,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
 
@@ -77,7 +78,7 @@ class AudioFrame(Gtk.Frame):
         self.start.set_css_name('startbutton')
         self.start.set_name('startbutton')
         self.start.set_sensitive(False)
-        table.attach(self.start, 0, 5, 6, 7,
+        table.attach(self.start, 0, 5, 7, 8,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
 
@@ -124,17 +125,25 @@ class AudioFrame(Gtk.Frame):
                 #GLib.idle_add(convert.play)
                 convert.play()
         
-    def __progress(self, convert, val, codec):
-        GLib.idle_add(self._progress[codec].set_fraction, float(val/100.0))
-        self._codecsprogress[codec] = val
+    def __progress(self, convert, val1, codec):
+        #GLib.idle_add(self._progress[codec].set_fraction, float(val1/100.0))
+        self._codecsprogress[codec] = val1
         progreso = 0
-        for val in self._codecsprogress.values():
-            progreso += val
+        for _val in self._codecsprogress.values():
+            progreso += _val
         progreso = progreso / len(self._codecs)
         totalesperado = self._initialFilesCount * 100.0
         totalterminado = ((self._initialFilesCount - len(self._files))) * 100.0 + progreso
-        n = (totalterminado * 100.0 / totalesperado ) / 100.0
-        GLib.idle_add(self._progressbar.set_fraction, n)
+        val2 = (totalterminado * 100.0 / totalesperado ) / 100.0
+        #GLib.idle_add(self._progressbar.set_fraction, val2)
+        GLib.idle_add(self.__updateProgress, codec, float(val1/100.0), val2)
+
+    def __updateProgress(self, codec, val1, val2):
+        Gdk.threads_enter()
+        self._progress[codec].set_fraction(val1)
+        self._progressbar.set_fraction(val2)
+        Gdk.threads_leave()
+        return False
 
     def __error(self, convert, error):
         if os.path.exists(convert._newpath):

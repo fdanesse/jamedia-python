@@ -75,13 +75,61 @@ class Converter(GObject.Object):
             self.__pipe.get_by_name('uridecodebin').connect('pad-added', self.__on_pad_added)
             self.__pipe.get_by_name('filesink').set_property("location", self._newpath)
             self.__pipe.get_by_name('uridecodebin').set_property("uri", self._origen)
-        
+        elif self._codec == "mp4":
+            self.__pipe = self.__get_mp4_out()
+            self.__pipe.get_by_name('uridecodebin').connect('pad-added', self.__on_pad_added)
+            self.__pipe.get_by_name('filesink').set_property("location", self._newpath)
+            self.__pipe.get_by_name('uridecodebin').set_property("uri", self._origen)
+
         self._bus = self.__pipe.get_bus()
         self._bus.add_signal_watch()
         self._bus.connect("message", self.__sync_message)
 
     #def __del__(self):
     #    print("DESTROY OK")
+
+    def __get_mp4_out(self):
+        bin = Gst.Pipeline()
+        bin.set_name('bin')
+
+        uridecodebin = Gst.ElementFactory.make('uridecodebin', 'uridecodebin')
+
+        videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
+        videorate = Gst.ElementFactory.make('videorate', 'videorate')
+        videorate.set_property("max-rate", 30)
+        x264enc = Gst.ElementFactory.make('x264enc', 'x264enc')
+
+        audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
+        audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
+        audioresample.set_property('quality', 10)
+        lamemp3enc = Gst.ElementFactory.make('lamemp3enc', 'lamemp3enc')
+
+        mp4mux = Gst.ElementFactory.make('mp4mux', 'mp4mux')
+        filesink = Gst.ElementFactory.make('filesink', 'filesink')
+
+        bin.add(uridecodebin)
+        bin.add(audioconvert)
+        bin.add(audioresample)
+        bin.add(lamemp3enc)
+        bin.add(mp4mux)
+        bin.add(filesink)
+        bin.add(videoconvert)
+        bin.add(videorate)
+        bin.add(x264enc)
+
+        audioconvert.link(audioresample)
+        audioresample.link(lamemp3enc)
+        lamemp3enc.link(mp4mux)
+        
+        videoconvert.link(videorate)
+        videorate.link(x264enc)
+        x264enc.link(mp4mux)
+
+        mp4mux.link(filesink)
+
+        self.__videoSink = videoconvert.get_static_pad('sink')
+        self.__audioSink = audioconvert.get_static_pad('sink')
+        return bin
 
     def __get_webm_out(self):
         bin = Gst.Pipeline()
