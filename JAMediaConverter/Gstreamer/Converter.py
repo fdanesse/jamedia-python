@@ -70,6 +70,11 @@ class Converter(GObject.Object):
             self.__pipe.get_by_name('uridecodebin').connect('pad-added', self.__on_pad_added)
             self.__pipe.get_by_name('filesink').set_property("location", self._newpath)
             self.__pipe.get_by_name('uridecodebin').set_property("uri", self._origen)
+        elif self._codec == "webm":
+            self.__pipe = self.__get_webm_out()
+            self.__pipe.get_by_name('uridecodebin').connect('pad-added', self.__on_pad_added)
+            self.__pipe.get_by_name('filesink').set_property("location", self._newpath)
+            self.__pipe.get_by_name('uridecodebin').set_property("uri", self._origen)
         
         self._bus = self.__pipe.get_bus()
         self._bus.add_signal_watch()
@@ -77,6 +82,49 @@ class Converter(GObject.Object):
 
     #def __del__(self):
     #    print("DESTROY OK")
+
+    def __get_webm_out(self):
+        bin = Gst.Pipeline()
+        bin.set_name('bin')
+
+        uridecodebin = Gst.ElementFactory.make('uridecodebin', 'uridecodebin')
+
+        videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
+        videorate = Gst.ElementFactory.make('videorate', 'videorate')
+        videorate.set_property("max-rate", 30)
+        vp8enc = Gst.ElementFactory.make('vp8enc', 'vp8enc')
+
+        audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
+        audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
+        audioresample.set_property('quality', 10)
+        vorbisenc = Gst.ElementFactory.make('vorbisenc', 'vorbisenc')
+
+        webmmux = Gst.ElementFactory.make('webmmux', 'webmmux')
+        filesink = Gst.ElementFactory.make('filesink', 'filesink')
+
+        bin.add(uridecodebin)
+        bin.add(audioconvert)
+        bin.add(audioresample)
+        bin.add(vorbisenc)
+        bin.add(webmmux)
+        bin.add(filesink)
+        bin.add(videoconvert)
+        bin.add(videorate)
+        bin.add(vp8enc)
+
+        audioconvert.link(audioresample)
+        audioresample.link(vorbisenc)
+        vorbisenc.link(webmmux)
+        
+        videoconvert.link(videorate)
+        videorate.link(vp8enc)
+        vp8enc.link(webmmux)
+
+        webmmux.link(filesink)
+
+        self.__videoSink = videoconvert.get_static_pad('sink')
+        self.__audioSink = audioconvert.get_static_pad('sink')
+        return bin
 
     def __get_ogv_out(self):
         bin = Gst.Pipeline()
