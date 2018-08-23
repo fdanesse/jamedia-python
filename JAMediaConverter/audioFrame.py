@@ -30,7 +30,7 @@ class AudioFrame(Gtk.Frame):
         self._codecsprogress = {}  # Progreso de cada codec
         self._inicial_files = []
         self._files = []
-        self._converters = [None, None, None]
+        self._converters = [None, None, None, None]
         self._dirOut = HOME
         self._initialFilesCount = 0
         self._progressbar = Gtk.ProgressBar()
@@ -38,13 +38,13 @@ class AudioFrame(Gtk.Frame):
         self._progressbar.get_style_context().add_class("convertprogress")
         self._checks = []
 
-        self._progress = {"ogg":None, "mp3":None, "wav":None}
+        self._progress = {"ogg":None, "mp3":None, "wav":None, "ogv":None}
 
         self.set_label(" Elige los formatos de extracción: ")
 
-        table = Gtk.Table(rows=5, columns=12, homogeneous=False)
+        table = Gtk.Table(rows=6, columns=12, homogeneous=False)
         table.set_col_spacings(0)
-        table.set_row_spacing(row=2, spacing=15)
+        table.set_row_spacing(row=3, spacing=15)
         row = 0
         for formato in sorted(self._progress.keys()):
             # http://python-gtk-3-tutorial.readthedocs.io/en/latest/button_widgets.html
@@ -69,7 +69,7 @@ class AudioFrame(Gtk.Frame):
         frame.set_label(' Total: ')
         frame.set_shadow_type(Gtk.ShadowType.NONE)
         frame.add(self._progressbar)
-        table.attach(frame, 0, 12, 3, 4,
+        table.attach(frame, 0, 12, 4, 5,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
 
@@ -77,7 +77,7 @@ class AudioFrame(Gtk.Frame):
         self.start.set_css_name('startbutton')
         self.start.set_name('startbutton')
         self.start.set_sensitive(False)
-        table.attach(self.start, 0, 5, 4, 5,
+        table.attach(self.start, 0, 5, 5, 6,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
 

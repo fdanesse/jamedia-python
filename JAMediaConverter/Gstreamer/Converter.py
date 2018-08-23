@@ -33,6 +33,9 @@ class Converter(GObject.Object):
         self.__pipe = Gst.ElementFactory.make("playbin", "player")
         self._info = {'Audio': '', 'Video': ''}
 
+        self.__videoSink = None
+        self.__audioSink = None
+
         # path de salida
         location = os.path.basename(self._origen)
         if "." in location:
@@ -49,18 +52,24 @@ class Converter(GObject.Object):
             audioBin = self.__get_wav_audio_out()
             self.__pipe.set_property('audio-sink', audioBin)
             audioBin.get_by_name('filesink').set_property("location", self._newpath)
+            self.__pipe.set_property("uri", self._origen)
         elif self._codec == "mp3":
             self.__pipe.set_property('video-sink', self.__get_video_fakesink())
             audioBin = self.__get_mp3_audio_out()
             self.__pipe.set_property('audio-sink', audioBin)
             audioBin.get_by_name('filesink').set_property("location", self._newpath)
+            self.__pipe.set_property("uri", self._origen)
         elif self._codec == "ogg":
             self.__pipe.set_property('video-sink', self.__get_video_fakesink())
             audioBin = self.__get_ogg_audio_out()
             self.__pipe.set_property('audio-sink', audioBin)
             audioBin.get_by_name('filesink').set_property("location", self._newpath)
-
-        self.__pipe.set_property("uri", self._origen)
+            self.__pipe.set_property("uri", self._origen)
+        elif self._codec == "ogv":
+            self.__pipe = self.__get_ogv_out()
+            self.__pipe.get_by_name('uridecodebin').connect('pad-added', self.__on_pad_added)
+            self.__pipe.get_by_name('filesink').set_property("location", self._newpath)
+            self.__pipe.get_by_name('uridecodebin').set_property("uri", self._origen)
         
         self._bus = self.__pipe.get_bus()
         self._bus.add_signal_watch()
@@ -68,6 +77,61 @@ class Converter(GObject.Object):
 
     #def __del__(self):
     #    print("DESTROY OK")
+
+    def __get_ogv_out(self):
+        bin = Gst.Pipeline()
+        bin.set_name('bin')
+
+        uridecodebin = Gst.ElementFactory.make('uridecodebin', 'uridecodebin')
+
+        videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
+        videorate = Gst.ElementFactory.make('videorate', 'videorate')
+        videorate.set_property("max-rate", 30)
+        theoraenc = Gst.ElementFactory.make('theoraenc', 'theoraenc')
+        theoraenc.set_property("quality", 63)
+
+        audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
+        audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
+        audioresample.set_property('quality', 10)
+        vorbisenc = Gst.ElementFactory.make('vorbisenc', 'vorbisenc')
+
+        oggmux = Gst.ElementFactory.make('oggmux', 'oggmux')
+        filesink = Gst.ElementFactory.make('filesink', 'filesink')
+
+        bin.add(uridecodebin)
+        bin.add(audioconvert)
+        bin.add(audioresample)
+        bin.add(vorbisenc)
+        bin.add(oggmux)
+        bin.add(filesink)
+        bin.add(videoconvert)
+        bin.add(videorate)
+        bin.add(theoraenc)
+
+        audioconvert.link(audioresample)
+        audioresample.link(vorbisenc)
+        vorbisenc.link(oggmux)
+        
+        videoconvert.link(videorate)
+        videorate.link(theoraenc)
+        theoraenc.link(oggmux)
+
+        oggmux.link(filesink)
+
+        self.__videoSink = videoconvert.get_static_pad('sink')
+        self.__audioSink = audioconvert.get_static_pad('sink')
+        return bin
+
+    def __on_pad_added(self, uridecodebin, pad):
+        # Agregar elementos en forma dinámica https://wiki.ubuntu.com/Novacut/GStreamer1.0
+        string = pad.query_caps(None).to_string()
+        if string.startswith('audio/'):
+            pad.link(self.__audioSink)
+            self._info['Audio'] = string
+        elif string.startswith('video/'):
+            pad.link(self.__videoSink)
+            self._info['Video'] = string
+        self.emit('info', self._info)
 
     def __get_video_fakesink(self):
         videoBin = Gst.Bin()
@@ -126,25 +190,27 @@ class Converter(GObject.Object):
             #self.__pipe.set_state(Gst.State.PAUSED)
             self.__pipe.set_state(Gst.State.NULL)
         self.__new_handle(False)
+        self.__videoSink = None
+        self.__audioSink = None
         self.__pipe = None
 
     def __sync_message(self, bus, mensaje):
         if mensaje.type == Gst.MessageType.EOS:
-            self.__new_handle(False)
+            self.stop()
             self.emit("end")
         elif mensaje.type == Gst.MessageType.DURATION_CHANGED:
-            bool1, valor1 = self.__pipe.query_duration(Gst.Format.TIME)
-            bool2, valor2 = self.__pipe.query_position(Gst.Format.TIME)
-            self._duration = valor1
-            self._position = valor2
+            if self.__pipe:
+                bool1, valor1 = self.__pipe.query_duration(Gst.Format.TIME)
+                bool2, valor2 = self.__pipe.query_position(Gst.Format.TIME)
+                self._duration = valor1
+                self._position = valor2
         elif mensaje.type == Gst.MessageType.ERROR:
-            self.__new_handle(False)
             name = ''
             try:
                 name = os.path.basename(self._origen)
             except:
                 pass
-            self.__pipe = None
+            self.stop()
             self.emit("error", "ERROR en: " + name + ' => ' + str(mensaje.parse_error()))
             
     def __new_handle(self, reset):
@@ -156,13 +222,12 @@ class Converter(GObject.Object):
 
     def __handle(self):
         if not self.__pipe:
-            self.__new_handle(False)
             name = ''
             try:
                 name = os.path.basename(self._origen)
             except:
                 pass
-            self.__pipe = None
+            self.stop()
             self.emit("error", "ERROR en: " + name + " - No se puede convertir a " + self._codec)
             return False
 
