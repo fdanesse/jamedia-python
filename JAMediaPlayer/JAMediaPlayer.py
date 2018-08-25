@@ -37,11 +37,11 @@ class JAMediaPlayer(Gtk.VBox):
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(icono, -1, 24)
         self.__jamedia_cursor = Gdk.Cursor(Gdk.Display.get_default(), pixbuf, 0, 0)
 
-        self.__toolbar = Toolbar()
+        self.toolbar = Toolbar()
         self.base_panel = BasePanel()
         self.__filechooser = FileChooser()
 
-        self.pack_start(self.__toolbar, False, False, 0)
+        self.pack_start(self.toolbar, False, False, 0)
         self.pack_start(self.base_panel, True, True, 0)
         self.pack_start(self.__filechooser, True, True, 0)
 
@@ -52,8 +52,8 @@ class JAMediaPlayer(Gtk.VBox):
         self.mouse_listener = MouseSpeedDetector(self)
         self.mouse_listener.new_handler(True)
 
-        self.__toolbar.salir.connect("clicked", self.__emit_switch, 'jamediatube')
-        self.__toolbar.connect("show_config", self.__show_config)
+        self.toolbar.salir.connect("clicked", self.__emit_switch, 'jamediatube')
+        self.toolbar.connect("show_config", self.__show_config)
         
         self.base_panel.player.connect("video", self.__set_video)
         self.base_panel.izquierda.video_visor.connect("ocultar_controles", self.__show_controls)
@@ -86,28 +86,28 @@ class JAMediaPlayer(Gtk.VBox):
 
     def __return_to_player(self, widget):
         self.__filechooser.hide()
-        self.__toolbar.show()
+        self.toolbar.show()
         self.base_panel.show()
 
     def __openfiles(self, widget, tipo):
-        self.__toolbar.hide()
+        self.toolbar.hide()
         self.base_panel.hide()
         self.__filechooser.run(self.directorio, tipo)
 
     def __set_fullscreen(self, widget, event):
         if event.type.value_name == "GDK_2BUTTON_PRESS":
-            GLib.idle_add(self.__toolbar.set_full, None)
+            GLib.idle_add(self.toolbar.set_full, None)
 
     def __set_video(self, widget, valor):
-        self.__toolbar.configurar.set_active(False)
-        self.__toolbar.configurar.set_sensitive(valor)
+        self.toolbar.configurar.set_active(False)
+        self.toolbar.configurar.set_sensitive(valor)
 
     def __realize(self, window):
         self.__cursor_root = self.get_property("window").get_cursor()
         self.get_property("window").set_cursor(self.__jamedia_cursor)
 
     def __setup_init(self):
-        self.__toolbar.configurar.set_sensitive(False)
+        self.toolbar.configurar.set_sensitive(False)
         self.base_panel.izquierda.setup_init()
         self.base_panel.derecha.setup_init()
         self.__filechooser.hide()
@@ -149,15 +149,15 @@ class JAMediaPlayer(Gtk.VBox):
                     return
 
     def __show_controls(self, widget, valor):
-        zona, ocultar = (valor, self.__toolbar.ocultar_controles)
+        zona, ocultar = (valor, self.toolbar.ocultar_controles)
         self.__mouse_in_visor = zona
         if zona and ocultar:
-            self.__toolbar.hide()
+            self.toolbar.hide()
             self.base_panel.derecha.hide()
             self.base_panel.izquierda.toolbar_info.hide()
             self.base_panel.izquierda.progress.hide()
         elif not zona and ocultar:
-            self.__toolbar.show()
+            self.toolbar.show()
             self.base_panel.derecha.show()
             self.base_panel.izquierda.toolbar_info.show()
             self.base_panel.izquierda.progress.show()

@@ -43,6 +43,14 @@ class Toolbar(Gtk.Toolbar):
         self.__full.connect("toggled", self.__set_full)
         self.insert(self.__full, -1)
 
+        self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
+
+        item = Gtk.ToolItem()
+        self.version = Gtk.Label("18")
+        self.version.get_style_context().add_class('versionlabel')
+        item.add(self.version)
+        self.insert(item, -1)
+
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         self.show_all()

@@ -172,6 +172,10 @@ trough highlight{
     border: 2px @jamedia3 solid;
 }
 
+.versionlabel {
+    color: @border;
+}
+
 @import url("toolbars.css");
 @import url("paneltube.css");
 @import url("jamedia.css");

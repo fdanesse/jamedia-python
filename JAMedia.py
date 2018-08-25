@@ -29,6 +29,7 @@ from PanelTube.paneltube import PanelTube
 from PanelTube.buscar import Buscar, FEED
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
 from JAMediaPlayer.Globales import ocultar
+from JAMediaPlayer.Globales import get_dict
 from WebKit.CreditsViewer import CreditsViewer
 from WebKit.RadioViewer import RadioViewer
 from JAMediaConverter.JAMediaConverter import JAMediaConverter
@@ -63,6 +64,8 @@ class JAMedia(Gtk.Window):
         Gtk.Window.__init__(self)
 
         self.set_style()
+
+        self.version = get_dict(os.path.join(BASE_PATH, 'proyecto.ide')).get('version', 18)
 
         self.set_title("JAMedia")
         self.set_icon_from_file(os.path.join(BASE_PATH, "Iconos", "JAMedia.svg"))
@@ -107,6 +110,12 @@ class JAMedia(Gtk.Window):
         self.connect('realize', self.__realized)
         self.show_all()
 
+        self.toolbar.version.set_text("V. %s" % self.version)
+        self.jamediaplayer.toolbar.version.set_text("V. %s" % self.version)
+        self.jamediaconverter.toolbar.version.set_text("V. %s" % self.version)
+        self.helpCreditsViewer.toolbar.version.set_text("V. %s" % self.version)
+        self.jamediaradioViewer.toolbar.version.set_text("V. %s" % self.version)
+        
         print ("JAMedia process:", os.getpid())
 
     def set_style(self):

@@ -4,7 +4,7 @@
 import os
 #import commands FIXME: No existe en python 3
 #import shutil
-#import json
+import json
 #import codecs
 
 import gi
@@ -56,6 +56,15 @@ def insensibilizar(objetos):
     for objeto in objetos:
         if objeto.get_sensitive():
             objeto.set_sensitive(False)
+
+
+def get_dict(path):
+    if not os.path.exists(path): return {}
+    archivo = open(path, "r")
+    _dict = json.loads(archivo.read())
+    archivo.close()
+    return _dict
+
 
 '''
 def get_dict(path):

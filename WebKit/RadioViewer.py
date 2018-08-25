@@ -26,14 +26,14 @@ class RadioViewer(Gtk.VBox):
         self.set_css_name('radio')
         self.set_name('radio')
 
-        self.__toolbar = Toolbar()
+        self.toolbar = Toolbar()
         self.__viewer = Webview()
         
-        self.pack_start(self.__toolbar, False, False, 0)
+        self.pack_start(self.toolbar, False, False, 0)
         self.pack_start(self.__viewer, True, True, 0)
 
-        self.__toolbar.salir.connect("clicked", self.__emit_salir)
-        self.__toolbar.home.connect("clicked", self.__run, 'jamediaradio')
+        self.toolbar.salir.connect("clicked", self.__emit_salir)
+        self.toolbar.home.connect("clicked", self.__run, 'jamediaradio')
         self.__viewer.connect('load_failed', self.__error_load)
 
         self.show_all()

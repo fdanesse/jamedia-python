@@ -47,6 +47,14 @@ class Toolbar(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
 
+        item = Gtk.ToolItem()
+        self.version = Gtk.Label("18")
+        self.version.get_style_context().add_class('versionlabel')
+        item.add(self.version)
+        self.insert(item, -1)
+
+        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+
         self.__salir = get_boton(os.path.join(ICONS_PATH, "button-cancel.svg"), flip=False, pixels=12, tooltip_text="Salir")
         self.__salir.connect("clicked", self.__emit_salir)
         self.insert(self.__salir, -1)
