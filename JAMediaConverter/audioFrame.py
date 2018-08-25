@@ -31,7 +31,7 @@ class AudioFrame(Gtk.Frame):
         self._codecsprogress = {}  # Progreso de cada codec
         self._inicial_files = []
         self._files = []
-        self._converters = [None, None, None, None, None, None]
+        self._converters = [None, None, None, None, None, None, None, None]
         self._dirOut = HOME
         self._initialFilesCount = 0
         self._progressbar = Gtk.ProgressBar()
@@ -39,13 +39,13 @@ class AudioFrame(Gtk.Frame):
         self._progressbar.get_style_context().add_class("convertprogress")
         self._checks = []
 
-        self._progress = {"ogg":None, "mp3":None, "wav":None, "ogv":None, "webm":None, "mp4":None}
+        self._progress = {"ogg":None, "mp3":None, "wav":None, "ogv":None, "webm":None, "mp4":None, "avi":None, "mpg":None}
 
         self.set_label(" Elige los formatos de extracción: ")
 
-        table = Gtk.Table(rows=8, columns=12, homogeneous=False)
+        table = Gtk.Table(rows=10, columns=12, homogeneous=False)
         table.set_col_spacings(0)
-        table.set_row_spacing(row=5, spacing=15)
+        table.set_row_spacing(row=7, spacing=15)
         row = 0
         for formato in sorted(self._progress.keys()):
             # http://python-gtk-3-tutorial.readthedocs.io/en/latest/button_widgets.html
@@ -70,7 +70,7 @@ class AudioFrame(Gtk.Frame):
         frame.set_label(' Total: ')
         frame.set_shadow_type(Gtk.ShadowType.NONE)
         frame.add(self._progressbar)
-        table.attach(frame, 0, 12, 6, 7,
+        table.attach(frame, 0, 12, 8, 9,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
 
@@ -78,7 +78,7 @@ class AudioFrame(Gtk.Frame):
         self.start.set_css_name('startbutton')
         self.start.set_name('startbutton')
         self.start.set_sensitive(False)
-        table.attach(self.start, 0, 5, 7, 8,
+        table.attach(self.start, 0, 5, 9, 10,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
 

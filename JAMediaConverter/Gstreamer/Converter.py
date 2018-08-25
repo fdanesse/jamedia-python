@@ -80,6 +80,16 @@ class Converter(GObject.Object):
             self.__pipe.get_by_name('uridecodebin').connect('pad-added', self.__on_pad_added)
             self.__pipe.get_by_name('filesink').set_property("location", self._newpath)
             self.__pipe.get_by_name('uridecodebin').set_property("uri", self._origen)
+        elif self._codec == "avi":
+            self.__pipe = self.__get_avi_out()
+            self.__pipe.get_by_name('uridecodebin').connect('pad-added', self.__on_pad_added)
+            self.__pipe.get_by_name('filesink').set_property("location", self._newpath)
+            self.__pipe.get_by_name('uridecodebin').set_property("uri", self._origen)
+        elif self._codec == "mpg":
+            self.__pipe = self.__get_mpg_out()
+            self.__pipe.get_by_name('uridecodebin').connect('pad-added', self.__on_pad_added)
+            self.__pipe.get_by_name('filesink').set_property("location", self._newpath)
+            self.__pipe.get_by_name('uridecodebin').set_property("uri", self._origen)
 
         self._bus = self.__pipe.get_bus()
         self._bus.add_signal_watch()
@@ -87,6 +97,93 @@ class Converter(GObject.Object):
 
     #def __del__(self):
     #    print("DESTROY OK")
+
+    def __get_mpg_out(self):
+        bin = Gst.Pipeline()
+        bin.set_name('bin')
+
+        uridecodebin = Gst.ElementFactory.make('uridecodebin', 'uridecodebin')
+
+        videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
+        videorate = Gst.ElementFactory.make('videorate', 'videorate')
+        videorate.set_property("max-rate", 30)
+        mpeg2enc = Gst.ElementFactory.make('mpeg2enc', 'mpeg2enc')
+
+        audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
+        audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
+        audioresample.set_property('quality', 10)
+        twolamemp2enc = Gst.ElementFactory.make('twolamemp2enc', 'twolamemp2enc')
+
+        mpegpsmux = Gst.ElementFactory.make('mpegpsmux', 'mpegpsmux')
+        filesink = Gst.ElementFactory.make('filesink', 'filesink')
+
+        bin.add(uridecodebin)
+        bin.add(audioconvert)
+        bin.add(audioresample)
+        bin.add(twolamemp2enc)
+        bin.add(mpegpsmux)
+        bin.add(filesink)
+        bin.add(videoconvert)
+        bin.add(videorate)
+        bin.add(mpeg2enc)
+
+        audioconvert.link(audioresample)
+        audioresample.link(twolamemp2enc)
+        twolamemp2enc.link(mpegpsmux)
+        
+        videoconvert.link(videorate)
+        videorate.link(mpeg2enc)
+        mpeg2enc.link(mpegpsmux)
+
+        mpegpsmux.link(filesink)
+
+        self.__videoSink = videoconvert.get_static_pad('sink')
+        self.__audioSink = audioconvert.get_static_pad('sink')
+        return bin
+
+    def __get_avi_out(self):
+        # Nota: Avi admite audio y vieo en crudo
+        bin = Gst.Pipeline()
+        bin.set_name('bin')
+
+        uridecodebin = Gst.ElementFactory.make('uridecodebin', 'uridecodebin')
+
+        videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
+        videorate = Gst.ElementFactory.make('videorate', 'videorate')
+        videorate.set_property("max-rate", 30)
+        x264enc = Gst.ElementFactory.make('x264enc', 'x264enc')
+
+        audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
+        audioresample = Gst.ElementFactory.make('audioresample', 'audioresample')
+        audioresample.set_property('quality', 10)
+        lamemp3enc = Gst.ElementFactory.make('lamemp3enc', 'lamemp3enc')
+
+        avimux = Gst.ElementFactory.make('avimux', 'avimux')
+        filesink = Gst.ElementFactory.make('filesink', 'filesink')
+
+        bin.add(uridecodebin)
+        bin.add(audioconvert)
+        bin.add(audioresample)
+        bin.add(lamemp3enc)
+        bin.add(avimux)
+        bin.add(filesink)
+        bin.add(videoconvert)
+        bin.add(videorate)
+        bin.add(x264enc)
+
+        audioconvert.link(audioresample)
+        audioresample.link(lamemp3enc)
+        lamemp3enc.link(avimux)
+        
+        videoconvert.link(videorate)
+        videorate.link(x264enc)
+        x264enc.link(avimux)
+
+        avimux.link(filesink)
+
+        self.__videoSink = videoconvert.get_static_pad('sink')
+        self.__audioSink = audioconvert.get_static_pad('sink')
+        return bin
 
     def __get_mp4_out(self):
         bin = Gst.Pipeline()
