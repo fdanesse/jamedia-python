@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+# NOTA: Documentación Interesante => http://z25.org/static/_rd_/videostreaming_intro_plab/
+
 import os
 
 import gi
@@ -63,9 +65,15 @@ class Converter(GObject.Object):
             self.__pipe = self.__get_avi_out()
         elif self._codec == "mpg":
             self.__pipe = self.__get_mpg_out()
+        elif self._codec == "png":
+            self.__videoSink = self.__get_png_out()
+            self.__pipe.set_property('video-sink', self.__videoSink)
+            self.__pipe.set_property('audio-sink', Gst.ElementFactory.make('fakesink', 'fakesink'))
+            self.__videoSink.get_by_name('multifilesink').set_property('location', "%s/img%s06d.png" % (dirpath_destino, "%"))
+            self.__pipe.set_property("uri", self._origen)
 
         if self._codec in ['wav', 'mp3', 'ogg']:
-            self.__pipe.set_property('video-sink', self.__get_video_fakesink())
+            self.__pipe.set_property('video-sink', Gst.ElementFactory.make('fakesink', 'fakesink'))
             self.__pipe.set_property('audio-sink', self.__audioSink)
             self.__audioSink.get_by_name('filesink').set_property("location", self._newpath)
             self.__pipe.set_property("uri", self._origen)
@@ -95,6 +103,21 @@ class Converter(GObject.Object):
     def __pipeline_Add_all(self, pipeline, bins):
         for bin in bins:
             pipeline.add(bin)
+
+    def __get_png_out(self):
+        pngBin = Gst.Bin()
+        pngBin.set_name('pngBin')
+        videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
+        videorate = Gst.ElementFactory.make('videorate', 'videorate')
+        videorate.set_property("max-rate", 30)
+        pngenc = Gst.ElementFactory.make('pngenc', 'pngenc')
+        multifilesink = Gst.ElementFactory.make('multifilesink', 'multifilesink')
+        self.__pipeline_Add_all(pngBin, [videoconvert, videorate, pngenc, multifilesink])
+        videoconvert.link(videorate)
+        videorate.link(pngenc)
+        pngenc.link(multifilesink)
+        pngBin.add_pad(Gst.GhostPad.new("sink", videoconvert.get_static_pad("sink")))
+        return pngBin
 
     def __get_mpg_out(self):
         bin = Gst.Pipeline()
@@ -209,24 +232,12 @@ class Converter(GObject.Object):
             self._info['Video'] = string
         self.emit('info', self._info)
 
-    def __get_video_fakesink(self):
-        videoBin = Gst.Bin()
-        videoBin.set_name('videobin')
-        videoqueue = Gst.ElementFactory.make('queue', 'videoqueue')
-        fakesink = Gst.ElementFactory.make('fakesink', 'fakesink')
-        videoBin.add(videoqueue)
-        videoBin.add(fakesink)
-        videoqueue.link(fakesink)
-        videoBin.add_pad(Gst.GhostPad.new("sink", videoqueue.get_static_pad("sink")))
-        return videoBin
-
     def __get_mp3_audio_out(self):
         audioBin = Gst.Bin()
         audioBin.set_name('audiobin')
         lamemp3enc = Gst.ElementFactory.make('lamemp3enc', 'lamemp3enc')
         filesink = Gst.ElementFactory.make('filesink', 'filesink')
-        audioBin.add(lamemp3enc)
-        audioBin.add(filesink)
+        self.__pipeline_Add_all(audioBin, [lamemp3enc, filesink])
         lamemp3enc.link(filesink)
         audioBin.add_pad(Gst.GhostPad.new("sink", lamemp3enc.get_static_pad("sink")))
         return audioBin
@@ -236,8 +247,7 @@ class Converter(GObject.Object):
         audioBin.set_name('audiobin')
         wavenc = Gst.ElementFactory.make('wavenc', 'wavenc')
         filesink = Gst.ElementFactory.make('filesink', 'filesink')
-        audioBin.add(wavenc)
-        audioBin.add(filesink)
+        self.__pipeline_Add_all(audioBin, [wavenc, filesink])
         wavenc.link(filesink)
         audioBin.add_pad(Gst.GhostPad.new("sink", wavenc.get_static_pad("sink")))
         return audioBin
@@ -248,9 +258,7 @@ class Converter(GObject.Object):
         vorbisenc = Gst.ElementFactory.make('vorbisenc', 'vorbisenc')
         oggmux = Gst.ElementFactory.make('oggmux', 'oggmux')
         filesink = Gst.ElementFactory.make('filesink', 'filesink')
-        audioBin.add(vorbisenc)
-        audioBin.add(oggmux)
-        audioBin.add(filesink)
+        self.__pipeline_Add_all(audioBin, [vorbisenc, oggmux, filesink])
         vorbisenc.link(oggmux)
         oggmux.link(filesink)
         audioBin.add_pad(Gst.GhostPad.new("sink", vorbisenc.get_static_pad("sink")))
