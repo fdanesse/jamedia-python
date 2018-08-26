@@ -3,6 +3,8 @@
 
 # API: https://lazka.github.io/pgi-docs
 # gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly gstreamer1.0-tools gstreamer1.0-libav
+# python3-magic
+# webkit4
 
 import os
 import sys
@@ -115,7 +117,7 @@ class JAMedia(Gtk.Window):
         self.jamediaconverter.toolbar.version.set_text("V. %s" % self.version)
         self.helpCreditsViewer.toolbar.version.set_text("V. %s" % self.version)
         self.jamediaradioViewer.toolbar.version.set_text("V. %s" % self.version)
-        
+
         print ("JAMedia process:", os.getpid())
 
     def set_style(self):

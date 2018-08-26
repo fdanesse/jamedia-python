@@ -11,6 +11,7 @@ from gi.repository import GObject
 from gi.repository import GLib
 
 from JAMediaConverter.Gstreamer.Converter import Converter
+from JAMediaPlayer.Globales import MAGIC
 
 HOME = os.environ['HOME']
 
@@ -21,6 +22,7 @@ class AudioFrame(Gtk.Frame):
         "end": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, []),
         "running": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
         "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
+        "warning": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
         "error": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_STRING, ))}
 
     def __init__(self):
@@ -39,6 +41,7 @@ class AudioFrame(Gtk.Frame):
         self._progressbar.get_style_context().add_class("convertprogress")
         self._checks = []
 
+        self.__videoCodecs = ["ogv", "webm", "mp4", "avi", "mpg", "png"]
         self._progress = {"ogg":None, "mp3":None, "wav":None, "ogv":None, "webm":None, "mp4":None, "avi":None, "mpg":None, "png":None}
 
         self.set_label(" Elige los formatos de extracción: ")
@@ -112,6 +115,25 @@ class AudioFrame(Gtk.Frame):
         for codec in self._codecs:
             self._codecsprogress[codec] = 0.0
             index = self._codecs.index(codec)
+
+            tipo = MAGIC.file(self._files[0])
+            info = "Contenido del Archivo: %s" % tipo
+            self.emit('info', info)
+
+            # NOTA: Evitar sobreescritura de archivo origen. Directorios de origen y destino deben ser distintos
+            if os.path.dirname(self._files[0]) == self._dirOut:
+                self._converters[index] = None
+                warning = "%s => Salteado porque directorios de origen y destino son el mismo.\n" % (self._files[0])
+                self.emit('warning', warning)
+                continue
+            # NOTA: Si el archivo sólo contiene audio, no se crearán converts de video o imágenes
+            if "audio" in tipo and codec in self.__videoCodecs:
+                self._converters[index] = None
+                warning = "%s => Salteando porque el origen no tiene video.\n" % (self._files[0])
+                self.emit('warning', warning)
+                continue
+            # FIXME: Implementar continue para archivos que no tienen ni video ni audio
+
             # FIXME: Parece necesarios armar un Convert único, es demasiado reproducir el archivo para cada conversión al mismo tiempo
             self._converters[index] = Converter(self._files[0], codec, self._dirOut)
             # NOTA: Cada instancia de Converter estará conectada a estas funciones
@@ -119,14 +141,17 @@ class AudioFrame(Gtk.Frame):
             self._converters[index].connect('error', self.__error)
             self._converters[index].connect('info', self.__info)
             self._converters[index].connect('end', self.__next)
-        for convert in self._converters:
-            if convert:
-                time.sleep(0.5)
-                #GLib.idle_add(convert.play)
-                convert.play()
+
+        # NOTA: si no hay converts no hay tareas pendientes porque ahora se pueden saltear los codecs configurados
+        if not any(self._converters):
+            self.__next(None)
+        else:
+            for convert in self._converters:
+                if convert:
+                    time.sleep(0.5)
+                    convert.play()
         
     def __progress(self, convert, val1, codec):
-        #GLib.idle_add(self._progress[codec].set_fraction, float(val1/100.0))
         self._codecsprogress[codec] = val1
         progreso = 0
         for _val in self._codecsprogress.values():
@@ -135,7 +160,6 @@ class AudioFrame(Gtk.Frame):
         totalesperado = self._initialFilesCount * 100.0
         totalterminado = ((self._initialFilesCount - len(self._files))) * 100.0 + progreso
         val2 = (totalterminado * 100.0 / totalesperado ) / 100.0
-        #GLib.idle_add(self._progressbar.set_fraction, val2)
         GLib.idle_add(self.__updateProgress, codec, float(val1/100.0), val2)
 
     def __updateProgress(self, codec, val1, val2):
@@ -159,18 +183,19 @@ class AudioFrame(Gtk.Frame):
 
     def __next(self, convert):
         # Va quitando los converters a medida que terminan y cuando no quedan más pasa el siguiente archivo
-        index = self._converters.index(convert)
-        convert.disconnect_by_func(self.__progress)
-        convert.disconnect_by_func(self.__error)
-        convert.disconnect_by_func(self.__info)
-        convert.disconnect_by_func(self.__next)
-        self._converters[index] = None
-        convert.stop()
-        convert = None
-        del(convert)
-        for convert in self._converters:
-            if convert:
-                return False
+        if convert:
+            index = self._converters.index(convert)
+            convert.disconnect_by_func(self.__progress)
+            convert.disconnect_by_func(self.__error)
+            convert.disconnect_by_func(self.__info)
+            convert.disconnect_by_func(self.__next)
+            self._converters[index] = None
+            convert.stop()
+            convert = None
+            del(convert)
+            for convert in self._converters:
+                if convert:
+                    return False
         if self._files:
             self._files.remove(self._files[0])
             if self._files:

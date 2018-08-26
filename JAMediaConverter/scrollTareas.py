@@ -60,13 +60,22 @@ class ScrollTareas(Gtk.ScrolledWindow):
         vbox.pack_start(self.audioframe, False, False, 5)
         
         self.__infoFrame = Gtk.Frame()
-        self.__infoFrame.set_label(" Formato: ")
+        self.__infoFrame.set_label(" Formato de Entrada: ")
         self.__infoLabel= Gtk.Label()
         self.__infoLabel.set_line_wrap(True)
         self.__infoLabel.set_justify(Gtk.Justification.LEFT)
         self.__infoLabel.get_style_context().add_class("formatlabel")
         self.__infoFrame.add(self.__infoLabel)
         vbox.pack_start(self.__infoFrame, False, False, 5)
+
+        self.__warningFrame = Gtk.Frame()
+        self.__warningFrame.set_label(" Salteos: ")
+        self.__warningLabel= Gtk.Label()
+        self.__warningLabel.set_line_wrap(True)
+        self.__warningLabel.set_justify(Gtk.Justification.LEFT)
+        self.__warningLabel.get_style_context().add_class("errorlabel")
+        self.__warningFrame.add(self.__warningLabel)
+        vbox.pack_start(self.__warningFrame, False, False, 5)
 
         self.__errorsFrame = Gtk.Frame()
         self.__errorsFrame.set_label(" Errores: ")
@@ -82,13 +91,27 @@ class ScrollTareas(Gtk.ScrolledWindow):
         self.audioframe.connect("running", self.__new_file_in_progress)
         self.audioframe.connect('error', self.__new_error)
         self.audioframe.connect('info', self.__new_info)
+        self.audioframe.connect('warning', self.__new_warning)
 
     def setup_init(self, widget=None):
         self.__errorsFrame.hide()
         self.__infoFrame.hide()
+        self.__warningFrame.hide()
 
     def __new_file_in_progress(self, widget, path):
         self.set_info_file_in_process(path)
+
+    def __new_warning(self, widget, warning):
+        self.set_warning(warning)
+
+    def set_warning(self, warning=''):
+        if warning:
+            if warning != self.__warningLabel.get_text():
+                self.__warningLabel.set_text("%s\n%s" % (self.__warningLabel.get_text(), warning))
+            self.__warningFrame.show_all()
+        else:
+            self.__warningLabel.set_text("")
+            self.__warningFrame.hide()
 
     def __new_info(self, widget, info):
         self.set_info(info)
@@ -99,6 +122,7 @@ class ScrollTareas(Gtk.ScrolledWindow):
                 self.__infoLabel.set_text(info)
             self.__infoFrame.show_all()
         else:
+            self.__infoLabel.set_text("")
             self.__infoFrame.hide()
 
     def __new_error(self, widget, error):

@@ -38,6 +38,7 @@ class Converter(GObject.Object):
         self.__videoSink = None
         self.__audioSink = None
 
+        # FIXME: Implementar limpieza del nombre del archivo
         # path de salida
         location = os.path.basename(self._origen)
         if "." in location:
@@ -48,6 +49,9 @@ class Converter(GObject.Object):
         self._newpath = os.path.join(dirpath_destino, location)
         self._origen = Gst.filename_to_uri(self._origen)
 
+        self.__configPipe(dirpath_destino)
+
+    def __configPipe(self, dirpath_destino):
         # Formato de salida
         if self._codec == "wav":
             self.__audioSink = self.__get_wav_audio_out()

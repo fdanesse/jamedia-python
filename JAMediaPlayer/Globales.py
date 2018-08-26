@@ -7,6 +7,10 @@ import os
 import json
 #import codecs
 
+from libs import magic
+MAGIC = magic.open(magic.MAGIC_MIME)  #MAGIC_NONE
+MAGIC.load()
+
 import gi
 gi.require_version("Gtk", "3.0")
 
