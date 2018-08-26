@@ -70,11 +70,9 @@ class ScrollTareas(Gtk.ScrolledWindow):
 
         self.__warningFrame = Gtk.Frame()
         self.__warningFrame.set_label(" Salteos: ")
-        self.__warningLabel= Gtk.Label()
-        self.__warningLabel.set_line_wrap(True)
-        self.__warningLabel.set_justify(Gtk.Justification.LEFT)
-        self.__warningLabel.get_style_context().add_class("errorlabel")
-        self.__warningFrame.add(self.__warningLabel)
+        self.__warning_box = Gtk.VBox()
+        self.__warning_box.get_style_context().add_class("errorbox")
+        self.__warningFrame.add(self.__warning_box)
         vbox.pack_start(self.__warningFrame, False, False, 5)
 
         self.__errorsFrame = Gtk.Frame()
@@ -101,18 +99,6 @@ class ScrollTareas(Gtk.ScrolledWindow):
     def __new_file_in_progress(self, widget, path):
         self.set_info_file_in_process(path)
 
-    def __new_warning(self, widget, warning):
-        self.set_warning(warning)
-
-    def set_warning(self, warning=''):
-        if warning:
-            if warning != self.__warningLabel.get_text():
-                self.__warningLabel.set_text("%s\n%s" % (self.__warningLabel.get_text(), warning))
-            self.__warningFrame.show_all()
-        else:
-            self.__warningLabel.set_text("")
-            self.__warningFrame.hide()
-
     def __new_info(self, widget, info):
         self.set_info(info)
 
@@ -125,13 +111,13 @@ class ScrollTareas(Gtk.ScrolledWindow):
             self.__infoLabel.set_text("")
             self.__infoFrame.hide()
 
-    def __new_error(self, widget, error):
-        self.set_errors(error)
-
     def set_info_file_in_process(self, path=''):
         text = 'No hay tareas pendientes'
         if path: text = "Procesando: %s" % os.path.basename(path)
         self.__info_file_in_process.set_text(text)
+
+    def __new_error(self, widget, error):
+        self.set_errors(error)
 
     def set_errors(self, text=''):
         if text:
@@ -146,3 +132,20 @@ class ScrollTareas(Gtk.ScrolledWindow):
                 self.__error_box.remove(widget)
                 widget.destroy()
             self.__errorsFrame.hide()
+
+    def __new_warning(self, widget, warning):
+        self.set_warning(warning)
+
+    def set_warning(self, warning=''):
+        if warning:
+            label = Gtk.Label(warning)
+            label.set_line_wrap(True)
+            label.set_justify(Gtk.Justification.LEFT)
+            label.get_style_context().add_class("errorlabel")
+            self.__warning_box.pack_start(label, False, False, 2)
+            self.__warningFrame.show_all()
+        else:
+            for widget in self.__warning_box.get_children():
+                self.__warning_box.remove(widget)
+                widget.destroy()
+            self.__warningFrame.hide()
