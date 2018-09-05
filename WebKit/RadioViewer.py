@@ -10,14 +10,10 @@ from gi.repository import WebKit2
 from gi.repository import GObject
 from gi.repository import GLib
 
-from WebKit.Toolbar import Toolbar
-
 BASE_PATH = os.path.dirname(__file__)
 
 
 class RadioViewer(Gtk.VBox):
-
-    __gsignals__ = {"salir": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
     def __init__(self):
 
@@ -26,14 +22,10 @@ class RadioViewer(Gtk.VBox):
         self.set_css_name('radio')
         self.set_name('radio')
 
-        self.toolbar = Toolbar()
         self.__viewer = Webview()
         
-        self.pack_start(self.toolbar, False, False, 0)
         self.pack_start(self.__viewer, True, True, 0)
 
-        self.toolbar.salir.connect("clicked", self.__emit_salir)
-        self.toolbar.home.connect("clicked", self.__run, 'jamediaradio')
         self.__viewer.connect('load_failed', self.__error_load)
 
         self.show_all()
@@ -43,12 +35,6 @@ class RadioViewer(Gtk.VBox):
     def __error_load(self, web_view, load_event, failing_uri, error):
         self.run('error')
         return True
-
-    def __run(self, widget, valor):
-        self.run(valor)
-
-    def __emit_salir(self, widget):
-        self.emit('salir')
 
     def run(self, valor):
         self.__viewer.try_close()

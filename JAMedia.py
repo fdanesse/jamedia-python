@@ -116,9 +116,7 @@ class JAMedia(Gtk.Window):
 
         self.jamediaplayer.toolbar.version.set_text("V. %s" % self.version)
         self.jamediaconverter.toolbar.version.set_text("V. %s" % self.version)
-        self.helpCreditsViewer.toolbar.version.set_text("V. %s" % self.version)
-        self.jamediaradioViewer.toolbar.version.set_text("V. %s" % self.version)
-
+    
         print ("JAMedia process:", os.getpid())
 
     def set_style(self):
@@ -146,8 +144,8 @@ class JAMedia(Gtk.Window):
         self.toolbar_salir.connect('salir', self.__salir)
         self.jamediaplayer.connect('switch', self.__switch)
         self.jamediaconverter.connect('switch', self.__switch)
-        self.helpCreditsViewer.connect('salir', self.__switch, 'jamediatube')
-        self.jamediaradioViewer.connect('salir', self.__switch, 'jamediatube')
+        #self.helpCreditsViewer.connect('salir', self.__switch, 'jamediatube')
+        #self.jamediaradioViewer.connect('salir', self.__switch, 'jamediatube')
         self.toolbar_busqueda.connect("comenzar_busqueda", self.__comenzar_busqueda)
         self.paneltube.connect('download', self.__run_download)
         self.toolbar_descarga.connect('end', self.__run_download)
@@ -256,37 +254,81 @@ class JAMedia(Gtk.Window):
     def __switch(self, widget, valor):
         self.__cancel_toolbars()
         if valor == 'jamediatube':
+            self.headerBar.home.hide()
+            self.headerBar.reload.hide()
+            self.headerBar.jamedia.show()
+            self.headerBar.converter.show()
+            self.headerBar.help.show()
+            self.headerBar.radio.show()
+
             self.jamediaplayer.hide()
             self.jamediaconverter.hide()
             self.helpCreditsViewer.hide()
             self.jamediaradioViewer.hide()
+
             self.box_tube.show()
+
         elif valor == 'jamedia':
+            self.headerBar.home.show()
+            self.headerBar.reload.hide()
+            self.headerBar.jamedia.hide()
+            self.headerBar.converter.show()
+            self.headerBar.help.show()
+            self.headerBar.radio.show()
+
             self.box_tube.hide()
             self.helpCreditsViewer.hide()
-            self.jamediaradioViewer.run('jamediaradio')
+            #self.jamediaradioViewer.run('jamediaradio')
             self.jamediaradioViewer.hide()
             self.jamediaconverter.hide()
+            
             self.jamediaplayer.show()
+
         elif valor == 'creditos':
+            self.headerBar.home.show()
+            self.headerBar.reload.show()
+            self.headerBar.jamedia.show()
+            self.headerBar.converter.show()
+            self.headerBar.help.hide()
+            self.headerBar.radio.show()
+
             self.box_tube.hide()
             self.jamediaplayer.hide()
             self.jamediaconverter.hide()
             self.jamediaradioViewer.hide()
-            self.helpCreditsViewer.run('creditos')
+
+            self.helpCreditsViewer.run('creditos')  # FIXME: cambiar por show
+        
         elif valor == 'jamediaradio':
+            self.headerBar.home.show()
+            self.headerBar.reload.show()
+            self.headerBar.jamedia.show()
+            self.headerBar.converter.show()
+            self.headerBar.help.show()
+            self.headerBar.radio.hide()
+
             self.box_tube.hide()
-            self.jamediaplayer.base_panel.player.stop()
+            # self.jamediaplayer.base_panel.player.stop()
             self.jamediaplayer.hide()
             self.jamediaconverter.hide()
             self.helpCreditsViewer.hide()
+
             self.jamediaradioViewer.show()
+
         elif valor == 'jamediaconverter':
+            self.headerBar.home.show()
+            self.headerBar.reload.hide()
+            self.headerBar.jamedia.show()
+            self.headerBar.converter.hide()
+            self.headerBar.help.show()
+            self.headerBar.radio.show()
+
+            self.box_tube.hide()
             self.jamediaplayer.hide()
-            self.jamediaconverter.show()
             self.helpCreditsViewer.hide()
             self.jamediaradioViewer.hide()
-            self.box_tube.hide()
+            
+            self.jamediaconverter.show()
 
     def __confirmar_salir(self, widget=None, senial=None):
         self.paneltube.cancel_toolbars_flotantes()

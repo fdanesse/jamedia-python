@@ -10,8 +10,6 @@ from gi.repository import WebKit2
 from gi.repository import GObject
 from gi.repository import GLib
 
-from WebKit.Toolbar import Toolbar
-
 BASE_PATH = os.path.dirname(__file__)
 
 
@@ -26,14 +24,10 @@ class CreditsViewer(Gtk.VBox):
         self.set_css_name('credits')
         self.set_name('credits')
 
-        self.toolbar = Toolbar()
         self.__viewer = Webview()
         
-        self.pack_start(self.toolbar, False, False, 0)
         self.pack_start(self.__viewer, True, True, 0)
 
-        self.toolbar.salir.connect("clicked", self.__emit_salir)
-        self.toolbar.home.connect("clicked", self.__run, 'creditos')
         self.__viewer.connect('load_failed', self.__error_load)
 
         self.show_all()
@@ -42,13 +36,6 @@ class CreditsViewer(Gtk.VBox):
     def __error_load(self, web_view, load_event, failing_uri, error):
         self.run('error')
         return True
-
-    def __run(self, widget, valor):
-        self.run(valor)
-
-    def __emit_salir(self, widget):
-        self.run('creditos')
-        self.emit('salir')
 
     def run(self, valor):
         self.__viewer.try_close()

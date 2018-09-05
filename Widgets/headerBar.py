@@ -29,6 +29,12 @@ class HeaderBar(Gtk.HeaderBar):
         self.set_show_close_button(False)
 
         btnbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.home = get_boton(os.path.join(ICONS_PATH, "home.svg"), flip=False, pixels=24, tooltip_text="JAMediaTube")
+        self.home.connect("clicked", self.__emit_switch, 'jamediatube')
+
+        self.reload = get_boton(os.path.join(ICONS_PATH, "reload.png"), flip=False, pixels=24, tooltip_text="Recargar")
+        # self.home.connect("clicked", self.__emit_switch, 'jamediatube')  # FIXME: Reload webpage
+
         self.jamedia = get_boton(os.path.join(ICONS_PATH, "jamedia.png"), flip=False, pixels=35, tooltip_text="JAMedia")
         self.jamedia.connect("clicked", self.__emit_switch, 'jamedia')
         
@@ -41,9 +47,13 @@ class HeaderBar(Gtk.HeaderBar):
         self.help = get_boton(os.path.join(ICONS_PATH, "help.svg"), flip=False, pixels=24, tooltip_text="Ayuda")
         self.help.connect("clicked", self.__emit_switch, 'creditos')
 
+        btnbox.pack_start(self.home, False, False, 0)
+        btnbox.pack_start(self.reload, False, False, 0)
+        btnbox.pack_start(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL), False, False, 3)
         btnbox.pack_start(self.jamedia, False, False, 0)
         btnbox.pack_start(self.radio, False, False, 0)
         btnbox.pack_start(self.converter, False, False, 0)
+        btnbox.pack_start(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL), False, False, 3)
         btnbox.pack_start(self.help, False, False, 0)
 
         self.pack_start(btnbox)
@@ -55,7 +65,6 @@ class HeaderBar(Gtk.HeaderBar):
         btnClose.add(imageClose)
         btnClose.connect('clicked', self.__emit_salir)
         self.version = Gtk.Label("")
-        #btnbox.pack_start(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL), False, False, 3)
         btnbox.pack_start(self.version, False, False, 3)
         btnbox.pack_start(btnClose, False, False, 3)
         self.pack_end(btnbox)
