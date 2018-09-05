@@ -9,7 +9,6 @@ from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import GObject
 
-from JAMediaConverter.toolbar import Toolbar
 from JAMediaPlayer.FileChooser import FileChooser
 from JAMediaPlayer.derecha.JAMediaPlayerList import PlayerList
 from JAMediaConverter.FileChooser import FileChooser as FileChooser2
@@ -17,8 +16,6 @@ from JAMediaConverter.scrollTareas import ScrollTareas
 
 
 class JAMediaConverter(Gtk.VBox):
-
-    __gsignals__ = {"switch": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING, ))}
 
     def __init__(self):
 
@@ -29,7 +26,6 @@ class JAMediaConverter(Gtk.VBox):
         self.set_css_name('converterbox')
         self.set_name('converterbox')
 
-        self.toolbar = Toolbar()
         self.__base_panel = Gtk.HPaned()
         self.__filechooser = FileChooser()      # Para armar la lista de arcivos a convertir
         self.__filechooser2 = FileChooser2()    # Para seleccionar directorio destino de las conversiones
@@ -42,14 +38,12 @@ class JAMediaConverter(Gtk.VBox):
         self.__base_panel.pack1(self.__outBox, resize=True, shrink=True)
         self.__base_panel.pack2(self.__playerList, resize=False, shrink=False)
 
-        self.pack_start(self.toolbar, False, False, 0)
         self.pack_start(self.__base_panel, True, True, 0)
         self.pack_start(self.__filechooser, True, True, 0)
         self.pack_start(self.__filechooser2, True, True, 0)
 
         self.show_all()
 
-        self.toolbar.home.connect("clicked", self.__emit_switch, 'jamediatube')
         self.__playerList.toolbar.openfiles.connect("clicked", self.__openfiles, 'load')
         self.__playerList.toolbar.appendfiles.connect("clicked", self.__openfiles, 'add')
         self.__playerList.lista.connect('len_items', self.__file_list_changed)
@@ -90,17 +84,12 @@ class JAMediaConverter(Gtk.VBox):
         
     def __run_selectFolder(self, widget):
         self.__filechooser.hide()
-        self.toolbar.hide()
         self.__base_panel.hide()
         self.__filechooser2.show()
-
-    def __emit_switch(self, widget, valor):
-        self.emit('switch', valor)
 
     def __setup_init(self, widget=False):
         self.__filechooser.hide()
         self.__filechooser2.hide()
-        self.toolbar.show()
         self.__base_panel.show()
         return False
 
@@ -118,6 +107,5 @@ class JAMediaConverter(Gtk.VBox):
         self.__playerList.lista.agregar_items(items)
 
     def __openfiles(self, widget, tipo):
-        self.toolbar.hide()
         self.__base_panel.hide()
         self.__filechooser.run(self.__directorio, tipo)

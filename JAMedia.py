@@ -115,8 +115,7 @@ class JAMedia(Gtk.Window):
         self.show_all()
 
         self.jamediaplayer.toolbar.version.set_text("V. %s" % self.version)
-        self.jamediaconverter.toolbar.version.set_text("V. %s" % self.version)
-    
+        
         print ("JAMedia process:", os.getpid())
 
     def set_style(self):
@@ -143,9 +142,6 @@ class JAMedia(Gtk.Window):
 
         self.toolbar_salir.connect('salir', self.__salir)
         self.jamediaplayer.connect('switch', self.__switch)
-        self.jamediaconverter.connect('switch', self.__switch)
-        #self.helpCreditsViewer.connect('salir', self.__switch, 'jamediatube')
-        #self.jamediaradioViewer.connect('salir', self.__switch, 'jamediatube')
         self.toolbar_busqueda.connect("comenzar_busqueda", self.__comenzar_busqueda)
         self.paneltube.connect('download', self.__run_download)
         self.toolbar_descarga.connect('end', self.__run_download)
