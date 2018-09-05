@@ -1,10 +1,5 @@
 
-#principaltoolbar button {
-    margin: 0;
-    padding: 0;
-}
-
-/* Anuncia lo que se va encntrando */
+/* Anuncia lo que se va encontrando */
 #alertabusquedas {
     background-image: image(@jamedia1);
     background-color: @jamedia1;

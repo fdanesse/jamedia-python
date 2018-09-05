@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 # API: https://lazka.github.io/pgi-docs
-# gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly gstreamer1.0-tools gstreamer1.0-libav
+# gstreamer1.0 gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
 # python3-magic
-# webkit4
+# gir1.2-webkit2-4.0
 
 import os
 import sys
@@ -21,7 +21,7 @@ from gi.repository import Gdk
 from gi.repository import GLib
 from gi.repository import Gst
 
-from Widgets.toolbar import Toolbar
+from Widgets.headerBar import HeaderBar
 from Widgets.toolbarbusquedas import ToolbarBusquedas
 from Widgets.alertabusquedas import AlertaBusqueda
 from Widgets.toolbardescargas import ToolbarDescargas
@@ -77,23 +77,25 @@ class JAMedia(Gtk.Window):
         self.archivos = []
         self.buscador = Buscar()
 
+        self.headerBar = HeaderBar()
+        self.headerBar.set_title("JAMedia")
+        self.headerBar.version.set_text("V. %s" % self.version)
+        self.set_titlebar(self.headerBar)
+
         boxbase = Gtk.VBox()
+        self.toolbar_salir = ToolbarSalir()
+        boxbase.pack_start(self.toolbar_salir, False, False, 0)
 
         self.box_tube = Gtk.VBox()
         self.box_tube.set_css_name('boxtube')
         self.box_tube.set_name('boxtube')
-        self.toolbar = Toolbar()
         self.toolbar_busqueda = ToolbarBusquedas()
         self.toolbar_descarga = ToolbarDescargas()
-        self.toolbar_salir = ToolbarSalir()
         self.alerta_busqueda = AlertaBusqueda()
         self.paneltube = PanelTube()
 
-        self.box_tube.pack_start(self.toolbar, False, False, 0)
-        self.box_tube.pack_start(self.toolbar_salir, False, False, 0)
         self.box_tube.pack_start(self.toolbar_busqueda, False, False, 0)
         self.box_tube.pack_start(self.toolbar_descarga, False, False, 0)
-
         self.box_tube.pack_start(self.alerta_busqueda, False, False, 0)
         self.box_tube.pack_start(self.paneltube, True, True, 0)
 
@@ -112,7 +114,6 @@ class JAMedia(Gtk.Window):
         self.connect('realize', self.__realized)
         self.show_all()
 
-        self.toolbar.version.set_text("V. %s" % self.version)
         self.jamediaplayer.toolbar.version.set_text("V. %s" % self.version)
         self.jamediaconverter.toolbar.version.set_text("V. %s" % self.version)
         self.helpCreditsViewer.toolbar.version.set_text("V. %s" % self.version)
@@ -139,10 +140,10 @@ class JAMedia(Gtk.Window):
         self.paneltube.descargar.connect("drag-drop", self.__drag_drop)
         self.paneltube.descargar.drag_dest_add_uri_targets()
 
-        self.connect("delete-event", self.__salir)
-        self.toolbar.connect('salir', self.__confirmar_salir)
+        self.headerBar.connect('switch', self.__switch)
+        self.headerBar.connect('salir', self.__confirmar_salir)
+
         self.toolbar_salir.connect('salir', self.__salir)
-        self.toolbar.connect('switch', self.__switch)
         self.jamediaplayer.connect('switch', self.__switch)
         self.jamediaconverter.connect('switch', self.__switch)
         self.helpCreditsViewer.connect('salir', self.__switch, 'jamediatube')

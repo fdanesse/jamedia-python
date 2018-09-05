@@ -1,0 +1,20 @@
+.header {
+    background-image: image(@bg_toolbar1);
+    background-color: @bg_toolbar1;
+    padding: 6px;
+    margin: 0px;
+    font-weight: Normal;
+    color: @border;
+}
+.header .title {
+    font-weight: Normal;
+    color: black;
+    margin: 0px;
+    padding: 0px;
+}
+.header button {
+    padding: 0px;
+    padding-left: 6px;
+    padding-right: 6px;
+    margin: 0px;
+}

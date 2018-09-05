@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 # NOTA: Documentación Interesante => http://z25.org/static/_rd_/videostreaming_intro_plab/
+# Audio to hdmi: http://trac.gateworks.com/wiki/Yocto/gstreamer/audio#Encoding
+# Manual de gstreamer: https://gstreamer.freedesktop.org/documentation/application-development/
 
 import os
 

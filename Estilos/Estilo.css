@@ -176,6 +176,8 @@ trough highlight{
     color: @border;
 }
 
+
+@import url("header.css");
 @import url("toolbars.css");
 @import url("paneltube.css");
 @import url("jamedia.css");
