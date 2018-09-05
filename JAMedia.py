@@ -113,8 +113,6 @@ class JAMedia(Gtk.Window):
 
         self.connect('realize', self.__realized)
         self.show_all()
-
-        self.jamediaplayer.toolbar.version.set_text("V. %s" % self.version)
         
         print ("JAMedia process:", os.getpid())
 
@@ -141,7 +139,6 @@ class JAMedia(Gtk.Window):
         self.headerBar.connect('salir', self.__confirmar_salir)
 
         self.toolbar_salir.connect('salir', self.__salir)
-        self.jamediaplayer.connect('switch', self.__switch)
         self.toolbar_busqueda.connect("comenzar_busqueda", self.__comenzar_busqueda)
         self.paneltube.connect('download', self.__run_download)
         self.toolbar_descarga.connect('end', self.__run_download)

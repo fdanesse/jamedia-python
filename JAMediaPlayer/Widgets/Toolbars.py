@@ -26,11 +26,6 @@ class Toolbar(Gtk.Toolbar):
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        self.salir = get_boton(os.path.join(ICONS_PATH, "home.svg"), flip=False, pixels=24, tooltip_text="JAMediaTube")
-        self.insert(self.salir, -1)
-
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
-
         self.configurar = get_toggle_boton(os.path.join(ICONS_PATH, "control_panel.png"), flip=False, pixels=24, tooltip_text="Configuraciones")
         self.configurar.connect("toggled", self.__emit_show_config)
         self.insert(self.configurar, -1)
@@ -44,14 +39,6 @@ class Toolbar(Gtk.Toolbar):
         self.insert(self.__full, -1)
 
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
-
-        item = Gtk.ToolItem()
-        self.version = Gtk.Label("18")
-        self.version.get_style_context().add_class('versionlabel')
-        item.add(self.version)
-        self.insert(item, -1)
-
-        self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
         self.show_all()
     
