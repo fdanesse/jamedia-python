@@ -28,7 +28,7 @@ class BasePanel(Gtk.HPaned):
         self.pack1(self.izquierda, resize=True, shrink=True)
         self.pack2(self.derecha, resize=False, shrink=False)
 
-        self.player = JAMediaReproductor()
+        self.player = JAMediaReproductor(self.izquierda.video_visor.gtkSink)
         self.player.connect("endfile", self.__endfile)
         self.player.connect("estado", self.__state_changed)
         self.player.connect("newposicion", self.__update_progress)
@@ -89,8 +89,7 @@ class BasePanel(Gtk.HPaned):
         volumen = 1.0
         volumen = float("{:.1f}".format(self.izquierda.progress.get_volumen()))
         self.izquierda.progress.set_sensitive(False)
-        xid = self.izquierda.video_visor.get_property('window').get_xid()
-        self.player.load(path, xid)
+        self.player.load(path)
         self.player.set_volumen(volumen)
     
     def __rotar(self, widget, valor):

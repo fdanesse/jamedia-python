@@ -6,7 +6,7 @@ import os
 
 import gi
 gi.require_version('Gst', '1.0')
-gi.require_version('GstVideo', '1.0')  # NOTA: Necesario => AttributeError: 'GstXvImageSink' object has no attribute 'set_window_handle'
+gi.require_version('GstVideo', '1.0')
 
 from gi.repository import GObject
 from gi.repository import GLib
@@ -36,12 +36,13 @@ class JAMediaReproductor(GObject.Object):
 
     # Estados: playing, paused, None
 
-    def __init__(self):
+    def __init__(self, sink):
 
         GObject.Object.__init__(self)
         
+        self.gtkSink = sink  # self.__pipe.props.video_sink = self.gtkSink
+
         self.__source = None
-        self.__winId = None
         self.__controller = False
         self.__status = Gst.State.NULL
         self.__hasVideo = False
@@ -87,7 +88,6 @@ class JAMediaReproductor(GObject.Object):
         self.__gamma.set_property('gamma', self.__config['gamma'])
         self.__videoflip = Gst.ElementFactory.make('videoflip',"videoflip")
         self.__videoflip.set_property('method', self.__config['rotacion'])
-        self.__xvimagesink = Gst.ElementFactory.make('xvimagesink', "xvimagesink")
 
         self.__videoBin.add(self.__videoqueue)
         # FIXME: Subtítulos no funcionan self.__videoBin.add(self.__subtitleoverlay)
@@ -96,7 +96,7 @@ class JAMediaReproductor(GObject.Object):
         self.__videoBin.add(self.__videobalance)
         self.__videoBin.add(self.__gamma)
         self.__videoBin.add(self.__videoflip)
-        self.__videoBin.add(self.__xvimagesink)
+        self.__videoBin.add(self.gtkSink)
 
         # FIXME: Subtítulos no funcionan self.__videoqueue.link(self.__subtitleoverlay)
         # FIXME: Subtítulos no funcionan self.__subtitleoverlay.link(self.__videoconvert)
@@ -105,21 +105,21 @@ class JAMediaReproductor(GObject.Object):
         self.__videorate.link(self.__videobalance)
         self.__videobalance.link(self.__gamma)
         self.__gamma.link(self.__videoflip)
-        self.__videoflip.link(self.__xvimagesink)
+        self.__videoflip.link(self.gtkSink)
 
         pad = self.__videoqueue.get_static_pad("sink")
         self.__videoBin.add_pad(Gst.GhostPad.new("sink", pad))
 
     def __reset(self):
         self.__source = None
-        #self.__winId = None
         #self.__controller = False
         self.__status = Gst.State.NULL
         self.__hasVideo = False
         self.__duration = 0
         self.__position = 0
 
-        self.__makeVideoBin()
+        if not self.__videoBin:
+            self.__makeVideoBin()
         self.__pipe = Gst.ElementFactory.make("playbin", "player")
         self.__pipe.set_property('volume', self.__config['volumen'])
         self.__pipe.set_property('force-aspect-ratio', True)
@@ -131,7 +131,6 @@ class JAMediaReproductor(GObject.Object):
         # self.__pipe.set_property("subtitle-font-desc", Pango.FontDescription("%s %s" % ("Monospace", 12)))
         # self.__subtitleoverlay.set_property("silent", False)
 
-        self.__xvimagesink.set_window_handle(self.__winId)
         self.__bus = self.__pipe.get_bus()
         #self.__bus.enable_sync_message_emission()
         #self.__bus.connect('sync-message', self.__sync_message)
@@ -232,7 +231,6 @@ class JAMediaReproductor(GObject.Object):
         if self.__status == Gst.State.PAUSED \
             or self.__status == Gst.State.NULL \
             or self.__status == Gst.State.READY:
-            self.__xvimagesink.set_window_handle(self.__winId)
             self.__play()
         elif self.__status == Gst.State.PLAYING:
             self.__pause()
@@ -306,10 +304,9 @@ class JAMediaReproductor(GObject.Object):
     #def set_subtitulos(self, path):
     #    self.__pipe.set_property("suburi", path)
 
-    def load(self, uri, xid):
+    def load(self, uri):
         self.stop()
         self.emit("video", False)
-        self.__winId = xid
         self.__reset()
         temp = uri
         if os.path.exists(temp):

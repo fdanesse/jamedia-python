@@ -9,8 +9,6 @@
 import os
 import sys
 
-os.putenv('GDK_BACKEND', 'x11')
-
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version("Gtk", "3.0")
@@ -271,7 +269,6 @@ class JAMedia(Gtk.Window):
 
             self.box_tube.hide()
             self.helpCreditsViewer.hide()
-            #self.jamediaradioViewer.run('jamediaradio')
             self.jamediaradioViewer.hide()
             self.jamediaconverter.hide()
             
@@ -301,7 +298,6 @@ class JAMedia(Gtk.Window):
             self.headerBar.radio.hide()
 
             self.box_tube.hide()
-            # self.jamediaplayer.base_panel.player.stop()
             self.jamediaplayer.hide()
             self.jamediaconverter.hide()
             self.helpCreditsViewer.hide()

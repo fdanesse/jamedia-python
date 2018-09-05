@@ -2,19 +2,23 @@
 
 import gi
 gi.require_version("Gtk", "3.0")
+gi.require_version('Gst', '1.0')
+gi.require_version('GstVideo', '1.0') 
 
+from gi.repository import Gst
+from gi.repository import GstVideo
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
 
 
-class VideoVisor(Gtk.DrawingArea):
+class VideoVisor(Gtk.EventBox):
 
     __gsignals__ = {"ocultar_controles": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,))}
 
     def __init__(self):
 
-        Gtk.DrawingArea.__init__(self)
+        Gtk.EventBox.__init__(self)
 
         self.add_events(
             Gdk.EventMask.KEY_PRESS_MASK |
@@ -25,6 +29,9 @@ class VideoVisor(Gtk.DrawingArea):
             Gdk.EventMask.BUTTON_PRESS_MASK |
             Gdk.EventMask.BUTTON_RELEASE_MASK
         )
+
+        self.gtkSink = Gst.ElementFactory.make("gtksink", None)
+        self.add(self.gtkSink.props.widget)
 
         self.show_all()
 
@@ -37,10 +44,4 @@ class VideoVisor(Gtk.DrawingArea):
             self.emit("ocultar_controles", False)
         else:
             self.emit("ocultar_controles", True)
-        return True
-            
-    def do_draw(self, contexto):
-        # FIXME: Porque cuando no hay video reproduciendose la interfaz no se dibuja bien
-        Gdk.cairo_set_source_color(contexto, Gdk.Color.parse("#000000").color)
-        contexto.paint()
         return True
