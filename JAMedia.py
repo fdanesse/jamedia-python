@@ -30,8 +30,8 @@ from PanelTube.buscar import Buscar, FEED
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
 from JAMediaPlayer.Globales import ocultar
 from JAMediaPlayer.Globales import get_dict
-from WebKit.CreditsViewer import CreditsViewer
-from WebKit.RadioViewer import RadioViewer
+from WebKit.WebViewer import WebViewer
+from WebKit.WebViewer import WebViewer
 from JAMediaConverter.JAMediaConverter import JAMediaConverter
 
 BASE_PATH = os.path.dirname(__file__)
@@ -99,8 +99,8 @@ class JAMedia(Gtk.Window):
 
         self.jamediaplayer = JAMediaPlayer()
         self.jamediaconverter = JAMediaConverter()
-        self.helpCreditsViewer = CreditsViewer()
-        self.jamediaradioViewer = RadioViewer()
+        self.helpCreditsViewer = WebViewer('creditos')
+        self.jamediaradioViewer = WebViewer('radio')
 
         boxbase.pack_start(self.box_tube, True, True, 0)
         boxbase.pack_start(self.jamediaplayer, True, True, 0)
@@ -135,6 +135,7 @@ class JAMedia(Gtk.Window):
 
         self.headerBar.connect('switch', self.__switch)
         self.headerBar.connect('salir', self.__confirmar_salir)
+        self.headerBar.reload.connect("clicked", self.__reset_webview)
 
         self.toolbar_salir.connect('salir', self.__salir)
         self.toolbar_busqueda.connect("comenzar_busqueda", self.__comenzar_busqueda)
@@ -155,6 +156,12 @@ class JAMedia(Gtk.Window):
             
         self.resize(640, 480)
         # make_tree_widgets(self)
+
+    def __reset_webview(self, widget):
+        if self.helpCreditsViewer.get_visible():
+            self.helpCreditsViewer.reset()
+        elif self.jamediaradioViewer.get_visible():
+            self.jamediaradioViewer.reset()
 
     def __cancel_toolbars(self, widget=None):
         self.toolbar_salir.cancelar()
@@ -287,7 +294,7 @@ class JAMedia(Gtk.Window):
             self.jamediaconverter.hide()
             self.jamediaradioViewer.hide()
 
-            self.helpCreditsViewer.run('creditos')  # FIXME: cambiar por show
+            self.helpCreditsViewer.show()
         
         elif valor == 'jamediaradio':
             self.headerBar.home.show()

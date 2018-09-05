@@ -13,14 +13,16 @@ from gi.repository import GLib
 BASE_PATH = os.path.dirname(__file__)
 
 
-class RadioViewer(Gtk.VBox):
+class WebViewer(Gtk.VBox):
 
-    def __init__(self):
+    def __init__(self, valor):
 
         Gtk.VBox.__init__(self)
 
-        self.set_css_name('radio')
-        self.set_name('radio')
+        self.valor = valor
+
+        self.set_css_name('webviewer')
+        self.set_name('webviewer')
 
         self.__viewer = Webview()
         
@@ -29,20 +31,21 @@ class RadioViewer(Gtk.VBox):
         self.__viewer.connect('load_failed', self.__error_load)
 
         self.show_all()
-        self.run('jamediaradio')
+        self.reset()
         self.hide()
 
     def __error_load(self, web_view, load_event, failing_uri, error):
-        self.run('error')
+        uri = 'file://' + os.path.join(BASE_PATH, "onerror/onerror.html")
+        GLib.idle_add(self.__viewer.load_uri, uri)
         return True
 
-    def run(self, valor):
+    def reset(self):
         self.__viewer.try_close()
-        uri = "https://fdanesse-f2b2c.firebaseapp.com/jamedia_radio"
-        if valor == 'jamediaradio':
+        uri = 'file://' + os.path.join(BASE_PATH, "credits/credits.html")
+        if self.valor == 'creditos':
             pass
-        elif valor == 'error':
-            uri = 'file://' + os.path.join(BASE_PATH, "onerror/onerror.html")
+        elif self.valor == 'radio':
+            uri = "https://fdanesse-f2b2c.firebaseapp.com/jamedia_radio"
         GLib.idle_add(self.__viewer.load_uri, uri)
 
 

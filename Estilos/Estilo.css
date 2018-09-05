@@ -168,7 +168,7 @@ trough highlight{
     opacity: 1;
 }
 
-#radio, #credits {
+ #webviewer {
     border: 2px @jamedia3 solid;
 }
 

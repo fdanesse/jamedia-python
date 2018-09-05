@@ -33,7 +33,6 @@ class HeaderBar(Gtk.HeaderBar):
         self.home.connect("clicked", self.__emit_switch, 'jamediatube')
 
         self.reload = get_boton(os.path.join(ICONS_PATH, "reload.png"), flip=False, pixels=24, tooltip_text="Recargar")
-        # self.home.connect("clicked", self.__emit_switch, 'jamediatube')  # FIXME: Reload webpage
 
         self.jamedia = get_boton(os.path.join(ICONS_PATH, "jamedia.png"), flip=False, pixels=35, tooltip_text="JAMedia")
         self.jamedia.connect("clicked", self.__emit_switch, 'jamedia')
