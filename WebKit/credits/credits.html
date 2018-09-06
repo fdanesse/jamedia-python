@@ -23,7 +23,7 @@
         
             <section>
                 <section>
-                <h1><strong>JAMedia 18</strong></h1>
+                <h1><strong>JAMedia 19</strong></h1>
                 <hr>
                 <h5><strong>Reproductor de audio, video y streamings.</strong></h5>
                 </section>
@@ -34,7 +34,7 @@
                 La motivación original de este desarrollo fue dar la oportunidad de ver el mundial de fútbol de Sudáfrica a todos los niños de uruguay en sus nuevas xo.
                 A lo largo de los años la aplicación fue mejorada y reescrita en otros lenguajes como java, vala, c++ y javascript, para adaptarla a diferentes plataformas y sobre todo como medio de aprendizaje personal.
                 A partir de la versión 17, se ha unificado JAMedia con JAMediaTube, por lo cual su principal propósito es ahora la busqueda, descarga y reproducción de videos.
-                La actual versión Nº 18, cuenta con importantes mejoras estéticas y de rendimiento. Se ha refactorizado todo el código y hecho el port de python 2 a python 3, de gtk 2 a gtk 3 y de gstreamer 0.10 a gstreamer 1.0.
+                La actual versión Nº 19, cuenta con importantes mejoras estéticas y de rendimiento. Se ha refactorizado todo el código y hecho el port de python 2 a python 3, de gtk 2 a gtk 3 y de gstreamer 0.10 a gstreamer 1.0.
                 Se han agregado interfaces gráficas en html, css y javascript y se ha reimplementado todo el estilo sobre css.
                 </p>
                 <p>
@@ -46,11 +46,15 @@
       
         <main class='animated bounceInUp'>
             <ol>
-                <h6><strong>JAMedia 18 tiene 3 funcionalidades:</strong></h6>
+                <h6><strong>JAMedia en python</strong></h6>
                 <hr>
-                <li>Busqueda y descarga de videos desde youtube.</li>
-                <li>Reproducción de archivos de Audio y Video.</li>
-                <li>Reproducción de streaming de radios de JAMedia.</li>
+                <li>Reproductor de Archivos de Audio y Video.</li>
+                <li>Reproductor de Streamings de radios.</li>
+                <li>Buscador masivo de videos en youtube.</li>
+                <li>Descarga masiva de videos desde youtube.</li>
+                <li>Extractor masivo de audio e imágenes desde archivos de videos.</li>
+                <li>Conversor masivo de archivos de audio y video a diversos formatos.</li>
+                <li><s>Grabador de Streamings</s> <i>(Quitado en Versión 18)</i></li>
             </ol>
             <ol>
                 <h6><strong>El panel principal tiene dos áreas:</strong></h6>
@@ -60,23 +64,25 @@
                 <li>Al dar click sobre el botón inferior derecho se comenzarán a descargar todos los videos de esta lista.</li>
                 <li>La estructura de directorios de las versiones anteriores se ha mantenido por lo cual todos los videos se descargan en: <i>/home/tu-usuario/JAMediaDatos/YoutubeVideos</i></li>
             </ol>
-            <p>
-                Para cambiar a la interfaz del reproductor, debes hacer click en el logo de JAMedia arriba a la izquierda, y para volver al buscador también.<br>
-                Para cambiar a la interfaz de radios, debes hacer click en el ícono de radio.<br>
-                Obviamente: para que el buscador y la interfaz de radios funcionen, debes estar conectado a internet. De lo contrario, solo podrás utilizar el reproductor.
-            </p>
             <ol>
                 <h6><strong>Para que esta versión funcione correctamente necesitas tener instalados los siguientes paquetes:</strong></h6>
+                <li>python 3.6.3</li>
+				<li>gtk 3.0</li>
+                <li>gstreamer 1.0</li>
+                <li>webkit 2-4.0</li>
                 <hr>
                 <li>gstreamer1.0</li>
-                <li>gstreamer1.0-plugins-base</li>
+				<li>gstreamer1.0-plugins-base</li>
                 <li>gstreamer1.0-plugins-good</li>
-                <li>gstreamer1.0-plugins-ugly</li>
+                <li>gstreamer1.0-plugins-bad</li>
+				<li>gstreamer1.0-plugins-ugly</li>
+				<li>gstreamer1.0-libav</li>
                 <li>gstreamer1.0-tools</li>
-                <li>gstreamer1.0-libav</li>
+                <li>gir1.2-webkit2-4.0</li>
+				<hr>
             </ol>
             <p>Para instalar estos paquetes en ubuntu, copia y pega el siguiente código en la terminal y presiona enter: <br>
-                <i>sudo apt-get install gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly gstreamer1.0-tools gstreamer1.0-libav</i>
+                <li>En la terminal Ejecuta: sudo apt-get install gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gir1.2-webkit2-4.0</li>
             </p>
             <ol>
                 <h6><strong>Autor:</strong></h6>
