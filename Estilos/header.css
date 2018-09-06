@@ -1,20 +1,42 @@
 .header {
     background-image: image(@bg_toolbar1);
     background-color: @bg_toolbar1;
-    padding: 6px;
-    margin: 0px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
     font-weight: Normal;
     color: @border;
+    border: 2px @jamedia3 solid;
+    border-bottom: 0px;
 }
+
 .header .title {
     font-weight: Normal;
     color: black;
     margin: 0px;
     padding: 0px;
 }
+
 .header button {
-    padding: 0px;
-    padding-left: 6px;
-    padding-right: 6px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 8px;
+    padding-right: 8px;
+    margin-right: 3px;
+    border: 0px;
+    box-shadow: 0 0 0 0;
+    border-radius: 5px;
+}
+
+.header button:hover {
+    background-image: image(@green3);
+    background-color: @green3;
+    border: 0.1em solid @green3;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
+}
+
+.versionlabel {
+    color: rgba(0,0,0,0.2);
     margin: 0px;
 }

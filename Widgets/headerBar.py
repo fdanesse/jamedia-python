@@ -57,13 +57,13 @@ class HeaderBar(Gtk.HeaderBar):
 
         self.pack_start(btnbox)
 
-
         btnbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         imageClose = Gtk.Image.new_from_icon_name('window-close-symbolic', Gtk.IconSize.LARGE_TOOLBAR)
         btnClose = Gtk.Button()
         btnClose.add(imageClose)
         btnClose.connect('clicked', self.__emit_salir)
         self.version = Gtk.Label("")
+        self.version.get_style_context().add_class("versionlabel")
         btnbox.pack_start(self.version, False, False, 3)
         btnbox.pack_start(btnClose, False, False, 3)
         self.pack_end(btnbox)
