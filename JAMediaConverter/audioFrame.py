@@ -8,7 +8,6 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
-from gi.repository import GLib
 
 from JAMediaConverter.Gstreamer.Converter import Converter
 from JAMediaPlayer.Globales import MAGIC
@@ -137,7 +136,7 @@ class AudioFrame(Gtk.Frame):
             # FIXME: Parece necesarios armar un Convert único, es demasiado reproducir el archivo para cada conversión al mismo tiempo
             self._converters[index] = Converter(self._files[0], codec, self._dirOut)
             # NOTA: Cada instancia de Converter estará conectada a estas funciones
-            self._converters[index].connect('progress', self.__progress)
+            self._converters[index].connect('progress', self.__updateProgress)
             self._converters[index].connect('error', self.__error)
             self._converters[index].connect('info', self.__info)
             self._converters[index].connect('end', self.__next)
@@ -151,7 +150,8 @@ class AudioFrame(Gtk.Frame):
                     time.sleep(0.5)
                     convert.play()
         
-    def __progress(self, convert, val1, codec):
+    def __updateProgress(self, convert, val1, codec):
+        Gdk.threads_enter()
         self._codecsprogress[codec] = val1
         progreso = 0
         for _val in self._codecsprogress.values():
@@ -160,14 +160,9 @@ class AudioFrame(Gtk.Frame):
         totalesperado = self._initialFilesCount * 100.0
         totalterminado = ((self._initialFilesCount - len(self._files))) * 100.0 + progreso
         val2 = (totalterminado * 100.0 / totalesperado ) / 100.0
-        GLib.idle_add(self.__updateProgress, codec, float(val1/100.0), val2)
-
-    def __updateProgress(self, codec, val1, val2):
-        Gdk.threads_enter()
-        self._progress[codec].set_fraction(val1)
+        self._progress[codec].set_fraction(float(val1/100.0))
         self._progressbar.set_fraction(val2)
         Gdk.threads_leave()
-        return False
 
     def __error(self, convert, error):
         if os.path.exists(convert._newpath):
@@ -185,7 +180,7 @@ class AudioFrame(Gtk.Frame):
         # Va quitando los converters a medida que terminan y cuando no quedan más pasa el siguiente archivo
         if convert:
             index = self._converters.index(convert)
-            convert.disconnect_by_func(self.__progress)
+            convert.disconnect_by_func(self.__updateProgress)
             convert.disconnect_by_func(self.__error)
             convert.disconnect_by_func(self.__info)
             convert.disconnect_by_func(self.__next)

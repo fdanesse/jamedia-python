@@ -18,7 +18,7 @@ FEED = {
     }
 
 
-class Buscar(GObject.GObject):
+class Buscar(GObject.Object):
 
     __gsignals__ = {
     'encontrado': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_STRING, GObject.TYPE_STRING)),
@@ -26,11 +26,13 @@ class Buscar(GObject.GObject):
 
     def __init__(self, ):
 
-        GObject.GObject.__init__(self)
+        GObject.Object.__init__(self)
 
     def __get_videos(self, consulta, limite):
         # Obtener web principal con resultado de busqueda y recorrer todas las pags de la busqueda obtenida hasta conseguir el id de los videos.
+        # https://www.youtube.com/results?search_query=selena+gomez
         params = urllib.parse.urlencode({'search_query': consulta})
+        print("PARáMETROS:", params)
         urls = {}
         print ("Comezando la búsqueda de %i videos sobre %s" % (limite, consulta))
         for pag in range(1, 10):

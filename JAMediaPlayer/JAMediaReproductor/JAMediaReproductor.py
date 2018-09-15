@@ -40,7 +40,7 @@ class JAMediaReproductor(GObject.Object):
 
         GObject.Object.__init__(self)
         
-        self.gtkSink = sink  # self.__pipe.props.video_sink = self.gtkSink
+        self.gtkSink = sink
 
         self.__source = None
         self.__controller = False
@@ -111,6 +111,15 @@ class JAMediaReproductor(GObject.Object):
         self.__videoBin.add_pad(Gst.GhostPad.new("sink", pad))
 
     def __reset(self):
+        if self.__bus:
+            self.__bus.disconnect_by_func(self.__sync_message)
+            self.__bus.remove_signal_watch()
+            self.__bus = None
+
+        if self.__pipe:
+            self.__pipe.set_property('video-sink', None)
+            self.__pipe = None
+
         self.__source = None
         #self.__controller = False
         self.__status = Gst.State.NULL
@@ -159,7 +168,7 @@ class JAMediaReproductor(GObject.Object):
                 if self.__status != new:
                     self.__status = new
                     self.emit("estado", "paused")
-                    self.__new_handle(False)
+                    self.__new_handle(False)                
         elif mensaje.type == Gst.MessageType.TAG:
             taglist = mensaje.parse_tag()
             datos = taglist.to_string()
@@ -236,8 +245,12 @@ class JAMediaReproductor(GObject.Object):
             self.__pause()
 
     def stop(self):
-        if self.__pipe and (self.__status != Gst.State.NULL and self.__status != Gst.State.PAUSED):
-            self.__pipe.set_state(Gst.State.NULL)
+        if self.__pipe:  # and (self.__status != Gst.State.NULL and self.__status != Gst.State.PAUSED):
+            self.__new_handle(False)
+            ret = self.__pipe.set_state(Gst.State.NULL)
+            # FIXME: Porque no se captura en Gst.MessageType.STATE_CHANGED
+            self.__status = Gst.State.NULL
+            self.emit("estado", "None")
 
     def get_balance(self):
         # Valores por defecto para una escala gtk

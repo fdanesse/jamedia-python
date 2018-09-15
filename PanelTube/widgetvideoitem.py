@@ -13,6 +13,8 @@ import urllib
 #import base64
 import subprocess
 
+# NOTA: Actualizar => sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O youtube-dl
+# https://github.com/rg3/youtube-dl/
 youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")  #"/usr/bin/youtube-dl"
 
 

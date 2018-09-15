@@ -9,14 +9,14 @@ from gi.repository import GLib
 from gi.repository import GObject
 
 
-class MouseSpeedDetector(GObject.GObject):
+class MouseSpeedDetector(GObject.Object):
 
     __gsignals__ = {
         'estado': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,))}
 
     def __init__(self, parent):
 
-        GObject.GObject.__init__(self)
+        GObject.Object.__init__(self)
 
         self.actualizador = False
         self.mouse_pos = (0, 0)

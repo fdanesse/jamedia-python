@@ -17,20 +17,20 @@ youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")
 
 CODECS = [
     [43, "WebM", "360p VP8 N/A 0.5 Vorbis 128"],
-    [5, "FLV", "240p Sorenson H.263    N/A    0.25 MP3 64"],
     [18, "MP4", "270p/360p H.264 Baseline 0.5 AAC 96"],
-    [82, "MP4", "360p H.264 3D 0.5 AAC 96"],
+    #[82, "MP4", "360p H.264 3D 0.5 AAC 96"],
+    #[5, "FLV", "240p Sorenson H.263    N/A    0.25 MP3 64"],
     ]
 
 
-class JAMediaYoutube(GObject.GObject):
+class JAMediaYoutube(GObject.Object):
 
     __gsignals__ = {
     'progress_download': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_STRING, ))}
 
     def __init__(self):
 
-        GObject.GObject.__init__(self)
+        GObject.Object.__init__(self)
 
         self.ultimosdatos = False
         self.contador = 0

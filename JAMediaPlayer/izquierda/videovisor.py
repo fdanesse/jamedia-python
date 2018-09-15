@@ -30,7 +30,7 @@ class VideoVisor(Gtk.EventBox):
             Gdk.EventMask.BUTTON_RELEASE_MASK
         )
 
-        self.gtkSink = Gst.ElementFactory.make("gtksink", None)
+        self.gtkSink = Gst.ElementFactory.make("gtksink", None)  # glsinkbin
         self.add(self.gtkSink.props.widget)
 
         self.show_all()

@@ -70,6 +70,7 @@ class Converter(GObject.Object):
         elif self._codec == "avi":
             self.__pipe = self.__get_avi_out()
         elif self._codec == "mpg":
+            # NOTA: Segun testeo: 100 imagenes x segundo 42.5Mb
             self.__pipe = self.__get_mpg_out()
         elif self._codec == "png":
             self.__videoSink = self.__get_png_out()

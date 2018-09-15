@@ -278,7 +278,7 @@ class JAMedia(Gtk.Window):
             self.helpCreditsViewer.hide()
             self.jamediaradioViewer.hide()
             self.jamediaconverter.hide()
-            
+
             self.jamediaplayer.show()
 
         elif valor == 'creditos':
@@ -323,7 +323,7 @@ class JAMedia(Gtk.Window):
             self.jamediaplayer.hide()
             self.helpCreditsViewer.hide()
             self.jamediaradioViewer.hide()
-            
+
             self.jamediaconverter.show()
 
     def __confirmar_salir(self, widget=None, senial=None):
