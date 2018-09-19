@@ -117,15 +117,16 @@ class AudioFrame(Gtk.Frame):
 
             tipo = MAGIC.file(self._files[0])
             info = "Contenido del Archivo: %s" % tipo
+            print("Codeando:", codec, tipo, self._files[0])
             self.emit('info', info)
 
-            # NOTA: Evitar sobreescritura de archivo origen. Directorios de origen y destino deben ser distintos
+            # Evitar sobreescritura de archivo origen. Directorios de origen y destino deben ser distintos
             if os.path.dirname(self._files[0]) == self._dirOut:
                 self._converters[index] = None
                 warning = "%s => Salteado porque directorios de origen y destino son el mismo.\n" % (self._files[0])
                 self.emit('warning', warning)
                 continue
-            # NOTA: Si el archivo sólo contiene audio, no se crearán converts de video o imágenes
+            # Si el archivo sólo contiene audio, no se crearán converts de video o imágenes
             if "audio" in tipo and codec in self.__videoCodecs:
                 self._converters[index] = None
                 warning = "%s => Salteando porque el origen no tiene video.\n" % (self._files[0])
@@ -135,18 +136,19 @@ class AudioFrame(Gtk.Frame):
 
             # FIXME: Parece necesarios armar un Convert único, es demasiado reproducir el archivo para cada conversión al mismo tiempo
             self._converters[index] = Converter(self._files[0], codec, self._dirOut)
-            # NOTA: Cada instancia de Converter estará conectada a estas funciones
+            # Cada instancia de Converter estará conectada a estas funciones
             self._converters[index].connect('progress', self.__updateProgress)
             self._converters[index].connect('error', self.__error)
             self._converters[index].connect('info', self.__info)
             self._converters[index].connect('end', self.__next)
 
-        # NOTA: si no hay converts no hay tareas pendientes porque ahora se pueden saltear los codecs configurados
+        # si no hay converts no hay tareas pendientes porque ahora se pueden saltear los codecs configurados
         if not any(self._converters):
             self.__next(None)
         else:
             for convert in self._converters:
                 if convert:
+                    # Esto no debiera ser necesario
                     time.sleep(0.5)
                     convert.play()
         
@@ -173,30 +175,29 @@ class AudioFrame(Gtk.Frame):
         self.__next(convert)
 
     def __info(self, convert, info):
-        # NOTA: Recordar que esta señal se recibe mas de una vez por archivo con diferentes datos
+        # Recordar que esta señal se recibe mas de una vez por archivo con diferentes datos
         self.emit('info', info)
 
     def __next(self, convert):
         # Va quitando los converters a medida que terminan y cuando no quedan más pasa el siguiente archivo
         if convert:
             index = self._converters.index(convert)
+            # Esto no debiera ser necesario
             convert.disconnect_by_func(self.__updateProgress)
             convert.disconnect_by_func(self.__error)
             convert.disconnect_by_func(self.__info)
             convert.disconnect_by_func(self.__next)
-            self._converters[index] = None
             convert.stop()
-            convert = None
+            # convert = None
+            # Esto no debiera ser necesario
             del(convert)
-            for convert in self._converters:
-                if convert:
-                    return False
+            self._converters[index] = None
+            if any(self._converters): return False  # Esperamos que terminen todos los procesos de este archivo
+        # Todas las tareas de este archivo terminaron o fallaron
+        if self._files: self._files.remove(self._files[0])
+        # Continuar con siguiente archivo o terminar
         if self._files:
-            self._files.remove(self._files[0])
-            if self._files:
-                self.run()
-            else:
-                self.__end_all()
+            self.run()
         else:
             self.__end_all()
 

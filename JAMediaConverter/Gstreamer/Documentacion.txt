@@ -1,0 +1,28 @@
+
+Gtk.Application:    https://python-gtk-3-tutorial.readthedocs.io/en/latest/application.html
+
+vp8enc:     https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gst-plugins-good/html/gst-plugins-good-plugins-vp8enc.html
+webm:       https://www.webmproject.org/docs/encoder-parameters/
+webmmux:    https://developer.gnome.org/gst-plugins-libs/stable/gst-plugins-good-plugins-webmmux.html
+
+Subtitle:   https://gstreamer.freedesktop.org/documentation/design/subtitle-overlays.html
+Raw Video Media Types:  https://gstreamer.freedesktop.org/documentation/design/mediatype-video-raw.html#formats
+
+
+bufferdraw: https://github.com/GStreamer/gst-python/blob/master/old_examples/buffer-draw.py
+python gstreamer tutorial:  http://brettviren.github.io/pygst-tutorial-org/pygst-tutorial.html
+
+Gstreamer 1.0:  https://lazka.github.io/pgi-docs/Gst-1.0/
+
+http://z25.org/static/_rd_/videostreaming_intro_plab/
+Audio to hdmi: http://trac.gateworks.com/wiki/Yocto/gstreamer/audio#Encoding
+Manual de gstreamer: https://gstreamer.freedesktop.org/documentation/application-development/
+
+numpy: https://stackoverflow.com/questions/48474308/getting-sum-of-adjacent-elements-of-a-matrix
+
+https://en.wikipedia.org/wiki/Chroma_subsampling
+http://www.cinedigital.tv/que-es-todo-eso-de-444-422-420-o-color-subsampling/
+https://wolfcrow.com/blog/chroma-subsampling-numbers-explained/
+
+
+Prueba sobre video de: 02:32 minutos de duración, demora 0:56:51.877362 minutos en trascodearlo en mpg

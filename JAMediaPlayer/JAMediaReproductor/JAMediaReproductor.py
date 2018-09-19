@@ -170,9 +170,7 @@ class JAMediaReproductor(GObject.Object):
                     self.emit("estado", "paused")
                     self.__new_handle(False)                
         elif mensaje.type == Gst.MessageType.TAG:
-            taglist = mensaje.parse_tag()
-            datos = taglist.to_string()
-            if 'video-codec' in datos:
+            if 'video-codec' in mensaje.parse_tag().to_string():
                 if self.__hasVideo == False or self.__hasVideo == None:
                     self.__hasVideo = True
                     self.emit("video", True)
@@ -180,16 +178,13 @@ class JAMediaReproductor(GObject.Object):
             # http://cgit.collabora.com/git/farstream.git/tree/examples/gui/fs-gui.py
             self.__pipe.recalculate_latency()
         elif mensaje.type == Gst.MessageType.DURATION_CHANGED:
-            bool1, valor1 = self.__pipe.query_duration(Gst.Format.TIME)
-            bool2, valor2 = self.__pipe.query_position(Gst.Format.TIME)
-            self.__duration = valor1
-            self.__position = valor2
+            bool1, self.__duration = self.__pipe.query_duration(Gst.Format.TIME)
+            bool2, self.__position = self.__pipe.query_position(Gst.Format.TIME)
         elif mensaje.type == Gst.MessageType.EOS:
             self.__new_handle(False)
             self.emit("endfile")
         elif mensaje.type == Gst.MessageType.ERROR:
-            print ("\n Gst.MessageType.ERROR:")
-            print (mensaje.parse_error())
+            print ("\nGst.MessageType.ERROR:", mensaje.parse_error())
             self.__new_handle(False)
 
     def __new_handle(self, reset):
@@ -202,16 +197,15 @@ class JAMediaReproductor(GObject.Object):
     def __handle(self):
         bool1, valor1 = self.__pipe.query_duration(Gst.Format.TIME)
         bool2, valor2 = self.__pipe.query_position(Gst.Format.TIME)
-
         duracion = float(valor1)
         posicion = float(valor2)
-        pos = 0.0
-        try:
-            pos = float(posicion * 100.0 / duracion)
-        except:
-            pass
         if self.__duration != duracion:
             self.__duration = duracion
+        pos = 0.0
+        try:
+            pos = float(posicion * 100.0 / self.__duration)
+        except:
+            pass
         if pos != self.__position:
             self.__position = pos
             # Se emite un flotante de 0.0 a 100.?
@@ -235,6 +229,11 @@ class JAMediaReproductor(GObject.Object):
     def __play(self):
         if self.__pipe:
             self.__pipe.set_state(Gst.State.PLAYING)
+            
+            self.__pipe.get_state(5000000000) 
+            pad = self.__pipe.emit('get-video-pad',0) 
+            caps = pad.get_current_caps() 
+            print("CAPS:", caps.to_string()) 
 
     def pause_play(self):
         if self.__status == Gst.State.PAUSED \

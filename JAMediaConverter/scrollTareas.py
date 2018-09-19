@@ -103,6 +103,7 @@ class ScrollTareas(Gtk.ScrolledWindow):
         self.set_info(info)
 
     def set_info(self, info=''):
+        # FIXME: Cambiar esta etiqueta por elementos que se agreguen en forma separada
         if info:
             if info != self.__infoLabel.get_text():
                 self.__infoLabel.set_text(info)

@@ -31,8 +31,12 @@ class WebViewer(Gtk.VBox):
         self.__viewer.connect('load_failed', self.__error_load)
 
         self.show_all()
-        self.reset()
         self.hide()
+
+        self.connect("realize", self.__on_realize)
+
+    def __on_realize(self, widget):
+        self.reset()
 
     def __error_load(self, web_view, load_event, failing_uri, error):
         uri = 'file://' + os.path.join(BASE_PATH, "onerror/onerror.html")
