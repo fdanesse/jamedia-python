@@ -60,23 +60,20 @@ class mpgPipeline(Gst.Pipeline):
         decodebin = Gst.ElementFactory.make("decodebin", "decodebin")
 
         # VIDEO
-        videoqueue = Gst.ElementFactory.make('queue', 'videoqueue')
-        videoqueue.set_property("max-size-buffers", 10000)
-        #videoqueue.set_property("max-size-bytes", 0)
-        #videoqueue.set_property("max-size-time", 0)
-        videoconvert1 = Gst.ElementFactory.make("videoconvert", "videoconvert1")
-        deinterlace = Gst.ElementFactory.make("deinterlace", "deinterlace")
-        deinterlace.set_property("mode", 2)  # disabled
-        videoconvert2 = Gst.ElementFactory.make("videoconvert", "videoconvert2")
+        videoconvert = Gst.ElementFactory.make("videoconvert", "videoconvert")
         #caps = Gst.Caps.from_string('video/x-raw,format=I420,framerate=30/1,width=640,height=480')
         _filter = Gst.ElementFactory.make("capsfilter", "_filter")
         #_filter.set_property("caps", caps)
+        vqueue1 = Gst.ElementFactory.make("queue", "vqueue1")
         mpeg2enc = Gst.ElementFactory.make("mpeg2enc", "mpeg2enc")
-        mpeg2enc.set_property("bufsize", 4000)
+        #mpeg2enc.set_property("bufsize", 4000)
+        vqueue2 = Gst.ElementFactory.make("queue", "vqueue2")
 
         # AUDIO
         audioconvert = Gst.ElementFactory.make("audioconvert", "audioconvert")
+        aqueue1 = Gst.ElementFactory.make("queue", "aqueue1")
         twolamemp2enc = Gst.ElementFactory.make("twolamemp2enc", "twolamemp2enc")
+        aqueue2 = Gst.ElementFactory.make("queue", "aqueue2")
 
         # SALIDA
         mpegpsmux = Gst.ElementFactory.make("mpegpsmux", "mpegpsmux")
@@ -85,33 +82,35 @@ class mpgPipeline(Gst.Pipeline):
         self.add(filesrc)
         self.add(decodebin)
 
-        self.add(videoqueue)
-        self.add(videoconvert1)
-        self.add(deinterlace)
-        self.add(videoconvert2)
+        self.add(videoconvert)
         self.add(_filter)
+        self.add(vqueue1)
         self.add(mpeg2enc)
+        self.add(vqueue2)
 
         self.add(audioconvert)
+        self.add(aqueue1)
         self.add(twolamemp2enc)
+        self.add(aqueue2)
 
         self.add(mpegpsmux)
         self.add(filesink)
 
         filesrc.link(decodebin)
 
-        videoqueue.link(videoconvert1)
-        videoconvert1.link(deinterlace)
-        deinterlace.link(videoconvert2)
-        videoconvert2.link(_filter)
-        _filter.link(mpeg2enc)
-        mpeg2enc.link(mpegpsmux)
+        videoconvert.link(_filter)
+        _filter.link(vqueue1)
+        vqueue1.link(mpeg2enc)
+        mpeg2enc.link(vqueue2)
+        vqueue2.link(mpegpsmux)
         mpegpsmux.link(filesink)
 
-        audioconvert.link(twolamemp2enc)
-        twolamemp2enc.link(mpegpsmux)
+        audioconvert.link(aqueue1)
+        aqueue1.link(twolamemp2enc)
+        twolamemp2enc.link(aqueue2)
+        aqueue2.link(mpegpsmux)
 
-        self.__videoSink = videoqueue.get_static_pad("sink")
+        self.__videoSink = videoconvert.get_static_pad("sink")
         self.__audioSink = audioconvert.get_static_pad("sink")
 
         filesink.set_property("location", self.__newpath)
@@ -164,5 +163,5 @@ class mpgPipeline(Gst.Pipeline):
             print("ERROR:", str(mensaje.parse_error()))
         
     def __del__(self):
-        print("DESTROY OK")
+        print("CODEC PIPELINE DESTROY")
         

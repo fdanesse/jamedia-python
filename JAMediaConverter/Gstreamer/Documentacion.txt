@@ -24,5 +24,14 @@ https://en.wikipedia.org/wiki/Chroma_subsampling
 http://www.cinedigital.tv/que-es-todo-eso-de-444-422-420-o-color-subsampling/
 https://wolfcrow.com/blog/chroma-subsampling-numbers-explained/
 
+ejemplo de streaming en html: https://gist.github.com/vo/a0cc9313861888ad5180f442a4b7bf48
+https://stackoverflow.com/questions/33306265/encode-decode-vp8-or-vp9-with-gstreamer
 
-Prueba sobre video de: 02:32 minutos de duración, demora 0:56:51.877362 minutos en trascodearlo en mpg
+https://github.com/tamaggo/gstreamer-examples/blob/master/test_gst_appsrc_testvideo_mp4mux.py
+
+
+Prueba sobre video de: 02:32 minutos de duración
+    mpg     demora  0:56:51.877362 minutos en trascodearlo con algunos cambios 1:15:03.829964
+    webm    demora  0:20:22.973616
+    Usando uridecodebin:
+    webm    demora  0:12:27.553653

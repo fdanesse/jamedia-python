@@ -58,10 +58,10 @@ class AudioFrame(Gtk.Frame):
             progress.set_show_text(True)
             progress.get_style_context().add_class("convertprogress")
             # http://www.mono-project.com/docs/gui/gtksharp/widgets/packing-with-tables/
-            table.attach(check, 0, 1, row, row+1,
+            table.attach(check, 0, 3, row, row+1,
                 Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
                 Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
-            table.attach(progress, 1, 12, row, row+1,
+            table.attach(progress, 3, 12, row, row+1,
                 Gtk.AttachOptions.FILL | Gtk.AttachOptions.EXPAND,
                 Gtk.AttachOptions.EXPAND, 0, 0)
             row += 1
@@ -72,7 +72,7 @@ class AudioFrame(Gtk.Frame):
         frame.set_label(' Total: ')
         frame.set_shadow_type(Gtk.ShadowType.NONE)
         frame.add(self._progressbar)
-        table.attach(frame, 0, 12, 9, 10,
+        table.attach(frame, 3, 12, 9, 10,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
 
@@ -80,7 +80,23 @@ class AudioFrame(Gtk.Frame):
         self.start.set_css_name('startbutton')
         self.start.set_name('startbutton')
         self.start.set_sensitive(False)
-        table.attach(self.start, 0, 5, 10, 11,
+        table.attach(self.start, 0, 4, 10, 11,
+            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
+            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
+
+        self.pausar = Gtk.Button('Pausar')
+        self.pausar.set_css_name('startbutton')
+        self.pausar.set_name('startbutton')
+        self.pausar.set_sensitive(False)
+        table.attach(self.pausar, 4, 8, 10, 11,
+            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
+            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
+
+        self.cancelar = Gtk.Button('Cancelar')
+        self.cancelar.set_css_name('startbutton')
+        self.cancelar.set_name('startbutton')
+        self.cancelar.set_sensitive(False)
+        table.attach(self.cancelar, 8, 12, 10, 11,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
             Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
 
@@ -117,7 +133,6 @@ class AudioFrame(Gtk.Frame):
 
             tipo = MAGIC.file(self._files[0])
             info = "Contenido del Archivo: %s" % tipo
-            print("Codeando:", codec, tipo, self._files[0])
             self.emit('info', info)
 
             # Evitar sobreescritura de archivo origen. Directorios de origen y destino deben ser distintos
@@ -183,14 +198,14 @@ class AudioFrame(Gtk.Frame):
         if convert:
             index = self._converters.index(convert)
             # Esto no debiera ser necesario
-            convert.disconnect_by_func(self.__updateProgress)
-            convert.disconnect_by_func(self.__error)
-            convert.disconnect_by_func(self.__info)
-            convert.disconnect_by_func(self.__next)
-            convert.stop()
+            # convert.disconnect_by_func(self.__updateProgress)
+            # convert.disconnect_by_func(self.__error)
+            # convert.disconnect_by_func(self.__info)  # FIXME: Actualmente no se emite en pipe, arreglar y acomodar la interfaz
+            # convert.disconnect_by_func(self.__next)
+            # convert.stop()
             # convert = None
             # Esto no debiera ser necesario
-            del(convert)
+            # del(convert)
             self._converters[index] = None
             if any(self._converters): return False  # Esperamos que terminen todos los procesos de este archivo
         # Todas las tareas de este archivo terminaron o fallaron
