@@ -20,7 +20,7 @@ class AudioFrame(Gtk.Frame):
     __gsignals__ = {
         "end": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, []),
         "running": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_STRING, )),
-        "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
+        "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
         "warning": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
         "error": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, (GObject.TYPE_STRING, ))}
 
@@ -122,6 +122,7 @@ class AudioFrame(Gtk.Frame):
 
     def run(self, widget=None):
         # Se ejecuta para iniciar todas las conversiones de cada archivo
+        # FIXME: Seleccionar el archivo en la lista
         self.emit("running", self._files[0])
         self._codecsprogress = {}
         for check in self._checks:

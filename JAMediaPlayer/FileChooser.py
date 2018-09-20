@@ -5,7 +5,7 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 
-from JAMediaPlayer.Globales import get_tube_directory
+from JAMediaPlayer.Globales import YoutubeDir
 
 
 class FileChooser(Gtk.FileChooserWidget):
@@ -47,8 +47,7 @@ class FileChooser(Gtk.FileChooserWidget):
 
     def run(self, path, tipo):
         self.tipo = tipo
-        if not path:
-            path = get_tube_directory()
+        if not path: path = YoutubeDir
         self.set_current_folder_uri("file://%s" % path)
         self.show_all()
         

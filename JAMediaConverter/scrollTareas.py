@@ -100,9 +100,10 @@ class ScrollTareas(Gtk.ScrolledWindow):
         self.set_info_file_in_process(path)
 
     def __new_info(self, widget, info):
-        self.set_info(info)
+        #self.set_info(info)  # FIXME: info es ahora un diccionario
+        print (info)
 
-    def set_info(self, info=''):
+    '''def set_info(self, info=''):
         # FIXME: Cambiar esta etiqueta por elementos que se agreguen en forma separada
         if info:
             if info != self.__infoLabel.get_text():
@@ -110,7 +111,7 @@ class ScrollTareas(Gtk.ScrolledWindow):
             self.__infoFrame.show_all()
         else:
             self.__infoLabel.set_text("")
-            self.__infoFrame.hide()
+            self.__infoFrame.hide()'''
 
     def set_info_file_in_process(self, path=''):
         text = 'No hay tareas pendientes'

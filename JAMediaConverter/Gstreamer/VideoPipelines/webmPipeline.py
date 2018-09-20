@@ -54,7 +54,7 @@ class webmPipeline(Gst.Pipeline):
     __gsignals__ = {
     "progress": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
     "error": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
-    "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
+    "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
     def __init__(self, origen, dirpath_destino):
@@ -81,7 +81,7 @@ class webmPipeline(Gst.Pipeline):
         self.__t2 = None
         self.__timeProcess = None
         self.__informeModel = InformeTranscoderModel(self.__codec + "-" + informeName)
-
+        self.__informeModel.connect("info", self.__emit_info)
         self.__newpath = os.path.join(dirpath_destino, location)
 
         self.__videoSink = None
@@ -89,6 +89,9 @@ class webmPipeline(Gst.Pipeline):
         self.__bus = None
 
         self.__Init()
+
+    def __emit_info(self, informemodel, info):
+        self.emit("info", info)
 
     def __Init(self):
         # ORIGEN (Siempre un archivo)
@@ -171,7 +174,7 @@ class webmPipeline(Gst.Pipeline):
 
             width, height = getSize(currentcaps)
             self.__informeModel.setInfo("relacion", float(width)/float(height))
-
+            if width == 1279: width = 1280  # HACK
             caps = Gst.Caps.from_string('video/x-raw,format=I420,framerate=30/1,width=%s,height=%s' % (width, height))
             _filter = self.get_by_name("_filter")
             _filter.set_property("caps", caps)

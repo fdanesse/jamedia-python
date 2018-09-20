@@ -28,7 +28,7 @@ class Converter(GObject.Object):
     __gsignals__ = {
     "progress": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
     "error": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
-    "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
+    "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
     def __init__(self, origen, codec, dirpath_destino):

@@ -1,30 +1,38 @@
 # -*- coding: utf-8 -*-
 
+import os
+from gi.repository import GObject
 
-class InformeTranscoderModel():
+from JAMediaPlayer.Globales import Reports
+from JAMediaPlayer.Globales import json_file
+
+
+class InformeTranscoderModel(GObject.Object):
+
+    __gsignals__ = {"info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,))}
 
     def __init__(self, filename):
 
-        self.__filename = filename  # codec-archivo.json
-        
+        GObject.Object.__init__(self)
+
+        self.__filename = filename + ".json"
+
         self.__data = {
             'archivo': '',
             'formato inicial': '',
             'entrada de video': '',
             'entrada de sonido': '',
             'codec': '',
-            'duracion': '', #
+            'duracion': '',
             'relacion': '',
             'tiempo de proceso': '',
-            'errores': [],  #
-            'alertas': []   #
+            'errores': ""
         }
 
     def setInfo(self, key, val):
         if key in self.__data.keys():
-            if key == 'errores' or key == 'alertas':
-                self.__data[key].append(val)
-            else:
-                self.__data[key] = val
-            print (self.__data, "\n")
+            self.__data[key] = val
+            self.emit("info", self.__data)
             # FIXME: Guardar cuando todos los campos tengan datos salvo 'tiempo de proceso', 'errores' y 'alertas'
+            filepath = os.path.join(Reports, self.__filename)
+            json_file(filepath, data=self.__data, delay=0.1)

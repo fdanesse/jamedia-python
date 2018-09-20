@@ -10,7 +10,7 @@ import subprocess
 from gi.repository import GLib
 from gi.repository import GObject
 
-from JAMediaPlayer.Globales import get_tube_directory
+from JAMediaPlayer.Globales import YoutubeDir
 
 # STDERR = "/dev/null"
 youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")
@@ -96,7 +96,7 @@ class JAMediaYoutube(GObject.Object):
         self.STDOUT = "/tmp/jamediatube%d" % time.time()
 
         archivo = "%s%s%s" % ("\"", self.titulo, "\"")
-        destino = os.path.join(get_tube_directory(), archivo)
+        destino = os.path.join(YoutubeDir, archivo)
 
         estructura = "python %s %s -i -R %s -f %s --no-part -o %s" % (youtubedl, self.url, 1, CODECS[self.codec][0], destino)
 
