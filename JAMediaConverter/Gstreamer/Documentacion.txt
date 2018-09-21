@@ -35,3 +35,43 @@ Prueba sobre video de: 02:32 minutos de duración
     webm    demora  0:20:22.973616
     Usando uridecodebin:
     webm    demora  0:12:27.553653
+
+
+Ejemplo para obtener toda la estructura a medida que se agregan los elementos:
+self.__playbin = Gst.ElementFactory.make("playbin", "playbin")
+self.__playbin.connect("element-setup", self.__element_setup)
+def __element_setup(self, uno=None, element=None, tres=None):
+    name = ""
+    try:
+        name = element.get_name()
+    except:
+        pass
+    print(name, element)
+
+Obtener las capas actuales:
+def busMessageCb(self, bus, mensaje):
+    if mensaje.type == Gst.MessageType.STATE_CHANGED:
+        old, new, pending = mensaje.parse_state_changed()
+
+        if old == Gst.State.PAUSED and new == Gst.State.PLAYING:
+            if self.__status != new:
+                pad = self.__playbin.emit('get-audio-pad', 0)
+                currentcaps = pad.get_current_caps().to_string()
+                print("*", currentcaps)
+                pad = self.__playbin.emit('get-video-pad', 0)
+                currentcaps = pad.get_current_caps().to_string()
+                print("*", currentcaps)
+
+
+
+from gi.repository import Gst, GstPbutils
+
+def on_discovered(discoverer, ismedia):
+    print("%s -- %s" %( discoverer.tags.get('title', 'Unknown'),
+                        discoverer.tags.get('artist', 'Unknown')))
+
+Gst.init(None)
+location = "file:///srv/Music/molly_hatchet-the_creeper.mp3"
+discoverer = GstPbutils.Discoverer()
+discoverer.discover_uri(location)
+discoverer.connect('discovered', on_discovered)
