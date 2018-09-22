@@ -75,3 +75,7 @@ location = "file:///srv/Music/molly_hatchet-the_creeper.mp3"
 discoverer = GstPbutils.Discoverer()
 discoverer.discover_uri(location)
 discoverer.connect('discovered', on_discovered)
+
+
+
+gst-launch-1.0 uridecodebin name=dec uri=$(/usr/local/bin/youtube-dl -g -f 18 1DhA69K3fZ4)  ! queue ! autoaudiosink dec. ! queue  ! videoscale ! video/x-raw-yuv,width=1024,height=768 ! autovideosink

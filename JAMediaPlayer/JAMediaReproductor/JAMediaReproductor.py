@@ -230,10 +230,10 @@ class JAMediaReproductor(GObject.Object):
         if self.__pipe:
             self.__pipe.set_state(Gst.State.PLAYING)
             
-            self.__pipe.get_state(5000000000) 
+            '''self.__pipe.get_state(5000000000) 
             pad = self.__pipe.emit('get-video-pad',0) 
-            caps = pad.get_current_caps() 
-            print("CAPS:", caps.to_string()) 
+            caps = pad.get_current_caps() # FIXME: Archivos de audio: AttributeError: 'NoneType' object has no attribute 'get_current_caps'
+            print("CAPS:", caps.to_string()) '''
 
     def pause_play(self):
         if self.__status == Gst.State.PAUSED \

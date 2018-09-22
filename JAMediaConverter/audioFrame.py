@@ -169,7 +169,7 @@ class AudioFrame(Gtk.Frame):
                     convert.play()
         
     def __updateProgress(self, convert, val1, codec):
-        Gdk.threads_enter()
+        #Gdk.threads_enter()
         self._codecsprogress[codec] = val1
         progreso = 0
         for _val in self._codecsprogress.values():
@@ -180,7 +180,7 @@ class AudioFrame(Gtk.Frame):
         val2 = (totalterminado * 100.0 / totalesperado ) / 100.0
         self._progress[codec].set_fraction(float(val1/100.0))
         self._progressbar.set_fraction(val2)
-        Gdk.threads_leave()
+        #Gdk.threads_leave()
 
     def __error(self, convert, error):
         if os.path.exists(convert._newpath):
@@ -199,14 +199,12 @@ class AudioFrame(Gtk.Frame):
         if convert:
             index = self._converters.index(convert)
             # Esto no debiera ser necesario
-            # convert.disconnect_by_func(self.__updateProgress)
-            # convert.disconnect_by_func(self.__error)
-            # convert.disconnect_by_func(self.__info)  # FIXME: Actualmente no se emite en pipe, arreglar y acomodar la interfaz
-            # convert.disconnect_by_func(self.__next)
-            # convert.stop()
-            # convert = None
+            '''self._converters[index].disconnect_by_func(self.__updateProgress)
+            self._converters[index].disconnect_by_func(self.__error)
+            self._converters[index].disconnect_by_func(self.__info)  # FIXME: Actualmente no se emite en pipe, arreglar y acomodar la interfaz
+            self._converters[index].disconnect_by_func(self.__next)
             # Esto no debiera ser necesario
-            # del(convert)
+            del(self._converters[index])'''
             self._converters[index] = None
             if any(self._converters): return False  # Esperamos que terminen todos los procesos de este archivo
         # Todas las tareas de este archivo terminaron o fallaron

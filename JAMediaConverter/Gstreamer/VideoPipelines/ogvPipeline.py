@@ -16,15 +16,15 @@ from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import Inf
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
 
-# FIXME: Suele suceder que no graba el video, solo una pantalla verde.
+# FIXME: Suele suceder que no graba el video, solo una pantalla verde. No graba el audio
 '''
-               / queue | videoconvert | videorate | videoscale | capsfilter | vp8enc
-uridecodebin --                                                                      \-- multiqueue | webmmux | filesink
+               / queue | videoconvert | videorate | videoscale | capsfilter | theoraenc
+uridecodebin --                                                                      \-- multiqueue | oggmux | filesink
                \ audioconvert | audioresample | audiorate | vorbisenc ---------------/
 '''
 
 
-class webmPipeline(Gst.Pipeline):
+class ogvPipeline(Gst.Pipeline):
 
     __gsignals__ = {
     "progress": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
@@ -33,10 +33,10 @@ class webmPipeline(Gst.Pipeline):
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
     def __init__(self, origen, dirpath_destino):
-        Gst.Pipeline.__init__(self, "webmPipeline")
+        Gst.Pipeline.__init__(self, "ogvPipeline")
 
         self.__controller = None
-        self.__codec = "webm"
+        self.__codec = "ogv"
         self.__origen = origen
         self.__duration = 0
         self.__position = 0
@@ -84,10 +84,8 @@ class webmPipeline(Gst.Pipeline):
         capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
         #capsfilter.set_property("caps", caps)
 
-        vp8enc = Gst.ElementFactory.make("vp8enc", "vp8enc")
-        vp8enc.set_property("threads", 1)
-        vp8enc.set_property("cq-level", 63)
-        vp8enc.set_property("cpu-used", 0)
+        theoraenc = Gst.ElementFactory.make('theoraenc', 'theoraenc')
+        theoraenc.set_property("quality", 63)
 
         # AUDIO
         audioconvert = Gst.ElementFactory.make("audioconvert", "audioconvert")
@@ -98,7 +96,7 @@ class webmPipeline(Gst.Pipeline):
 
         # SALIDA
         multiqueue = Gst.ElementFactory.make("multiqueue", "multiqueue")
-        webmmux = Gst.ElementFactory.make("webmmux", "webmmux")
+        oggmux = Gst.ElementFactory.make("oggmux", "oggmux")
         filesink = Gst.ElementFactory.make("filesink", "filesink")
 
         self.add(uridecodebin)
@@ -108,7 +106,7 @@ class webmPipeline(Gst.Pipeline):
         self.add(videorate)
         self.add(videoscale)
         self.add(capsfilter)
-        self.add(vp8enc)
+        self.add(theoraenc)
 
         self.add(audioconvert)
         self.add(audioresample)
@@ -116,23 +114,23 @@ class webmPipeline(Gst.Pipeline):
         self.add(vorbisenc)
 
         self.add(multiqueue)
-        self.add(webmmux)
+        self.add(oggmux)
         self.add(filesink)
 
         vqueue.link(videoconvert)
         videoconvert.link(videorate)
         videorate.link(videoscale)
         videoscale.link(capsfilter)
-        capsfilter.link(vp8enc)
-        vp8enc.link(multiqueue)
+        capsfilter.link(theoraenc)
+        theoraenc.link(multiqueue)
 
         audioconvert.link(audioresample)
         audioresample.link(audiorate)
         audiorate.link(vorbisenc)
         vorbisenc.link(multiqueue)
 
-        multiqueue.link(webmmux)
-        webmmux.link(filesink)
+        multiqueue.link(oggmux)
+        oggmux.link(filesink)
 
         self.__videoSink = vqueue.get_static_pad("sink")
         self.__audioSink = audioconvert.get_static_pad("sink")
@@ -153,18 +151,8 @@ class webmPipeline(Gst.Pipeline):
         print(message.type)'''
 
     def __on_pad_added(self, uridecodebin, pad):
-        # FIXME: 1279 * 720 **ERROR: [python3] horizontal_size must be a even (4:2:0 / 4:2:2)
-        #   https://en.wikipedia.org/wiki/Chroma_subsampling
-        #   http://www.cinedigital.tv/que-es-todo-eso-de-444-422-420-o-color-subsampling/
-        # Necesitamos la resolucion del video para las capas del filtro porque hay un bug en la negociación automática de gstreamer
-        # De no ser por este bug ni siquiera se necesitaría el filtro
-        # En el caso analizado, se recibe: width=(int)1279, height=(int)720
-        # Pero se corrige al cambiar el ancho por 1280
-        # Lo cual es: Maximal output width of 1280 horizontal pixels - De-Interlacing and YUV 4:2:2 to 4:2:0 Conversion Algorithm
         tpl_property = pad.get_property("template")  # https://lazka.github.io/pgi-docs/Gst-1.0/classes/PadTemplate.html
-        #tpl_name = tpl_property.name_template
         currentcaps = pad.get_current_caps().to_string()
-        #print ("Template: %s => %s" % (tpl_name, currentcaps))
         if currentcaps.startswith('video/'):
             self.__informeModel.setInfo("archivo", self.__origen)
             self.__informeModel.setInfo("codec",self.__codec)
@@ -174,7 +162,7 @@ class webmPipeline(Gst.Pipeline):
             width, height = getSize(currentcaps)
             self.__informeModel.setInfo("relacion", float(width)/float(height))
             if width == 1279: width = 1280  # HACK
-            caps = Gst.Caps.from_string('video/x-raw,framerate=30/1,width=%s,height=%s' % (width, height))  #format=I420,
+            caps = Gst.Caps.from_string('video/x-raw,framerate=30/1,width=%s,height=%s' % (width, height))
             capsfilter = self.get_by_name("capsfilter")
             capsfilter.set_property("caps", caps)
 

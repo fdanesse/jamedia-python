@@ -7,144 +7,163 @@ import gi
 gi.require_version("Gst", "1.0")
 gi.require_version("GstVideo", "1.0")
 
+from gi.repository import GObject
 from gi.repository import Gst
 from gi.repository import GstVideo
+from gi.repository import GLib
+from JAMediaPlayer.Globales import MAGIC
+from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
+from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
 
-def getSize(currentcaps):
-    # video/x-raw(memory:VASurface), format=(string)NV12, width=(int)1279, height=(int)720, framerate=(fraction)30/1, interlace-mode=(string)progressive, pixel-aspect-ratio=(fraction)1/1
-    items = currentcaps.split(",")
-    width = 0
-    height = 0
-    for item in items:
-        if "width" in item:
-            if ")" in item:
-                width = item.split(")")[-1]
-        elif "height" in item:
-            if ")" in item:
-                height = item.split(")")[-1]
-        if width and height: continue
-    rels = [1.7777777777777777, 1.3333333333333333]
-    rel = float(width)/float(height)
-    if rel not in rels:
-        print ("REL:", rel) # width = float(height) # usar el mas cercano de los dos
-    return width, height
+# FIXME: El rendimiento es inaceptable y se produce el error: **ERROR: [python3] horizontal_size must be a even (4:2:0 / 4:2:2)
+
+'''
+               / queue | videoconvert | videorate | videoscale | capsfilter | mpeg2enc
+uridecodebin --                                                                      \-- multiqueue | mpegpsmux | filesink
+               \ audioconvert | audioresample | audiorate | twolamemp2enc -----------/
+'''
 
 
 class mpgPipeline(Gst.Pipeline):
 
+    __gsignals__ = {
+    "progress": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
+    "error": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
+    "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
+    "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
+
     def __init__(self, origen, dirpath_destino):
         Gst.Pipeline.__init__(self, "mpgPipeline")
 
-        self.set_name("mpgPipeline")
-
+        self.__controller = None
         self.__codec = "mpg"
         self.__origen = origen
-        self.__status = Gst.State.NULL
-        self.__t1 = None
-        self.__t2 = None
-        self.timeProcess = None
+        self.__duration = 0
+        self.__position = 0
 
         # FIXME: Implementar limpieza del nombre del archivo
         location = os.path.basename(self.__origen)
+        informeName = self.__origen
         if "." in location:
             extension = ".%s" % self.__origen.split(".")[-1]
+            informeName = location.replace(extension, "")
             location = location.replace(extension, ".%s" % self.__codec)
         else:
             location = "%s.%s" % (location, self.__codec)
 
+        self.__tipo = MAGIC.file(origen)
+        self.__status = Gst.State.NULL
+        self.__t1 = None
+        self.__t2 = None
+        self.__timeProcess = None
+        self.__informeModel = InformeTranscoderModel(self.__codec + "-" + informeName)
+        self.__informeModel.connect("info", self.__emit_info)
         self.__newpath = os.path.join(dirpath_destino, location)
 
+        self.__videoSink = None
+        self.__audioSink = None
+        self.__bus = None
+
+        self.__Init()
+
+    def __emit_info(self, informemodel, info):
+        self.emit("info", info)
+
+    def __Init(self):
         # ORIGEN (Siempre un archivo)
-        filesrc = Gst.ElementFactory.make("filesrc", "filesrc")
-        decodebin = Gst.ElementFactory.make("decodebin", "decodebin")
+        uridecodebin = Gst.ElementFactory.make("uridecodebin", "uridecodebin")
 
         # VIDEO
+        vqueue = Gst.ElementFactory.make("queue", "vqueue")
         videoconvert = Gst.ElementFactory.make("videoconvert", "videoconvert")
-        #caps = Gst.Caps.from_string('video/x-raw,format=I420,framerate=30/1,width=640,height=480')
-        _filter = Gst.ElementFactory.make("capsfilter", "_filter")
-        #_filter.set_property("caps", caps)
-        vqueue1 = Gst.ElementFactory.make("queue", "vqueue1")
+        videorate = Gst.ElementFactory.make("videorate", "videorate")
+        videorate.set_property("drop-only", True)
+        videorate.set_property("max-rate", 30)
+        videoscale = Gst.ElementFactory.make("videoscale", "videoscale")
+        #caps = Gst.Caps.from_string('video/x-raw,format=(string)I420')
+        capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
+        #capsfilter.set_property("caps", caps)
         mpeg2enc = Gst.ElementFactory.make("mpeg2enc", "mpeg2enc")
         #mpeg2enc.set_property("bufsize", 4000)
-        vqueue2 = Gst.ElementFactory.make("queue", "vqueue2")
 
         # AUDIO
         audioconvert = Gst.ElementFactory.make("audioconvert", "audioconvert")
-        aqueue1 = Gst.ElementFactory.make("queue", "aqueue1")
+        audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
+        audioresample.set_property("quality", 10)
+        audiorate = Gst.ElementFactory.make('audiorate', "audiorate")
         twolamemp2enc = Gst.ElementFactory.make("twolamemp2enc", "twolamemp2enc")
-        aqueue2 = Gst.ElementFactory.make("queue", "aqueue2")
 
         # SALIDA
+        multiqueue = Gst.ElementFactory.make("multiqueue", "multiqueue")
         mpegpsmux = Gst.ElementFactory.make("mpegpsmux", "mpegpsmux")
         filesink = Gst.ElementFactory.make("filesink", "filesink")
 
-        self.add(filesrc)
-        self.add(decodebin)
+        self.add(uridecodebin)
 
+        self.add(vqueue)
         self.add(videoconvert)
-        self.add(_filter)
-        self.add(vqueue1)
+        self.add(videorate)
+        self.add(videoscale)
+        self.add(capsfilter)
         self.add(mpeg2enc)
-        self.add(vqueue2)
 
         self.add(audioconvert)
-        self.add(aqueue1)
+        self.add(audioresample)
+        self.add(audiorate)
         self.add(twolamemp2enc)
-        self.add(aqueue2)
 
+        self.add(multiqueue)
         self.add(mpegpsmux)
         self.add(filesink)
 
-        filesrc.link(decodebin)
+        vqueue.link(videoconvert)
+        videoconvert.link(videorate)
+        videorate.link(videoscale)
+        videoscale.link(capsfilter)
+        capsfilter.link(mpeg2enc)
+        mpeg2enc.link(multiqueue)
 
-        videoconvert.link(_filter)
-        _filter.link(vqueue1)
-        vqueue1.link(mpeg2enc)
-        mpeg2enc.link(vqueue2)
-        vqueue2.link(mpegpsmux)
+        multiqueue.link(mpegpsmux)
         mpegpsmux.link(filesink)
 
-        audioconvert.link(aqueue1)
-        aqueue1.link(twolamemp2enc)
-        twolamemp2enc.link(aqueue2)
-        aqueue2.link(mpegpsmux)
+        audioconvert.link(audioresample)
+        audioresample.link(audiorate)
+        audiorate.link(twolamemp2enc)
+        twolamemp2enc.link(multiqueue)
 
-        self.__videoSink = videoconvert.get_static_pad("sink")
+        self.__videoSink = vqueue.get_static_pad("sink")
         self.__audioSink = audioconvert.get_static_pad("sink")
 
         filesink.set_property("location", self.__newpath)
-        filesrc.set_property("location", self.__origen)
-        # FIXME: Agregar informe en
-        decodebin.connect('pad-added', self.__on_pad_added)
+        uridecodebin.set_property("uri", Gst.filename_to_uri(self.__origen))
+        uridecodebin.connect('pad-added', self.__on_pad_added)
 
-        self._bus = self.get_bus()
-        self._bus.add_signal_watch()
-        self._bus.connect("message", self.busMessageCb)
-
-    def getSinks(self):
-        return self.get_by_name("decodebin"), self.__videoSink, self.__audioSink
+        self.__bus = self.get_bus()
+        self.__bus.add_signal_watch()
+        self.__bus.connect("message", self.busMessageCb)
 
     def __on_pad_added(self, uridecodebin, pad):
-        # Necesitamos la resolucion del video para las capas del filtro porque hay un bug en la negociación automática de gstreamer
-        # De no ser por este bug ni siquiera se necesitaría el filtro
-        # En el caso analizado, se recibe: width=(int)1279, height=(int)720
-        # Pero se corrige al cambiar el ancho por 1280
-        # Lo cual es: Maximal output width of 1280 horizontal pixels - De-Interlacing and YUV 4:2:2 to 4:2:0 Conversion Algorithm
         tpl_property = pad.get_property("template")  # https://lazka.github.io/pgi-docs/Gst-1.0/classes/PadTemplate.html
-        tpl_name = tpl_property.name_template
         currentcaps = pad.get_current_caps().to_string()
-        print ("Template: %s => %s" % (tpl_name, currentcaps))
         if currentcaps.startswith('video/'):
+            self.__informeModel.setInfo("archivo", self.__origen)
+            self.__informeModel.setInfo("codec",self.__codec)
+            self.__informeModel.setInfo("formato inicial", self.__tipo)
+            self.__informeModel.setInfo("entrada de video", currentcaps)           
+
             width, height = getSize(currentcaps)
-            # FIXME: 1279 * 720 **ERROR: [python3] horizontal_size must be a even (4:2:0 / 4:2:2)
-            # https://en.wikipedia.org/wiki/Chroma_subsampling
-            # http://www.cinedigital.tv/que-es-todo-eso-de-444-422-420-o-color-subsampling/
-            print ("SIZE:", width, height)
-            width = 1280
+            self.__informeModel.setInfo("relacion", float(width)/float(height))
+            if width == 1279: width = 1280  # HACK
             caps = Gst.Caps.from_string('video/x-raw,format=I420,framerate=30/1,width=%s,height=%s' % (width, height))
-            _filter = self.get_by_name("_filter")
-            _filter.set_property("caps", caps)
+            capsfilter = self.get_by_name("capsfilter")
+            capsfilter.set_property("caps", caps)
+
+            pad.link(self.__videoSink)
+
+        elif currentcaps.startswith('audio/'):
+            self.__informeModel.setInfo("entrada de sonido", currentcaps)
+            pad.link(self.__audioSink)
 
     def busMessageCb(self, bus, mensaje):
         if mensaje.type == Gst.MessageType.STATE_CHANGED:
@@ -156,12 +175,51 @@ class mpgPipeline(Gst.Pipeline):
 
         elif mensaje.type == Gst.MessageType.EOS:
             self.__t2 = datetime.datetime.now()
-            self.timeProcess = self.__t2 - self.__t1
-            print("END:", str(self.timeProcess))
+            self.__timeProcess = self.__t2 - self.__t1
+            self.__informeModel.setInfo('tiempo de proceso', str(self.__timeProcess))
+            self.stop()
+            self.emit("end")
 
         elif mensaje.type == Gst.MessageType.ERROR:
-            print("ERROR:", str(mensaje.parse_error()))
+            self.__informeModel.setInfo('errores', str(mensaje.parse_error()))
+            self.stop()
+            self.emit("error", "ERROR en: " + self.__newpath + ' => ' + str(mensaje.parse_error()))
         
     def __del__(self):
         print("CODEC PIPELINE DESTROY")
-        
+
+    def stop(self):
+        self.__new_handle(False)
+        self.set_state(Gst.State.NULL)
+        if self.__bus:
+            self.__bus.disconnect_by_func(self.busMessageCb)
+            self.__bus.remove_signal_watch()
+            self.__bus = None
+
+    def play(self):
+        self.set_state(Gst.State.PLAYING)
+        self.__new_handle(True)
+
+    def __new_handle(self, reset):
+        if self.__controller:
+            GLib.source_remove(self.__controller)
+            self.__controller = False
+        if reset:
+            self.__controller = GLib.timeout_add(300, self.__handle)
+
+    def __handle(self):
+        bool1, valor1 = self.query_duration(Gst.Format.TIME)
+        if self.__duration != valor1:
+            self.__duration = valor1
+            self.__informeModel.setInfo("duracion", "{0}".format(format_ns(self.__duration)))
+
+        bool2, valor2 = self.query_position(Gst.Format.TIME)
+        pos = 0
+        try:
+            pos = int(float(valor2) * 100 / float(valor1))
+        except:
+            pass
+        if pos != self.__position:
+            self.__position = pos
+            self.emit("progress", self.__position, self.__codec)
+        return True
