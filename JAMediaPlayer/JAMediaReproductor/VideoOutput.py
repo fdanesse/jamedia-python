@@ -32,7 +32,7 @@ class VideoOutput(Gst.Pipeline):
         # self.__subtitleoverlay = Gst.ElementFactory.make('subtitleoverlay', 'subtitleoverlay')
 
         self.__videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
-        caps = Gst.Caps.from_string('video/x-raw,pixel-aspect-ratio=1/1')
+        caps = Gst.Caps.from_string('video/x-raw,pixel-aspect-ratio=1/1')  # Corrige un BUG: http://gstreamer-devel.966125.n4.nabble.com/master-vs-1-5-1-changing-video-size-on-compositor-input-td4673354.html
         self.__capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
         self.__capsfilter.set_property("caps", caps)
         self.__videorate = Gst.ElementFactory.make('videorate', 'videorate')

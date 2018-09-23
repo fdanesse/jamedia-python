@@ -55,7 +55,7 @@ class JAMediaReproductor(GObject.Object):
             'hue': 0.0,
             'gamma': 1.0,
             'rotacion': 0,
-            'volumen': 1.0
+            'volumen': 0.1
             }
 
         self.__tipo = None
@@ -104,7 +104,6 @@ class JAMediaReproductor(GObject.Object):
             if old == Gst.State.PAUSED and new == Gst.State.PLAYING:
                 if self.__status != new:
                     self.__status = new
-                    print(self.__config['rotacion'])
                     self.__autoSet()
                     self.emit("estado", "playing")
                     self.__new_handle(True)
@@ -263,8 +262,8 @@ class JAMediaReproductor(GObject.Object):
         self.__config['rotacion'] = rot
 
     def set_volumen(self, valor):
-        # recibe de 1.0 a 10.0
-        self.__config['volumen'] = float(valor)  # float(valor/10.0) # FIXME: Con valores sin modificar, en mis parlantes satura mucho por encima de 5.0
+        # recibe de 0.0 a 1.0
+        self.__config['volumen'] = valor*10.0
         self.__pipe.set_property('volume', self.__config['volumen'])
 
     def set_position(self, posicion):
