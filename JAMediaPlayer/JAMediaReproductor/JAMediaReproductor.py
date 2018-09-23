@@ -10,19 +10,15 @@ gi.require_version('GstVideo', '1.0')
 
 from gi.repository import GObject
 from gi.repository import GLib
-# from gi.repository import Pango
 from gi.repository import Gst
 from gi.repository import GstVideo
 
+from JAMediaPlayer.Globales import MAGIC
+from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
+from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
-def format_ns(ns):
-    s, ns = divmod(ns, 1000000000)
-    m, s = divmod(s, 60)
-    h, m = divmod(m, 60)
-    if not h:
-        return "%02u:%02u" % (m, s)
-    else:
-        return "%02u:%02u:%02u" % (h, m, s)
+GObject.threads_init()
+Gst.init("--opengl-hwdec-interop=vaapi-glx")
 
 
 class JAMediaReproductor(GObject.Object):
@@ -32,6 +28,7 @@ class JAMediaReproductor(GObject.Object):
     "estado": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
     "newposicion": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
     "video": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_BOOLEAN,)),
+    "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,))
     }
 
     # Estados: playing, paused, None
@@ -59,6 +56,10 @@ class JAMediaReproductor(GObject.Object):
             'volumen': 1.0
             }
         self.__config = self.__config_default.copy()
+
+        self.__tipo = None
+        self.__informeModel = None  # InformeTranscoderModel("PLAYER" + "-" + informeName)
+        # self.__informeModel.connect("info", self.__emit_info)
 
         self.__pipe = None
         self.__videoBin = None
@@ -146,6 +147,12 @@ class JAMediaReproductor(GObject.Object):
         self.__bus.add_signal_watch()
         self.__bus.connect("message", self.__sync_message)
 
+    def __del__(self):
+        print("PLAYER DESTROY")
+
+    def __emit_info(self, informemodel, info):
+        self.emit("info", info)  # FIXME: señal actualmente no conectada
+
     def __sync_message(self, bus, mensaje):
         if mensaje.type == Gst.MessageType.STATE_CHANGED:
             old, new, pending = mensaje.parse_state_changed()
@@ -168,23 +175,28 @@ class JAMediaReproductor(GObject.Object):
                 if self.__status != new:
                     self.__status = new
                     self.emit("estado", "paused")
-                    self.__new_handle(False)                
+                    self.__new_handle(False)           
+
         elif mensaje.type == Gst.MessageType.TAG:
             if 'video-codec' in mensaje.parse_tag().to_string():
                 if self.__hasVideo == False or self.__hasVideo == None:
                     self.__hasVideo = True
                     self.emit("video", True)
+
         elif mensaje.type == Gst.MessageType.LATENCY:
             # http://cgit.collabora.com/git/farstream.git/tree/examples/gui/fs-gui.py
             self.__pipe.recalculate_latency()
+
         elif mensaje.type == Gst.MessageType.DURATION_CHANGED:
             bool1, self.__duration = self.__pipe.query_duration(Gst.Format.TIME)
             bool2, self.__position = self.__pipe.query_position(Gst.Format.TIME)
+
         elif mensaje.type == Gst.MessageType.EOS:
             self.__new_handle(False)
             self.emit("endfile")
+
         elif mensaje.type == Gst.MessageType.ERROR:
-            print ("\nGst.MessageType.ERROR:", mensaje.parse_error())
+            self.__informeModel.setInfo('errores', str(mensaje.parse_error()))
             self.__new_handle(False)
 
     def __new_handle(self, reset):
@@ -229,11 +241,18 @@ class JAMediaReproductor(GObject.Object):
     def __play(self):
         if self.__pipe:
             self.__pipe.set_state(Gst.State.PLAYING)
-            
-            '''self.__pipe.get_state(5000000000) 
+            '''self.__pipe.get_state(1000)  # FIXME: Mover todo esto de aquí
             pad = self.__pipe.emit('get-video-pad',0) 
-            caps = pad.get_current_caps() # FIXME: Archivos de audio: AttributeError: 'NoneType' object has no attribute 'get_current_caps'
-            print("CAPS:", caps.to_string()) '''
+            if pad:
+                currentcaps = pad.get_current_caps().to_string()
+                if currentcaps.startswith('video/'):
+                    self.__informeModel.setInfo("archivo", self.__source)
+                    self.__informeModel.setInfo("formato inicial", self.__tipo)
+                    self.__informeModel.setInfo("entrada de video", currentcaps)           
+                    width, height = getSize(currentcaps)
+                    self.__informeModel.setInfo("relacion", float(width)/float(height))
+                elif currentcaps.startswith('audio/'):
+                    self.__informeModel.setInfo("entrada de sonido", currentcaps)'''
 
     def pause_play(self):
         if self.__status == Gst.State.PAUSED \
@@ -320,8 +339,19 @@ class JAMediaReproductor(GObject.Object):
         self.stop()
         self.emit("video", False)
         self.__reset()
+        
         temp = uri
         if os.path.exists(temp):
+            # FIXME: Implementar limpieza del nombre del archivo
+            location = os.path.basename(temp)
+            informeName = temp
+            if "." in location:
+                extension = ".%s" % temp.split(".")[-1]
+                informeName = location.replace(extension, "")
+            self.__informeModel = InformeTranscoderModel("PLAYER" + "-" + informeName)
+            self.__informeModel.connect("info", self.__emit_info)
+                
+            self.__tipo = MAGIC.file(uri)
             temp = Gst.filename_to_uri(uri)
         if Gst.uri_is_valid(temp):
             self.__source = temp

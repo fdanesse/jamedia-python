@@ -86,11 +86,11 @@ class BasePanel(Gtk.HPaned):
     #    self.player.set_subtitulos(path)
 
     def __cargar_reproducir(self, widget, path):
-        #volumen = 1.0
-        #volumen = float("{:.1f}".format(self.izquierda.progress.get_volumen()))
+        volumen = 1.0
+        volumen = float("{:.1f}".format(self.izquierda.progress.get_volumen()))
         self.izquierda.progress.set_sensitive(False)
         self.player.load(path)
-        #self.player.set_volumen(volumen)
+        self.player.set_volumen(volumen)
     
     def __rotar(self, widget, valor):
         if self.player:

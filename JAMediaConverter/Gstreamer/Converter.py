@@ -23,6 +23,9 @@ class Converter(GObject.Object):
 
         self.__configPipe(dirpath_destino)
 
+    def getInfo(self):
+        return self.__codec, self.__origen
+
     def __configPipe(self, dirpath_destino):
         
         # EXTRACCION DE AUDIO
@@ -84,28 +87,18 @@ class Converter(GObject.Object):
         self.emit("progress", val1, codec)
 
     def __error(self, pipe, error):
-        '''self.__pipe.disconnect_by_func(self.__updateProgress)
-        self.__pipe.disconnect_by_func(self.__error)
-        self.__pipe.disconnect_by_func(self.__info)
-        self.__pipe.disconnect_by_func(self.__end)
-        del(self.__pipe)
-        self.__pipe = None'''
+        self.stop()
         self.emit("error", error)
 
     def __info(self, pipe, info):
         self.emit('info', info)
 
     def __end(self, pipe):
-        '''self.__pipe.disconnect_by_func(self.__updateProgress)
-        self.__pipe.disconnect_by_func(self.__error)
-        self.__pipe.disconnect_by_func(self.__info)
-        self.__pipe.disconnect_by_func(self.__end)
-        del(self.__pipe)
-        self.__pipe = None'''
+        self.stop()
         self.emit("end")
 
-    def __del__(self):
-        print("CONVERTER DESTROY")
+    '''def __del__(self):
+        print("CONVERTER DESTROY")'''
 
     def __get_png_out(self):
         pngBin = Gst.Bin()
@@ -125,8 +118,7 @@ class Converter(GObject.Object):
     def play(self):
         self.__pipe.play()
         
-    '''def stop(self):
-        self.__pipe.stop()'''
-
+    def stop(self):
+        self.__pipe.stop()
 
 GObject.type_register(Converter)

@@ -15,6 +15,9 @@ from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
+GObject.threads_init()
+Gst.init("--opengl-hwdec-interop=vaapi-glx")
+
 
 class audioBin1(Gst.Bin):
     def __init__(self, path, codec):
@@ -88,6 +91,7 @@ class audioBin(Gst.Pipeline):
         self.__controller = None
         self.__codec = codec
         self.__origen = origen
+        self.__dirpath_destino = dirpath_destino
         self.__duration = 0
         self.__position = 0
 
@@ -154,21 +158,17 @@ class audioBin(Gst.Pipeline):
             self.stop()
             self.emit("error", "ERROR en: " + self.__newpath + ' => ' + str(mensaje.parse_error()))
         
-    def __del__(self):
-        print("CODEC PIPELINE DESTROY")
+    '''def __del__(self):
+        print("CODEC PIPELINE DESTROY")'''
 
     def stop(self):
         self.__new_handle(False)
         self.set_state(Gst.State.NULL)
-        '''if self.__bus:
-            self.__bus.disconnect_by_func(self.busMessageCb)
-            self.__bus.remove_signal_watch()
-            self.__bus = None'''
 
     def play(self):
         self.__new_handle(True)
         self.set_state(Gst.State.PLAYING)
-        self.get_state(5000000000) 
+        self.get_state(5000000000) # FIXME: Quitar todo esto de aca
         pad = self.__pipe.emit('get-video-pad',0) 
         if pad:
             currentcaps = pad.get_current_caps().to_string()
@@ -205,3 +205,5 @@ class audioBin(Gst.Pipeline):
             self.__position = pos
             self.emit("progress", self.__position, self.__codec)
         return True
+
+GObject.type_register(audioBin)

@@ -101,7 +101,8 @@ class ScrollTareas(Gtk.ScrolledWindow):
 
     def __new_info(self, widget, info):
         #self.set_info(info)  # FIXME: info es ahora un diccionario
-        print (info)
+        #print (info)
+        pass
 
     '''def set_info(self, info=''):
         # FIXME: Cambiar esta etiqueta por elementos que se agreguen en forma separada

@@ -28,6 +28,9 @@ if not os.path.exists(YoutubeDir):
     os.mkdir(YoutubeDir)
     # os.chmod(YoutubeDir, stat.S_IXOTH)
 
+# FIXME: clear Repor path: os.remove(convert._newpath)
+
+
 def json_file(path, data=None, delay=0.1):
     while True:
         try:

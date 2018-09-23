@@ -210,25 +210,16 @@ class webmPipeline(Gst.Pipeline):
     def stop(self):
         self.__new_handle(False)
         self.set_state(Gst.State.NULL)
-        ret = self.get_state(1000)
+        '''ret = self.get_state(1000)
         print("STOP", ret)
         if self.__bus:
             self.__bus.disconnect_by_func(self.busMessageCb)
             self.__bus.remove_signal_watch()
-            self.__bus = None
+            self.__bus = None'''
 
     def play(self):
         self.__new_handle(True)
         self.set_state(Gst.State.PLAYING)
-        ret = self.get_state(1000)
-        print("PLAY", ret)
-        '''
-        if ret == Gst.State.PLAYING:
-            self.__new_handle(True)
-        else:
-            print("PLAY", ret)
-            self.stop()
-            self.emit("end")'''
 
     def __new_handle(self, reset):
         if self.__controller:

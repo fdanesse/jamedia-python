@@ -79,3 +79,24 @@ discoverer.connect('discovered', on_discovered)
 
 
 gst-launch-1.0 uridecodebin name=dec uri=$(/usr/local/bin/youtube-dl -g -f 18 1DhA69K3fZ4)  ! queue ! autoaudiosink dec. ! queue  ! videoscale ! video/x-raw-yuv,width=1024,height=768 ! autovideosink
+
+
+
+Reproducir un video:
+    mpv --hwdec=vaapi Selena_Gomez_-_Back_To_You 
+
+Playing: Selena_Gomez_-_Back_To_You
+ (+) Video --vid=1 (*) (vp8 640x360 23.976fps)
+ (+) Audio --aid=1 (*) (vorbis 2ch 44100Hz)
+mesa: for the -simplifycfg-sink-common option: may only occur zero or one times!
+[vo/opengl/vaapi-egl] vaDeriveImage(): invalid VASurfaceID
+[vo/opengl/vaapi-egl] vaDeriveImage(): invalid VAImageFormat
+[vo/opengl/vaapi-egl] vaDeriveImage(): invalid VAImageFormat
+AO: [pulse] 44100Hz stereo 2ch float
+VO: [opengl] 640x360 yuv420p
+AV: 00:00:27 / 00:04:27 (10%) A-V:  0.000 Dropped: 15
+
+
+LIBGL_DRI3_DISABLE=1
+Reproducir un video solucionando el bug de gstreamer1.0-vaapi:
+mpv --opengl-hwdec-interop=vaapi-glx Selena_Gomez_-_Back_To_You

@@ -338,6 +338,6 @@ class JAMedia(Gtk.Window):
 if __name__ == "__main__":
     GObject.threads_init()
     Gdk.threads_init()
-    Gst.init(None)
+    Gst.init("--opengl-hwdec-interop=vaapi-glx")
     jamedia = JAMedia()
     Gtk.main()
