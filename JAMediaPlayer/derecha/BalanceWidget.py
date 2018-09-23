@@ -41,21 +41,17 @@ class BalanceWidget(Gtk.Table):
         self.__hue.connect('valor',self.__emit_senial, 'hue')
         self.__gamma.connect('valor',self.__emit_senial, 'gamma')
 
+        self.set_balance()
+
     def __emit_senial(self, widget, valor, tipo):
         self.emit('balance-valor', valor, tipo)
 
-    def set_balance(self, brillo=50.0, contraste=50.0,
-        saturacion=50.0, hue=50.0, gamma=10.0):
-        if saturacion != None:
-            self.__saturacion.set_progress(saturacion)
-        if contraste != None:
-            self.__contraste.set_progress(contraste)
-        if brillo != None:
-            self.__brillo.set_progress(brillo)
-        if hue != None:
-            self.__hue.set_progress(hue)
-        if gamma != None:
-            self.__gamma.set_progress(gamma)
+    def set_balance(self, brillo=50.0, contraste=50.0, saturacion=50.0, hue=50.0, gamma=10.0):
+        if saturacion != None: self.__saturacion.set_progress(saturacion)
+        if contraste != None: self.__contraste.set_progress(contraste)
+        if brillo != None: self.__brillo.set_progress(brillo)
+        if hue != None: self.__hue.set_progress(hue)
+        if gamma != None: self.__gamma.set_progress(gamma)
 
 
 class ToolbarcontrolValores(Gtk.Toolbar):

@@ -100,3 +100,14 @@ AV: 00:00:27 / 00:04:27 (10%) A-V:  0.000 Dropped: 15
 LIBGL_DRI3_DISABLE=1
 Reproducir un video solucionando el bug de gstreamer1.0-vaapi:
 mpv --opengl-hwdec-interop=vaapi-glx Selena_Gomez_-_Back_To_You
+
+
+Ver Para utilizar:
+https://docs.python.org/3/py-modindex.html
+
+https://gstreamer.freedesktop.org/documentation/tutorials/basic/media-information-gathering.html
+https://gstreamer.freedesktop.org/documentation/tutorials/basic/short-cutting-the-pipeline.html
+https://markwingerd.wordpress.com/2014/11/19/using-gstreamer-with-python/
+https://gstreamer.freedesktop.org/documentation/tutorials/playback/custom-playbin-sinks.html
+https://gstreamer.freedesktop.org/documentation/design/overview.html#pipeline-clock
+http://gstreamer-devel.966125.n4.nabble.com/master-vs-1-5-1-changing-video-size-on-compositor-input-td4673354.html

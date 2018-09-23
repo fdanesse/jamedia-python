@@ -5,7 +5,6 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 from gi.repository import GLib
-#from gi.repository import GdkX11 # NOTA: Necesario para obtener el id de la ventana
 
 from JAMediaPlayer.izquierda.Izquierda import Izquierda
 from JAMediaPlayer.derecha.Derecha import Derecha
@@ -46,8 +45,7 @@ class BasePanel(Gtk.HPaned):
         self.izquierda.progress.connect("volumen", self.__set_volumen)
 
     def __len_items(self, widget, items):
-        if items == 0 and self.player:
-            self.player.stop()
+        if items == 0 and self.player: self.player.stop()
 
     def __accion_balance(self, widget, valor, prop):
         if prop == "saturacion":
@@ -67,34 +65,29 @@ class BasePanel(Gtk.HPaned):
         elif accion == "siguiente":
             self.derecha.lista.lista.seleccionar_siguiente()
         elif accion == "stop":
-            if self.player:
-                self.player.stop()
+            if self.player: self.player.stop()
         elif accion == "pausa-play":
-            if self.player:
-                self.player.pause_play()
+            if self.player: self.player.pause_play()
 
     def __set_volumen(self, widget, valor):
-        if self.player:
-            self.player.set_volumen(valor)
+        if self.player: self.player.set_volumen(valor)
 
     def __user_set_progress(self, widget, valor):
-        if self.player:
-            self.player.set_position(valor)
+        if self.player: self.player.set_position(valor)
 
     # FIXME: Subtítulos no funcionan
     #def __load_subtitulos(self, widget, path):
     #    self.player.set_subtitulos(path)
 
     def __cargar_reproducir(self, widget, path):
-        volumen = 1.0
-        volumen = float("{:.1f}".format(self.izquierda.progress.get_volumen()))
+        #volumen = 1.0
+        #volumen = float("{:.1f}".format(self.izquierda.progress.get_volumen()))
         self.izquierda.progress.set_sensitive(False)
         self.player.load(path)
-        self.player.set_volumen(volumen)
+        #self.player.set_volumen(volumen)
     
     def __rotar(self, widget, valor):
-        if self.player:
-            self.player.rotar(valor)
+        if self.player: self.player.rotar(valor)
 
     def __set_video(self, widget, valor):
         self.izquierda.toolbar_info.set_video(valor)
@@ -108,24 +101,24 @@ class BasePanel(Gtk.HPaned):
         if "playing" in valor:
             GLib.idle_add(self.derecha.playercontrols.set_playing)
             GLib.idle_add(self.izquierda.progress.set_sensitive, True)
-            GLib.idle_add(self.__update_balance)
+            #GLib.idle_add(self.__update_balance)
         elif "paused" in valor or "None" in valor:
             GLib.idle_add(self.derecha.playercontrols.set_paused)
-            GLib.idle_add(self.__update_balance)
+            #GLib.idle_add(self.__update_balance)
         else:
             print ("Estado del Reproductor desconocido:", valor)
 
+    '''
     def __update_balance(self):
         config = {}
-        if self.player:
-            config = self.player.get_balance()
+        if self.player: config = self.player.get_balance()
         GLib.idle_add(self.derecha.balance.set_balance, 
             brillo=config.get('brillo', 50.0),
             contraste=config.get('contraste', 50.0),
             saturacion=config.get('saturacion', 50.0),
             hue=config.get('hue', 50.0),
             gamma=config.get('gamma', 10.0))
-        return False
+        return False'''
 
     def __endfile(self, widget=None, senial=None):
         GLib.idle_add(self.izquierda.toolbar_info.label.set_text, "00:00 - 00:00")

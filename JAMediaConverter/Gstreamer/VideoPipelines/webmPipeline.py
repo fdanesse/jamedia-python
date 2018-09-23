@@ -15,8 +15,11 @@ from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
+GObject.threads_init()
+Gst.init("--opengl-hwdec-interop=vaapi-glx")
 
-# FIXME: Suele suceder que no graba el video, solo una pantalla verde.
+
+# FIXME: No graba el audio.
 '''
                / queue | videoconvert | videorate | videoscale | capsfilter | vp8enc
 uridecodebin --                                                                      \-- multiqueue | webmmux | filesink
@@ -82,6 +85,7 @@ class webmPipeline(Gst.Pipeline):
         videoscale = Gst.ElementFactory.make("videoscale", "videoscale")
         #caps = Gst.Caps.from_string('video/x-raw,format=(string)I420')
         capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
+        encqueue = Gst.ElementFactory.make("queue", "encqueue")
         #capsfilter.set_property("caps", caps)
 
         vp8enc = Gst.ElementFactory.make("vp8enc", "vp8enc")
@@ -108,6 +112,7 @@ class webmPipeline(Gst.Pipeline):
         self.add(videorate)
         self.add(videoscale)
         self.add(capsfilter)
+        self.add(encqueue)
         self.add(vp8enc)
 
         self.add(audioconvert)
@@ -123,7 +128,8 @@ class webmPipeline(Gst.Pipeline):
         videoconvert.link(videorate)
         videorate.link(videoscale)
         videoscale.link(capsfilter)
-        capsfilter.link(vp8enc)
+        capsfilter.link(encqueue)
+        encqueue.link(vp8enc)
         vp8enc.link(multiqueue)
 
         audioconvert.link(audioresample)
@@ -203,19 +209,10 @@ class webmPipeline(Gst.Pipeline):
             self.__informeModel.setInfo('errores', str(mensaje.parse_error()))
             self.stop()
             self.emit("error", "ERROR en: " + self.__newpath + ' => ' + str(mensaje.parse_error()))
-        
-    def __del__(self):
-        print("CODEC PIPELINE DESTROY")
 
     def stop(self):
         self.__new_handle(False)
         self.set_state(Gst.State.NULL)
-        '''ret = self.get_state(1000)
-        print("STOP", ret)
-        if self.__bus:
-            self.__bus.disconnect_by_func(self.busMessageCb)
-            self.__bus.remove_signal_watch()
-            self.__bus = None'''
 
     def play(self):
         self.__new_handle(True)
