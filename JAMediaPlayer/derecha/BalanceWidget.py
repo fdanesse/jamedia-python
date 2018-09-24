@@ -19,6 +19,7 @@ class BalanceWidget(Gtk.Table):
 
         Gtk.Table.__init__(self, rows=5, columns=1, homogeneous=True)
 
+        # FIXME: Agregar botón reset
         self.__brillo = ToolbarcontrolValores("Brillo")
         self.__contraste = ToolbarcontrolValores("Contraste")
         self.__saturacion = ToolbarcontrolValores("Saturación")

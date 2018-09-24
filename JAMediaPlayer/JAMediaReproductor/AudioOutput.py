@@ -20,29 +20,41 @@ Gst.init("--opengl-hwdec-interop=vaapi-glx")
 
 class AudioOutput(Gst.Pipeline):
 
-    def __init__(self):
+    def __init__(self, config):
 
         Gst.Pipeline.__init__(self, "AudioOutput")
         
+        self.__config = config
+
         self.__audioqueue = Gst.ElementFactory.make('queue', 'audioqueue')
-        self.__equalizer = Gst.ElementFactory.make('equalizer-3bands', 'equalizer')
-        #self.__equalizer.set_property('band1', -24)
-        #self.__equalizer.set_property('band2', -24)
+        self.__equalizer = Gst.ElementFactory.make('equalizer-10bands', 'equalizer')
         self.__audioconvert = Gst.ElementFactory.make('audioconvert', 'audioconvert')
+        self.__audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
+        self.__audioresample.set_property("quality", 10)
+        self.__audiorate = Gst.ElementFactory.make('audiorate', "audiorate")
         self.__audiosink = Gst.ElementFactory.make('autoaudiosink', 'audiosink')
         
         self.add(self.__audioqueue)
         self.add(self.__equalizer)
         self.add(self.__audioconvert)
+        self.add(self.__audioresample)
+        self.add(self.__audiorate)
         self.add(self.__audiosink)
 
         self.__audioqueue.link(self.__equalizer)
         self.__equalizer.link(self.__audioconvert)
-        self.__audioconvert.link(self.__audiosink)
+        self.__audioconvert.link(self.__audioresample)
+        self.__audioresample.link(self.__audiorate)
+        self.__audiorate.link(self.__audiosink)
 
         pad = self.__audioqueue.get_static_pad("sink")
         self.add_pad(Gst.GhostPad.new("sink", pad))
 
+    def setting(self, config):
+        for key in config.keys():
+            if self.__config[key] != config[key]:
+                self.__config[key] = config[key]
+                self.__equalizer.set_property(key, self.__config[key])
 
 '''
 band0               : gain for the frequency band 29 Hz, ranging from -24 dB to +12 dB

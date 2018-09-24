@@ -22,7 +22,6 @@ class VideoOutput(Gst.Pipeline):
 
         Gst.Pipeline.__init__(self, "VideoOutput")
         
-        self.__config = config
         self.__gtkSink = sink
         
         self.__videoqueue = Gst.ElementFactory.make('queue', 'videoqueue')

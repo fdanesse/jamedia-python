@@ -48,23 +48,34 @@ class JAMediaReproductor(GObject.Object):
         self.__duration = 0
         self.__position = 0
 
-        self.__config = {
+        self.__videoconfig = {
             'saturacion': 1.0,
             'contraste': 1.0,
             'brillo': 0.0,
             'hue': 0.0,
             'gamma': 1.0,
             'rotacion': 0,
-            'volumen': 0.1
-            }
+            'volumen': 0.1}
+
+        self.__audioconfig = {
+            'band0': 0,
+            'band1': 0,
+            'band2': 0,
+            'band3': 0,
+            'band4': 0,
+            'band5': 0,
+            'band6': 0,
+            'band7': 0,
+            'band8': 0,
+            'band9': 0}
 
         self.__tipo = None
         self.__informeModel = None  # InformeTranscoderModel("PLAYER" + "-" + informeName)
         # self.__informeModel.connect("info", self.__emit_info)
 
         self.__pipe = None
-        self.__videoBin = VideoOutput(self.__gtkSink, self.__config)
-        self.__audioBin = AudioOutput()
+        self.__videoBin = VideoOutput(self.__gtkSink)
+        self.__audioBin = AudioOutput(dict(self.__audioconfig))
         self.__bus = None
 
     def __reset(self):
@@ -75,10 +86,10 @@ class JAMediaReproductor(GObject.Object):
         self.__duration = 0
         self.__position = 0
 
-        if not self.__videoBin: self.__videoBin = VideoOutput(self.__gtkSink, self.__config)
-        if not self.__audioBin: self.__audioBin = AudioOutput()
+        if not self.__videoBin: self.__videoBin = VideoOutput(self.__gtkSink)
+        if not self.__audioBin: self.__audioBin = AudioOutput(dict(self.__audioconfig))
         self.__pipe = Gst.ElementFactory.make("playbin", "player")
-        self.__pipe.set_property('volume', self.__config['volumen'])
+        self.__pipe.set_property('volume', self.__videoconfig['volumen'])
         self.__pipe.set_property('force-aspect-ratio', True)
         self.__pipe.set_property('video-sink', self.__videoBin)
         self.__pipe.set_property('audio-sink', self.__audioBin)
@@ -107,16 +118,19 @@ class JAMediaReproductor(GObject.Object):
                     self.__autoSet()
                     self.emit("estado", "playing")
                     self.__new_handle(True)
+
             elif old == Gst.State.READY and new == Gst.State.PAUSED:
                 if self.__status != new:
                     self.__status = new
                     self.emit("estado", "paused")
                     self.__new_handle(False)
+
             elif old == Gst.State.READY and new == Gst.State.NULL:
                 if self.__status != new:
                     self.__status = new
                     self.emit("estado", "None")
                     self.__new_handle(False)
+                    
             elif old == Gst.State.PLAYING and new == Gst.State.PAUSED:
                 if self.__status != new:
                     self.__status = new
@@ -216,35 +230,37 @@ class JAMediaReproductor(GObject.Object):
             self.emit("estado", "None")
         
     def __autoSet(self):
-        self.__videoBin.videobalance.set_property('saturation', self.__config['saturacion'])
-        self.__videoBin.videobalance.set_property('contrast', self.__config['contraste'])
-        self.__videoBin.videobalance.set_property('brightness', self.__config['brillo'])
-        self.__videoBin.videobalance.set_property('hue', self.__config['hue'])
-        self.__videoBin.gamma.set_property('gamma', self.__config['gamma'])
-        self.__pipe.set_property('volume', self.__config['volumen'])
-        self.__videoBin.videoflip.set_property('method', self.__config['rotacion'])
+        self.__videoBin.videobalance.set_property('saturation', self.__videoconfig['saturacion'])
+        self.__videoBin.videobalance.set_property('contrast', self.__videoconfig['contraste'])
+        self.__videoBin.videobalance.set_property('brightness', self.__videoconfig['brillo'])
+        self.__videoBin.videobalance.set_property('hue', self.__videoconfig['hue'])
+        self.__videoBin.gamma.set_property('gamma', self.__videoconfig['gamma'])
+        self.__pipe.set_property('volume', self.__videoconfig['volumen'])
+        self.__videoBin.videoflip.set_property('method', self.__videoconfig['rotacion'])
+
+        self.__audioBin.setting(self.__audioconfig)
 
     def set_balance(self, brillo=False, contraste=False, saturacion=False, hue=False, gamma=False):
         if saturacion:
             # Double. Range: 0 - 2 Default: 1
-            self.__config['saturacion'] = 2.0 * saturacion / 100.0
-            self.__videoBin.videobalance.set_property('saturation', self.__config['saturacion'])
+            self.__videoconfig['saturacion'] = 2.0 * saturacion / 100.0
+            self.__videoBin.videobalance.set_property('saturation', self.__videoconfig['saturacion'])
         if contraste:
             # Double. Range: 0 - 2 Default: 1
-            self.__config['contraste'] = 2.0 * contraste / 100.0
-            self.__videoBin.videobalance.set_property('contrast', self.__config['contraste'])
+            self.__videoconfig['contraste'] = 2.0 * contraste / 100.0
+            self.__videoBin.videobalance.set_property('contrast', self.__videoconfig['contraste'])
         if brillo:
             # Double. Range: -1 - 1 Default: 0
-            self.__config['brillo'] = (2.0 * brillo / 100.0) - 1.0
-            self.__videoBin.videobalance.set_property('brightness', self.__config['brillo'])
+            self.__videoconfig['brillo'] = (2.0 * brillo / 100.0) - 1.0
+            self.__videoBin.videobalance.set_property('brightness', self.__videoconfig['brillo'])
         if hue:
             # Double. Range: -1 - 1 Default: 0
-            self.__config['hue'] = (2.0 * hue / 100.0) - 1.0
-            self.__videoBin.videobalance.set_property('hue', self.__config['hue'])
+            self.__videoconfig['hue'] = (2.0 * hue / 100.0) - 1.0
+            self.__videoBin.videobalance.set_property('hue', self.__videoconfig['hue'])
         if gamma:
             # Double. Range: 0,01 - 10 Default: 1
-            self.__config['gamma'] = (10.0 * gamma / 100.0)
-            self.__videoBin.gamma.set_property('gamma', self.__config['gamma'])
+            self.__videoconfig['gamma'] = (10.0 * gamma / 100.0)
+            self.__videoBin.gamma.set_property('gamma', self.__videoconfig['gamma'])
 
     def rotar(self, valor):
         rot = self.__videoBin.videoflip.get_property('method')
@@ -259,12 +275,19 @@ class JAMediaReproductor(GObject.Object):
             else:
                 rot = 3
         self.__videoBin.videoflip.set_property('method', rot)
-        self.__config['rotacion'] = rot
+        self.__videoconfig['rotacion'] = rot
+
+    def set_banda(self, valor, banda):
+        # Convertir a rango -24 - +12 default 0
+        hz = (valor / 100.0 * 36.0) - 24.0
+        if self.__audioconfig[banda] != hz:
+            self.__audioconfig[banda] = hz
+            self.__audioBin.setting(dict(self.__audioconfig))
 
     def set_volumen(self, valor):
         # recibe de 0.0 a 1.0
-        self.__config['volumen'] = valor*10.0
-        self.__pipe.set_property('volume', self.__config['volumen'])
+        self.__videoconfig['volumen'] = float(valor)*10.0
+        self.__pipe.set_property('volume', self.__videoconfig['volumen'])
 
     def set_position(self, posicion):
         posicion = self.__duration * posicion / 100

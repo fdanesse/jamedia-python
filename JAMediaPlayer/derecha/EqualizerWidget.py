@@ -19,49 +19,20 @@ class EqualizerWidget(Gtk.Table):
 
         Gtk.Table.__init__(self, rows=10, columns=1, homogeneous=True)
 
-        self.__banda0 = ToolbarcontrolValores("Banda 0")
-        self.__banda1 = ToolbarcontrolValores("Banda 1")
-        self.__banda2 = ToolbarcontrolValores("Banda 2")
-        self.__banda3 = ToolbarcontrolValores("Banda 3")
-        self.__banda4 = ToolbarcontrolValores("Banda 4")
-        self.__banda5 = ToolbarcontrolValores("Banda 5")
-        self.__banda6 = ToolbarcontrolValores("Banda 6")
-        self.__banda7 = ToolbarcontrolValores("Banda 7")
-        self.__banda8 = ToolbarcontrolValores("Banda 8")
-        self.__banda9 = ToolbarcontrolValores("Banda 9")
-
-        self.attach(self.__banda0, 0, 1, 0, 1)
-        self.attach(self.__banda1, 0, 1, 1, 2)
-        self.attach(self.__banda2, 0, 1, 2, 3)
-        self.attach(self.__banda3, 0, 1, 3, 4)
-        self.attach(self.__banda4, 0, 1, 4, 5)
-        self.attach(self.__banda5, 0, 1, 5, 6)
-        self.attach(self.__banda6, 0, 1, 6, 7)
-        self.attach(self.__banda7, 0, 1, 7, 8)
-        self.attach(self.__banda8, 0, 1, 8, 9)
-        self.attach(self.__banda9, 0, 1, 9, 10)
+        # FIXME: Agregar botón reset
+        self.__bandas = []
+        for x in range(0, 10):
+            banda = ToolbarcontrolValores("Banda " + str(x))
+            banda.set_progress((0+24)*100/36)  # en el reproductor un rango -24 - +12 default 0
+            banda.connect('valor', self.__emit_senial, "band" + str(x))
+            self.attach(banda, 0, 1, x, x+1)
 
         self.show_all()
 
         self.set_size_request(150, -1)
 
-        '''self.__banda1.connect('valor',self.__emit_senial, 'brillo')
-        self.__banda2.connect('valor',self.__emit_senial, 'contraste')
-        self.__banda3.connect('valor',self.__emit_senial, 'saturacion')
-        self.__banda4.connect('valor',self.__emit_senial, 'hue')
-        self.__banda5.connect('valor',self.__emit_senial, 'gamma')'''
-
-        #self.set_equalizer()
-
     def __emit_senial(self, widget, valor, tipo):
         self.emit('equalizer-valor', valor, tipo)
-
-    '''def set_equalizer(self, brillo=50.0, contraste=50.0, saturacion=50.0, hue=50.0):
-        if saturacion != None: self.__banda3.set_progress(saturacion)
-        if contraste != None: self.__banda2.set_progress(contraste)
-        if brillo != None: self.__banda1.set_progress(brillo)
-        if hue != None: self.__banda4.set_progress(hue)
-        if gamma != None: self.__banda5.set_progress(gamma)'''
 
 
 class ToolbarcontrolValores(Gtk.Toolbar):

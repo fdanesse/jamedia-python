@@ -38,6 +38,7 @@ class BasePanel(Gtk.HPaned):
         self.derecha.lista.lista.connect("nueva-seleccion", self.__cargar_reproducir)
         self.derecha.playercontrols.connect("accion-controls", self.__accion_controls)
         self.derecha.balance.connect("balance-valor", self.__accion_balance)
+        self.derecha.equalizer.connect("equalizer-valor", self.__accion_equalizer)
         self.derecha.lista.lista.connect("len_items", self.__len_items)
         # FIXME: Subtítulos no funcionan self.derecha.lista.connect("subtitulos", self.__load_subtitulos)
         self.izquierda.toolbar_info.connect("rotar", self.__rotar)
@@ -46,6 +47,9 @@ class BasePanel(Gtk.HPaned):
 
     def __len_items(self, widget, items):
         if items == 0 and self.player: self.player.stop()
+
+    def __accion_equalizer(self, widget, valor, banda):
+        self.player.set_banda(valor, banda)
 
     def __accion_balance(self, widget, valor, prop):
         if prop == "saturacion":
