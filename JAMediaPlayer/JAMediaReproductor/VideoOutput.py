@@ -18,7 +18,7 @@ Gst.init("--opengl-hwdec-interop=vaapi-glx")
 
 class VideoOutput(Gst.Pipeline):
 
-    def __init__(self, sink, config):
+    def __init__(self, sink):
 
         Gst.Pipeline.__init__(self, "VideoOutput")
         

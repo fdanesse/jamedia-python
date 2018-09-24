@@ -33,6 +33,9 @@ class InformeTranscoderModel(GObject.Object):
         if key in self.__data.keys():
             self.__data[key] = val
             self.emit("info", self.__data)
-            # FIXME: Guardar cuando todos los campos tengan datos salvo 'tiempo de proceso', 'errores' y 'alertas'
-            filepath = os.path.join(Reports, self.__filename)
-            json_file(filepath, data=self.__data, delay=0.1)
+            try:
+                filepath = os.path.join(Reports, self.__filename)
+                json_file(filepath, data=self.__data, delay=0.1)
+            except:
+                pass
+                
