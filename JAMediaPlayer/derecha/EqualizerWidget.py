@@ -17,19 +17,23 @@ class EqualizerWidget(Gtk.Table):
 
     def __init__(self):
 
-        Gtk.Table.__init__(self, rows=10, columns=1, homogeneous=True)
+        Gtk.Table.__init__(self, rows=11, columns=10, homogeneous=True)
 
-        # FIXME: Agregar botón reset
         self.__bandas = []
-        for x in range(0, 10):
-            banda = ToolbarcontrolValores("Banda " + str(x))
+        for row in range(0, 10):
+            banda = ToolbarcontrolValores("Banda " + str(row))
+            banda.get_style_context().add_class("equalizervalue")
             banda.set_progress((0+24)*100/36)  # en el reproductor un rango -24 - +12 default 0
-            banda.connect('valor', self.__emit_senial, "band" + str(x))
-            self.attach(banda, 0, 1, x, x+1)
+            banda.connect('valor', self.__emit_senial, "band" + str(row))
+            self.attach(banda, 0, 10, row, row+1)
+
+        reset = Gtk.Button("Reset")
+        reset.get_style_context().add_class("resetbutton")
+        self.attach(reset, 0, 10, 10, 11)
 
         self.show_all()
 
-        self.set_size_request(150, -1)
+        self.set_size_request(250, -1)
 
     def __emit_senial(self, widget, valor, tipo):
         self.emit('equalizer-valor', valor, tipo)
@@ -46,6 +50,7 @@ class ToolbarcontrolValores(Gtk.Toolbar):
 
         self.__titulo = label
         self.__escala = BarraProgreso()
+        self.__escala.get_style_context().add_class("equalizerscale")
 
         self.__frame = Gtk.Frame()
         self.__frame.set_label(self.__titulo)
@@ -63,6 +68,7 @@ class ToolbarcontrolValores(Gtk.Toolbar):
 
         self.show_all()
 
+        # FIXME: Mejorar esto
         self.__escala.escala.connect("motion-notify-event", self.__user_set_value)
 
     def __user_set_value(self, widget, event):

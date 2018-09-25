@@ -43,7 +43,7 @@ class PlayerList(Gtk.Frame):
         self.add(vbox)
         self.show_all()
 
-        self.set_size_request(150, -1)
+        self.set_size_request(250, -1)
 
         self.toolbar.clearlist.connect("clicked", self.__clearList)
         # FIXME: Subtítulos no funcionan self.toolbar.subtitulos.connect("clicked", self.__cargar_subtitulos)

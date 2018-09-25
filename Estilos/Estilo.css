@@ -20,7 +20,7 @@ window {
     background-image: image(@bg_toolbar1);
     background-color: @bg_toolbar1;
     color: black;
-    font: 10pt "Comic Sans";
+    font: 8pt "Comic Sans";
     font-weight: normal;
 }
 

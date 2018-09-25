@@ -50,9 +50,6 @@ class ProgressPlayer(Gtk.Toolbar):
 
     def __set_volumen(self, widget, valor):
         self.emit('volumen', valor)
-    
-    '''def get_volumen(self):
-        return int(self.__volumen.get_value() * 10)'''
 
     def set_progress(self, valor):
         if not self.__presed:

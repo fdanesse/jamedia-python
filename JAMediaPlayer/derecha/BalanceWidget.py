@@ -17,42 +17,31 @@ class BalanceWidget(Gtk.Table):
 
     def __init__(self):
 
-        Gtk.Table.__init__(self, rows=5, columns=1, homogeneous=True)
+        Gtk.Table.__init__(self, rows=6, columns=10, homogeneous=True)
 
-        # FIXME: Agregar botón reset
-        self.__brillo = ToolbarcontrolValores("Brillo")
-        self.__contraste = ToolbarcontrolValores("Contraste")
-        self.__saturacion = ToolbarcontrolValores("Saturación")
-        self.__hue = ToolbarcontrolValores("Matíz")
-        self.__gamma = ToolbarcontrolValores("Gamma")
+        valores = ["Brillo", "Contraste", "Saturación", "Matíz", "Gamma"]
 
-        self.attach(self.__brillo, 0, 1, 0, 1)
-        self.attach(self.__contraste, 0, 1, 1, 2)
-        self.attach(self.__saturacion, 0, 1, 2, 3)
-        self.attach(self.__hue, 0, 1, 3, 4)
-        self.attach(self.__gamma, 0, 1, 4, 5)
+        for valor in valores:
+            row = valores.index(valor)
+            banda = ToolbarcontrolValores(" %s " % (valor))
+            if valor == "Gamma":
+                banda.set_progress(10.0)
+            else:
+                banda.set_progress(50.0)
+            banda.get_style_context().add_class("equalizervalue")
+            banda.connect('valor', self.__emit_senial, valor.lower())
+            self.attach(banda, 0, 10, row, row+1)
+
+        reset = Gtk.Button("Reset")
+        reset.get_style_context().add_class("resetbutton")
+        self.attach(reset, 0, 10, 5, 6)
 
         self.show_all()
 
-        self.set_size_request(150, -1)
-
-        self.__brillo.connect('valor',self.__emit_senial, 'brillo')
-        self.__contraste.connect('valor',self.__emit_senial, 'contraste')
-        self.__saturacion.connect('valor',self.__emit_senial, 'saturacion')
-        self.__hue.connect('valor',self.__emit_senial, 'hue')
-        self.__gamma.connect('valor',self.__emit_senial, 'gamma')
-
-        self.set_balance()
+        self.set_size_request(250, -1)
 
     def __emit_senial(self, widget, valor, tipo):
         self.emit('balance-valor', valor, tipo)
-
-    def set_balance(self, brillo=50.0, contraste=50.0, saturacion=50.0, hue=50.0, gamma=10.0):
-        if saturacion != None: self.__saturacion.set_progress(saturacion)
-        if contraste != None: self.__contraste.set_progress(contraste)
-        if brillo != None: self.__brillo.set_progress(brillo)
-        if hue != None: self.__hue.set_progress(hue)
-        if gamma != None: self.__gamma.set_progress(gamma)
 
 
 class ToolbarcontrolValores(Gtk.Toolbar):
@@ -66,7 +55,8 @@ class ToolbarcontrolValores(Gtk.Toolbar):
 
         self.__titulo = label
         self.__escala = BarraProgreso()
-
+        self.__escala.get_style_context().add_class("equalizerscale")
+        
         self.__frame = Gtk.Frame()
         self.__frame.set_label(self.__titulo)
         self.__frame.set_label_align(0.5, 1.0)

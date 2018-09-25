@@ -19,6 +19,7 @@ class Derecha(Gtk.VBox):
 
         Gtk.VBox.__init__(self)
 
+        # FIXME: Agregar espacio a la derecha de las barras para mejor uso del scroll
         self.balance = BalanceWidget()
         self.equalizer = EqualizerWidget()
         self.lista = PlayerList()
@@ -26,13 +27,16 @@ class Derecha(Gtk.VBox):
 
         balanceFrame = Gtk.Frame()
         balanceFrame.set_label(" Balance: ")
+        balanceFrame.get_label_widget().get_style_context().add_class('equalizerlabelframe')
         balanceFrame.add(self.balance)
 
         equalizerFrame = Gtk.Frame()
         equalizerFrame.set_label(" Ecualizador: ")
+        equalizerFrame.get_label_widget().get_style_context().add_class('equalizerlabelframe')
         equalizerFrame.add(self.equalizer)
 
         confbox = Gtk.VBox()
+        confbox.get_style_context().add_class("equalizerbox")
         confbox.pack_start(balanceFrame, False, False, 0)
         confbox.pack_start(equalizerFrame, False, False, 10)
 

@@ -52,7 +52,7 @@ class JAMediaPlayer(Gtk.VBox):
 
         self.toolbar.connect("show_config", self.__show_config)
         
-        self.base_panel.player.connect("video", self.__set_video)
+        #self.base_panel.player.connect("video", self.__set_video)
         self.base_panel.izquierda.video_visor.connect("ocultar_controles", self.__show_controls)
         self.base_panel.izquierda.video_visor.connect("button_press_event", self.__set_fullscreen)
         self.base_panel.derecha.lista.toolbar.openfiles.connect("clicked", self.__openfiles, 'load')
@@ -95,16 +95,11 @@ class JAMediaPlayer(Gtk.VBox):
         if event.type.value_name == "GDK_2BUTTON_PRESS":
             GLib.idle_add(self.toolbar.set_full, None)
 
-    def __set_video(self, widget, valor):
-        self.toolbar.configurar.set_active(False)
-        self.toolbar.configurar.set_sensitive(valor)
-
     def __realize(self, window):
         self.__cursor_root = self.get_property("window").get_cursor()
         self.get_property("window").set_cursor(self.__jamedia_cursor)
 
     def __setup_init(self):
-        self.toolbar.configurar.set_sensitive(False)
         self.base_panel.izquierda.setup_init()
         self.base_panel.derecha.setup_init()
         self.__filechooser.hide()
