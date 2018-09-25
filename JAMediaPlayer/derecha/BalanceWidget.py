@@ -21,15 +21,20 @@ class BalanceWidget(Gtk.Table):
 
         valores = ["Brillo", "Contraste", "Saturación", "Matíz", "Gamma"]
 
-        for valor in valores:
-            row = valores.index(valor)
-            banda = ToolbarcontrolValores(" %s " % (valor))
-            if valor == "Gamma":
+        for name in valores:
+            row = valores.index(name)
+            banda = ToolbarcontrolValores(" %s " % (name))
+            if name == "Gamma":
                 banda.set_progress(10.0)
             else:
                 banda.set_progress(50.0)
+            tipo = name
+            if name == "Saturación":
+                tipo = "Saturacion"
+            if name == "Matíz":
+                tipo = "Matiz"
             banda.get_style_context().add_class("equalizervalue")
-            banda.connect('valor', self.__emit_senial, valor.lower())
+            banda.connect('valor', self.__emit_senial, tipo.lower())
             self.attach(banda, 0, 10, row, row+1)
 
         reset = Gtk.Button("Reset")
@@ -54,15 +59,15 @@ class ToolbarcontrolValores(Gtk.Toolbar):
         Gtk.Toolbar.__init__(self)
 
         self.__titulo = label
-        self.__escala = BarraProgreso()
-        self.__escala.get_style_context().add_class("equalizerscale")
+        self.__progressBar = BarraProgreso()
+        self.__progressBar.get_style_context().add_class("equalizerscale")
         
         self.__frame = Gtk.Frame()
         self.__frame.set_label(self.__titulo)
         self.__frame.set_label_align(0.5, 1.0)
 
         event = Gtk.EventBox()
-        event.add(self.__escala)
+        event.add(self.__progressBar)
         self.__frame.add(event)
         self.__frame.show_all()
 
@@ -73,13 +78,19 @@ class ToolbarcontrolValores(Gtk.Toolbar):
 
         self.show_all()
 
-        self.__escala.escala.connect("motion-notify-event", self.__user_set_value)
+        self.__progressBar.escala.connect("change-value", self.__moveSlider)
 
-    def __user_set_value(self, widget, event):
-        valor = self.__escala.escala.get_adjustment().get_value()
-        self.emit("valor", valor)
-        self.__frame.set_label("%s: %s%s" % (self.__titulo, int(valor), "%"))
+    def __moveSlider(self, widget, scroll, value):
+        ret = value
+        if value < 0.0:
+            ret = 0.0
+            self.set_progress(ret)
+        elif value > 100.0:
+            ret = 100.0
+            self.set_progress(ret)
+        self.emit("valor", ret)
+        self.__frame.set_label("%s: %s%s" % (self.__titulo, int(ret), "%"))
 
     def set_progress(self, valor):
-        GLib.idle_add(self.__escala.escala.get_adjustment().set_value, valor)
+        GLib.idle_add(self.__progressBar.escala.get_adjustment().set_value, valor)
         self.__frame.set_label("%s: %s%s" % (self.__titulo, int(valor), "%"))

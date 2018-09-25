@@ -45,6 +45,7 @@ class AudioFrame(Gtk.Frame):
 
         self.set_label(" Elige los formatos de extracción: ")
 
+        # FIXME: Corregir estilo todos los botones iguales
         table = Gtk.Table(rows=11, columns=12, homogeneous=False)
         table.set_col_spacings(0)
         table.set_row_spacing(row=8, spacing=15)

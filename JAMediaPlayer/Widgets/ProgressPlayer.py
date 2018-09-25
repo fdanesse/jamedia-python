@@ -20,7 +20,6 @@ class ProgressPlayer(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.__presed = False
         self.get_style_context().add_class("progressplayer")
 
         self.__progressBar = BarraProgreso()
@@ -41,31 +40,28 @@ class ProgressPlayer(Gtk.Toolbar):
         self.insert(item, -1)
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
-        self.__progressBar.escala.connect("button-press-event", self.__button_press_event)
-        self.__progressBar.escala.connect("button-release-event", self.__button_release_event)
-        self.__progressBar.escala.connect("motion-notify-event", self.__motion_notify_event)
+        self.__progressBar.escala.connect("change-value", self.__moveSlider)
         self.__volumen.connect("value-changed", self.__set_volumen)
-
+        
         self.show_all()
 
+    def __moveSlider(self, widget, scroll, value):
+        ret = value
+        if value < 0.0:
+            ret = 0.0
+            self.set_progress(ret)
+        elif value > 100.0:
+            ret = 100.0
+            self.set_progress(ret)
+        self.emit("seek", ret)
+
     def __set_volumen(self, widget, valor):
+        # valor de 0.0 a 1.0
         self.emit('volumen', valor)
 
     def set_progress(self, valor):
-        if not self.__presed:
-            adj = self.__progressBar.escala.get_adjustment()
-            GLib.idle_add(adj.set_value, valor)
-
-    def __button_press_event(self, widget, event):
-        self.__presed = True
-    
-    def __button_release_event(self, widget, event):
-        self.__presed = False
-
-    def __motion_notify_event(self, widget, event):
-        if self.__presed:
-            adj = self.__progressBar.escala.get_adjustment()
-            self.emit("seek", adj.get_value())
+        adj = self.__progressBar.escala.get_adjustment()
+        GLib.idle_add(adj.set_value, valor)
 
 
 class BarraProgreso(Gtk.EventBox):

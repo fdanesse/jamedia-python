@@ -241,7 +241,7 @@ class JAMediaReproductor(GObject.Object):
             # Double. Range: 0 - 2 Default: 1
             self.__videoconfig['saturacion'] = 2.0 * saturacion / 100.0
             self.__videoBin.videobalance.set_property('saturation', self.__videoconfig['saturacion'])
-        if contraste:
+        elif contraste:
             # Double. Range: 0 - 2 Default: 1
             self.__videoconfig['contraste'] = 2.0 * contraste / 100.0
             self.__videoBin.videobalance.set_property('contrast', self.__videoconfig['contraste'])
@@ -282,7 +282,7 @@ class JAMediaReproductor(GObject.Object):
 
     def set_volumen(self, valor):
         # recibe de 0.0 a 1.0
-        self.__videoconfig['volumen'] = float(valor)*10.0
+        self.__videoconfig['volumen'] = valor # float(valor)*10.0 playbin es de 0.0 a 10.0
         self.__pipe.set_property('volume', self.__videoconfig['volumen'])
 
     def set_position(self, posicion):
