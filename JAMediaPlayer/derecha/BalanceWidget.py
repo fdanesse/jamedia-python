@@ -20,10 +20,11 @@ class BalanceWidget(Gtk.Table):
         Gtk.Table.__init__(self, rows=6, columns=10, homogeneous=True)
 
         valores = ["Brillo", "Contraste", "Saturación", "Matíz", "Gamma"]
-
+        
+        self.__bandas = []
         for name in valores:
             row = valores.index(name)
-            banda = ToolbarcontrolValores(" %s " % (name))
+            banda = ToolbarcontrolValores(name)
             if name == "Gamma":
                 banda.set_progress(10.0)
             else:
@@ -36,8 +37,10 @@ class BalanceWidget(Gtk.Table):
             banda.get_style_context().add_class("equalizervalue")
             banda.connect('valor', self.__emit_senial, tipo.lower())
             self.attach(banda, 0, 10, row, row+1)
+            self.__bandas.append(banda)
 
         reset = Gtk.Button("Reset")
+        reset.connect("clicked", self.__reset)
         reset.get_style_context().add_class("resetbutton")
         self.attach(reset, 0, 10, 5, 6)
 
@@ -47,6 +50,19 @@ class BalanceWidget(Gtk.Table):
 
     def __emit_senial(self, widget, valor, tipo):
         self.emit('balance-valor', valor, tipo)
+
+    def __reset(self, button):
+        for banda in self.__bandas:
+            valor = 50.0
+            if banda.name == "Gamma":
+                valor = 10.0
+            banda.set_progress(valor)
+            tipo = banda.name
+            if banda.name == "Saturación":
+                tipo = "Saturacion"
+            if banda.name == "Matíz":
+                tipo = "Matiz"
+            self.emit('balance-valor', valor, tipo.lower())
 
 
 class ToolbarcontrolValores(Gtk.Toolbar):
@@ -58,16 +74,16 @@ class ToolbarcontrolValores(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.__titulo = label
-        self.__progressBar = BarraProgreso()
-        self.__progressBar.get_style_context().add_class("equalizerscale")
+        self.name = label
+        self.progress = BarraProgreso()
+        self.progress.get_style_context().add_class("equalizerscale")
         
         self.__frame = Gtk.Frame()
-        self.__frame.set_label(self.__titulo)
+        self.__frame.set_label(" %s " % (self.name))
         self.__frame.set_label_align(0.5, 1.0)
 
         event = Gtk.EventBox()
-        event.add(self.__progressBar)
+        event.add(self.progress)
         self.__frame.add(event)
         self.__frame.show_all()
 
@@ -78,7 +94,7 @@ class ToolbarcontrolValores(Gtk.Toolbar):
 
         self.show_all()
 
-        self.__progressBar.escala.connect("change-value", self.__moveSlider)
+        self.progress.escala.connect("change-value", self.__moveSlider)
 
     def __moveSlider(self, widget, scroll, value):
         ret = value
@@ -89,8 +105,8 @@ class ToolbarcontrolValores(Gtk.Toolbar):
             ret = 100.0
             self.set_progress(ret)
         self.emit("valor", ret)
-        self.__frame.set_label("%s: %s%s" % (self.__titulo, int(ret), "%"))
+        self.__frame.set_label("%s: %s%s" % (self.name, int(ret), "%"))
 
     def set_progress(self, valor):
-        GLib.idle_add(self.__progressBar.escala.get_adjustment().set_value, valor)
-        self.__frame.set_label("%s: %s%s" % (self.__titulo, int(valor), "%"))
+        GLib.idle_add(self.progress.escala.get_adjustment().set_value, valor)
+        self.__frame.set_label("%s: %s%s" % (self.name, int(valor), "%"))

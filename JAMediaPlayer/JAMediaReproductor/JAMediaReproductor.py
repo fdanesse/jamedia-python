@@ -51,7 +51,7 @@ class JAMediaReproductor(GObject.Object):
             'saturacion': 1.0,
             'contraste': 1.0,
             'brillo': 0.0,
-            'hue': 0.0,
+            'matiz': 0.0,
             'gamma': 1.0,
             'rotacion': 0,
             'volumen': 0.1}
@@ -230,13 +230,13 @@ class JAMediaReproductor(GObject.Object):
         self.__videoBin.videobalance.set_property('saturation', self.__videoconfig['saturacion'])
         self.__videoBin.videobalance.set_property('contrast', self.__videoconfig['contraste'])
         self.__videoBin.videobalance.set_property('brightness', self.__videoconfig['brillo'])
-        self.__videoBin.videobalance.set_property('hue', self.__videoconfig['hue'])
+        self.__videoBin.videobalance.set_property('hue', self.__videoconfig["matiz"])
         self.__videoBin.gamma.set_property('gamma', self.__videoconfig['gamma'])
         self.__pipe.set_property('volume', self.__videoconfig['volumen'])
         self.__videoBin.videoflip.set_property('method', self.__videoconfig['rotacion'])
         self.__audioBin.setting(self.__audioconfig)
 
-    def set_balance(self, brillo=False, contraste=False, saturacion=False, hue=False, gamma=False):
+    def set_balance(self, brillo=False, contraste=False, saturacion=False, matiz=False, gamma=False):
         if saturacion:
             # Double. Range: 0 - 2 Default: 1
             self.__videoconfig['saturacion'] = 2.0 * saturacion / 100.0
@@ -249,10 +249,10 @@ class JAMediaReproductor(GObject.Object):
             # Double. Range: -1 - 1 Default: 0
             self.__videoconfig['brillo'] = (2.0 * brillo / 100.0) - 1.0
             self.__videoBin.videobalance.set_property('brightness', self.__videoconfig['brillo'])
-        if hue:
+        if matiz:
             # Double. Range: -1 - 1 Default: 0
-            self.__videoconfig['hue'] = (2.0 * hue / 100.0) - 1.0
-            self.__videoBin.videobalance.set_property('hue', self.__videoconfig['hue'])
+            self.__videoconfig["matiz"] = (2.0 * matiz / 100.0) - 1.0
+            self.__videoBin.videobalance.set_property('hue', self.__videoconfig["matiz"])
         if gamma:
             # Double. Range: 0,01 - 10 Default: 1
             self.__videoconfig['gamma'] = (10.0 * gamma / 100.0)

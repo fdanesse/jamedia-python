@@ -58,8 +58,8 @@ class BasePanel(Gtk.HPaned):
             self.player.set_balance(contraste=valor)
         elif prop == "brillo":
             self.player.set_balance(brillo=valor)
-        elif prop == "hue":
-            self.player.set_balance(hue=valor)
+        elif prop == "matiz":
+            self.player.set_balance(matiz=valor)
         elif prop == "gamma":
             self.player.set_balance(gamma=valor)
 

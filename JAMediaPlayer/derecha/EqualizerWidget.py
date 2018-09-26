@@ -27,8 +27,10 @@ class EqualizerWidget(Gtk.Table):
             banda.set_progress((0+24)*100/36)  # en el reproductor un rango -24 - +12 default 0
             banda.connect('valor', self.__emit_senial, "band" + str(row))
             self.attach(banda, 0, 10, row, row+1)
+            self.__bandas.append(banda)
 
         reset = Gtk.Button("Reset")
+        reset.connect("clicked", self.__reset)
         reset.get_style_context().add_class("resetbutton")
         self.attach(reset, 0, 10, 10, 11)
 
@@ -38,3 +40,9 @@ class EqualizerWidget(Gtk.Table):
 
     def __emit_senial(self, widget, valor, tipo):
         self.emit('equalizer-valor', valor, tipo)
+
+    def __reset(self, button):
+        for banda in self.__bandas:
+            banda.set_progress((0+24)*100/36)
+            tipo = banda.name.lower().replace("banda ", "band")
+            self.emit('equalizer-valor', (0+24)*100/36, tipo)
