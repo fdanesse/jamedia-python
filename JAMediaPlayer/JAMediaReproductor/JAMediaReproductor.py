@@ -222,7 +222,7 @@ class JAMediaReproductor(GObject.Object):
         if self.__pipe:  # and (self.__status != Gst.State.NULL and self.__status != Gst.State.PAUSED):
             self.__new_handle(False)
             self.__pipe.set_state(Gst.State.NULL)
-            # FIXME: Porque no se captura en Gst.MessageType.STATE_CHANGED
+            # Porque no se captura en Gst.MessageType.STATE_CHANGED
             self.__status = Gst.State.NULL
             self.emit("estado", "None")
         

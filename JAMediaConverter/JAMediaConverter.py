@@ -59,7 +59,6 @@ class JAMediaConverter(Gtk.VBox):
         GLib.idle_add(self.__setup_init)
 
     def __end_all_process(self, widget):
-        # FIXME: Armar un log ?
         self.__scrollTareas.set_info_file_in_process('')
         # self.__scrollTareas.set_info('') #FIXME: Reset para info de archivo en proceso, hay que cambiarlo
         self.__scrollTareas.selectFolder.set_sensitive(True)

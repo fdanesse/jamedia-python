@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
-
 import os
 import urllib.parse
 import urllib.request

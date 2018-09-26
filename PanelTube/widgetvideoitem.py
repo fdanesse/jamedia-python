@@ -14,7 +14,6 @@ import urllib
 import subprocess
 
 # NOTA: Actualizar => sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O youtube-dl
-# https://github.com/rg3/youtube-dl/
 youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")  #"/usr/bin/youtube-dl"
 
 
@@ -32,6 +31,7 @@ class WidgetVideoItem(Gtk.EventBox):
         
         self._temp_dat = []
         self.videodict = videodict
+        self.fileimage = None
 
         hbox = Gtk.HBox()
         hbox.get_style_context().add_class("videoitemHB")
@@ -92,6 +92,11 @@ class WidgetVideoItem(Gtk.EventBox):
     def __run_update(self, widget):
         GLib.timeout_add(100, self.__update)
 
+    def reSetImage(self, width=200, height=150):
+        if self.fileimage and os.path.exists(self.fileimage):
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(self.fileimage, width, height)
+            self.imagen.set_from_pixbuf(pixbuf)
+
     def __update(self):
         if self.videodict.get("previews", False):
             # 1 lista con 1 url
@@ -100,15 +105,14 @@ class WidgetVideoItem(Gtk.EventBox):
             archivo = "/tmp/preview%s" % self.videodict["id"]
             try:
                 # FIXME: Porque Falla si no hay Conexión.
-                fileimage, headers = urllib.request.urlretrieve(url, archivo)
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(fileimage, 200, 150)
-                self.imagen.set_from_pixbuf(pixbuf)
+                self.fileimage, headers = urllib.request.urlretrieve(url, archivo)
+                self.reSetImage(200, 150)
                 # NOTA: Convertir imagen a string por si se quiere guardar.
-                '''pixbuf_file = open(fileimage, 'rb')
+                '''pixbuf_file = open(self.fileimage, 'rb')
                 image_string = base64.b64encode(pixbuf_file.read())
                 pixbuf_file.close()
                 self.videodict["previews"] = image_string'''
-                self.videodict["previews"] = pixbuf
+                #self.videodict["previews"] = pixbuf
             except:
                 #FIXME: Verificar que sucede si no hay conexión
                 print ("ERROR: Quizas no hay conexión", self.__update)
@@ -121,7 +125,7 @@ class WidgetVideoItem(Gtk.EventBox):
         return False
 
     def update(self):
-        # NOTA: desde PanelTube
+        # NOTA: desde PanelTube https://github.com/rg3/youtube-dl
         _url = self.videodict["url"]
         STDOUT = "/tmp/jamediatube-dl%s" % self.videodict["id"]
         STERR = "/tmp/jamediatube-dlERR%s" % self.videodict["id"]

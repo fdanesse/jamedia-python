@@ -19,7 +19,6 @@ class Derecha(Gtk.VBox):
 
         Gtk.VBox.__init__(self)
 
-        # FIXME: Agregar espacio a la derecha de las barras para mejor uso del scroll
         self.balance = BalanceWidget()
         self.equalizer = EqualizerWidget()
         self.lista = PlayerList()

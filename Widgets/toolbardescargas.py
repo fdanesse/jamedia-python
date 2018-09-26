@@ -13,132 +13,122 @@ from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Widgets.ProgressPlayer import BarraProgreso
 
 
-class ToolbarDescargas(Gtk.VBox):
+class ToolbarDescargas(Gtk.Toolbar):
 
-    __gsignals__ = {
-    'end': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, [])}
+    __gsignals__ = {'end': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, [])}
 
     def __init__(self):
 
-        Gtk.VBox.__init__(self)
+        Gtk.Toolbar.__init__(self, orientation=Gtk.Orientation.VERTICAL)
 
-        self.set_css_name('vboxdescargas')
-        self.set_name('vboxdescargas')
+        self.get_style_context().add_class("toolbardescargas")
 
-        # FIXME: Agregar preview del video
-        self.toolbar = Gtk.Toolbar()
-        self.toolbar.set_css_name('toolbardescargas')
-        self.toolbar.set_name('toolbardescargas')
-
-        self.progress = 0.0
+        self.__progress = 0.0
         self.estado = False
-        self.actualizador = False
-        self.datostemporales = None
-        self.ultimosdatos = None
-        self.contadortestigo = 0
+        self.__actualizador = False
+        self.__datostemporales = None
+        self.__ultimosdatos = None
+        self.__contadortestigo = 0
 
-        self.video_item = None
-        self.url = None
-        self.titulo = None
+        self.__video_item = None
 
-        self.jamediayoutube = JAMediaYoutube()
+        self.__jamediayoutube = JAMediaYoutube()
 
-        self.toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
-
-        item = Gtk.ToolItem()
-        self.label_titulo = Gtk.Label("")
-        self.label_titulo.show()
-        item.add(self.label_titulo)
-        self.toolbar.insert(item, -1)
-
-        self.toolbar.insert(get_separador(draw=False, ancho=3, expand=False), -1)
+        self.__itemWidgetVideoItem = Gtk.ToolItem()
+        self.__itemWidgetVideoItem.set_expand(False)
+        self.insert(self.__itemWidgetVideoItem, -1)
 
         item = Gtk.ToolItem()
-        self.label_progreso = Gtk.Label("")
-        self.label_progreso.show()
-        item.add(self.label_progreso)
-        self.toolbar.insert(item, -1)
+        item.set_expand(False)
+        self.__label_titulo = Gtk.Label("")
+        item.add(self.__label_titulo)
+        self.insert(item, -1)
 
-        self.barra_progreso = BarraProgreso()
-        self.barra_progreso.set_sensitive(False)
-        self.barra_progreso.show()
+        item = Gtk.ToolItem()
+        item.set_expand(False)
+        self.__label_progreso = Gtk.Label("")
+        item.add(self.__label_progreso)
+        self.insert(item, -1)
 
-        self.pack_start(self.toolbar, False, False, 0)
-        self.pack_start(self.barra_progreso, False, False, 0)
+        item = Gtk.ToolItem()
+        item.set_expand(False)
+        self.__barra_progreso = BarraProgreso()
+        self.__barra_progreso.set_sensitive(False)
+        item.add(self.__barra_progreso)
+        self.insert(item, -1)
 
         self.show_all()
 
-        self.jamediayoutube.connect("progress_download", self.__progress_download)
+        self.__jamediayoutube.connect("progress_download", self.__progress_download)
 
     def __handle(self):
-        if self.ultimosdatos != self.datostemporales:
-            self.ultimosdatos = self.datostemporales
-            self.contadortestigo = 0
+        if self.__ultimosdatos != self.__datostemporales:
+            self.__ultimosdatos = self.__datostemporales
+            self.__contadortestigo = 0
         else:
-            self.contadortestigo += 1
-        if self.contadortestigo > 15:
+            self.__contadortestigo += 1
+        if self.__contadortestigo > 15:
             print ("\nNo se pudo controlar la descarga de:")
-            print ("%s %s\n" % (self.titulo, self.url))
+            print ("%s %s\n" % (self.__video_item.videodict["titulo"], self.__video_item.videodict["url"]))
             self.__cancel_download()
             return False
         return True
 
     def __progress_download(self, widget, progress):
-        self.datostemporales = progress
-        if '[youtube]' in self.datostemporales:
-            dat = self.datostemporales.replace('[youtube]', '').strip()
-            if self.label_progreso.get_text() != dat:
-                self.label_progreso.set_text(dat)
-        elif '[download]' in self.datostemporales:
-            if '%' in self.datostemporales:
-                lista = self.datostemporales.strip().split(" ")
+        self.__datostemporales = progress
+        if '[youtube]' in self.__datostemporales:
+            dat = self.__datostemporales.replace('[youtube]', '').strip()
+            if self.__label_progreso.get_text() != dat:
+                self.__label_progreso.set_text(dat)
+        elif '[download]' in self.__datostemporales:
+            if '%' in self.__datostemporales:
+                lista = self.__datostemporales.strip().split(" ")
                 porcentaje = [item for item in lista if "%" in item]
                 if porcentaje:
                     index = lista.index(porcentaje[0])
                     text = ''
                     for item in lista[index:]:
                         text = "%s %s" % (text, item)
-                    if self.label_progreso.get_text() != text.strip():
-                        self.label_progreso.set_text(text.strip())
-                    adj = self.barra_progreso.escala.get_adjustment()
+                    if self.__label_progreso.get_text() != text.strip():
+                        self.__label_progreso.set_text(text.strip())
+                    adj = self.__barra_progreso.escala.get_adjustment()
                     GLib.idle_add(adj.set_value, float(porcentaje[0].replace("%", '')))
-        if "100.0%" in self.datostemporales:
+        if "100.0%" in self.__datostemporales:
             self.__cancel_download()
             return False
         return True
 
     def __cancel_download(self, button=None, event=None):
         # FIXME: No funciona correctamente, la descarga continúa.
-        if self.actualizador:
-            GLib.source_remove(self.actualizador)
-            self.actualizador = False
-        self.jamediayoutube.reset()
-        self.video_item.destroy()
+        if self.__actualizador:
+            GLib.source_remove(self.__actualizador)
+            self.__actualizador = False
+        self.__jamediayoutube.reset()
+        self.__video_item.destroy()
         self.estado = False
         self.emit("end")
         return False
 
     def download(self, video_item):
         self.estado = True
-        self.progress = 0.0
-        self.datostemporales = None
-        self.ultimosdatos = None
-        self.contadortestigo = 0
+        self.__progress = 0.0
+        self.__datostemporales = None
+        self.__ultimosdatos = None
+        self.__contadortestigo = 0
 
-        self.video_item = video_item
-        self.url = video_item.videodict["url"]
-        self.titulo = video_item.videodict["titulo"]
+        self.__video_item = video_item
+        self.__itemWidgetVideoItem.add(self.__video_item)
 
-        texto = self.titulo
-        if len(self.titulo) > 30:
-            texto = str(self.titulo[0:30]) + " . . . "
+        texto = self.__video_item.videodict["titulo"]
+        if len(self.__video_item.videodict["titulo"]) > 30:
+            texto = str(self.__video_item.videodict["titulo"][0:30]) + " . . . "
 
-        self.label_titulo.set_text(texto)
-        self.jamediayoutube.download(self.url, self.titulo)
+        self.__label_titulo.set_text(texto)
+        self.__jamediayoutube.download(self.__video_item.videodict["url"], self.__video_item.videodict["titulo"])
 
-        if self.actualizador:
-            GLib.source_remove(self.actualizador)
-            self.actualizador = False
+        if self.__actualizador:
+            GLib.source_remove(self.__actualizador)
+            self.__actualizador = False
 
-        self.actualizador = GLib.timeout_add(1000, self.__handle)
+        self.__actualizador = GLib.timeout_add(1000, self.__handle)
         self.show_all()

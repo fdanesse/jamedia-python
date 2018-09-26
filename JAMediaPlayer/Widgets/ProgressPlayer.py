@@ -75,7 +75,6 @@ class BarraProgreso(Gtk.EventBox):
         # self.set_name('progressplayerscale')
 
         self.escala = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL)
-        # FIXME: Mejorar saltos del ajuste
         self.escala.set_adjustment(Gtk.Adjustment(0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
         self.escala.set_digits(0)
         self.escala.set_draw_value(False)

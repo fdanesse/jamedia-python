@@ -13,6 +13,7 @@ from gi.repository import GObject
 from JAMediaPlayer.Globales import YoutubeDir
 
 # STDERR = "/dev/null"
+# NOTA: Actualizar => sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O youtube-dl
 youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")
 
 CODECS = [
@@ -48,6 +49,7 @@ class JAMediaYoutube(GObject.Object):
         self.codec = 0
 
     def __get_titulo(self, titulo):
+        # FIXME: ? Mejorar
         texto = ""
         excluir = ["\\", "/", ",", ".", "&",
         "¿", "?", "@", "#", "$", "\'", ":", ";", "|",
@@ -81,6 +83,7 @@ class JAMediaYoutube(GObject.Object):
         return self.estado
 
     def download(self, url, titulo):
+        # FIXME: Portar todo a: https://github.com/rg3/youtube-dl#embedding-youtube-dl
         self.datos_originales = [url, titulo]
 
         self.ultimosdatos = False

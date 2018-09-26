@@ -37,27 +37,22 @@
 }
 
 /* Progreso de descargas */
-#vboxdescargas {
+.toolbardescargas {
     background-image: image(@jamedia2);
     background-color: @jamedia2;
     border: 1px solid @border;
     padding: 5px;
 }
-#vboxdescargas scale { /* FIXME: Cambiar Scale por ProgressBar ? */
+.toolbardescargas scale { /* FIXME: Cambiar Scale por ProgressBar ?*/
     background-image: image(@jamedia2);
     background-color: @jamedia2;
     margin: 0;
-    padding:5px;
-    margin:3px;
+    padding: 5px;
+    margin: 3px;
 }
-#vboxdescargas scale trough highlight{
+.toolbardescargas scale trough highlight{
     background-image: image(cyan);
     background-color: cyan;
-}
-#toolbardescargas {
-    background-image: image(@jamedia2);
-    background-color: @jamedia2;
-    border: 0;
 }
 
 /* Confirmar salir */
