@@ -15,8 +15,7 @@ from JAMediaPlayer.Globales import ICONS_PATH
 
 class ToolbarAddVideo(Gtk.Toolbar):
 
-    __gsignals__ = {
-    "ok": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_STRING,))}
+    __gsignals__ = {"ok": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_STRING,))}
 
     def __init__(self):
 
@@ -70,8 +69,7 @@ class ToolbarAddVideo(Gtk.Toolbar):
 
     def __emit_ok(self):
         text = self.__entry.get_text() # FIXME: Validar
-        if text:
-            self.emit('ok', text)
+        if text: self.emit('ok', text)
 
     def run(self):
         self.__entry.set_text('')

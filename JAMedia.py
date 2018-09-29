@@ -8,6 +8,8 @@
 
 import os
 import sys
+import time
+import threading
 
 import gi
 gi.require_version('Gst', '1.0')
@@ -21,12 +23,12 @@ from gi.repository import Gst
 
 from Widgets.headerBar import HeaderBar
 from Widgets.toolbarbusquedas import ToolbarBusquedas
-from Widgets.alertabusquedas import AlertaBusqueda
 from Widgets.toolbardescargas import ToolbarDescargas
+from Widgets.alertabusquedas import AlertaBusqueda
 from Widgets.toolbarsalir import ToolbarSalir
 from PanelTube.widgetvideoitem import WidgetVideoItem
 from PanelTube.paneltube import PanelTube
-from PanelTube.buscar import Buscar, FEED
+from PanelTube.buscar import buscar  #, FEED
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
 from JAMediaPlayer.Globales import ocultar
 from JAMediaPlayer.Globales import get_dict
@@ -54,6 +56,13 @@ def make_tree_widgets(widget, tab):
         make_tree_widgets(child, tab)
 '''
 
+screen = Gdk.Screen.get_default()
+css_provider = Gtk.CssProvider()
+style_path = os.path.join(BASE_PATH, "Estilos", "Estilo.css")
+css_provider.load_from_path(style_path)
+context = Gtk.StyleContext()
+context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_SETTINGS)
+
 
 class JAMedia(Gtk.Window):
 
@@ -63,9 +72,10 @@ class JAMedia(Gtk.Window):
 
         Gtk.Window.__init__(self)
 
-        self.set_style()
-
         self.version = get_dict(os.path.join(BASE_PATH, 'proyecto.ide')).get('version', 18)
+
+        self.set_default_size(640, 480)
+        self.set_size_request(640, 480)
 
         self.set_title("JAMedia")
         self.set_icon_from_file(os.path.join(BASE_PATH, "Iconos", "JAMedia.svg"))
@@ -73,7 +83,7 @@ class JAMedia(Gtk.Window):
         self.set_position(Gtk.WindowPosition.CENTER)
 
         self.archivos = []
-        self.buscador = Buscar()
+        self.__videosEncontrados = []
 
         self.headerBar = HeaderBar()
         self.headerBar.set_title("JAMedia")
@@ -114,14 +124,6 @@ class JAMedia(Gtk.Window):
         
         print ("JAMedia process:", os.getpid())
 
-    def set_style(self):
-        screen = Gdk.Screen.get_default()
-        css_provider = Gtk.CssProvider()
-        style_path = os.path.join(BASE_PATH, "Estilos", "Estilo.css")
-        css_provider.load_from_path(style_path)
-        context = Gtk.StyleContext()
-        context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_SETTINGS)
-
     def __realized(self, widget):
         ocultar([self.toolbar_descarga, self.alerta_busqueda])
 
@@ -143,8 +145,6 @@ class JAMedia(Gtk.Window):
         self.toolbar_descarga.connect('end', self.__run_download)
         self.paneltube.connect("cancel_toolbar", self.__cancel_toolbars)
         self.paneltube.toolbar_add_video.connect('ok', self.__user_add_video)
-        self.buscador.connect("encontrado", self.__add_video_encontrado)
-        self.buscador.connect("end", self.paneltube.update_widgets_videos_encontrados)
 
         if self.archivos:
             self.__switch(None, 'jamedia')
@@ -197,56 +197,66 @@ class JAMedia(Gtk.Window):
             self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
             self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
 
+    def __user_add_video(self, widget, url):
+        # El usuario agrega manualmene un video
+        self.__add_videos([str(url).strip()], self.paneltube.descargar)
+        self.paneltube.update_widget_video(url)
+
     def __comenzar_busqueda(self, widget, palabras, cantidad):
+        # 1 - Busquedas
         self.toolbar_busqueda.set_sensitive(False)
         self.__cancel_toolbars()
         self.alerta_busqueda.show()
         self.alerta_busqueda.label.set_text("Buscando: %s..." % (palabras))
         objetos = self.paneltube.encontrados.get_children()
         for objeto in objetos:
-            objeto.get_parent().remove(objeto)
-            objeto.destroy()
+            self.paneltube.remove(objeto)
+        for objeto in objetos:
+            GLib.idle_add(objeto.destroy)
+        self.__videosEncontrados.clear()
         self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
-        # FIXME: Reparar (Si no hay conexión)
-        GLib.idle_add(self.buscador.buscar, palabras, cantidad)
+        # FIXME: Verificar si es necesario matar los hilos al terminar la busqueda
+        threading.Thread(target=buscar, args=(palabras, cantidad, self.__add_video_encontrado, self.__busquedasEnd)).start()
+        
+    def __add_video_encontrado(self, url):
+        # 2 - Busquedas
+        self.__videosEncontrados.append(str(url).strip())
+        # FIXME: agregar barra de progreso y cantidad de videos encontrados
+        self.alerta_busqueda.label.set_text("Encontrado: %s..." % (url))
 
-    def __add_video_encontrado(self, buscador, _id, url):
-        video = FEED.copy()
-        video["id"] = _id
-        video["url"] = url
-        self.__add_videos([video], self.paneltube.encontrados)
+    def __busquedasEnd(self):
+        # 3 - Busquedas
+        self.toolbar_busqueda.set_sensitive(True)
+        ocultar([self.alerta_busqueda])
+        GLib.idle_add(self.__add_videos, self.__videosEncontrados, self.paneltube.encontrados)
 
-    def __user_add_video(self, widget, url):
-        video = FEED.copy()
-        video["url"] = url
-        self.__add_videos([video], self.paneltube.descargar)
-        self.paneltube.update_widget_video(video)
-
-    def __add_videos(self, videos, destino):
-        if not videos:
-            ocultar([self.alerta_busqueda])
+    def __add_videos(self, urls, destino):
+        # 4 - Busquedas
+        if not urls:
             self.toolbar_busqueda.set_sensitive(True)
+            if destino == self.paneltube.encontrados:
+                self.paneltube.busquedaEnd()  # 5 - Busquedas
             return False
+        else:
+            self.toolbar_busqueda.set_sensitive(False)
 
-        texto = "Encontrado: %s" % (videos[0]["titulo"])
-        if len(texto) > 50:
-            texto = str(texto[0:50]) + " . . . "
-
-        videowidget = WidgetVideoItem(videos[0])
+        videowidget = WidgetVideoItem(urls[0])
         if destino == self.paneltube.encontrados:
             videowidget.set_tooltip_text(TipEncontrados)
         elif destino == self.paneltube.descargar:
             videowidget.set_tooltip_text(TipDescargas)
+        
         videowidget.show_all()
         videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
-        videos.remove(videos[0])
         destino.pack_start(videowidget, False, False, 3)
+        urls.remove(urls[0])
+
         if destino == self.paneltube.encontrados:
             self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
         elif destino == self.paneltube.descargar:
             self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
-        self.alerta_busqueda.label.set_text(texto)
-        GLib.idle_add(self.__add_videos, videos, destino)
+        
+        GLib.idle_add(self.__add_videos, list(urls), destino)
         return False
 
     def __switch(self, widget, valor):

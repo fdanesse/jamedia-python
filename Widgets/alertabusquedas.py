@@ -28,3 +28,4 @@ class AlertaBusqueda(Gtk.Toolbar):
         self.insert(item, -1)
 
         self.show_all()
+        

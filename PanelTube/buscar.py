@@ -1,38 +1,28 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
+import datetime
 import urllib.parse
 import urllib.request
+import subprocess
 
-from gi.repository import GObject
+from gi.repository import GLib
 
-FEED = {
-    "id": "",
-    "titulo": "",
-    "descripcion": "",
-    "url": "",
-    "duracion": 0,
-    "previews": ""
-    }
+'''
+JAMedia.py lanza una búsqueda en def __comenzar_busqueda(self, widget, palabras, cantidad):
+El buscador es un thread que llama a def __add_video_encontrado(self, url): cada vez que encuentra un video.
+Al terminar el buscador llama a self.paneltube.busquedaEnd(self): que comienza un ciclo de actualización de los metadatos de cada video 
+llando recursivamente a self.__update_next(False, items)
+'''
 
-
-class Buscar(GObject.Object):
-
-    __gsignals__ = {
-    'encontrado': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_STRING, GObject.TYPE_STRING)),
-    'end': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, [])}
-
-    def __init__(self, ):
-
-        GObject.Object.__init__(self)
-
-    def __get_videos(self, consulta, limite):
-        # Obtener web principal con resultado de busqueda y recorrer todas las pags de la busqueda obtenida hasta conseguir el id de los videos.
-        # https://www.youtube.com/results?search_query=selena+gomez
+def __get_videos(consulta, limite, callback, callbackend):
+    # Obtener web principal con resultado de busqueda y recorrer todas las pags de la busqueda obtenida hasta conseguir el id de los videos.
+    # https://www.youtube.com/results?search_query=selena+gomez
+    try:
         params = urllib.parse.urlencode({'search_query': consulta})
-        print("PARáMETROS:", params)
         urls = {}
-        print ("Comezando la búsqueda de %i videos sobre %s" % (limite, consulta))
+        print ("Comezando la búsqueda de %i videos sobre %s..." % (limite, consulta))
         for pag in range(1, 10):
             f = urllib.request.urlopen("http://www.youtube.com/results?%s&filters=video&page=%i" % (params, pag))
             text = str(f.read()).replace("\n", "")
@@ -42,23 +32,72 @@ class Buscar(GObject.Object):
                 url = "http://www.youtube.com/watch?v=%s" % _id
                 if not _id in urls.keys():
                     urls[_id] = {"url": url}
-                    self.emit("encontrado", _id, url)
+                    time.sleep(0.2)
+                    callback(url)
                 if len(urls.keys()) >= limite:
                     break
             if len(urls.keys()) >= limite:
                 break
-        print ("Búsqueda finalizada para:", consulta, "Videos encontrados:", len(urls.keys()))
-        self.emit("end")
+        print ("Búsqueda finalizada para:", consulta, "- Videos encontrados:", len(urls.keys()))
+    except:
+        print ("No tienes conexión ?")  # FIXME: implementar callback error
+    return callbackend()
 
-    def buscar(self, palabras, cantidad):
-        buscar = ""
-        for palabra in palabras.split(" "):
-            buscar = "%s%s+" % (buscar, palabra.lower())
-        if buscar.endswith("+"):
-            buscar = str(buscar[:-1])
-        try:  # FIXME: Porque falla si no hay Conexión.
-            if buscar:
-                self.__get_videos(buscar, cantidad)
-        except:
-            # FIXME: La interfaz queda insensitive
-            print ("No tienes conexión ?")
+def buscar(palabras, cantidad, callback, callbackend):
+    # Realiza la busqueda de videos en youtube
+    buscar = palabras.replace(" ", "+").strip().lower()
+    __get_videos(buscar, cantidad, callback, callbackend)
+
+
+'''
+[youtube] 1DhA69K3fZ4: Downloading webpage
+
+[youtube] 1DhA69K3fZ4: Downloading video info webpage
+
+[info] Writing video description metadata as JSON to: /tmp/1DhA69K3fZ4.info.json
+
+[youtube] 1DhA69K3fZ4: Downloading thumbnail ...
+
+[youtube] 1DhA69K3fZ4: Writing thumbnail to: /tmp/1DhA69K3fZ4.jpg
+'''
+# Descarga de info.json y thumbnail
+def __get_progress(salida, _dict, callback, youtubedl, STDOUT, t1):
+    # Devuelve la dirección a los archivos json y thumbnail luego de descargados
+    progress = salida.readline()
+    if progress:
+        print(progress)
+        if "Writing video description" in progress:
+            _dict["json"] = progress.split(":")[-1].replace("\n", "").strip()
+        elif "Writing thumbnail to" in progress:
+            _dict["thumb"] = progress.split(":")[-1].replace("\n", "").strip()
+
+    if all(_dict.values()):
+        t2 = datetime.datetime.now()
+        #print("Time:", t2 - t1)
+        youtubedl.kill()
+        if salida:
+            salida.close()
+        if os.path.exists(STDOUT):
+            os.unlink(STDOUT)
+        callback(_dict)
+        # FIXME: al terminar, eliminar STDOUT, json y thumbnail ?
+        return False
+
+    return True
+    
+def getJsonAndThumbnail(url, callback):
+    # Descargar json y thumbnail. Genera 3 archivos, json, jpg y STDOUT
+    # ./youtube-dl --write-info-json --write-thumbnail --skip-download -o /tmp/1DhA69K3fZ4 https://www.youtube.com/watch?v=1DhA69K3fZ4
+    t1 = datetime.datetime.now()  # Solo para ver cuanto demora en hacer todo => 0:00:12.460755
+    _dict = {"json": "", "thumb": ""}
+
+    youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")
+    STDOUT = "/tmp/jamediatube%d" % time.time()
+
+    destino = "/tmp/%s%d" % (url.split("=")[-1].strip(), time.time())
+    estructura = "python3 %s --write-info-json --write-thumbnail --skip-download -o %s %s" % (youtubedl, destino, url)
+
+    youtubedl = subprocess.Popen(estructura, shell=True, stdout=open(STDOUT, "w+b"), universal_newlines=True)
+    salida = open(STDOUT, "r")
+
+    GLib.timeout_add(200, __get_progress, salida, _dict, callback, youtubedl, STDOUT, t1)

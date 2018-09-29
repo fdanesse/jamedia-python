@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import threading
+
 import gi
 gi.require_version("Gtk", "3.0")
 
@@ -87,7 +89,7 @@ class PanelTube(Gtk.HPaned):
 
     def __filter2Items(self, item, items):
         for i in items:
-            if i.videodict["url"] == item.videodict["url"]:
+            if i._dict["url"] == item._dict["url"]:
                 item.destroy()
                 return False
         return True
@@ -141,40 +143,29 @@ class PanelTube(Gtk.HPaned):
         scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         return scroll
 
-    def __update_next(self, widget, items):
-        '''Un video ha actualizado sus metadatos, lanza la actualización del siguiente.'''
-        if widget:
-            widget.set_sensitive(True)
-        if not items:
-            del(items)
-            return False
-        item = items[0]
-        items.remove(item)
-        if item:
-            if item.get_parent():
-                item.connect("end-update", self.__update_next, items)
-                item.update()  #NOTA: en WidgetVideoItem
-            else:
-                self.__update_next(False, items)
-        else:
-            self.__update_next(False, items)
-
     def cancel_toolbars_flotantes(self, widget=None):
         for toolbar in self.toolbars_flotantes:
             toolbar.cancelar()
 
-    def update_widgets_videos_encontrados(self, buscador):
-        '''widgets de videos actualizan sus metadatos.'''
+    def __update_next(self, widget, items):
+        # 6 - Busquedas
+        # Un video ha actualizado sus metadatos y lanza la actualización del siguiente.
+        if not items: return False
+        item = items[0]
+        items.remove(item)
+        item.connect("end-update", self.__update_next, items)
+        item.update()
+
+    def busquedaEnd(self):
+        # 5 - Busquedas
+        # El buscador no agregará mas videos. Así que cada widget de video actualizará sus metadatos.
         items = list(self.encontrados.get_children())
-        for item in items:
-            item.set_sensitive(False)
         self.__update_next(False, items)
 
     def __filterItems(self, item, url):
-        return item.videodict["url"] == url
+        return item._dict.get("url", "") == url
 
-    def update_widget_video(self, video):
+    def update_widget_video(self, url):
         # usuario agrega una dirección específica
-        items = [item for item in self.descargar.get_children() if self.__filterItems(item, video['url'])]
+        items = [item for item in self.descargar.get_children() if self.__filterItems(item, url)]
         self.__update_next(False, items)
-        
