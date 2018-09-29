@@ -197,17 +197,24 @@ class JAMedia(Gtk.Window):
             self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
             self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
 
+    def __filterItems(self, item, url):
+        return item._dict["url"].split(":")[-1] == url.split(":")[-1]
+
     def __user_add_video(self, widget, url):
         # El usuario agrega manualmene un video
-        # FIXME: Arreglar que no agregue repetidos
-        videowidget = WidgetVideoItem(url)
-        videowidget.set_tooltip_text(TipDescargas)
-        videowidget.show_all()
-        videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
-        self.paneltube.descargar.pack_start(videowidget, False, False, 3)
-        self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.encontrados)
-        #videowidget.connect("end-update", self.__make_append_update_video, urls)
-        videowidget.update()
+        items = self.paneltube.descargar.get_children()
+        items.extend(self.paneltube.encontrados.get_children())
+        if not [item for item in items if self.__filterItems(item, url)]:
+            videowidget = WidgetVideoItem(url)
+            videowidget.set_tooltip_text(TipDescargas)
+            videowidget.show_all()
+            videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
+            self.paneltube.descargar.pack_start(videowidget, False, False, 3)
+            self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
+            #videowidget.connect("end-update", self.__make_append_update_video, urls)
+            videowidget.update()
+        else:
+            print("FIXME: El video ya está listado")
 
     def __comenzar_busqueda(self, widget, palabras, cantidad):
         # 1 - Busquedas
@@ -215,6 +222,7 @@ class JAMedia(Gtk.Window):
         self.__cancel_toolbars()
         self.alerta_busqueda.show()
         self.alerta_busqueda.label.set_text("Buscando: %s..." % (palabras))
+        # FIXME: analizar si es necesario eliminar estos videos
         objetos = self.paneltube.encontrados.get_children()
         for objeto in objetos:
             self.paneltube.remove(objeto)
@@ -227,9 +235,16 @@ class JAMedia(Gtk.Window):
         
     def __add_video_encontrado(self, url):
         # 2 - Busquedas
-        self.__videosEncontrados.append(str(url).strip())
-        # FIXME: agregar barra de progreso y cantidad de videos encontrados
-        self.alerta_busqueda.label.set_text("Encontrado: %s..." % (url))
+        items = self.paneltube.descargar.get_children()
+        items.extend(self.paneltube.encontrados.get_children())
+        if not [item for item in items if self.__filterItems(item, url)]:
+            self.__videosEncontrados.append(str(url).strip())
+            # FIXME: agregar barra de progreso y cantidad de videos encontrados
+            self.alerta_busqueda.show()
+            self.alerta_busqueda.label.set_text("Encontrado: %s..." % (url))
+        else:
+            self.alerta_busqueda.show()
+            self.alerta_busqueda.label.set_text("Ya se encuentra listado: %s..." % (url))
 
     def __busquedasEnd(self):
         # 3 - Busquedas
@@ -243,6 +258,7 @@ class JAMedia(Gtk.Window):
             self.paneltube.encontrados.pack_start(item, False, False, 3)
             self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
         if urls:
+            self.alerta_busqueda.show()
             self.alerta_busqueda.label.set_text("Actualizando: %s..." % (urls[0]))
             # FIXME: agregar barra de progreso y cantidad de videos encontrados
             videowidget = WidgetVideoItem(urls[0])
