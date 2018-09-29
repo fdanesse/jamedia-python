@@ -64,10 +64,6 @@ class WidgetVideoItem(Gtk.EventBox):
         if os.path.exists(self.__fileimage): os.unlink(self.__fileimage)
         if os.path.exists(self.__filejson): os.unlink(self.__filejson)
 
-    def update(self):
-        # NOTA: desde PanelTube
-        getJsonAndThumbnail(self._dict["url"], self.__endUpdate)
-
     def setImage(self, width=200, height=150):
         if os.path.exists(self.__fileimage):
             pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(self.__fileimage, width, height)
@@ -79,7 +75,13 @@ class WidgetVideoItem(Gtk.EventBox):
         for label in labels:
             label.set_text("%s: %s" % (values[labels.index(label)]))
 
+    def update(self):
+        # 5 - Busquedas. NOTA: desde PanelTube
+        # FIXME: Emitir señal para informar en la alerta de busquedas
+        getJsonAndThumbnail(self._dict["url"], self.__endUpdate)
+
     def __endUpdate(self, _dict):
+        # 7 - Busquedas
         self.__fileimage = _dict.get("thumb", "")
         self.__filejson = _dict["json"]
         newdict = json_file(self.__filejson)

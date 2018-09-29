@@ -65,7 +65,6 @@ def __get_progress(salida, _dict, callback, youtubedl, STDOUT, t1):
     # Devuelve la dirección a los archivos json y thumbnail luego de descargados
     progress = salida.readline()
     if progress:
-        print(progress)
         if "Writing video description" in progress:
             _dict["json"] = progress.split(":")[-1].replace("\n", "").strip()
         elif "Writing thumbnail to" in progress:
@@ -80,7 +79,6 @@ def __get_progress(salida, _dict, callback, youtubedl, STDOUT, t1):
         if os.path.exists(STDOUT):
             os.unlink(STDOUT)
         callback(_dict)
-        # FIXME: al terminar, eliminar STDOUT, json y thumbnail ?
         return False
 
     return True

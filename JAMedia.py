@@ -199,8 +199,15 @@ class JAMedia(Gtk.Window):
 
     def __user_add_video(self, widget, url):
         # El usuario agrega manualmene un video
-        self.__add_videos([str(url).strip()], self.paneltube.descargar)
-        self.paneltube.update_widget_video(url)
+        # FIXME: Arreglar que no agregue repetidos
+        videowidget = WidgetVideoItem(url)
+        videowidget.set_tooltip_text(TipDescargas)
+        videowidget.show_all()
+        videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
+        self.paneltube.descargar.pack_start(videowidget, False, False, 3)
+        self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.encontrados)
+        #videowidget.connect("end-update", self.__make_append_update_video, urls)
+        videowidget.update()
 
     def __comenzar_busqueda(self, widget, palabras, cantidad):
         # 1 - Busquedas
@@ -227,37 +234,26 @@ class JAMedia(Gtk.Window):
     def __busquedasEnd(self):
         # 3 - Busquedas
         self.toolbar_busqueda.set_sensitive(True)
-        ocultar([self.alerta_busqueda])
-        GLib.idle_add(self.__add_videos, self.__videosEncontrados, self.paneltube.encontrados)
+        self.__make_append_update_video(None, list(self.__videosEncontrados))
+        self.__videosEncontrados = []
 
-    def __add_videos(self, urls, destino):
-        # 4 - Busquedas
-        if not urls:
-            self.toolbar_busqueda.set_sensitive(True)
-            if destino == self.paneltube.encontrados:
-                self.paneltube.busquedaEnd()  # 5 - Busquedas
-            return False
-        else:
-            self.toolbar_busqueda.set_sensitive(False)
-
-        videowidget = WidgetVideoItem(urls[0])
-        if destino == self.paneltube.encontrados:
-            videowidget.set_tooltip_text(TipEncontrados)
-        elif destino == self.paneltube.descargar:
-            videowidget.set_tooltip_text(TipDescargas)
-        
-        videowidget.show_all()
-        videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
-        destino.pack_start(videowidget, False, False, 3)
-        urls.remove(urls[0])
-
-        if destino == self.paneltube.encontrados:
+    def __make_append_update_video(self, item, urls):
+        # 4 - Busquedas. crear, agregar, actualizar
+        if item:
+            self.paneltube.encontrados.pack_start(item, False, False, 3)
             self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
-        elif destino == self.paneltube.descargar:
-            self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
-        
-        GLib.idle_add(self.__add_videos, list(urls), destino)
-        return False
+        if urls:
+            self.alerta_busqueda.label.set_text("Actualizando: %s..." % (urls[0]))
+            # FIXME: agregar barra de progreso y cantidad de videos encontrados
+            videowidget = WidgetVideoItem(urls[0])
+            videowidget.set_tooltip_text(TipEncontrados)
+            videowidget.show_all()
+            videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
+            urls.remove(urls[0])
+            videowidget.connect("end-update", self.__make_append_update_video, urls)
+            videowidget.update() # 5 - Busquedas
+        else:
+            ocultar([self.alerta_busqueda])
 
     def __switch(self, widget, valor):
         self.__cancel_toolbars()

@@ -147,7 +147,7 @@ class PanelTube(Gtk.HPaned):
         for toolbar in self.toolbars_flotantes:
             toolbar.cancelar()
 
-    def __update_next(self, widget, items):
+    '''def __update_next(self, widget, items):
         # 6 - Busquedas
         # Un video ha actualizado sus metadatos y lanza la actualización del siguiente.
         if not items: return False
@@ -160,12 +160,12 @@ class PanelTube(Gtk.HPaned):
         # 5 - Busquedas
         # El buscador no agregará mas videos. Así que cada widget de video actualizará sus metadatos.
         items = list(self.encontrados.get_children())
-        self.__update_next(False, items)
+        self.__update_next(False, items)'''
 
-    def __filterItems(self, item, url):
+    '''def __filterItems(self, item, url):
         return item._dict.get("url", "") == url
 
     def update_widget_video(self, url):
         # usuario agrega una dirección específica
         items = [item for item in self.descargar.get_children() if self.__filterItems(item, url)]
-        self.__update_next(False, items)
+        self.__update_next(False, items)'''
