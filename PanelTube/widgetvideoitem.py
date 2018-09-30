@@ -94,5 +94,4 @@ class WidgetVideoItem(Gtk.EventBox):
             self.__setLabels()
             self.emit("end-update")
         else:
-            # FIXME: error update para que no se agregue
             self.emit("error-update")

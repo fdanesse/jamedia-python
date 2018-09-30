@@ -21,11 +21,14 @@ class AlertaBusqueda(Gtk.Toolbar):
 
         item = Gtk.ToolItem()
         item.set_expand(True)
-        self.label = Gtk.Label("")
-        self.label.set_justify(Gtk.Justification.LEFT)
-        self.label.show()
-        item.add(self.label)
+        self.__label = Gtk.Label("")
+        self.__label.set_justify(Gtk.Justification.LEFT)
+        self.__label.show()
+        item.add(self.__label)
         self.insert(item, -1)
 
         self.show_all()
         
+    def set_data(self, text):
+        self.__label.set_text(text)
+        self.show()

@@ -9,12 +9,6 @@ import subprocess
 
 from gi.repository import GLib
 
-'''
-JAMedia.py lanza una búsqueda en def __comenzar_busqueda(self, widget, palabras, cantidad):
-El buscador es un thread que llama a def __add_video_encontrado(self, url): cada vez que encuentra un video.
-Al terminar el buscador llama a self.paneltube.busquedaEnd(self): que comienza un ciclo de actualización de los metadatos de cada video 
-llando recursivamente a self.__update_next(False, items)
-'''
 
 def __get_videos(consulta, limite, callback, callbackend):
     # Obtener web principal con resultado de busqueda y recorrer todas las pags de la busqueda obtenida hasta conseguir el id de los videos.
