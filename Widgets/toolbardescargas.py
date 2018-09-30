@@ -67,9 +67,9 @@ class ToolbarDescargas(Gtk.Toolbar):
             self.__contadortestigo = 0
         else:
             self.__contadortestigo += 1
-        if self.__contadortestigo > 15:
-            print ("\nNo se pudo controlar la descarga de:")
-            print ("%s %s\n" % (self.__video_item.videodict["titulo"], self.__video_item.videodict["url"]))
+        if self.__contadortestigo > 25:
+            #print ("\nNo se pudo controlar la descarga de:")
+            #print ("%s %s\n" % (self.__video_item._dict["title"], self.__video_item._dict["url"]))
             self.__cancel_download()
             return False
         return True
@@ -119,12 +119,12 @@ class ToolbarDescargas(Gtk.Toolbar):
         self.__video_item = video_item
         self.__itemWidgetVideoItem.add(self.__video_item)
 
-        texto = self.__video_item.videodict["titulo"]
-        if len(self.__video_item.videodict["titulo"]) > 30:
-            texto = str(self.__video_item.videodict["titulo"][0:30]) + " . . . "
+        texto = self.__video_item._dict["title"]
+        if len(self.__video_item._dict["title"]) > 30:
+            texto = str(self.__video_item._dict["title"][0:30]) + " . . . "
 
         self.__label_titulo.set_text(texto)
-        self.__jamediayoutube.download(self.__video_item.videodict["url"], self.__video_item.videodict["titulo"])
+        self.__jamediayoutube.download(self.__video_item._dict["url"], self.__video_item._dict["title"])
 
         if self.__actualizador:
             GLib.source_remove(self.__actualizador)

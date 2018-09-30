@@ -56,15 +56,13 @@ class JAMediaYoutube(GObject.Object):
         "!", "¡", "%", "+", "*", "ª", "º", "~", "{",
         "}", "Ç", "[", "]", "^", "`", "=", "¬", "\""]
         for l in titulo:
-            if not l in excluir:
-                texto += l
+            if not l in excluir: texto += l
         return str(texto).replace(" ", "_")
 
     def __get_progress(self):
         progress = self.salida.readline()
         if progress:
-            if "100.0%" in progress.split():
-                self.estado = False
+            if "100.0%" in progress.split(): self.estado = False
             self.emit("progress_download", progress)
 
         # control switch codec.
@@ -74,7 +72,7 @@ class JAMediaYoutube(GObject.Object):
         else:
             self.contador += 1
 
-        if self.contador > 15:
+        if self.contador > 25:
             if self.codec + 1 < len(CODECS):
                 self.end()
                 self.codec += 1
@@ -89,8 +87,8 @@ class JAMediaYoutube(GObject.Object):
         self.ultimosdatos = False
         self.contador = 0
 
-        print ("Intentando Descargar:", titulo)
-        print ("\t En Formato:", CODECS[self.codec])
+        #print ("Intentando Descargar:", titulo)
+        #print ("\t En Formato:", CODECS[self.codec])
 
         self.estado = True
 

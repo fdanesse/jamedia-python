@@ -168,8 +168,7 @@ class JAMedia(Gtk.Window):
         self.paneltube.cancel_toolbars_flotantes()
 
     def __run_download(self, widget):
-        if self.toolbar_descarga.estado:
-            return
+        if self.toolbar_descarga.estado: return
         videos = self.paneltube.descargar.get_children()
         if videos:
             videos[0].get_parent().remove(videos[0])
@@ -179,6 +178,7 @@ class JAMedia(Gtk.Window):
             self.toolbar_descarga.hide()
     
     def __drag_drop(self, destino, drag_context, x, y, n):
+        # FIXME: Agregar imagen al drag
         videoitem = Gtk.drag_get_source_widget(drag_context)
         if videoitem.get_parent() == destino:
             return
@@ -220,7 +220,7 @@ class JAMedia(Gtk.Window):
         # 1 - Busquedas
         self.toolbar_busqueda.set_sensitive(False)
         self.__cancel_toolbars()
-        self.alerta_busqueda.show()
+        self.alerta_busqueda.show() # FIXME: Mejorar Alertas
         self.alerta_busqueda.label.set_text("Buscando: %s..." % (palabras))
         # FIXME: analizar si es necesario eliminar estos videos
         objetos = self.paneltube.encontrados.get_children()
@@ -267,9 +267,14 @@ class JAMedia(Gtk.Window):
             videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
             urls.remove(urls[0])
             videowidget.connect("end-update", self.__make_append_update_video, urls)
+            videowidget.connect("error-update", self.__cancel_append_video, urls)
             videowidget.update() # 5 - Busquedas
         else:
             ocultar([self.alerta_busqueda])
+
+    def __cancel_append_video(self, item, urls):
+        item.destroy()
+        self.__make_append_update_video(None, urls)
 
     def __switch(self, widget, valor):
         self.__cancel_toolbars()

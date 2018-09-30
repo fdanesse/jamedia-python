@@ -17,7 +17,9 @@ from JAMediaPlayer.Globales import json_file
 
 class WidgetVideoItem(Gtk.EventBox):
 
-    __gsignals__ = {"end-update": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),}
+    __gsignals__ = {
+        "end-update": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
+        "error-update": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),}
 
     def __init__(self, url):
 
@@ -60,11 +62,10 @@ class WidgetVideoItem(Gtk.EventBox):
         self.show_all()
     
     def __del__(self):
-        #print("DESTROY:", self)
         if os.path.exists(self.__fileimage): os.unlink(self.__fileimage)
         if os.path.exists(self.__filejson): os.unlink(self.__filejson)
 
-    def setImage(self, width=200, height=150):
+    def __setImage(self, width=200, height=150):
         if os.path.exists(self.__fileimage):
             pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(self.__fileimage, width, height)
             self.__imagen.set_from_pixbuf(pixbuf)
@@ -77,17 +78,21 @@ class WidgetVideoItem(Gtk.EventBox):
 
     def update(self):
         # 5 - Busquedas. NOTA: desde PanelTube
-        # FIXME: Emitir señal para informar en la alerta de busquedas
         getJsonAndThumbnail(self._dict["url"], self.__endUpdate)
 
     def __endUpdate(self, _dict):
         # 7 - Busquedas
         self.__fileimage = _dict.get("thumb", "")
         self.__filejson = _dict["json"]
-        newdict = json_file(self.__filejson)
-        for key in self._dict.keys():
-            if key == "url": continue
-            self._dict[key] = newdict.get(key, None)
-        self.setImage()
-        self.__setLabels()
-        self.emit("end-update")
+        # NOTA: si los archivos no existen cuelga la aplicación
+        if os.path.exists(self.__fileimage) and os.path.exists(self.__fileimage):
+            newdict = json_file(self.__filejson)
+            for key in self._dict.keys():
+                if key == "url": continue
+                self._dict[key] = newdict.get(key, None)
+            self.__setImage()
+            self.__setLabels()
+            self.emit("end-update")
+        else:
+            # FIXME: error update para que no se agregue
+            self.emit("error-update")

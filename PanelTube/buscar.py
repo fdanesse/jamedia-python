@@ -60,6 +60,7 @@ def buscar(palabras, cantidad, callback, callbackend):
 
 [youtube] 1DhA69K3fZ4: Writing thumbnail to: /tmp/1DhA69K3fZ4.jpg
 '''
+
 # Descarga de info.json y thumbnail
 def __get_progress(salida, _dict, callback, youtubedl, STDOUT, t1):
     # Devuelve la dirección a los archivos json y thumbnail luego de descargados
@@ -69,18 +70,20 @@ def __get_progress(salida, _dict, callback, youtubedl, STDOUT, t1):
             _dict["json"] = progress.split(":")[-1].replace("\n", "").strip()
         elif "Writing thumbnail to" in progress:
             _dict["thumb"] = progress.split(":")[-1].replace("\n", "").strip()
-
-    if all(_dict.values()):
-        t2 = datetime.datetime.now()
+    
+    t2 = datetime.datetime.now()
+    t3 = t2 - t1
+    if all(_dict.values()) or t3.seconds >= 25:  # Más de 25 segundos no debe estar pausado
+        if t3.seconds >= 25:
+            print("Salteando descarga de metadatos", t3)
+        #t2 = datetime.datetime.now()
         #print("Time:", t2 - t1)
         youtubedl.kill()
-        if salida:
-            salida.close()
-        if os.path.exists(STDOUT):
-            os.unlink(STDOUT)
+        if salida: salida.close()
+        if os.path.exists(STDOUT): os.unlink(STDOUT)
         callback(_dict)
         return False
-
+    
     return True
     
 def getJsonAndThumbnail(url, callback):
