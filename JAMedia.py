@@ -28,7 +28,7 @@ from Widgets.alertabusquedas import AlertaBusqueda
 from Widgets.toolbarsalir import ToolbarSalir
 from PanelTube.widgetvideoitem import WidgetVideoItem
 from PanelTube.paneltube import PanelTube
-from PanelTube.buscar import buscar  #, FEED
+from PanelTube.jamediayoutube import buscar
 from JAMediaPlayer.JAMediaPlayer import JAMediaPlayer
 from JAMediaPlayer.Globales import ocultar
 from JAMediaPlayer.Globales import get_dict

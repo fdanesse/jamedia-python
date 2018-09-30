@@ -11,7 +11,7 @@ from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
 
-from PanelTube.buscar import getJsonAndThumbnail
+from PanelTube.jamediayoutube import getJsonAndThumbnail
 from JAMediaPlayer.Globales import json_file
 
 
