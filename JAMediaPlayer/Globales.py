@@ -27,8 +27,9 @@ if not os.path.exists(Reports):
 if not os.path.exists(YoutubeDir):
     os.mkdir(YoutubeDir)
     # os.chmod(YoutubeDir, stat.S_IXOTH)
-
-# FIXME: clear Repor path: os.remove(convert._newpath)
+for _file in os.listdir(Reports):
+    arch = os.path.join(Reports, _file)
+    os.remove(arch)
 
 
 def json_file(path, data=None, delay=0.1):

@@ -23,6 +23,10 @@ class audioBin1(Gst.Bin):
     def __init__(self, path, codec):
         Gst.Bin.__init__(self, "audioBin1")
 
+        audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
+        audioresample.set_property("quality", 10)
+        audiorate = Gst.ElementFactory.make('audiorate', "audiorate")
+
         enc = None
         if codec == "wav":
             enc = Gst.ElementFactory.make('wavenc', 'wavenc')
@@ -30,10 +34,6 @@ class audioBin1(Gst.Bin):
             enc = Gst.ElementFactory.make('lamemp3enc', 'lamemp3enc')
 
         filesink = Gst.ElementFactory.make('filesink', 'filesink')
-
-        audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
-        audioresample.set_property("quality", 10)
-        audiorate = Gst.ElementFactory.make('audiorate', "audiorate")
 
         self.add(audioresample)
         self.add(audiorate)
@@ -53,13 +53,12 @@ class audioBin2(Gst.Bin):
     def __init__(self, path):
         Gst.Bin.__init__(self, "audioBin2")
 
-        enc = Gst.ElementFactory.make('vorbisenc', 'vorbisenc')
-        mux = Gst.ElementFactory.make('oggmux', 'oggmux')
-        filesink = Gst.ElementFactory.make('filesink', 'filesink')
-
         audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
         audioresample.set_property("quality", 10)
         audiorate = Gst.ElementFactory.make('audiorate', "audiorate")
+        enc = Gst.ElementFactory.make('vorbisenc', 'vorbisenc')
+        mux = Gst.ElementFactory.make('oggmux', 'oggmux')
+        filesink = Gst.ElementFactory.make('filesink', 'filesink')
 
         self.add(audioresample)
         self.add(audiorate)
@@ -97,7 +96,7 @@ class audioBin(Gst.Pipeline):
 
         # FIXME: Implementar limpieza del nombre del archivo
         location = os.path.basename(self.__origen)
-        informeName = self.__origen
+        informeName = location
         if "." in location:
             extension = ".%s" % self.__origen.split(".")[-1]
             informeName = location.replace(extension, "")
@@ -144,6 +143,7 @@ class audioBin(Gst.Pipeline):
             if old == Gst.State.PAUSED and new == Gst.State.PLAYING:
                 if self.__status != new:
                     self.__status = new
+                    self.__informar()
                     self.__t1 = datetime.datetime.now()
 
         elif mensaje.type == Gst.MessageType.EOS:
@@ -161,15 +161,8 @@ class audioBin(Gst.Pipeline):
     '''def __del__(self):
         print("CODEC PIPELINE DESTROY")'''
 
-    def stop(self):
-        self.__new_handle(False)
-        self.set_state(Gst.State.NULL)
-
-    def play(self):
-        self.__new_handle(True)
-        self.set_state(Gst.State.PLAYING)
-        self.get_state(5000000000) # FIXME: Quitar todo esto de aca
-        pad = self.__pipe.emit('get-video-pad',0) 
+    def __informar(self):
+        pad = self.__pipe.emit('get-video-pad',0)
         if pad:
             currentcaps = pad.get_current_caps().to_string()
             if currentcaps.startswith('video/'):
@@ -179,8 +172,20 @@ class audioBin(Gst.Pipeline):
                 self.__informeModel.setInfo("entrada de video", currentcaps)           
                 width, height = getSize(currentcaps)
                 self.__informeModel.setInfo("relacion", float(width)/float(height))
-            elif currentcaps.startswith('audio/'):
+        pad = self.__pipe.emit('get-audio-pad',0) 
+        if pad:
+            currentcaps = pad.get_current_caps().to_string()
+            if currentcaps.startswith('audio/'):
                 self.__informeModel.setInfo("entrada de sonido", currentcaps)
+                pass
+
+    def stop(self):
+        self.__new_handle(False)
+        self.set_state(Gst.State.NULL)
+
+    def play(self):
+        self.__new_handle(True)
+        self.set_state(Gst.State.PLAYING)
 
     def __new_handle(self, reset):
         if self.__controller:

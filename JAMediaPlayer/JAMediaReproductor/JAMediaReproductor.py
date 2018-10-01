@@ -105,7 +105,8 @@ class JAMediaReproductor(GObject.Object):
         self.__bus.connect("message", self.__sync_message)
 
     def __emit_info(self, informemodel, info):
-        self.emit("info", info)  # FIXME: señal actualmente no conectada
+        # FIXME: señal actualmente no conectada, Mostrará en la interfaz las características del video
+        self.emit("info", info)
 
     def __sync_message(self, bus, mensaje):
         if mensaje.type == Gst.MessageType.STATE_CHANGED:
