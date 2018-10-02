@@ -35,8 +35,8 @@ class VideoOutput(Gst.Pipeline):
         self.__capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
         self.__capsfilter.set_property("caps", caps)
         self.__videorate = Gst.ElementFactory.make('videorate', 'videorate')
-        self.__videorate.set_property('skip-to-first', True)  # No pruce datos hasta el primer frame recibido
-        self.__videorate.set_property('drop-only', True)  # No pasa imagenes duplicadas
+        self.__videorate.set_property('skip-to-first', True)    # No produce datos hasta el primer frame recibido
+        self.__videorate.set_property('drop-only', True)        # No pasa imagenes duplicadas
         self.__videorate.set_property('max-rate', 30)
         self.__videoscale = Gst.ElementFactory.make("videoscale", "videoscale")
         self.videobalance = Gst.ElementFactory.make('videobalance', "videobalance")

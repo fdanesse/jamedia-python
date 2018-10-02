@@ -19,11 +19,10 @@ GObject.threads_init()
 Gst.init("--opengl-hwdec-interop=vaapi-glx")
 
 
-# FIXME: No graba el audio.
 '''
-               / queue | videoconvert | videorate | videoscale | capsfilter | vp8enc
-uridecodebin --                                                                      \-- multiqueue | webmmux | filesink
-               \ audioconvert | audioresample | audiorate | vorbisenc ---------------/
+                      / videorate | capsfilter | vp8enc
+filesrc | decodebin --                                  \-- webmmux | filesink
+                      \ audioresample | vorbisenc ------/
 '''
 
 
@@ -46,7 +45,7 @@ class webmPipeline(Gst.Pipeline):
 
         # FIXME: Implementar limpieza del nombre del archivo
         location = os.path.basename(self.__origen)
-        informeName = self.__origen
+        informeName = location
         if "." in location:
             extension = ".%s" % self.__origen.split(".")[-1]
             informeName = location.replace(extension, "")
@@ -73,83 +72,65 @@ class webmPipeline(Gst.Pipeline):
         self.emit("info", info)
 
     def __Init(self):
-        # ORIGEN (Siempre un archivo)
-        uridecodebin = Gst.ElementFactory.make("uridecodebin", "uridecodebin")
+        # ORIGEN
+        filesrc = Gst.ElementFactory.make("filesrc", "filesrc")
+        decodebin = Gst.ElementFactory.make("decodebin", "decodebin")
 
         # VIDEO
-        vqueue = Gst.ElementFactory.make("queue", "vqueue")
-        videoconvert = Gst.ElementFactory.make("videoconvert", "videoconvert")
         videorate = Gst.ElementFactory.make("videorate", "videorate")
-        videorate.set_property("drop-only", True)
-        videorate.set_property("max-rate", 30)
-        videoscale = Gst.ElementFactory.make("videoscale", "videoscale")
-        #caps = Gst.Caps.from_string('video/x-raw,format=(string)I420')
         capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
-        encqueue = Gst.ElementFactory.make("queue", "encqueue")
-        #capsfilter.set_property("caps", caps)
-
+        caps = Gst.Caps.from_string('video/x-raw, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)24000/1001')
+        capsfilter.set_property("caps", caps)
         vp8enc = Gst.ElementFactory.make("vp8enc", "vp8enc")
-        vp8enc.set_property("threads", 1)
-        vp8enc.set_property("cq-level", 63)
-        vp8enc.set_property("cpu-used", 0)
+        #vp8enc.set_property("threads", 1)
+        #vp8enc.set_property("cq-level", 63)
+        #vp8enc.set_property("cpu-used", 0)
 
         # AUDIO
-        audioconvert = Gst.ElementFactory.make("audioconvert", "audioconvert")
         audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
         audioresample.set_property("quality", 10)
-        audiorate = Gst.ElementFactory.make('audiorate', "audiorate")
         vorbisenc = Gst.ElementFactory.make("vorbisenc", "vorbisenc")
 
         # SALIDA
-        multiqueue = Gst.ElementFactory.make("multiqueue", "multiqueue")
         webmmux = Gst.ElementFactory.make("webmmux", "webmmux")
         filesink = Gst.ElementFactory.make("filesink", "filesink")
 
-        self.add(uridecodebin)
+        self.add(filesrc)
+        self.add(decodebin)
 
-        self.add(vqueue)
-        self.add(videoconvert)
         self.add(videorate)
-        self.add(videoscale)
         self.add(capsfilter)
-        self.add(encqueue)
         self.add(vp8enc)
 
-        self.add(audioconvert)
         self.add(audioresample)
-        self.add(audiorate)
         self.add(vorbisenc)
 
-        self.add(multiqueue)
         self.add(webmmux)
         self.add(filesink)
 
-        vqueue.link(videoconvert)
-        videoconvert.link(videorate)
-        videorate.link(videoscale)
-        videoscale.link(capsfilter)
-        capsfilter.link(encqueue)
-        encqueue.link(vp8enc)
-        vp8enc.link(multiqueue)
+        filesrc.link(decodebin)
 
-        audioconvert.link(audioresample)
-        audioresample.link(audiorate)
-        audiorate.link(vorbisenc)
-        vorbisenc.link(multiqueue)
+        videorate.link(capsfilter)
+        capsfilter.link(vp8enc)
+        vp8enc.link(webmmux)
 
-        multiqueue.link(webmmux)
+        audioresample.link(vorbisenc)
+        vorbisenc.link(webmmux)
+
         webmmux.link(filesink)
 
-        self.__videoSink = vqueue.get_static_pad("sink")
-        self.__audioSink = audioconvert.get_static_pad("sink")
+        self.__videoSink = videorate.get_static_pad("sink")
+        self.__audioSink = audioresample.get_static_pad("sink")
 
         filesink.set_property("location", self.__newpath)
-        uridecodebin.set_property("uri", Gst.filename_to_uri(self.__origen))
-        uridecodebin.connect('pad-added', self.__on_pad_added)
+        filesrc.set_property("location", self.__origen)
+        decodebin.connect('pad-added', self.__on_pad_added)
 
         self.__bus = self.get_bus()
         self.__bus.add_signal_watch()
         self.__bus.connect("message", self.busMessageCb)
+
+        #self.use_clock(None)
 
         '''
         self.__bus.enable_sync_message_emission()
@@ -158,7 +139,7 @@ class webmPipeline(Gst.Pipeline):
     def busMessageCbSync(self, bus, message):
         print(message.type)'''
 
-    def __on_pad_added(self, uridecodebin, pad):
+    def __on_pad_added(self, decodebin, pad):
         # FIXME: 1279 * 720 **ERROR: [python3] horizontal_size must be a even (4:2:0 / 4:2:2)
         #   https://en.wikipedia.org/wiki/Chroma_subsampling
         #   http://www.cinedigital.tv/que-es-todo-eso-de-444-422-420-o-color-subsampling/
@@ -176,16 +157,9 @@ class webmPipeline(Gst.Pipeline):
             self.__informeModel.setInfo("codec",self.__codec)
             self.__informeModel.setInfo("formato inicial", self.__tipo)
             self.__informeModel.setInfo("entrada de video", currentcaps)           
-
             width, height = getSize(currentcaps)
             self.__informeModel.setInfo("relacion", float(width)/float(height))
-            if width == 1279: width = 1280  # HACK
-            caps = Gst.Caps.from_string('video/x-raw,framerate=30/1,width=%s,height=%s' % (width, height))  #format=I420,
-            capsfilter = self.get_by_name("capsfilter")
-            capsfilter.set_property("caps", caps)
-
             pad.link(self.__videoSink)
-
         elif currentcaps.startswith('audio/'):
             self.__informeModel.setInfo("entrada de sonido", currentcaps)
             pad.link(self.__audioSink)
