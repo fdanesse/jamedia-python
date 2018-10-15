@@ -69,7 +69,7 @@ class JAMediaReproductor(GObject.Object):
             'band9': 0}
 
         self.__tipo = None
-        self.__informeModel = None  # InformeTranscoderModel("PLAYER" + "-" + informeName)
+        #self.__informeModel = None  # InformeTranscoderModel("PLAYER" + "-" + informeName)
         # self.__informeModel.connect("info", self.__emit_info)
 
         self.__pipe = None
@@ -150,12 +150,13 @@ class JAMediaReproductor(GObject.Object):
             self.emit("endfile")
 
         elif mensaje.type == Gst.MessageType.ERROR:
-            self.__informeModel.setInfo('errores', str(mensaje.parse_error()))
+            #self.__informeModel.setInfo('errores', str(mensaje.parse_error()))
             self.__new_handle(False)
 
     def __informar(self):
         pad = self.__pipe.emit('get-video-pad',0)
         self.emit("video", bool(pad))
+        '''
         if pad:
             currentcaps = pad.get_current_caps().to_string()
             if currentcaps.startswith('video/'):
@@ -169,7 +170,7 @@ class JAMediaReproductor(GObject.Object):
             currentcaps = pad.get_current_caps().to_string()
             if currentcaps.startswith('audio/'):
                 self.__informeModel.setInfo("entrada de sonido", currentcaps)
-
+        '''
     def __new_handle(self, reset):
         if self.__controller:
             GLib.source_remove(self.__controller)
@@ -309,14 +310,15 @@ class JAMediaReproductor(GObject.Object):
             if "." in informeName:
                 extension = ".%s" % informeName.split(".")[-1]
                 informeName = informeName.replace(extension, "")
-            self.__informeModel = InformeTranscoderModel("PLAYER" + "-" + informeName)
-            self.__informeModel.connect("info", self.__emit_info)
+            #self.__informeModel = InformeTranscoderModel("PLAYER" + "-" + informeName)
+            #self.__informeModel.connect("info", self.__emit_info)
                 
             self.__tipo = MAGIC.file(uri)
             temp = Gst.filename_to_uri(uri)
         else:
-            self.__informeModel = InformeTranscoderModel("PLAYER" + "-" + uri)
-            self.__informeModel.connect("info", self.__emit_info)
+            #self.__informeModel = InformeTranscoderModel("PLAYER" + "-" + uri)
+            #self.__informeModel.connect("info", self.__emit_info)
+            pass
 
         if Gst.uri_is_valid(temp):
             self.__source = temp

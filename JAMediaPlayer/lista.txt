@@ -1,0 +1,38 @@
+ADN 40, http://www.iptv.uy:8000/live/GEN543/UR7792/10.ts
+ADN 40 FHD, http://www.iptv.uy:8000/live/GEN543/UR7792/6756.ts
+AZ CLIC, http://www.iptv.uy:8000/live/GEN543/UR7792/106.ts
+AZ CORAZON, http://www.iptv.uy:8000/live/GEN543/UR7792/28.ts
+AZTECA 13, http://www.iptv.uy:8000/live/GEN543/UR7792/149.ts
+AZTECA 7, http://www.iptv.uy:8000/live/GEN543/UR7792/6.ts
+AZTECA CINEMA, http://www.iptv.uy:8000/live/GEN543/UR7792/75.ts
+AZTECA MUNDO, http://www.iptv.uy:8000/live/GEN543/UR7792/40.ts
+CANAL 5, http://www.iptv.uy:8000/live/GEN543/UR7792/4.ts
+CANAL 11 HD, http://www.iptv.uy:8000/live/GEN543/UR7792/8.ts
+FORO TV, http://www.iptv.uy:8000/live/GEN543/UR7792/5.ts
+GALA TV, http://www.iptv.uy:8000/live/GEN543/UR7792/7.ts
+LAS ESTRELLAS, http://www.iptv.uy:8000/live/GEN543/UR7792/3.ts
+MILENIO TV, http://www.iptv.uy:8000/live/GEN543/UR7792/599.ts
+MULTIMEDIOS TV, http://www.iptv.uy:8000/live/GEN543/UR7792/13.ts
+TELEFORMULA, http://www.iptv.uy:8000/live/GEN543/UR7792/12.ts
+TVE, http://www.iptv.uy:8000/live/GEN543/UR7792/442.ts
+UNICABLE, http://www.iptv.uy:8000/live/GEN543/UR7792/409.ts
+A&E, http://www.iptv.uy:8000/live/GEN543/UR7792/20.ts
+A&E FHD, http://www.iptv.uy:8000/live/GEN543/UR7792/6744.ts
+ANIMAL PLANET, http://www.iptv.uy:8000/live/GEN543/UR7792/61.ts
+CNN EN ESPANOL, http://www.iptv.uy:8000/live/GEN543/UR7792/435.ts
+DISCOVERY CHANNEL, http://www.iptv.uy:8000/live/GEN543/UR7792/60.ts
+DISCOVERY CIVILIZATION, http://www.iptv.uy:8000/live/GEN543/UR7792/66.ts
+DISCOVERY HOME & HEALTH, http://www.iptv.uy:8000/live/GEN543/UR7792/62.ts
+DISCOVERY HOME & HEALTH FHD, http://www.iptv.uy:8000/live/GEN543/UR7792/6711.ts
+DISCOVERY HOME & HEALTH FHD (dual audio), http://www.iptv.uy:8000/live/GEN543/UR7792/1547.ts
+DISCOVERY SCIENCE, http://www.iptv.uy:8000/live/GEN543/UR7792/65.ts
+DISCOVERY THEATER, http://www.iptv.uy:8000/live/GEN543/UR7792/56.ts
+DISCOVERY THEATER FHD (dual audio),http://www.iptv.uy:8000/live/GEN543/UR7792/1139.ts
+DISCOVERY TLC, http://www.iptv.uy:8000/live/GEN543/UR7792/68.ts
+DISCOVERY TURBO, http://www.iptv.uy:8000/live/GEN543/UR7792/67.ts
+DISCOVERY WORLD, http://www.iptv.uy:8000/live/GEN543/UR7792/59.ts
+DISCOVERY WORLD FHD (dual audio), http://www.iptv.uy:8000/live/GEN543/UR7792/1138.ts
+EL GOURMETH, http://www.iptv.uy:8000/live/GEN543/UR7792/424.ts
+HBO, http://www.iptv.uy:8000/live/GEN543/UR7792/3710.ts
+I-SAT, http://www.iptv.uy:8000/live/GEN543/UR7792/468.ts
+CINEMAX, http://www.iptv.uy:8000/live/GEN543/UR7792/463.ts

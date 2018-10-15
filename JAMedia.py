@@ -10,6 +10,7 @@ import os
 import sys
 import time
 import threading
+import signal
 
 import gi
 gi.require_version('Gst', '1.0')
@@ -20,6 +21,7 @@ from gi.repository import GObject
 from gi.repository import Gdk
 from gi.repository import GLib
 from gi.repository import Gst
+from gi.repository import Gio
 
 from Widgets.headerBar import HeaderBar
 from Widgets.toolbarbusquedas import ToolbarBusquedas
@@ -35,6 +37,7 @@ from JAMediaPlayer.Globales import get_dict
 from WebKit.WebViewer import WebViewer
 from WebKit.WebViewer import WebViewer
 from JAMediaConverter.JAMediaConverter import JAMediaConverter
+from PanelTube.InformeDescargas import InformeDescargas
 
 BASE_PATH = os.path.dirname(__file__)
 
@@ -64,15 +67,44 @@ context = Gtk.StyleContext()
 context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_SETTINGS)
 
 
-class JAMedia(Gtk.Window):
-
-    __gtype_name__ = 'JAMediaWindow'
+class JAMedia(Gtk.Application):
 
     def __init__(self):
 
-        Gtk.Window.__init__(self)
+        Gtk.Application.__init__(self)
+
+        self.set_flags(Gio.ApplicationFlags.NON_UNIQUE | Gio.ApplicationFlags.HANDLES_OPEN)
+
+    def do_activate(self):
+        self.win = JAMediaWindow(self)
+        self.win.show()
+
+    def do_open(self, files, i, hint):
+        print(files, i, hint)
+        '''
+        if len(files) > 1:
+            print("Multiple files not supported, using %s" % files[0].get_path())
+        if not files[0].query_exists(None):
+        print("%s doesn't exist" % files[0].get_path())
+            return
+        '''
+        self.do_activate ()
+
+    def do_startup (self):
+        Gtk.Application.do_startup(self)
+
+
+class JAMediaWindow(Gtk.ApplicationWindow):
+
+    __gtype_name__ = 'JAMediaWindow'
+
+    def __init__(self, app):
+
+        Gtk.Window.__init__(self, title="JAMedia", application=app)
 
         self.version = get_dict(os.path.join(BASE_PATH, 'proyecto.ide')).get('version', 18)
+
+        self.__informe = InformeDescargas()
 
         self.set_default_size(640, 480)
         self.set_size_request(640, 480)
@@ -120,6 +152,7 @@ class JAMedia(Gtk.Window):
         self.add(boxbase)
 
         self.connect('realize', self.__realized)
+        self.connect("delete-event", self.__salir)
         self.show_all()
         
         print ("JAMedia process:", os.getpid())
@@ -172,7 +205,7 @@ class JAMedia(Gtk.Window):
         videos = self.paneltube.descargar.get_children()
         if videos:
             videos[0].get_parent().remove(videos[0])
-            self.toolbar_descarga.download(videos[0])
+            self.toolbar_descarga.download(videos[0], self.__informe)
             self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
         else:
             self.toolbar_descarga.hide()
@@ -227,7 +260,7 @@ class JAMedia(Gtk.Window):
         #    self.paneltube.remove(objeto)
         #for objeto in objetos:
         #    GLib.idle_add(objeto.destroy)
-        self.__videosEncontrados = []
+        self.__videosEncontrados = []        
         self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
         # FIXME: Verificar si es necesario matar los hilos al terminar la busqueda
         threading.Thread(target=buscar, args=(palabras, cantidad, self.__add_video_encontrado, self.__busquedasEnd)).start()
@@ -270,6 +303,7 @@ class JAMedia(Gtk.Window):
             ocultar([self.alerta_busqueda])
 
     def __cancel_append_video(self, item, urls):
+        self.__informe.setInfo('cancelados en metadatos', item._dict["url"])
         item.destroy()
         self.__make_append_update_video(None, urls)
 
@@ -355,7 +389,7 @@ class JAMedia(Gtk.Window):
         self.toolbar_salir.run()
 
     def __salir(self, widget=None, senial=None):
-        Gtk.main_quit()
+        #Gtk.main_quit()
         sys.exit(0)
 
 
@@ -364,4 +398,7 @@ if __name__ == "__main__":
     Gdk.threads_init()
     Gst.init("--opengl-hwdec-interop=vaapi-glx")
     jamedia = JAMedia()
-    Gtk.main()
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    exit_status = jamedia.run(sys.argv)
+    sys.exit(exit_status)
+    #Gtk.main()

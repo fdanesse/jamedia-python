@@ -114,7 +114,7 @@ def __end(salida, youtubedl, STDOUT, callbackEnd):
     callbackEnd()
     return False
 
-def __get_progressDownload(salida, progressCallback, callbackEnd, youtubedl, STDOUT, t1, url):
+def __get_progressDownload(salida, progressCallback, callbackEnd, youtubedl, STDOUT, t1, url, informe):
     # Devuelve la dirección a los archivos json y thumbnail luego de descargados
     progress = salida.readline()
     if progress:
@@ -128,6 +128,7 @@ def __get_progressDownload(salida, progressCallback, callbackEnd, youtubedl, STD
     t3 = t2 - t1
     if t3.seconds >= 25:  # Más de 25 segundos no debe estar pausado
         print("Salteando descarga de video:", url, t3)
+        informe.setInfo('cancelados en descargas', url)
         #t2 = datetime.datetime.now()
         #print("Time:", t2 - t1)
         __end(salida, youtubedl, STDOUT, callbackEnd)
@@ -135,7 +136,7 @@ def __get_progressDownload(salida, progressCallback, callbackEnd, youtubedl, STD
     
     return True
 
-def runDownload(url, titulo, progressCallback, callbackEnd):
+def runDownload(url, titulo, progressCallback, callbackEnd, informe):
     # Descargar video
     t1 = datetime.datetime.now()  # Solo para ver cuanto demora en hacer todo => 0:00:12.460755
 
@@ -156,4 +157,11 @@ def runDownload(url, titulo, progressCallback, callbackEnd):
     youtubedl = subprocess.Popen(estructura, shell=True, stdout=open(STDOUT, "w+b"), universal_newlines=True)
     salida = open(STDOUT, "r")
 
-    GLib.timeout_add(200, __get_progressDownload, salida, progressCallback, callbackEnd, youtubedl, STDOUT, t1, url)
+    GLib.timeout_add(200, __get_progressDownload, salida, progressCallback, callbackEnd, youtubedl, STDOUT, t1, url, informe)
+
+'''
+para 100 videos de inna:
+Descargados 93
+3 en carpetas
+Se informa de 65 que no se pudieron descargar
+'''

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from json import dump, load
+import json
 from time import sleep
 from random import random
 
@@ -37,10 +37,10 @@ def json_file(path, data=None, delay=0.1):
         try:
             if data == None:
                 with open(path, "r", encoding="utf-8") as f:
-                    return load(f)
+                    return json.loads(f)
             else:
                 with open(path, "w", encoding="utf-8") as f:
-                    return dump(data, f)
+                    return json.dump(data, f, sort_keys=True, separators=(',', ':'), indent=4, skipkeys=False, ensure_ascii=False)
         except:
             sleep(random()*delay) # concurrency
 

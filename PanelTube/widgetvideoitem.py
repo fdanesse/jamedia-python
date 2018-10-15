@@ -81,7 +81,7 @@ class WidgetVideoItem(Gtk.EventBox):
         getJsonAndThumbnail(self._dict["url"], self.__endUpdate)
 
     def __endUpdate(self, _dict):
-        # 7 - Busquedas
+        # 6 - Busquedas
         self.__fileimage = _dict.get("thumb", "")
         self.__filejson = _dict["json"]
         # NOTA: si los archivos no existen cuelga la aplicación

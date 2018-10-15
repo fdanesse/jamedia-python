@@ -80,7 +80,7 @@ class ToolbarDescargas(Gtk.Toolbar):
         self.emit("end")
         return False
 
-    def download(self, video_item):
+    def download(self, video_item, informe):
         self.estado = True
         self.__video_item = video_item
         self.__itemWidgetVideoItem.add(self.__video_item)
@@ -90,6 +90,6 @@ class ToolbarDescargas(Gtk.Toolbar):
             texto = str(self.__video_item._dict["title"][0:30]) + " . . . "
 
         self.__label_titulo.set_text(texto)
-        runDownload(self.__video_item._dict["url"], self.__video_item._dict["title"], self.__progress_download, self.__cancel_download)
+        runDownload(self.__video_item._dict["url"], self.__video_item._dict["title"], self.__progress_download, self.__cancel_download, informe)
 
         self.show_all()

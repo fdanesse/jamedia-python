@@ -25,45 +25,47 @@ class VideoOutput(Gst.Pipeline):
         self.__gtkSink = sink
         
         self.__videoqueue = Gst.ElementFactory.make('queue', 'videoqueue')
+        self.__videoqueue.set_property("min-threshold-buffers", 10000)
 
         # self.__subparse = Gst.ElementFactory.make('subparse', 'subparse')
         # FIXME: Subtítulos no funcionan
         # self.__subtitleoverlay = Gst.ElementFactory.make('subtitleoverlay', 'subtitleoverlay')
 
         self.__videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
-        caps = Gst.Caps.from_string('video/x-raw,pixel-aspect-ratio=1/1')  # Corrige un BUG: http://gstreamer-devel.966125.n4.nabble.com/master-vs-1-5-1-changing-video-size-on-compositor-input-td4673354.html
-        self.__capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
-        self.__capsfilter.set_property("caps", caps)
         self.__videorate = Gst.ElementFactory.make('videorate', 'videorate')
-        self.__videorate.set_property('skip-to-first', True)    # No produce datos hasta el primer frame recibido
-        self.__videorate.set_property('drop-only', True)        # No pasa imagenes duplicadas
-        self.__videorate.set_property('max-rate', 30)
-        self.__videoscale = Gst.ElementFactory.make("videoscale", "videoscale")
+        #self.__videorate.set_property('skip-to-first', True)    # No produce datos hasta el primer frame recibido
+        #self.__videorate.set_property('drop-only', True)        # No pasa imagenes duplicadas
+        #self.__videorate.set_property('max-rate', 60)
         self.videobalance = Gst.ElementFactory.make('videobalance', "videobalance")
         self.gamma = Gst.ElementFactory.make('gamma', "gamma")
         self.videoflip = Gst.ElementFactory.make('videoflip',"videoflip")
+        caps = Gst.Caps.from_string('video/x-raw,pixel-aspect-ratio=1/1')  # Corrige un BUG: http://gstreamer-devel.966125.n4.nabble.com/master-vs-1-5-1-changing-video-size-on-compositor-input-td4673354.html
+        self.__capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
+        self.__capsfilter.set_property("caps", caps)
+        self.__queue2 = Gst.ElementFactory.make('queue', 'queue2')
+        self.__queue2.set_property("min-threshold-buffers", 1000)
 
         self.add(self.__videoqueue)
         # FIXME: Subtítulos no funcionan self.add(self.__subtitleoverlay)
         self.add(self.__videoconvert)
-        self.add(self.__capsfilter)
         self.add(self.__videorate)
-        self.add(self.__videoscale)
         self.add(self.videobalance)
         self.add(self.gamma)
         self.add(self.videoflip)
+        self.add(self.__capsfilter)
+        self.add(self.__queue2)
         self.add(self.__gtkSink)
 
         # FIXME: Subtítulos no funcionan self.__videoqueue.link(self.__subtitleoverlay)
         # FIXME: Subtítulos no funcionan self.__subtitleoverlay.link(self.__videoconvert)
         self.__videoqueue.link(self.__videoconvert)
-        self.__videoconvert.link(self.__capsfilter)
-        self.__capsfilter.link(self.__videorate)
-        self.__videorate.link(self.__videoscale)
-        self.__videoscale.link(self.videobalance)
+        self.__videoconvert.link(self.__videorate)
+        self.__videorate.link(self.videobalance)
         self.videobalance.link(self.gamma)
         self.gamma.link(self.videoflip)
-        self.videoflip.link(self.__gtkSink)
+        self.videoflip.link(self.__capsfilter)
+        self.__capsfilter.link(self.__queue2)
+        self.__queue2.link(self.__gtkSink)
 
         pad = self.__videoqueue.get_static_pad("sink")
         self.add_pad(Gst.GhostPad.new("sink", pad))

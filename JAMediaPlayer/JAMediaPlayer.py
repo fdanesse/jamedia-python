@@ -16,6 +16,9 @@ from JAMediaPlayer.BasePanel import BasePanel
 from JAMediaPlayer.FileChooser import FileChooser
 
 from JAMediaPlayer.Globales import ICONS_PATH
+from JAMediaPlayer.Globales import json_file
+
+BASE_PATH = os.path.dirname(__file__)
 
 
 class JAMediaPlayer(Gtk.VBox):
@@ -57,6 +60,7 @@ class JAMediaPlayer(Gtk.VBox):
         self.base_panel.izquierda.video_visor.connect("button_press_event", self.__set_fullscreen)
         self.base_panel.derecha.lista.toolbar.openfiles.connect("clicked", self.__openfiles, 'load')
         self.base_panel.derecha.lista.toolbar.appendfiles.connect("clicked", self.__openfiles, 'add')
+        self.base_panel.derecha.lista.toolbar.tv.connect("clicked", self.__openTv)
 
         self.__filechooser.open.connect("clicked", self.__load_files)
         self.__filechooser.connect("file-activated", self.__load_files)
@@ -85,6 +89,16 @@ class JAMediaPlayer(Gtk.VBox):
         self.__filechooser.hide()
         self.toolbar.show()
         self.base_panel.show()
+
+    def __openTv(self, widget):
+        self.base_panel.derecha.lista.lista.limpiar()
+        arch = open(os.path.join(BASE_PATH, "lista.txt"), "r")
+        items = arch.readlines()
+        arch.close()
+        tvs = []
+        for item in items:
+            tvs.append(item.replace("\n", "").split(","))
+        self.base_panel.derecha.lista.lista.agregar_items(tvs)
 
     def __openfiles(self, widget, tipo):
         self.toolbar.hide()

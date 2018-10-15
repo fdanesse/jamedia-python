@@ -77,9 +77,9 @@ class webmPipeline(Gst.Pipeline):
         decodebin = Gst.ElementFactory.make("decodebin", "decodebin")
 
         # VIDEO
-        videorate = Gst.ElementFactory.make("videorate", "videorate")
+        videoconvert = Gst.ElementFactory.make("videoconvert", "videoconvert")
         capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
-        caps = Gst.Caps.from_string('video/x-raw, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)24000/1001')
+        caps = Gst.Caps.from_string('video/x-raw, pixel-aspect-ratio=(fraction)1/1')  #framerate=(fraction)24000/1001
         capsfilter.set_property("caps", caps)
         vp8enc = Gst.ElementFactory.make("vp8enc", "vp8enc")
         #vp8enc.set_property("threads", 1)
@@ -87,6 +87,7 @@ class webmPipeline(Gst.Pipeline):
         #vp8enc.set_property("cpu-used", 0)
 
         # AUDIO
+        audioconvert = Gst.ElementFactory.make('audioconvert', "audioconvert")
         audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
         audioresample.set_property("quality", 10)
         vorbisenc = Gst.ElementFactory.make("vorbisenc", "vorbisenc")
@@ -98,10 +99,11 @@ class webmPipeline(Gst.Pipeline):
         self.add(filesrc)
         self.add(decodebin)
 
-        self.add(videorate)
+        self.add(videoconvert)
         self.add(capsfilter)
         self.add(vp8enc)
 
+        self.add(audioconvert)
         self.add(audioresample)
         self.add(vorbisenc)
 
@@ -110,17 +112,18 @@ class webmPipeline(Gst.Pipeline):
 
         filesrc.link(decodebin)
 
-        videorate.link(capsfilter)
+        videoconvert.link(capsfilter)
         capsfilter.link(vp8enc)
         vp8enc.link(webmmux)
 
+        audioconvert.link(audioresample)
         audioresample.link(vorbisenc)
         vorbisenc.link(webmmux)
 
         webmmux.link(filesink)
 
-        self.__videoSink = videorate.get_static_pad("sink")
-        self.__audioSink = audioresample.get_static_pad("sink")
+        self.__videoSink = videoconvert.get_static_pad("sink")
+        self.__audioSink = audioconvert.get_static_pad("sink")
 
         filesink.set_property("location", self.__newpath)
         filesrc.set_property("location", self.__origen)
@@ -130,7 +133,7 @@ class webmPipeline(Gst.Pipeline):
         self.__bus.add_signal_watch()
         self.__bus.connect("message", self.busMessageCb)
 
-        #self.use_clock(None)
+        self.use_clock(None)
 
         '''
         self.__bus.enable_sync_message_emission()
@@ -141,17 +144,12 @@ class webmPipeline(Gst.Pipeline):
 
     def __on_pad_added(self, decodebin, pad):
         # FIXME: 1279 * 720 **ERROR: [python3] horizontal_size must be a even (4:2:0 / 4:2:2)
-        #   https://en.wikipedia.org/wiki/Chroma_subsampling
-        #   http://www.cinedigital.tv/que-es-todo-eso-de-444-422-420-o-color-subsampling/
-        # Necesitamos la resolucion del video para las capas del filtro porque hay un bug en la negociación automática de gstreamer
-        # De no ser por este bug ni siquiera se necesitaría el filtro
-        # En el caso analizado, se recibe: width=(int)1279, height=(int)720
-        # Pero se corrige al cambiar el ancho por 1280
-        # Lo cual es: Maximal output width of 1280 horizontal pixels - De-Interlacing and YUV 4:2:2 to 4:2:0 Conversion Algorithm
+        # https://en.wikipedia.org/wiki/Chroma_subsampling  http://www.cinedigital.tv/que-es-todo-eso-de-444-422-420-o-color-subsampling/
+        # Bug en la negociación automática de gstreamer. En el caso analizado, se recibe: width=(int)1279, height=(int)720
+        # Pero se corrige al cambiar el ancho por 1280 lo cual es: Maximal output width of 1280 horizontal pixels - De-Interlacing and YUV 4:2:2 to 4:2:0 Conversion Algorithm
+        # Se corrige con videorate y filtrando con pixel-aspect-ratio=(fraction)1/1
         tpl_property = pad.get_property("template")  # https://lazka.github.io/pgi-docs/Gst-1.0/classes/PadTemplate.html
-        #tpl_name = tpl_property.name_template
         currentcaps = pad.get_current_caps().to_string()
-        #print ("Template: %s => %s" % (tpl_name, currentcaps))
         if currentcaps.startswith('video/'):
             self.__informeModel.setInfo("archivo", self.__origen)
             self.__informeModel.setInfo("codec",self.__codec)

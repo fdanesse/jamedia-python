@@ -144,7 +144,7 @@ class Lista(Gtk.TreeView):
         texto, path = elementos[0]
         icono = os.path.join(ICONS_PATH, "sonido.svg")
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(icono, 24, -1)
-        self.get_model().append([pixbuf, texto, path])
+        self.get_model().append([pixbuf, texto.strip(), path.strip()])
         elementos.remove(elementos[0])
         GLib.idle_add(self.__ejecutar_agregar_elemento, elementos)
         return False
@@ -221,6 +221,8 @@ class JAMediaToolbarList(Gtk.Toolbar):
         self.subtitulos = get_boton(os.path.join(ICONS_PATH, "subtitulo.png"), flip=False, pixels=18, tooltip_text="Cargar Subtítulos")
         self.insert(self.subtitulos, -1)
         '''
+        self.tv = get_boton(os.path.join(ICONS_PATH, "tvicon.png"), flip=False, pixels=18, tooltip_text="Cargar Lista de Tv")
+        self.insert(self.tv, -1)
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
         self.show_all()
         self.clearlist.set_sensitive(False)
