@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+# https://lazka.github.io/pgi-docs/Gst-1.0/functions.html
+
 import os
 
 from gi.repository import GObject
@@ -32,48 +34,28 @@ class Converter(GObject.Object):
         if self.__codec in ["wav", "mp3", "ogg"]:
             from JAMediaConverter.Gstreamer.AudioPipelines.audioBin import audioBin
             self.__pipe = audioBin(self.__origen, dirpath_destino, self.__codec)
-            self.__pipe.connect('progress', self.__updateProgress)
-            self.__pipe.connect('error', self.__error)
-            self.__pipe.connect('info', self.__info)
-            self.__pipe.connect('end', self.__end)
 
         # TRANSCODE AUDIO Y VIDEO
         elif self.__codec == "ogv":
             from JAMediaConverter.Gstreamer.VideoPipelines.ogvPipeline import ogvPipeline
             self.__pipe = ogvPipeline(self.__origen, dirpath_destino)
-            self.__pipe.connect('progress', self.__updateProgress)
-            self.__pipe.connect('error', self.__error)
-            self.__pipe.connect('info', self.__info)
-            self.__pipe.connect('end', self.__end)
+
         elif self.__codec == "webm":
             from JAMediaConverter.Gstreamer.VideoPipelines.webmPipeline import webmPipeline
             self.__pipe = webmPipeline(self.__origen, dirpath_destino)
-            self.__pipe.connect('progress', self.__updateProgress)
-            self.__pipe.connect('error', self.__error)
-            self.__pipe.connect('info', self.__info)
-            self.__pipe.connect('end', self.__end)
+
         elif self.__codec == "mpg":
             from JAMediaConverter.Gstreamer.VideoPipelines.mpgPipeline import mpgPipeline
             self.__pipe = mpgPipeline(self.__origen, dirpath_destino)
-            self.__pipe.connect('progress', self.__updateProgress)
-            self.__pipe.connect('error', self.__error)
-            self.__pipe.connect('info', self.__info)
-            self.__pipe.connect('end', self.__end)
+
         elif self.__codec == "mp4":
             from JAMediaConverter.Gstreamer.VideoPipelines.mp4Pipeline import mp4Pipeline
             self.__pipe = mp4Pipeline(self.__origen, dirpath_destino)
-            self.__pipe.connect('progress', self.__updateProgress)
-            self.__pipe.connect('error', self.__error)
-            self.__pipe.connect('info', self.__info)
-            self.__pipe.connect('end', self.__end)
+
         elif self.__codec == "avi":
             from JAMediaConverter.Gstreamer.VideoPipelines.aviPipeline import aviPipeline
             self.__pipe = aviPipeline(self.__origen, dirpath_destino)
-            self.__pipe.connect('progress', self.__updateProgress)
-            self.__pipe.connect('error', self.__error)
-            self.__pipe.connect('info', self.__info)
-            self.__pipe.connect('end', self.__end)
-        
+
         # EXTRACCION DE IMAGENES
         elif self.__codec == "png":
             # NOTA: Segun testeo: 100 imagenes x segundo 42.5Mb
@@ -83,6 +65,11 @@ class Converter(GObject.Object):
             self.__videoSink.get_by_name('multifilesink').set_property('location', "%s/img%s06d.png" % (dirpath_destino, "%"))
             self.__pipe.set_property("uri", self.__origen)
 
+        self.__pipe.connect('progress', self.__updateProgress)
+        self.__pipe.connect('error', self.__error)
+        self.__pipe.connect('info', self.__info)
+        self.__pipe.connect('end', self.__end)
+        
     def __updateProgress(self, pipe, val1, codec):
         self.emit("progress", val1, codec)
 

@@ -12,7 +12,7 @@ from gi.repository import GObject
 from gi.repository import GdkPixbuf
 
 from PanelTube.jamediayoutube import getJsonAndThumbnail
-from JAMediaPlayer.Globales import json_file
+from JAMediaPlayer.Globales import get_dict
 
 
 class WidgetVideoItem(Gtk.EventBox):
@@ -86,7 +86,7 @@ class WidgetVideoItem(Gtk.EventBox):
         self.__filejson = _dict["json"]
         # NOTA: si los archivos no existen cuelga la aplicación
         if os.path.exists(self.__fileimage) and os.path.exists(self.__fileimage):
-            newdict = json_file(self.__filejson)
+            newdict = get_dict(self.__filejson)
             for key in self._dict.keys():
                 if key == "url": continue
                 self._dict[key] = newdict.get(key, None)

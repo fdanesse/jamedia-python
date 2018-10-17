@@ -18,7 +18,8 @@ from gi.repository import GstPbutils
 from JAMediaPlayer.JAMediaReproductor.VideoOutput import VideoOutput
 from JAMediaPlayer.JAMediaReproductor.AudioOutput import AudioOutput
 from JAMediaPlayer.Globales import MAGIC
-from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
+# FIXME: Reconstruir informe para posibles errores en el reproductor
+#from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
 GObject.threads_init()
@@ -94,40 +95,44 @@ class JAMediaReproductor(GObject.Object):
     def __succeed(self, discoverer, info, error):
         result=GstPbutils.DiscovererInfo.get_result(info)
         if result != GstPbutils.DiscovererResult.ERROR:
-            streaminfo=info.get_stream_info() #https://lazka.github.io/pgi-docs/GstPbutils-1.0/classes/DiscovererInfo.html
-            if streaminfo != None:
-                print("CAPS:", streaminfo.get_caps())
+            #https://lazka.github.io/pgi-docs/GstPbutils-1.0/classes/DiscovererInfo.html
             print("SEEKABLE:", info.get_seekable())
             print("DURATION:", info.get_duration())
             for i in info.get_stream_list():
+                # https://lazka.github.io/pgi-docs/GstPbutils-1.0/classes/DiscovererStreamInfo.html
                 if isinstance(i, GstPbutils.DiscovererAudioInfo):
-                    print("AUDIO streamid:", i.get_stream_id())
-                    print("LENGUAJE:", i.get_language())
+                    print("AUDIO CAPS:", i.get_caps())
+                    print("AUDIO LENGUAJE:", i.get_language())
+                    print("AUDIO TAGS:", i.get_tags().to_string())
+                    print("AUDIO MISC:", i.get_misc())
                 elif isinstance(i, GstPbutils.DiscovererVideoInfo):
-                   print("VIDEO streamid:", i.get_stream_id())
-                   print("TAGS:", i.get_tags())
-            ''' Un Archivo
-            CAPS: video/webm
-            SEEKABLE: True
-            DURATION: 331601000000
-            AUDIO streamid: 27c1f5039b8684326542c3efe070ac0a2a2eef9bc15a80402958586c74ba8f65/002:002
-            LENGUAJE: es
-            VIDEO streamid: 27c1f5039b8684326542c3efe070ac0a2a2eef9bc15a80402958586c74ba8f65/001:001
-            TAGS: <Gst.TagList object at 0x7f070d6f5d68 (GstTagList at 0x7f06b000c050)>
-            '''
-            ''' Un Streaming
-            CAPS: video/mpegts, systemstream=(boolean)true, packetsize=(int)188
-            SEEKABLE: True
-            DURATION: 18446744073709551615
-            AUDIO streamid: 3787d2b646bdd7ed0967503c86dd6a0bf1cef37f80f8ffdcea4475baa62f539a:1/00000101
-            LENGUAJE: None
-            VIDEO streamid: 3787d2b646bdd7ed0967503c86dd6a0bf1cef37f80f8ffdcea4475baa62f539a:1/00000100
-            TAGS: <Gst.TagList object at 0x7f38dd7f8f48 (GstTagList at 0x1b95000)>
-            '''
+                    print("VIDEO CAPS:", i.get_caps())
+                    print("VIDEO TAGS:", i.get_tags().to_string())
+                    print("VIDEO MISC:", i.get_misc(), "\n")
             self.__pipe.set_property("uri", self.__source)
             self.__play()
         else:
             print(error)
+        '''
+        SEEKABLE: True
+        DURATION: 152904000000
+        AUDIO CAPS: audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw,
+                    level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)121056e500,
+                    rate=(int)44100, channels=(int)2
+        AUDIO LENGUAJE: None
+        AUDIO TAGS: taglist, audio-codec=(string)"MPEG-4\ AAC\ audio", maximum-bitrate=(uint)128000,
+                    bitrate=(uint)127648, title=(string)"\"Udemy\ Video\ Asset\"", encoder=(string)Lavf57.71.100,
+                    container-format=(string)"ISO\ MP4/M4A";
+        AUDIO MISC: None
+        VIDEO CAPS: video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high,
+                    codec_data=(buffer)0164001fffe1001e6764001facd9405005bbff0bbd0bbe10000003001000000303c0f183196001000568eae3dc9c,
+                    width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)39060/39073,
+                    interlace-mode=(string)progressive, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8,
+                    parsed=(boolean)true
+        VIDEO TAGS: taglist, video-codec=(string)"H.264\ /\ AVC", bitrate=(uint)117750, title=(string)"\"Udemy\ Video\ Asset\"",
+                    encoder=(string)Lavf57.71.100, container-format=(string)"ISO\ MP4/M4A";
+        VIDEO MISC: None
+        '''
 
     def __reset(self):
         self.__source = None
@@ -374,11 +379,8 @@ class JAMediaReproductor(GObject.Object):
 
         if Gst.uri_is_valid(temp):
             self.__source = temp
-            #self.__pipe.set_property("uri", self.__source)
-            #self.__play()
+            self.__discovered.discover_uri_async(self.__source)
         else:
             print ("Dirección no válida", temp)
-        
-        self.__discovered.discover_uri_async(self.__source)
 
 GObject.type_register(JAMediaReproductor)

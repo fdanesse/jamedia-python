@@ -25,7 +25,7 @@ def __get_videos(consulta, limite, callback, callbackend):
     try:
         params = urllib.parse.urlencode({'search_query': consulta})
         urls = {}
-        print ("Comezando la búsqueda de %i videos sobre %s..." % (limite, consulta))
+        print ("Comenzando la búsqueda de %i videos sobre %s..." % (limite, consulta))
         for pag in range(1, 10):
             f = urllib.request.urlopen("http://www.youtube.com/results?%s&filters=video&page=%i" % (params, pag))
             text = str(f.read()).replace("\n", "")

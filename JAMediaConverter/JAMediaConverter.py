@@ -52,22 +52,28 @@ class JAMediaConverter(Gtk.VBox):
         self.__filechooser.salir.connect("clicked", self.__setup_init)
         self.__scrollTareas.selectFolder.connect('clicked', self.__run_selectFolder)
         self.__scrollTareas.audioframe.start.connect("clicked", self.__run)
+        self.__scrollTareas.audioframe.connect("running", self.__running)
         self.__scrollTareas.audioframe.connect('end', self.__end_all_process)
         self.__filechooser2.salir.connect("clicked", self.__setup_init)
         self.__filechooser2.open.connect("clicked", self.__folder_selected)
 
         GLib.idle_add(self.__setup_init)
 
+    def __running(self, audioframe, path):
+        self.__playerList.lista.seleccionar_pista(path)
+
     def __end_all_process(self, widget):
-        self.__scrollTareas.set_info_file_in_process('')
-        # self.__scrollTareas.set_info('') #FIXME: Reset para info de archivo en proceso, hay que cambiarlo
+        self.__scrollTareas.set_info_file_in_process(None, '')
+        self.__scrollTareas.set_info(None, '')
         self.__scrollTareas.selectFolder.set_sensitive(True)
         self.__playerList.set_sensitive(True)
+        self.__playerList.lista.seleccionar_primero()
 
     def __run(self, widget):
-        self.__scrollTareas.set_warning('')
-        self.__scrollTareas.set_errors('')
+        self.__scrollTareas.set_warning(None, '')
+        self.__scrollTareas.set_errors(None, '')
         self.__scrollTareas.selectFolder.set_sensitive(False)
+        self.__playerList.lista.seleccionar_primero()
         self.__playerList.set_sensitive(False)  # FIXME: Es necesario ?
         self.__scrollTareas.audioframe.run()
 

@@ -20,7 +20,7 @@ Gst.init("--opengl-hwdec-interop=vaapi-glx")
 
 
 '''
-                      / videorate | capsfilter | vp8enc
+                      / videorate | capsfilter | vp9enc
 filesrc | decodebin --                                  \-- webmmux | filesink
                       \ audioresample | vorbisenc ------/
 '''
@@ -81,10 +81,10 @@ class webmPipeline(Gst.Pipeline):
         capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
         caps = Gst.Caps.from_string('video/x-raw, pixel-aspect-ratio=(fraction)1/1')  #framerate=(fraction)24000/1001
         capsfilter.set_property("caps", caps)
-        vp8enc = Gst.ElementFactory.make("vp8enc", "vp8enc")
-        #vp8enc.set_property("threads", 1)
-        #vp8enc.set_property("cq-level", 63)
-        #vp8enc.set_property("cpu-used", 0)
+        vp9enc = Gst.ElementFactory.make("vp9enc", "vp9enc")
+        #vp9enc.set_property("threads", 1)
+        #vp9enc.set_property("cq-level", 63)
+        #vp9enc.set_property("cpu-used", 0)
 
         # AUDIO
         audioconvert = Gst.ElementFactory.make('audioconvert', "audioconvert")
@@ -101,7 +101,7 @@ class webmPipeline(Gst.Pipeline):
 
         self.add(videoconvert)
         self.add(capsfilter)
-        self.add(vp8enc)
+        self.add(vp9enc)
 
         self.add(audioconvert)
         self.add(audioresample)
@@ -113,15 +113,17 @@ class webmPipeline(Gst.Pipeline):
         filesrc.link(decodebin)
 
         videoconvert.link(capsfilter)
-        capsfilter.link(vp8enc)
-        vp8enc.link(webmmux)
+        capsfilter.link(vp9enc)
+        vp9enc.link(webmmux)
 
         audioconvert.link(audioresample)
         audioresample.link(vorbisenc)
         vorbisenc.link(webmmux)
 
         webmmux.link(filesink)
-
+        #taglist = Gst.TagList() #FIXME: No hace lo que debiera
+        #webmmux.merge_tags(taglist, Gst.TagMergeMode.REPLACE_ALL)  #https://lazka.github.io/pgi-docs/Gst-1.0/enums.html#Gst.TagMergeMode
+        
         self.__videoSink = videoconvert.get_static_pad("sink")
         self.__audioSink = audioconvert.get_static_pad("sink")
 

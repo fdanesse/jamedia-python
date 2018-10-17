@@ -86,43 +86,34 @@ class ScrollTareas(Gtk.ScrolledWindow):
         self.connect('realize', self.setup_init)
         self.show_all()
 
-        self.audioframe.connect("running", self.__new_file_in_progress)
-        self.audioframe.connect('error', self.__new_error)
-        self.audioframe.connect('info', self.__new_info)
-        self.audioframe.connect('warning', self.__new_warning)
+        self.audioframe.connect("running", self.set_info_file_in_process)
+        self.audioframe.connect('error', self.set_errors)
+        self.audioframe.connect('info', self.set_info)
+        self.audioframe.connect('warning', self.set_warning)
 
     def setup_init(self, widget=None):
         self.__errorsFrame.hide()
         self.__infoFrame.hide()
         self.__warningFrame.hide()
 
-    def __new_file_in_progress(self, widget, path):
-        self.set_info_file_in_process(path)
-
-    def __new_info(self, widget, info):
-        #self.set_info(info)  # FIXME: info es ahora un diccionario
-        #print (info)
+    def set_info(self, widget, info):
         pass
-
-    '''def set_info(self, info=''):
-        # FIXME: Cambiar esta etiqueta por elementos que se agreguen en forma separada
+        '''
         if info:
             if info != self.__infoLabel.get_text():
                 self.__infoLabel.set_text(info)
             self.__infoFrame.show_all()
         else:
             self.__infoLabel.set_text("")
-            self.__infoFrame.hide()'''
-
-    def set_info_file_in_process(self, path=''):
+            self.__infoFrame.hide()
+        '''
+        
+    def set_info_file_in_process(self, widget, path):
         text = 'No hay tareas pendientes'
         if path: text = "Procesando: %s" % os.path.basename(path)
         self.__info_file_in_process.set_text(text)
 
-    def __new_error(self, widget, error):
-        self.set_errors(error)
-
-    def set_errors(self, text=''):
+    def set_errors(self, widget, text):
         if text:
             label = Gtk.Label(text)
             label.set_line_wrap(True)
@@ -136,10 +127,7 @@ class ScrollTareas(Gtk.ScrolledWindow):
                 widget.destroy()
             self.__errorsFrame.hide()
 
-    def __new_warning(self, widget, warning):
-        self.set_warning(warning)
-
-    def set_warning(self, warning=''):
+    def set_warning(self, widget, warning):
         if warning:
             label = Gtk.Label(warning)
             label.set_line_wrap(True)

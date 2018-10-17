@@ -18,7 +18,7 @@ from JAMediaPlayer.Globales import ICONS_PATH
 class PlayerList(Gtk.Frame):
 
     __gsignals__ = {
-        "subtitulos": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING, ))
+    "subtitulos": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING, ))
     }
 
     def __init__(self):
@@ -45,15 +45,12 @@ class PlayerList(Gtk.Frame):
 
         self.set_size_request(250, -1)
 
-        self.toolbar.clearlist.connect("clicked", self.__clearList)
+        self.toolbar.clearlist.connect("clicked", self.lista.limpiar)
         # FIXME: Subtítulos no funcionan self.toolbar.subtitulos.connect("clicked", self.__cargar_subtitulos)
         self.lista.connect("len_items", self.__len_items)
 
     def __len_items(self, widget, val):
         self.toolbar.clearlist.set_sensitive(bool(val))
-
-    def __clearList(self, widget):
-        self.lista.limpiar()
 
     ''' # FIXME: Subtítulos no funcionan
     def __cargar_subtitulos(self, widget):
@@ -201,6 +198,15 @@ class Lista(Gtk.TreeView):
         if _iter:
             self.get_selection().select_iter(_iter)
 
+    def seleccionar_pista(self, pista):
+        model = self.get_model()
+        item = model.get_iter_first()
+        while item:
+            if model.get_value(item, 2) == pista:
+                self.get_selection().select_iter(item)
+                break
+            item = model.iter_next(item)
+
     def limpiar(self, widget=None):
         self.get_selection().disconnect_by_func(self.__changedSelection)
         self.get_model().clear()
@@ -208,8 +214,11 @@ class Lista(Gtk.TreeView):
 
 
 class JAMediaToolbarList(Gtk.Toolbar):
+
     def __init__(self):
+
         Gtk.Toolbar.__init__(self)
+
         self.get_style_context().add_class('toolbarlist')
         self.openfiles = get_boton(os.path.join(ICONS_PATH, "document-open.svg"), flip=False, pixels=18, tooltip_text="Cargar Archivos")
         self.insert(self.openfiles, -1)

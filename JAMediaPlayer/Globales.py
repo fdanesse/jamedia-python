@@ -36,11 +36,11 @@ def json_file(path, data=None, delay=0.1):
     while True:
         try:
             if data == None:
-                with open(path, "r", encoding="utf-8") as f:
+                with open(path, "r") as f:  #, encoding="utf-8"
                     return json.loads(f)
             else:
-                with open(path, "w", encoding="utf-8") as f:
-                    return json.dump(data, f, sort_keys=True, separators=(',', ':'), indent=4, skipkeys=False, ensure_ascii=False)
+                with open(path, "w") as f:  #, encoding="utf-8"
+                    return json.dump(data, f)  #sort_keys=True, separators=(',', ':'), indent=4, skipkeys=False, ensure_ascii=False
         except:
             sleep(random()*delay) # concurrency
 

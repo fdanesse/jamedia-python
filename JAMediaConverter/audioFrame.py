@@ -166,7 +166,7 @@ class AudioFrame(Gtk.Frame):
         else:
             for convert in self._converters.values():
                 if convert:
-                    print("PLAY", convert.getInfo())
+                    #print("CONVERT", convert.getInfo())
                     # Esto no debiera ser necesario
                     time.sleep(0.5)
                     convert.play()
@@ -202,7 +202,7 @@ class AudioFrame(Gtk.Frame):
         # Va quitando los converters a medida que terminan y cuando no quedan más pasa el siguiente archivo
         if convert:
             codec, origen = convert.getInfo()
-            print("\nNEXT", codec, origen, self._converters)
+            #print("\nNEXT", codec, origen, self._converters)
             '''# Esto no debiera ser necesario
             self._converters[codec].disconnect_by_func(self.__updateProgress)
             self._converters[codec].disconnect_by_func(self.__error)
