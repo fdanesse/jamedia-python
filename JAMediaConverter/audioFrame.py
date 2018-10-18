@@ -41,7 +41,7 @@ class AudioFrame(Gtk.Frame):
         self._checks = []
 
         self.__videoCodecs = ["ogv", "webm", "mp4", "avi", "mpg", "png"]
-        self._progress = {"ogg":None, "mp3":None, "wav":None, "webm":None}  #, "ogv":None, "webm":None, "mp4":None, "avi":None, "mpg":None, "png":None
+        self._progress = {"ogg":None, "mp3":None, "wav":None, "webm":None, "ogv":None, "mp4":None, "avi":None, "mpg":None, "png":None}
 
         self.set_label(" Elige los formatos de extracción: ")
 

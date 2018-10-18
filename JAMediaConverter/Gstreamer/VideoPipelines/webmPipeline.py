@@ -20,9 +20,9 @@ Gst.init("--opengl-hwdec-interop=vaapi-glx")
 
 
 '''
-                      / videorate | capsfilter | vp9enc
-filesrc | decodebin --                                  \-- webmmux | filesink
-                      \ audioresample | vorbisenc ------/
+                      / vp9enc ---
+filesrc | decodebin --            \-- webmmux | filesink
+                      \ vorbisenc /
 '''
 
 
@@ -77,19 +77,12 @@ class webmPipeline(Gst.Pipeline):
         decodebin = Gst.ElementFactory.make("decodebin", "decodebin")
 
         # VIDEO
-        videoconvert = Gst.ElementFactory.make("videoconvert", "videoconvert")
-        capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
-        caps = Gst.Caps.from_string('video/x-raw, pixel-aspect-ratio=(fraction)1/1')  #framerate=(fraction)24000/1001
-        capsfilter.set_property("caps", caps)
         vp9enc = Gst.ElementFactory.make("vp9enc", "vp9enc")
         #vp9enc.set_property("threads", 1)
         #vp9enc.set_property("cq-level", 63)
         #vp9enc.set_property("cpu-used", 0)
 
         # AUDIO
-        audioconvert = Gst.ElementFactory.make('audioconvert', "audioconvert")
-        audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
-        audioresample.set_property("quality", 10)
         vorbisenc = Gst.ElementFactory.make("vorbisenc", "vorbisenc")
 
         # SALIDA
@@ -98,34 +91,20 @@ class webmPipeline(Gst.Pipeline):
 
         self.add(filesrc)
         self.add(decodebin)
-
-        self.add(videoconvert)
-        self.add(capsfilter)
         self.add(vp9enc)
-
-        self.add(audioconvert)
-        self.add(audioresample)
         self.add(vorbisenc)
-
         self.add(webmmux)
         self.add(filesink)
 
         filesrc.link(decodebin)
-
-        videoconvert.link(capsfilter)
-        capsfilter.link(vp9enc)
         vp9enc.link(webmmux)
-
-        audioconvert.link(audioresample)
-        audioresample.link(vorbisenc)
         vorbisenc.link(webmmux)
-
         webmmux.link(filesink)
         #taglist = Gst.TagList() #FIXME: No hace lo que debiera
         #webmmux.merge_tags(taglist, Gst.TagMergeMode.REPLACE_ALL)  #https://lazka.github.io/pgi-docs/Gst-1.0/enums.html#Gst.TagMergeMode
         
-        self.__videoSink = videoconvert.get_static_pad("sink")
-        self.__audioSink = audioconvert.get_static_pad("sink")
+        self.__videoSink = vp9enc.get_static_pad("sink")
+        self.__audioSink = vorbisenc.get_static_pad("sink")
 
         filesink.set_property("location", self.__newpath)
         filesrc.set_property("location", self.__origen)

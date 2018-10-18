@@ -73,73 +73,57 @@ class aviPipeline(Gst.Pipeline):
 
     def __Init(self):
         # ORIGEN (Siempre un archivo)
-        uridecodebin = Gst.ElementFactory.make("uridecodebin", "uridecodebin")
+        filesrc = Gst.ElementFactory.make("filesrc", "filesrc")
+        decodebin = Gst.ElementFactory.make("decodebin", "decodebin")
 
         # VIDEO
-        vqueue = Gst.ElementFactory.make("queue", "vqueue")
-        videoconvert = Gst.ElementFactory.make("videoconvert", "videoconvert")
-        videorate = Gst.ElementFactory.make("videorate", "videorate")
-        videorate.set_property("drop-only", True)
-        videorate.set_property("max-rate", 30)
-        videoscale = Gst.ElementFactory.make("videoscale", "videoscale")
-        #caps = Gst.Caps.from_string('video/x-raw,format=(string)I420')
-        capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
-        #capsfilter.set_property("caps", caps)
         x264enc = Gst.ElementFactory.make("x264enc", "x264enc")
 
         # AUDIO
-        audioconvert = Gst.ElementFactory.make("audioconvert", "audioconvert")
-        audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
-        audioresample.set_property("quality", 10)
-        audiorate = Gst.ElementFactory.make('audiorate', "audiorate")
         lamemp3enc = Gst.ElementFactory.make("lamemp3enc", "lamemp3enc")
 
         # SALIDA
         avimux = Gst.ElementFactory.make("avimux", "avimux")
         filesink = Gst.ElementFactory.make("filesink", "filesink")
 
-        self.add(uridecodebin)
-
-        self.add(vqueue)
-        self.add(videoconvert)
-        self.add(videorate)
-        self.add(videoscale)
-        self.add(capsfilter)
+        self.add(filesrc)
+        self.add(decodebin)
         self.add(x264enc)
-
-        self.add(audioconvert)
-        self.add(audioresample)
-        self.add(audiorate)
         self.add(lamemp3enc)
-
         self.add(avimux)
         self.add(filesink)
 
-        vqueue.link(videoconvert)
-        videoconvert.link(videorate)
-        videorate.link(videoscale)
-        videoscale.link(capsfilter)
-        capsfilter.link(x264enc)
+        filesrc.link(decodebin)
         x264enc.link(avimux)
+        lamemp3enc.link(avimux)
         avimux.link(filesink)
 
-        audioconvert.link(audioresample)
-        audioresample.link(audiorate)
-        audiorate.link(lamemp3enc)
-        lamemp3enc.link(avimux)
-
-        self.__videoSink = vqueue.get_static_pad("sink")
-        self.__audioSink = audioconvert.get_static_pad("sink")
+        self.__videoSink = x264enc.get_static_pad("sink")
+        self.__audioSink = lamemp3enc.get_static_pad("sink")
 
         filesink.set_property("location", self.__newpath)
-        uridecodebin.set_property("uri", Gst.filename_to_uri(self.__origen))
-        uridecodebin.connect('pad-added', self.__on_pad_added)
+        filesrc.set_property("location", self.__origen)
+        decodebin.connect('pad-added', self.__on_pad_added)
 
         self.__bus = self.get_bus()
         self.__bus.add_signal_watch()
         self.__bus.connect("message", self.busMessageCb)
 
-    def __on_pad_added(self, uridecodebin, pad):
+        self.use_clock(None)
+
+        '''
+        self.__bus.enable_sync_message_emission()
+        self.__bus.connect("sync-message", self.busMessageCbSync)
+
+    def busMessageCbSync(self, bus, message):
+        print(message.type)'''
+
+    def __on_pad_added(self, decodebin, pad):
+        # FIXME: 1279 * 720 **ERROR: [python3] horizontal_size must be a even (4:2:0 / 4:2:2)
+        # https://en.wikipedia.org/wiki/Chroma_subsampling  http://www.cinedigital.tv/que-es-todo-eso-de-444-422-420-o-color-subsampling/
+        # Bug en la negociación automática de gstreamer. En el caso analizado, se recibe: width=(int)1279, height=(int)720
+        # Pero se corrige al cambiar el ancho por 1280 lo cual es: Maximal output width of 1280 horizontal pixels - De-Interlacing and YUV 4:2:2 to 4:2:0 Conversion Algorithm
+        # Se corrige con videorate y filtrando con pixel-aspect-ratio=(fraction)1/1
         tpl_property = pad.get_property("template")  # https://lazka.github.io/pgi-docs/Gst-1.0/classes/PadTemplate.html
         currentcaps = pad.get_current_caps().to_string()
         if currentcaps.startswith('video/'):
@@ -147,16 +131,9 @@ class aviPipeline(Gst.Pipeline):
             self.__informeModel.setInfo("codec",self.__codec)
             self.__informeModel.setInfo("formato inicial", self.__tipo)
             self.__informeModel.setInfo("entrada de video", currentcaps)           
-
             width, height = getSize(currentcaps)
             self.__informeModel.setInfo("relacion", float(width)/float(height))
-            if width == 1279: width = 1280  # HACK
-            caps = Gst.Caps.from_string('video/x-raw,framerate=30/1,width=%s,height=%s' % (width, height))
-            capsfilter = self.get_by_name("capsfilter")
-            capsfilter.set_property("caps", caps)
-
             pad.link(self.__videoSink)
-
         elif currentcaps.startswith('audio/'):
             self.__informeModel.setInfo("entrada de sonido", currentcaps)
             pad.link(self.__audioSink)
@@ -180,32 +157,14 @@ class aviPipeline(Gst.Pipeline):
             self.__informeModel.setInfo('errores', str(mensaje.parse_error()))
             self.stop()
             self.emit("error", "ERROR en: " + self.__newpath + ' => ' + str(mensaje.parse_error()))
-        
-    def __del__(self):
-        print("CODEC PIPELINE DESTROY")
 
     def stop(self):
         self.__new_handle(False)
         self.set_state(Gst.State.NULL)
-        ret = self.get_state(1000)
-        print("STOP", ret)
-        if self.__bus:
-            self.__bus.disconnect_by_func(self.busMessageCb)
-            self.__bus.remove_signal_watch()
-            self.__bus = None
 
     def play(self):
         self.__new_handle(True)
         self.set_state(Gst.State.PLAYING)
-        ret = self.get_state(1000)
-        print("PLAY", ret)
-        '''
-        if ret == Gst.State.PLAYING:
-            self.__new_handle(True)
-        else:
-            print("PLAY", ret)
-            self.stop()
-            self.emit("end")'''
 
     def __new_handle(self, reset):
         if self.__controller:

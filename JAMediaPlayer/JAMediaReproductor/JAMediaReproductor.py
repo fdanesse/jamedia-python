@@ -133,7 +133,35 @@ class JAMediaReproductor(GObject.Object):
                     encoder=(string)Lavf57.71.100, container-format=(string)"ISO\ MP4/M4A";
         VIDEO MISC: None
         '''
-
+        '''
+        {"archivo":
+        "/home/flavio/Descargas/Tienda Angular/22 - A\u00f1adiendo y actualizando productos.mp4",
+        "formato inicial": "video/mp4; charset=binary",
+        "entrada de video": "video/x-raw, format=(string)I420, width=(int)1280, height=(int)720,
+            interlace-mode=(string)progressive, multiview-mode=(string)mono,
+            multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:
+            /right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono,
+            pixel-aspect-ratio=(fraction)39060/39073, chroma-site=(string)mpeg2, colorimetry=(string)bt709,
+            framerate=(fraction)30/1",
+            "entrada de sonido": "audio/x-raw, format=(string)F32LE, layout=(string)interleaved,
+            rate=(int)44100, channels=(int)2, channel-mask=(bitmask)0x0000000000000003",
+            "codec": "webm", "duracion": "02:32", "relacion": 1.7777777777777777,
+            "tiempo de proceso": "0:32:58.984548", "errores": ""}
+        '''
+        '''
+        SEEKABLE: True
+        DURATION: 152880000000
+        AUDIO CAPS: audio/x-vorbis, channels=(int)2, rate=(int)44100, streamheader=(buffer)<
+        AUDIO LENGUAJE: en
+        AUDIO TAGS: taglist, container-format=(string)Matroska, language-code=(string)en, title=(string)"\"Udemy\ Video\ Asset\"",
+                    encoder=(string)Lavf57.71.100, encoder-version=(uint)0, audio-codec=(string)Vorbis, nominal-bitrate=(uint)112000,
+                    bitrate=(uint)112000;
+        AUDIO MISC: None
+        VIDEO CAPS: video/x-vp9, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1
+        VIDEO TAGS: taglist, video-codec=(string)"VP9\ video", container-format=(string)Matroska, title=(string)"\"Udemy\ Video\ Asset\"",
+                    encoder=(string)Lavf57.71.100;
+        VIDEO MISC: None
+        '''
     def __reset(self):
         self.__source = None
         #self.__controller = False
