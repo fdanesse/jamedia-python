@@ -77,9 +77,12 @@ class mp4Pipeline(Gst.Pipeline):
         decodebin = Gst.ElementFactory.make("decodebin", "decodebin")
 
         # VIDEO
+        videoscale = Gst.ElementFactory.make("videoscale", "videoscale")
+        self.__capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
         x264enc = Gst.ElementFactory.make("x264enc", "x264enc")
     
         # AUDIO
+        audioconvert = Gst.ElementFactory.make("audioconvert", "audioconvert")
         lamemp3enc = Gst.ElementFactory.make("lamemp3enc", "lamemp3enc")
 
         # SALIDA
@@ -88,18 +91,24 @@ class mp4Pipeline(Gst.Pipeline):
 
         self.add(filesrc)
         self.add(decodebin)
+        self.add(videoscale)
+        self.add(self.__capsfilter)
         self.add(x264enc)
+        self.add(audioconvert)
         self.add(lamemp3enc)
         self.add(mp4mux)
         self.add(filesink)
 
         filesrc.link(decodebin)
+        videoscale.link(self.__capsfilter)
+        self.__capsfilter.link(x264enc)
+        audioconvert.link(lamemp3enc)
         lamemp3enc.link(mp4mux)
         x264enc.link(mp4mux)
         mp4mux.link(filesink)
 
-        self.__videoSink = x264enc.get_static_pad("sink")
-        self.__audioSink = lamemp3enc.get_static_pad("sink")
+        self.__videoSink = videoscale.get_static_pad("sink")
+        self.__audioSink = audioconvert.get_static_pad("sink")
 
         filesink.set_property("location", self.__newpath)
         filesrc.set_property("location", self.__origen)
@@ -133,6 +142,8 @@ class mp4Pipeline(Gst.Pipeline):
             self.__informeModel.setInfo("entrada de video", currentcaps)           
             width, height = getSize(currentcaps)
             self.__informeModel.setInfo("relacion", float(width)/float(height))
+            caps = Gst.Caps.from_string('video/x-raw, pixel-aspect-ratio=(fraction)1/1, width=(int)%s, height=(int)%s' % (width, height))  #framerate=(fraction)24000/1001
+            self.__capsfilter.set_property("caps", caps)
             pad.link(self.__videoSink)
         elif currentcaps.startswith('audio/'):
             self.__informeModel.setInfo("entrada de sonido", currentcaps)

@@ -76,10 +76,12 @@ class mpgPipeline(Gst.Pipeline):
         decodebin = Gst.ElementFactory.make("decodebin", "decodebin")
 
         # VIDEO
+        videoscale = Gst.ElementFactory.make("videoscale", "videoscale")
+        self.__capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
         mpeg2enc = Gst.ElementFactory.make("mpeg2enc", "mpeg2enc")
-        #mpeg2enc.set_property("bufsize", 4000)
 
         # AUDIO
+        audioconvert = Gst.ElementFactory.make("audioconvert", "audioconvert")
         twolamemp2enc = Gst.ElementFactory.make("twolamemp2enc", "twolamemp2enc")
 
         # SALIDA
@@ -88,18 +90,24 @@ class mpgPipeline(Gst.Pipeline):
 
         self.add(filesrc)
         self.add(decodebin)
+        self.add(videoscale)
+        self.add(self.__capsfilter)
         self.add(mpeg2enc)
+        self.add(audioconvert)
         self.add(twolamemp2enc)
         self.add(mpegpsmux)
         self.add(filesink)
 
         filesrc.link(decodebin)
+        videoscale.link(self.__capsfilter)
+        self.__capsfilter.link(mpeg2enc)
+        audioconvert.link(twolamemp2enc)
         mpeg2enc.link(mpegpsmux)
         twolamemp2enc.link(mpegpsmux)
         mpegpsmux.link(filesink)
 
-        self.__videoSink = mpeg2enc.get_static_pad("sink")
-        self.__audioSink = twolamemp2enc.get_static_pad("sink")
+        self.__videoSink = videoscale.get_static_pad("sink")
+        self.__audioSink = audioconvert.get_static_pad("sink")
 
         filesink.set_property("location", self.__newpath)
         filesrc.set_property("location", self.__origen)
@@ -133,6 +141,8 @@ class mpgPipeline(Gst.Pipeline):
             self.__informeModel.setInfo("entrada de video", currentcaps)           
             width, height = getSize(currentcaps)
             self.__informeModel.setInfo("relacion", float(width)/float(height))
+            caps = Gst.Caps.from_string('video/x-raw, pixel-aspect-ratio=(fraction)1/1, width=(int)%s, height=(int)%s' % (width, height))  #framerate=(fraction)24000/1001
+            self.__capsfilter.set_property("caps", caps)
             pad.link(self.__videoSink)
         elif currentcaps.startswith('audio/'):
             self.__informeModel.setInfo("entrada de sonido", currentcaps)

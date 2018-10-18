@@ -77,12 +77,12 @@ class webmPipeline(Gst.Pipeline):
         decodebin = Gst.ElementFactory.make("decodebin", "decodebin")
 
         # VIDEO
+        videoscale = Gst.ElementFactory.make("videoscale", "videoscale")
+        self.__capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
         vp9enc = Gst.ElementFactory.make("vp9enc", "vp9enc")
-        #vp9enc.set_property("threads", 1)
-        #vp9enc.set_property("cq-level", 63)
-        #vp9enc.set_property("cpu-used", 0)
 
         # AUDIO
+        audioconvert = Gst.ElementFactory.make("audioconvert", "audioconvert")
         vorbisenc = Gst.ElementFactory.make("vorbisenc", "vorbisenc")
 
         # SALIDA
@@ -91,20 +91,26 @@ class webmPipeline(Gst.Pipeline):
 
         self.add(filesrc)
         self.add(decodebin)
+        self.add(videoscale)
+        self.add(self.__capsfilter)
         self.add(vp9enc)
+        self.add(audioconvert)
         self.add(vorbisenc)
         self.add(webmmux)
         self.add(filesink)
 
         filesrc.link(decodebin)
+        videoscale.link(self.__capsfilter)
+        self.__capsfilter.link(vp9enc)
         vp9enc.link(webmmux)
+        audioconvert.link(vorbisenc)
         vorbisenc.link(webmmux)
         webmmux.link(filesink)
         #taglist = Gst.TagList() #FIXME: No hace lo que debiera
         #webmmux.merge_tags(taglist, Gst.TagMergeMode.REPLACE_ALL)  #https://lazka.github.io/pgi-docs/Gst-1.0/enums.html#Gst.TagMergeMode
         
-        self.__videoSink = vp9enc.get_static_pad("sink")
-        self.__audioSink = vorbisenc.get_static_pad("sink")
+        self.__videoSink = videoscale.get_static_pad("sink")
+        self.__audioSink = audioconvert.get_static_pad("sink")
 
         filesink.set_property("location", self.__newpath)
         filesrc.set_property("location", self.__origen)
@@ -138,6 +144,8 @@ class webmPipeline(Gst.Pipeline):
             self.__informeModel.setInfo("entrada de video", currentcaps)           
             width, height = getSize(currentcaps)
             self.__informeModel.setInfo("relacion", float(width)/float(height))
+            caps = Gst.Caps.from_string('video/x-raw, pixel-aspect-ratio=(fraction)1/1, width=(int)%s, height=(int)%s' % (width, height))  #framerate=(fraction)24000/1001
+            self.__capsfilter.set_property("caps", caps)
             pad.link(self.__videoSink)
         elif currentcaps.startswith('audio/'):
             self.__informeModel.setInfo("entrada de sonido", currentcaps)

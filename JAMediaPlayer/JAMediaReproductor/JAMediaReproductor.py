@@ -51,7 +51,6 @@ class JAMediaReproductor(GObject.Object):
         self.__position = 0
 
         self.__discovered = GstPbutils.Discoverer() #https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gst-plugins-base-libs/html/GstDiscoverer.html
-        #self.__discovered.connect('source-setup', self.__sourceSetup)
         self.__discovered.connect('discovered', self.__succeed)
         self.__discovered.start()
 
@@ -85,13 +84,6 @@ class JAMediaReproductor(GObject.Object):
         self.__audioBin = AudioOutput(dict(self.__audioconfig))
         self.__bus = None
 
-    '''
-    def __sourceSetup(self, parent, element):
-        <GstPbutils.Discoverer object at 0x7fa35960abd0 (GstDiscoverer at 0x2c7a2f0)>
-        <__gi__.GstFileSrc object at 0x7fa30a1b2ee8 (GstFileSrc at 0x4240600)>
-        print(parent, element)
-    '''
-
     def __succeed(self, discoverer, info, error):
         result=GstPbutils.DiscovererInfo.get_result(info)
         if result != GstPbutils.DiscovererResult.ERROR:
@@ -113,55 +105,7 @@ class JAMediaReproductor(GObject.Object):
             self.__play()
         else:
             print(error)
-        '''
-        SEEKABLE: True
-        DURATION: 152904000000
-        AUDIO CAPS: audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw,
-                    level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)121056e500,
-                    rate=(int)44100, channels=(int)2
-        AUDIO LENGUAJE: None
-        AUDIO TAGS: taglist, audio-codec=(string)"MPEG-4\ AAC\ audio", maximum-bitrate=(uint)128000,
-                    bitrate=(uint)127648, title=(string)"\"Udemy\ Video\ Asset\"", encoder=(string)Lavf57.71.100,
-                    container-format=(string)"ISO\ MP4/M4A";
-        AUDIO MISC: None
-        VIDEO CAPS: video/x-h264, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high,
-                    codec_data=(buffer)0164001fffe1001e6764001facd9405005bbff0bbd0bbe10000003001000000303c0f183196001000568eae3dc9c,
-                    width=(int)1280, height=(int)720, framerate=(fraction)30/1, pixel-aspect-ratio=(fraction)39060/39073,
-                    interlace-mode=(string)progressive, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8,
-                    parsed=(boolean)true
-        VIDEO TAGS: taglist, video-codec=(string)"H.264\ /\ AVC", bitrate=(uint)117750, title=(string)"\"Udemy\ Video\ Asset\"",
-                    encoder=(string)Lavf57.71.100, container-format=(string)"ISO\ MP4/M4A";
-        VIDEO MISC: None
-        '''
-        '''
-        {"archivo":
-        "/home/flavio/Descargas/Tienda Angular/22 - A\u00f1adiendo y actualizando productos.mp4",
-        "formato inicial": "video/mp4; charset=binary",
-        "entrada de video": "video/x-raw, format=(string)I420, width=(int)1280, height=(int)720,
-            interlace-mode=(string)progressive, multiview-mode=(string)mono,
-            multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:
-            /right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono,
-            pixel-aspect-ratio=(fraction)39060/39073, chroma-site=(string)mpeg2, colorimetry=(string)bt709,
-            framerate=(fraction)30/1",
-            "entrada de sonido": "audio/x-raw, format=(string)F32LE, layout=(string)interleaved,
-            rate=(int)44100, channels=(int)2, channel-mask=(bitmask)0x0000000000000003",
-            "codec": "webm", "duracion": "02:32", "relacion": 1.7777777777777777,
-            "tiempo de proceso": "0:32:58.984548", "errores": ""}
-        '''
-        '''
-        SEEKABLE: True
-        DURATION: 152880000000
-        AUDIO CAPS: audio/x-vorbis, channels=(int)2, rate=(int)44100, streamheader=(buffer)<
-        AUDIO LENGUAJE: en
-        AUDIO TAGS: taglist, container-format=(string)Matroska, language-code=(string)en, title=(string)"\"Udemy\ Video\ Asset\"",
-                    encoder=(string)Lavf57.71.100, encoder-version=(uint)0, audio-codec=(string)Vorbis, nominal-bitrate=(uint)112000,
-                    bitrate=(uint)112000;
-        AUDIO MISC: None
-        VIDEO CAPS: video/x-vp9, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1
-        VIDEO TAGS: taglist, video-codec=(string)"VP9\ video", container-format=(string)Matroska, title=(string)"\"Udemy\ Video\ Asset\"",
-                    encoder=(string)Lavf57.71.100;
-        VIDEO MISC: None
-        '''
+
     def __reset(self):
         self.__source = None
         #self.__controller = False

@@ -75,10 +75,13 @@ class ogvPipeline(Gst.Pipeline):
         decodebin = Gst.ElementFactory.make("decodebin", "decodebin")
 
         # VIDEO
+        videoscale = Gst.ElementFactory.make("videoscale", "videoscale")
+        self.__capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
         theoraenc = Gst.ElementFactory.make('theoraenc', 'theoraenc')
         theoraenc.set_property("quality", 63)
 
         # AUDIO
+        audioconvert = Gst.ElementFactory.make("audioconvert", "audioconvert")
         vorbisenc = Gst.ElementFactory.make("vorbisenc", "vorbisenc")
 
         # SALIDA
@@ -87,18 +90,24 @@ class ogvPipeline(Gst.Pipeline):
 
         self.add(filesrc)
         self.add(decodebin)
+        self.add(videoscale)
+        self.add(self.__capsfilter)
         self.add(theoraenc)
+        self.add(audioconvert)
         self.add(vorbisenc)
         self.add(oggmux)
         self.add(filesink)
 
         filesrc.link(decodebin)
+        videoscale.link(self.__capsfilter)
+        self.__capsfilter.link(theoraenc)
         theoraenc.link(oggmux)
+        audioconvert.link(vorbisenc)
         vorbisenc.link(oggmux)
         oggmux.link(filesink)
 
-        self.__videoSink = theoraenc.get_static_pad("sink")
-        self.__audioSink = vorbisenc.get_static_pad("sink")
+        self.__videoSink = videoscale.get_static_pad("sink")
+        self.__audioSink = audioconvert.get_static_pad("sink")
 
         filesink.set_property("location", self.__newpath)
         filesrc.set_property("location", self.__origen)
@@ -132,6 +141,8 @@ class ogvPipeline(Gst.Pipeline):
             self.__informeModel.setInfo("entrada de video", currentcaps)           
             width, height = getSize(currentcaps)
             self.__informeModel.setInfo("relacion", float(width)/float(height))
+            caps = Gst.Caps.from_string('video/x-raw, pixel-aspect-ratio=(fraction)1/1, width=(int)%s, height=(int)%s' % (width, height))  #framerate=(fraction)24000/1001
+            self.__capsfilter.set_property("caps", caps)
             pad.link(self.__videoSink)
         elif currentcaps.startswith('audio/'):
             self.__informeModel.setInfo("entrada de sonido", currentcaps)
