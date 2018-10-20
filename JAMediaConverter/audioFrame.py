@@ -45,7 +45,7 @@ class AudioFrame(Gtk.Frame):
 
         self.set_label(" Elige los formatos de extracción: ")
         self.get_label_widget().get_style_context().add_class("labelcodecs")
-        
+
         # FIXME: Corregir estilo todos los botones iguales
         table = Gtk.Table(rows=14, columns=9, homogeneous=True)
         table.set_col_spacings(0)
@@ -150,20 +150,19 @@ class AudioFrame(Gtk.Frame):
 
             # Evitar sobreescritura de archivo origen. Directorios de origen y destino deben ser distintos
             if os.path.dirname(self._files[0]) == self._dirOut:
-                del(self._converters)
-                warning = "%s => Salteado porque directorios de origen y destino son el mismo.\n" % (self._files[0])
+                warning = "%s => Directorios de origen y destino son el mismo.\n" % (self._files[0])
                 self.emit('warning', warning)
                 continue
 
-            # FIXME: Reparar
-            # Si el archivo sólo contiene audio, no se crearán converts de video o imágenes
-            '''
             if "audio" in tipo and codec in self.__videoCodecs:
-                del(self._converters)
-                warning = "%s => Salteando porque el origen no tiene video.\n" % (self._files[0])
+                warning = "Codec: %s Formato: %s %s => El origen no tiene video.\n" % (codec, tipo, self._files[0])
                 self.emit('warning', warning)
-                continue'''
-            # FIXME: Implementar continue para archivos que no tienen ni video ni audio
+                continue
+
+            if not "audio" in tipo and not "video" in tipo:
+                warning = "Codec: %s Formato: %s %s => El origen no tiene ni audio ni video.\n" % (codec, tipo, self._files[0])
+                self.emit('warning', warning)
+                continue
 
             # FIXME: Parece necesarios armar un Convert único, es demasiado reproducir el archivo para cada conversión al mismo tiempo
             self._converters[codec] = Converter(self._files[0], codec, self._dirOut)

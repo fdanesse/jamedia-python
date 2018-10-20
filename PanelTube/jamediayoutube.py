@@ -107,7 +107,7 @@ def getJsonAndThumbnail(url, callback):
 
 # DESCARGAR Videos de youtube
 def __end(salida, youtubedl, STDOUT, callbackEnd):
-    # FIXME: No es necesario y detiene los merge
+    # NOTA: No es necesario y detiene los merge
     '''youtubedl.kill()
     if salida: salida.close()
     if os.path.exists(STDOUT): os.unlink(STDOUT)'''
@@ -146,8 +146,8 @@ def runDownload(url, titulo, progressCallback, callbackEnd, informe):
     #url = "http://youtu.be/" + url.split("=")[1]
     STDOUT = "/tmp/jamediatube%d" % time.time()
 
-    archivo = "%s%s%s" % ("\"", titulo, "\"")
-    destino = os.path.join(YoutubeDir, archivo)
+    #archivo = "%s%s%s" % ("\"", titulo, "\"")
+    destino = "%s/" % YoutubeDir #os.path.join(YoutubeDir, archivo)
     #python3 youtube-dl -f 'bestvideo+bestaudio' --ignore-config --ignore-errors --no-playlist -R 2 --no-part --no-warnings -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=1DhA69K3fZ4
     estructura = "python3 %s -f 'bestvideo+bestaudio' --ignore-config --ignore-errors --no-playlist -R 2 --no-part --no-warnings " % youtubedl
     estructura = estructura + "-o %s" % destino
@@ -158,10 +158,3 @@ def runDownload(url, titulo, progressCallback, callbackEnd, informe):
     salida = open(STDOUT, "r")
 
     GLib.timeout_add(200, __get_progressDownload, salida, progressCallback, callbackEnd, youtubedl, STDOUT, t1, url, informe)
-
-'''
-para 100 videos de inna:
-Descargados 93
-3 en carpetas
-Se informa de 65 que no se pudieron descargar
-'''
