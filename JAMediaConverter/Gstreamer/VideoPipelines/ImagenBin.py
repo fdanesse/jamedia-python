@@ -18,65 +18,34 @@ from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 GObject.threads_init()
 Gst.init("--opengl-hwdec-interop=vaapi-glx")
 
-
-class audioBin1(Gst.Bin):
-    def __init__(self, path, codec):
-        Gst.Bin.__init__(self, "audioBin1")
-
-        audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
-        audioresample.set_property("quality", 10)
-        audiorate = Gst.ElementFactory.make('audiorate', "audiorate")
-
-        enc = None
-        if codec == "wav":
-            enc = Gst.ElementFactory.make('wavenc', 'wavenc')
-        elif codec == "mp3":
-            enc = Gst.ElementFactory.make('lamemp3enc', 'lamemp3enc')
-
-        filesink = Gst.ElementFactory.make('filesink', 'filesink')
-
-        self.add(audioresample)
-        self.add(audiorate)
-        self.add(enc)
-        self.add(filesink)
-
-        audioresample.link(audiorate)
-        audiorate.link(enc)
-        enc.link(filesink)
-
-        self.add_pad(Gst.GhostPad.new("sink", audioresample.get_static_pad("sink")))
-
-        filesink.set_property("location", path)
+# NOTA: Segun testeo: 100 imagenes x segundo 42.5Mb
 
 
-class audioBin2(Gst.Bin):
-    def __init__(self, path):
-        Gst.Bin.__init__(self, "audioBin2")
+class ImageBin1(Gst.Bin):
 
-        audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
-        audioresample.set_property("quality", 10)
-        audiorate = Gst.ElementFactory.make('audiorate', "audiorate")
-        enc = Gst.ElementFactory.make('vorbisenc', 'vorbisenc')
-        mux = Gst.ElementFactory.make('oggmux', 'oggmux')
-        filesink = Gst.ElementFactory.make('filesink', 'filesink')
+    def __init__(self):
 
-        self.add(audioresample)
-        self.add(audiorate)
-        self.add(enc)
-        self.add(mux)
-        self.add(filesink)
+        Gst.Bin.__init__(self, "ImageBin1")
 
-        audioresample.link(audiorate)
-        audiorate.link(enc)
-        enc.link(mux)
-        mux.link(filesink)
+        videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
+        videorate = Gst.ElementFactory.make('videorate', 'videorate')
+        videorate.set_property("max-rate", 30)
+        pngenc = Gst.ElementFactory.make('pngenc', 'pngenc')
+        multifilesink = Gst.ElementFactory.make('multifilesink', 'multifilesink')
+        
+        self.add(videoconvert)
+        self.add(videorate)
+        self.add(pngenc)
+        self.add(multifilesink)
 
-        self.add_pad(Gst.GhostPad.new("sink", audioresample.get_static_pad("sink")))
+        videoconvert.link(videorate)
+        videorate.link(pngenc)
+        pngenc.link(multifilesink)
 
-        filesink.set_property("location", path)
+        self.add_pad(Gst.GhostPad.new("sink", videoconvert.get_static_pad("sink")))
 
 
-class audioBin(Gst.Pipeline):
+class ImagenBin(Gst.Pipeline):
 
     __gsignals__ = {
     "progress": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
@@ -84,11 +53,11 @@ class audioBin(Gst.Pipeline):
     "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
-    def __init__(self, origen, dirpath_destino, codec):
-        Gst.Pipeline.__init__(self, "audioBin")
+    def __init__(self, origen, dirpath_destino):
+        Gst.Pipeline.__init__(self, "ImagenBin")
 
         self.__controller = None
-        self.__codec = codec
+        self.__codec = "png"
         self.__origen = origen
         self.__dirpath_destino = dirpath_destino
         self.__duration = 0
@@ -100,9 +69,7 @@ class audioBin(Gst.Pipeline):
         if "." in location:
             extension = ".%s" % self.__origen.split(".")[-1]
             informeName = location.replace(extension, "")
-            location = location.replace(extension, ".%s" % self.__codec)
-        else:
-            location = "%s.%s" % (location, self.__codec)
+            location = location.replace(extension, "")
 
         self.__tipo = MAGIC.file(origen)
         self.__status = Gst.State.NULL
@@ -111,23 +78,20 @@ class audioBin(Gst.Pipeline):
         self.__timeProcess = None
         self.__informeModel = InformeTranscoderModel(self.__codec + "-" + informeName)
         self.__informeModel.connect("info", self.__emit_info)
-        self.__newpath = os.path.join(dirpath_destino, location)
 
-        self.__videoSink = Gst.ElementFactory.make('fakesink', 'fakesink')
-
-        self.__audioSink = None
-        if codec == "wav" or codec == "mp3":
-            self.__audioSink = audioBin1(self.__newpath, codec)
-        elif codec == "ogg":
-            self.__audioSink = audioBin2(self.__newpath)
+        self.__videoSink = ImageBin1()
 
         self.__pipe = Gst.ElementFactory.make('playbin', 'playbin')
         self.add(self.__pipe)
-        self.__pipe.set_property('video-sink', Gst.ElementFactory.make('fakesink', 'fakesink'))
-        self.__pipe.set_property('audio-sink', self.__audioSink)
+        self.__pipe.set_property('audio-sink', Gst.ElementFactory.make('fakesink', 'fakesink'))
+        self.__pipe.set_property('video-sink', self.__videoSink)
+        p = os.path.join(dirpath_destino, location)
+        if not os.path.exists(p):
+            os.mkdir(p)
+        self.__videoSink.get_by_name('multifilesink').set_property('location', "%s/%s/img%s06d.png" % (dirpath_destino, location, "%"))
 
         self.__pipe.set_property("uri", Gst.filename_to_uri(self.__origen))
-        #uridecodebin.connect('pad-added', self.__on_pad_added)
+
         self.__bus = self.get_bus()
         #self.__bus.add_signal_watch()
         #self.__bus.connect("message", self.busMessageCb)
@@ -190,10 +154,6 @@ class audioBin(Gst.Pipeline):
     def stop(self):
         self.__new_handle(False)
         self.set_state(Gst.State.NULL)
-        if os.path.exists(self.__newpath):
-            statinfo = os.stat(self.__newpath)
-            if not statinfo.st_size:
-                os.remove(self.__newpath)
 
     def play(self):
         self.__new_handle(True)
@@ -223,4 +183,4 @@ class audioBin(Gst.Pipeline):
             self.emit("progress", self.__position, self.__codec)
         return True
 
-GObject.type_register(audioBin)
+GObject.type_register(ImagenBin)

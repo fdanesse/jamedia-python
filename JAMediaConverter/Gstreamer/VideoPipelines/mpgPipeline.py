@@ -15,13 +15,13 @@ from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
-
-# FIXME: El rendimiento es inaceptable y se produce el error: **ERROR: [python3] horizontal_size must be a even (4:2:0 / 4:2:2)
+GObject.threads_init()
+Gst.init("--opengl-hwdec-interop=vaapi-glx")
 
 '''
-               / queue | videoconvert | videorate | videoscale | capsfilter | mpeg2enc
-uridecodebin --                                                                      \-- multiqueue | mpegpsmux | filesink
-               \ audioconvert | audioresample | audiorate | twolamemp2enc -----------/
+                      / videoscale | capsfilter | mpeg2enc \
+filesrc | decodebin --                                       -- mpegpsmux | filesink
+                      \ audioconvert | twolamemp2enc ----- /
 '''
 
 
@@ -114,17 +114,12 @@ class mpgPipeline(Gst.Pipeline):
         decodebin.connect('pad-added', self.__on_pad_added)
 
         self.__bus = self.get_bus()
-        self.__bus.add_signal_watch()
-        self.__bus.connect("message", self.busMessageCb)
+        #self.__bus.add_signal_watch()
+        #self.__bus.connect("message", self.busMessageCb)
+        self.__bus.enable_sync_message_emission()
+        self.__bus.connect("sync-message", self.busMessageCb)
 
         self.use_clock(None)
-
-        '''
-        self.__bus.enable_sync_message_emission()
-        self.__bus.connect("sync-message", self.busMessageCbSync)
-
-    def busMessageCbSync(self, bus, message):
-        print(message.type)'''
 
     def __on_pad_added(self, decodebin, pad):
         # FIXME: 1279 * 720 **ERROR: [python3] horizontal_size must be a even (4:2:0 / 4:2:2)
@@ -157,20 +152,30 @@ class mpgPipeline(Gst.Pipeline):
                     self.__t1 = datetime.datetime.now()
 
         elif mensaje.type == Gst.MessageType.EOS:
-            self.__t2 = datetime.datetime.now()
-            self.__timeProcess = self.__t2 - self.__t1
-            self.__informeModel.setInfo('tiempo de proceso', str(self.__timeProcess))
-            self.stop()
-            self.emit("end")
+            self.__endProcess()
 
         elif mensaje.type == Gst.MessageType.ERROR:
-            self.__informeModel.setInfo('errores', str(mensaje.parse_error()))
-            self.stop()
-            self.emit("error", "ERROR en: " + self.__newpath + ' => ' + str(mensaje.parse_error()))
+            self.__errorProcess(str(mensaje.parse_error()))
+
+    def __endProcess(self):
+        self.__t2 = datetime.datetime.now()
+        self.__timeProcess = self.__t2 - self.__t1
+        self.__informeModel.setInfo('tiempo de proceso', str(self.__timeProcess))
+        self.emit("end")
+        self.stop()
+        
+    def __errorProcess(self, error):
+        self.__informeModel.setInfo('errores', error)
+        self.emit("error", "ERROR en: " + self.__origen + ' => ' + error)
+        self.stop()
 
     def stop(self):
         self.__new_handle(False)
         self.set_state(Gst.State.NULL)
+        if os.path.exists(self.__newpath):
+            statinfo = os.stat(self.__newpath)
+            if not statinfo.st_size:
+                os.remove(self.__newpath)
 
     def play(self):
         self.__new_handle(True)
@@ -181,7 +186,7 @@ class mpgPipeline(Gst.Pipeline):
             GLib.source_remove(self.__controller)
             self.__controller = False
         if reset:
-            self.__controller = GLib.timeout_add(300, self.__handle)
+            self.__controller = GLib.timeout_add(200, self.__handle)
 
     def __handle(self):
         bool1, valor1 = self.query_duration(Gst.Format.TIME)

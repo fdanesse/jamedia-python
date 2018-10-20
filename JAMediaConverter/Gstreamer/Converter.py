@@ -3,8 +3,10 @@
 # https://lazka.github.io/pgi-docs/Gst-1.0/functions.html
 
 import os
-
+#import gi
+#gi.require_version('GstPbutils', '1.0')
 from gi.repository import GObject
+#from gi.repository import GstPbutils
 
 
 class Converter(GObject.Object):
@@ -22,6 +24,10 @@ class Converter(GObject.Object):
         self.__origen = origen
         self.__codec = codec
         self.__pipe = None
+
+        '''self.__discovered = GstPbutils.Discoverer() #https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gst-plugins-base-libs/html/GstDiscoverer.html
+        self.__discovered.connect('discovered', self.__succeed)
+        self.__discovered.start()'''
 
         self.__configPipe(dirpath_destino)
 
@@ -58,12 +64,8 @@ class Converter(GObject.Object):
 
         # EXTRACCION DE IMAGENES
         elif self.__codec == "png":
-            # NOTA: Segun testeo: 100 imagenes x segundo 42.5Mb
-            self.__videoSink = self.__get_png_out()
-            self.__pipe.set_property('video-sink', self.__videoSink)
-            self.__pipe.set_property('audio-sink', Gst.ElementFactory.make('fakesink', 'fakesink'))
-            self.__videoSink.get_by_name('multifilesink').set_property('location', "%s/img%s06d.png" % (dirpath_destino, "%"))
-            self.__pipe.set_property("uri", self.__origen)
+            from JAMediaConverter.Gstreamer.VideoPipelines.ImagenBin import ImagenBin
+            self.__pipe = ImagenBin(self.__origen, dirpath_destino)
 
         self.__pipe.connect('progress', self.__updateProgress)
         self.__pipe.connect('error', self.__error)
@@ -74,38 +76,43 @@ class Converter(GObject.Object):
         self.emit("progress", val1, codec)
 
     def __error(self, pipe, error):
-        self.stop()
         self.emit("error", error)
 
     def __info(self, pipe, info):
         self.emit('info', info)
 
     def __end(self, pipe):
-        self.stop()
         self.emit("end")
 
     '''def __del__(self):
         print("CONVERTER DESTROY")'''
 
-    def __get_png_out(self):
-        pngBin = Gst.Bin()
-        pngBin.set_name('pngBin')
-        videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
-        videorate = Gst.ElementFactory.make('videorate', 'videorate')
-        videorate.set_property("max-rate", 30)
-        pngenc = Gst.ElementFactory.make('pngenc', 'pngenc')
-        multifilesink = Gst.ElementFactory.make('multifilesink', 'multifilesink')
-        self.__pipeline_Add_all(pngBin, [videoconvert, videorate, pngenc, multifilesink])
-        videoconvert.link(videorate)
-        videorate.link(pngenc)
-        pngenc.link(multifilesink)
-        pngBin.add_pad(Gst.GhostPad.new("sink", videoconvert.get_static_pad("sink")))
-        return pngBin
-
     def play(self):
+        #self.__discovered.discover_uri_async(self.__origen)
         self.__pipe.play()
         
-    def stop(self):
-        self.__pipe.stop()
+    #def stop(self):
+    #    self.__pipe.stop()
+
+    '''def __succeed(self, discoverer, info, error):
+        result=GstPbutils.DiscovererInfo.get_result(info)
+        if result != GstPbutils.DiscovererResult.ERROR:
+            #https://lazka.github.io/pgi-docs/GstPbutils-1.0/classes/DiscovererInfo.html
+            print("SEEKABLE:", info.get_seekable())
+            print("DURATION:", info.get_duration())
+            for i in info.get_stream_list():
+                # https://lazka.github.io/pgi-docs/GstPbutils-1.0/classes/DiscovererStreamInfo.html
+                if isinstance(i, GstPbutils.DiscovererAudioInfo):
+                    print("AUDIO CAPS:", i.get_caps())
+                    print("AUDIO LENGUAJE:", i.get_language())
+                    print("AUDIO TAGS:", i.get_tags().to_string())
+                    print("AUDIO MISC:", i.get_misc())
+                elif isinstance(i, GstPbutils.DiscovererVideoInfo):
+                    print("VIDEO CAPS:", i.get_caps())
+                    print("VIDEO TAGS:", i.get_tags().to_string())
+                    print("VIDEO MISC:", i.get_misc(), "\n")
+            self.__pipe.play()
+        else:
+            print(error)'''
 
 GObject.type_register(Converter)

@@ -7,13 +7,11 @@ import os
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GstVideo', '1.0')
-gi.require_version('GstPbutils', '1.0')
 
 from gi.repository import GObject
 from gi.repository import GLib
 from gi.repository import Gst
 from gi.repository import GstVideo
-from gi.repository import GstPbutils
 
 from JAMediaPlayer.JAMediaReproductor.VideoOutput import VideoOutput
 from JAMediaPlayer.JAMediaReproductor.AudioOutput import AudioOutput
@@ -50,10 +48,6 @@ class JAMediaReproductor(GObject.Object):
         self.__duration = 0
         self.__position = 0
 
-        self.__discovered = GstPbutils.Discoverer() #https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gst-plugins-base-libs/html/GstDiscoverer.html
-        self.__discovered.connect('discovered', self.__succeed)
-        self.__discovered.start()
-
         self.__videoconfig = {
             'saturacion': 1.0,
             'contraste': 1.0,
@@ -83,28 +77,6 @@ class JAMediaReproductor(GObject.Object):
         self.__videoBin = VideoOutput(self.__gtkSink)
         self.__audioBin = AudioOutput(dict(self.__audioconfig))
         self.__bus = None
-
-    def __succeed(self, discoverer, info, error):
-        result=GstPbutils.DiscovererInfo.get_result(info)
-        if result != GstPbutils.DiscovererResult.ERROR:
-            #https://lazka.github.io/pgi-docs/GstPbutils-1.0/classes/DiscovererInfo.html
-            print("SEEKABLE:", info.get_seekable())
-            print("DURATION:", info.get_duration())
-            for i in info.get_stream_list():
-                # https://lazka.github.io/pgi-docs/GstPbutils-1.0/classes/DiscovererStreamInfo.html
-                if isinstance(i, GstPbutils.DiscovererAudioInfo):
-                    print("AUDIO CAPS:", i.get_caps())
-                    print("AUDIO LENGUAJE:", i.get_language())
-                    print("AUDIO TAGS:", i.get_tags().to_string())
-                    print("AUDIO MISC:", i.get_misc())
-                elif isinstance(i, GstPbutils.DiscovererVideoInfo):
-                    print("VIDEO CAPS:", i.get_caps())
-                    print("VIDEO TAGS:", i.get_tags().to_string())
-                    print("VIDEO MISC:", i.get_misc(), "\n")
-            self.__pipe.set_property("uri", self.__source)
-            self.__play()
-        else:
-            print(error)
 
     def __reset(self):
         self.__source = None
@@ -351,7 +323,8 @@ class JAMediaReproductor(GObject.Object):
 
         if Gst.uri_is_valid(temp):
             self.__source = temp
-            self.__discovered.discover_uri_async(self.__source)
+            self.__pipe.set_property("uri", self.__source)
+            self.__play()
         else:
             print ("Dirección no válida", temp)
 

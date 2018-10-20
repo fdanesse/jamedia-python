@@ -122,7 +122,6 @@ class AudioFrame(Gtk.Frame):
 
     def run(self, widget=None):
         # Se ejecuta para iniciar todas las conversiones de cada archivo
-        # FIXME: Seleccionar el archivo en la lista
         self.emit("running", self._files[0])
         self._codecsprogress = {}
         for check in self._checks:
@@ -172,7 +171,6 @@ class AudioFrame(Gtk.Frame):
                     convert.play()
         
     def __updateProgress(self, convert, val1, codec):
-        #Gdk.threads_enter()
         self._codecsprogress[codec] = val1
         progreso = 0
         for _val in self._codecsprogress.values():
@@ -183,35 +181,18 @@ class AudioFrame(Gtk.Frame):
         val2 = (totalterminado * 100.0 / totalesperado ) / 100.0
         self._progress[codec].set_fraction(float(val1/100.0))
         self._progressbar.set_fraction(val2)
-        #Gdk.threads_leave()
 
     def __error(self, convert, error):
-        # FIXME: Reparar
-        '''if os.path.exists(convert._newpath):
-            statinfo = os.stat(convert._newpath)
-            if not statinfo.st_size:
-                os.remove(convert._newpath)'''
         self.emit("error", error)  # FIXME: Agregar codec ?
         self.__next(convert)
 
     def __info(self, convert, info):
-        # Recordar que esta señal se recibe mas de una vez por archivo con diferentes datos
         self.emit('info', info)
 
     def __next(self, convert):
         # Va quitando los converters a medida que terminan y cuando no quedan más pasa el siguiente archivo
         if convert:
             codec, origen = convert.getInfo()
-            #print("\nNEXT", codec, origen, self._converters)
-            '''# Esto no debiera ser necesario
-            self._converters[codec].disconnect_by_func(self.__updateProgress)
-            self._converters[codec].disconnect_by_func(self.__error)
-            self._converters[codec].disconnect_by_func(self.__info)  # FIXME: Actualmente no se emite en pipe, arreglar y acomodar la interfaz
-            self._converters[codec].disconnect_by_func(self.__next)
-            # Esto no debiera ser necesario
-            convert.stop()
-            convert = None
-            del(convert)'''
             del(self._converters[codec])
             self._converters[codec] = None
             if any(self._converters.values()): return False  # Esperamos que terminen todos los procesos de este archivo

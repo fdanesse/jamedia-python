@@ -97,16 +97,15 @@ class ScrollTareas(Gtk.ScrolledWindow):
         self.__warningFrame.hide()
 
     def set_info(self, widget, info):
-        pass
-        '''
-        if info:
+        # FIXME: Mejorar. (Se recibe cada vez que comienza una conversión, es decir varias veces para un mismo archivo)
+        '''if info:
             if info != self.__infoLabel.get_text():
-                self.__infoLabel.set_text(info)
+                self.__infoLabel.set_text(str(info))
             self.__infoFrame.show_all()
         else:
             self.__infoLabel.set_text("")
-            self.__infoFrame.hide()
-        '''
+            self.__infoFrame.hide()'''
+        pass
         
     def set_info_file_in_process(self, widget, path):
         text = 'No hay tareas pendientes'
