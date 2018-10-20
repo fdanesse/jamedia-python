@@ -33,9 +33,10 @@ class InformeTranscoderModel(GObject.Object):
         if key in self.__data.keys():
             self.__data[key] = val
             self.emit("info", self.__data)
-            try:
-                filepath = os.path.join(Reports, self.__filename)
-                json_file(filepath, data=self.__data, delay=0.1)
-            except:
-                pass
+            if self.__data.get("errores", False):
+                try:
+                    filepath = os.path.join(Reports, self.__filename)
+                    json_file(filepath, data=self.__data, delay=0.1)
+                except:
+                    pass
                 

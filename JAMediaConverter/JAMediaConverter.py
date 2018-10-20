@@ -31,6 +31,7 @@ class JAMediaConverter(Gtk.VBox):
         self.__filechooser2 = FileChooser2()    # Para seleccionar directorio destino de las conversiones
 
         self.__playerList = PlayerList()
+        self.__playerList.toolbar.tv.destroy()
         self.__outBox = Gtk.VBox()
         self.__scrollTareas = ScrollTareas()
         self.__outBox.pack_start(self.__scrollTareas, True, True, 0)

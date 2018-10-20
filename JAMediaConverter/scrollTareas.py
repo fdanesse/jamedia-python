@@ -31,12 +31,15 @@ class ScrollTareas(Gtk.ScrolledWindow):
 
         frame = Gtk.Frame()
         frame.set_label(" Selecciona el directorio de destino: ")
+        frame.get_label_widget().get_style_context().add_class("labelcodecs")
         toolbar = Gtk.Toolbar()
         toolbar.set_css_name('toolbarconverter')
         toolbar.set_name('toolbarconverter')
         
         self.dirLabel = Gtk.Label(self.currentDir)
         self.dirLabel.set_justify(Gtk.Justification.LEFT)
+        self.dirLabel.set_xalign(0.0)
+        self.dirLabel.get_style_context().add_class("labelcodecs")
         item = Gtk.ToolItem()
         item.set_expand(False)
         item.add(self.dirLabel)

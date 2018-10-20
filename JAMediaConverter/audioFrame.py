@@ -44,13 +44,61 @@ class AudioFrame(Gtk.Frame):
         self._progress = {"ogg":None, "mp3":None, "wav":None, "webm":None, "ogv":None, "mp4":None, "avi":None, "mpg":None, "png":None}
 
         self.set_label(" Elige los formatos de extracción: ")
-
+        self.get_label_widget().get_style_context().add_class("labelcodecs")
+        
         # FIXME: Corregir estilo todos los botones iguales
-        table = Gtk.Table(rows=11, columns=12, homogeneous=False)
+        table = Gtk.Table(rows=14, columns=9, homogeneous=True)
         table.set_col_spacings(0)
-        table.set_row_spacing(row=8, spacing=15)
+
         row = 0
-        for formato in sorted(self._progress.keys()):
+        label = Gtk.Label("Solo Audio")
+        label.set_justify(Gtk.Justification.LEFT)
+        label.set_xalign(0.0)
+        label.get_style_context().add_class("labelcodecs")
+        table.attach(label, 0, 9, row, row+1, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
+        row = self.__packProgress(table, ["mp3", "ogg", "wav"], row+1)
+
+        label = Gtk.Label("Audio y Video")
+        label.set_justify(Gtk.Justification.LEFT)
+        label.set_xalign(0.0)
+        label.get_style_context().add_class("labelcodecs")
+        table.attach(label, 0, 9, row, row+1, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
+        row = self.__packProgress(table, ["avi", "ogv", "mp4", "mpg", "webm"], row+1)
+
+        label = Gtk.Label("Solo Imágenes")
+        label.set_justify(Gtk.Justification.LEFT)
+        label.set_xalign(0.0)
+        label.get_style_context().add_class("labelcodecs")
+        table.attach(label, 0, 9, row, row+1, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
+        row = self.__packProgress(table, ["png"], row+1)
+
+        table.set_row_spacing(row=11, spacing=15)
+        label = Gtk.Label("Total:")
+        label.set_justify(Gtk.Justification.LEFT)
+        label.set_xalign(0.0)
+        label.get_style_context().add_class("labelcodecs")
+        table.attach(label, 0, 2, row, row+1, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
+        table.attach(self._progressbar, 2, 9, row, row+1, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
+
+        table.set_row_spacing(row=12, spacing=15)
+        row += 1
+        self.start = Gtk.Button('Convertir')
+        self.start.set_css_name('startbutton')
+        self.start.set_name('startbutton')
+        self.start.set_sensitive(False)
+        table.attach(self.start, 0, 4, row, row+3, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
+
+        self.cancelar = Gtk.Button('Cancelar')
+        self.cancelar.set_css_name('startbutton')
+        self.cancelar.set_name('startbutton')
+        self.cancelar.set_sensitive(False)
+        table.attach(self.cancelar, 5, 9, row, row+3, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
+
+        self.add(table)
+        self.show_all()
+
+    def __packProgress(self, table, _codecs, row=0):
+        for formato in _codecs:
             # http://python-gtk-3-tutorial.readthedocs.io/en/latest/button_widgets.html
             check = Gtk.CheckButton(formato)
             check.get_style_context().add_class("convertcheck")
@@ -59,50 +107,16 @@ class AudioFrame(Gtk.Frame):
             progress.set_show_text(True)
             progress.get_style_context().add_class("convertprogress")
             # http://www.mono-project.com/docs/gui/gtksharp/widgets/packing-with-tables/
-            table.attach(check, 0, 3, row, row+1,
+            table.attach(check, 0, 2, row, row+1,
                 Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
                 Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
-            table.attach(progress, 3, 12, row, row+1,
+            table.attach(progress, 2, 9, row, row+1,
                 Gtk.AttachOptions.FILL | Gtk.AttachOptions.EXPAND,
                 Gtk.AttachOptions.EXPAND, 0, 0)
             row += 1
             check.connect("toggled", self.__toggledButton)
             self._progress[formato] = progress
-
-        frame = Gtk.Frame()
-        frame.set_label(' Total: ')
-        frame.set_shadow_type(Gtk.ShadowType.NONE)
-        frame.add(self._progressbar)
-        table.attach(frame, 3, 12, 9, 10,
-            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
-            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
-
-        self.start = Gtk.Button('Convertir')
-        self.start.set_css_name('startbutton')
-        self.start.set_name('startbutton')
-        self.start.set_sensitive(False)
-        table.attach(self.start, 0, 4, 10, 11,
-            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
-            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
-
-        self.pausar = Gtk.Button('Pausar')
-        self.pausar.set_css_name('startbutton')
-        self.pausar.set_name('startbutton')
-        self.pausar.set_sensitive(False)
-        table.attach(self.pausar, 4, 8, 10, 11,
-            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
-            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
-
-        self.cancelar = Gtk.Button('Cancelar')
-        self.cancelar.set_css_name('startbutton')
-        self.cancelar.set_name('startbutton')
-        self.cancelar.set_sensitive(False)
-        table.attach(self.cancelar, 8, 12, 10, 11,
-            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL,
-            Gtk.AttachOptions.SHRINK | Gtk.AttachOptions.FILL, 0, 0)
-
-        self.add(table)
-        self.show_all()
+        return row
 
     def set_files(self, _files):
         self._files = []
