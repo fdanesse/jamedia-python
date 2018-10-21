@@ -16,8 +16,6 @@ from JAMediaPlayer.Globales import YoutubeDir
 
 # STDERR = "/dev/null"
 
-# FIXME: Generar reportes al estilo del conversor
-
 # BUSCAR Videos en Youtube
 def __get_videos(consulta, limite, callback, callbackend):
     # Obtener web principal con resultado de busqueda y recorrer todas las pags de la busqueda obtenida hasta conseguir el id de los videos.
@@ -48,11 +46,30 @@ def __get_videos(consulta, limite, callback, callbackend):
 
 def buscar(palabras, cantidad, callback, callbackend):
     # Realiza la busqueda de videos en youtube
+    # FIXME: Si se desconecta durante la busqueda, todo el proceso se bloquea
     buscar = palabras.replace(" ", "+").strip().lower()
     __get_videos(buscar, cantidad, callback, callbackend)
 
 
+
+T1 = datetime.datetime.now()
+T2 = datetime.datetime.now()
 # DESCARGAR Metadatos del Videos encontrados
+def __timeCalc(youtubedl, salida, STDOUT, limite, url, text):
+    global T1
+    t2 = datetime.datetime.now()
+    t3 = t2 - T1
+    if t3.seconds >= limite:
+        youtubedl.kill()
+        if salida: salida.close()
+        if os.path.exists(STDOUT): os.unlink(STDOUT)
+        callback(_dict)
+        print("TIEMPO => Salteando descarga de metadatos:", url, text, t3)
+        return False, T1
+    else:
+        #print(url, text, t3)
+        return True, datetime.datetime.now()
+
 '''
 [youtube] 1DhA69K3fZ4: Downloading webpage
 [youtube] 1DhA69K3fZ4: Downloading video info webpage
@@ -61,35 +78,48 @@ def buscar(palabras, cantidad, callback, callbackend):
 [youtube] 1DhA69K3fZ4: Writing thumbnail to: /tmp/1DhA69K3fZ4.jpg
 '''
 # Descarga de info.json y thumbnail
-def __get_progressThumbnail(salida, _dict, callback, youtubedl, STDOUT, t1, url):
+def __get_progressThumbnail(salida, _dict, callback, youtubedl, STDOUT, url):
     # Devuelve la dirección a los archivos json y thumbnail luego de descargados
     progress = salida.readline()
+    global T1
     if progress:
-        t1 = datetime.datetime.now()
-        if "Writing video description" in progress:
+        if "Downloading webpage" in progress:
+            ret, T1 = __timeCalc(youtubedl, salida, STDOUT, 13, url, "Downloading webpage")  # Normalmente demora entre 7 y 8 segundos
+            return ret
+        elif "Downloading video info webpage" in progress:
+            ret, T1 = __timeCalc(youtubedl, salida, STDOUT, 5, url, "Downloading video info webpage")  # Normalmente demora menos de 1 segundo
+            return ret
+        elif "Writing video description" in progress:
             _dict["json"] = progress.split(":")[-1].replace("\n", "").strip()
+        elif "Downloading thumbnail" in progress:
+            ret, T1 = __timeCalc(youtubedl, salida, STDOUT, 5, url, "Downloading thumbnail")  # Normalmente demora casi 2 segundos
+            return ret
         elif "Writing thumbnail to" in progress:
             _dict["thumb"] = progress.split(":")[-1].replace("\n", "").strip()
-    
+
     t2 = datetime.datetime.now()
-    t3 = t2 - t1
-    if all(_dict.values()) or t3.seconds >= 25:  # Más de 25 segundos no debe estar pausado
-        if t3.seconds >= 25:
-            print("Salteando descarga de metadatos:", url, t3)
-        #t2 = datetime.datetime.now()
-        #print("Time:", t2 - t1)
+    t3 = t2 - T1
+    if all(_dict.values()) or t3.seconds >= 20:  # NOTA: Es necesario un límite de espera para que no bloquee todo el proceso
+        if t3.seconds >= 20:
+            print("TIEMPO => Salteando descarga de metadatos:", url)
+        #else:
+        #    global T2
+        #    print("END:", t2 - T2, url)  #NOTA: Normalmente se demora entre 10 y segundos en todo el proceso
         youtubedl.kill()
         if salida: salida.close()
         if os.path.exists(STDOUT): os.unlink(STDOUT)
         callback(_dict)
         return False
-    
+
     return True
     
 def getJsonAndThumbnail(url, callback):
     # Descargar json y thumbnail. Genera 3 archivos, json, jpg y STDOUT
     # ./youtube-dl --write-info-json --write-thumbnail --skip-download -o /tmp/1DhA69K3fZ4 https://www.youtube.com/watch?v=1DhA69K3fZ4
-    t1 = datetime.datetime.now()  # Solo para ver cuanto demora en hacer todo => 0:00:12.460755
+    global T2
+    T2 = datetime.datetime.now()
+    global T1
+    T1 = datetime.datetime.now()
     _dict = {"json": "", "thumb": ""}
 
     youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")
@@ -101,8 +131,7 @@ def getJsonAndThumbnail(url, callback):
     youtubedl = subprocess.Popen(estructura, shell=True, stdout=open(STDOUT, "w+b"), universal_newlines=True)
     salida = open(STDOUT, "r")
 
-    GLib.timeout_add(200, __get_progressThumbnail, salida, _dict, callback, youtubedl, STDOUT, t1, url)
-
+    GLib.timeout_add(200, __get_progressThumbnail, salida, _dict, callback, youtubedl, STDOUT, url)
 
 
 # DESCARGAR Videos de youtube
@@ -114,23 +143,32 @@ def __end(salida, youtubedl, STDOUT, callbackEnd):
     callbackEnd()
     return False
 
-def __get_progressDownload(salida, progressCallback, callbackEnd, youtubedl, STDOUT, t1, url, informe):
+def __get_progressDownload(salida, progressCallback, callbackEnd, youtubedl, STDOUT, url, informe):
     # Devuelve la dirección a los archivos json y thumbnail luego de descargados
     progress = salida.readline()
+    global T1
     if progress:
-        t1 = datetime.datetime.now()
+        T1 = datetime.datetime.now()
+        # Downloading webpage
+        # Downloading video info webpage
+        # Destination
+        # download
         if "100.0%" in progress.split():
             GLib.timeout_add(1000, __end, salida, youtubedl, STDOUT, callbackEnd)
+            #print("END:", datetime.datetime.now() - T2, url)
+            return False
+        elif "error" in progress or "ERROR" in progress:
+            print("CONEXION ? => Salteando descarga de video:", url)
+            informe.setInfo('cancelados en descargas', url)
+            __end(salida, youtubedl, STDOUT, callbackEnd)
             return False
         progressCallback(progress)
     
     t2 = datetime.datetime.now()
-    t3 = t2 - t1
-    if t3.seconds >= 25:  # Más de 25 segundos no debe estar pausado
-        print("Salteando descarga de video:", url, t3)
+    t3 = t2 - T1
+    if t3.seconds >= 50:
+        print("TIEMPO => Salteando descarga de video:", url, t3)
         informe.setInfo('cancelados en descargas', url)
-        #t2 = datetime.datetime.now()
-        #print("Time:", t2 - t1)
         __end(salida, youtubedl, STDOUT, callbackEnd)
         return False
     
@@ -138,7 +176,10 @@ def __get_progressDownload(salida, progressCallback, callbackEnd, youtubedl, STD
 
 def runDownload(url, titulo, progressCallback, callbackEnd, informe):
     # Descargar video
-    t1 = datetime.datetime.now()  # Solo para ver cuanto demora en hacer todo => 0:00:12.460755
+    global T2
+    T2 = datetime.datetime.now()
+    global T1
+    T1 = datetime.datetime.now()  # Solo para ver cuanto demora en hacer todo => 0:00:12.460755
 
     youtubedl = os.path.join(os.path.dirname(__file__), "youtube-dl")
     STDOUT = "/tmp/jamediatube%d" % time.time()
@@ -157,4 +198,4 @@ def runDownload(url, titulo, progressCallback, callbackEnd, informe):
     youtubedl = subprocess.Popen(estructura, shell=True, stdout=open(STDOUT, "w+b"), universal_newlines=True)
     salida = open(STDOUT, "r")
 
-    GLib.timeout_add(200, __get_progressDownload, salida, progressCallback, callbackEnd, youtubedl, STDOUT, t1, url, informe)
+    GLib.timeout_add(200, __get_progressDownload, salida, progressCallback, callbackEnd, youtubedl, STDOUT, url, informe)

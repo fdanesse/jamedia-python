@@ -85,7 +85,7 @@ class WidgetVideoItem(Gtk.EventBox):
         self.__fileimage = _dict.get("thumb", "")
         self.__filejson = _dict["json"]
         # NOTA: si los archivos no existen cuelga la aplicación
-        if os.path.exists(self.__fileimage) and os.path.exists(self.__fileimage):
+        if os.path.exists(self.__fileimage) and os.path.exists(self.__filejson):
             newdict = get_dict(self.__filejson)
             for key in self._dict.keys():
                 if key == "url": continue

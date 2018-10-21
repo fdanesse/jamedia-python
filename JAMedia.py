@@ -205,7 +205,7 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         videos = self.paneltube.descargar.get_children()
         if videos:
             videos[0].get_parent().remove(videos[0])
-            self.toolbar_descarga.download(videos[0], self.__informe)
+            self.toolbar_descarga.download(videos[0], self.__informe) # FIXME: Agregar opciones para cancelados en descargas
             self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
         else:
             self.toolbar_descarga.hide()
@@ -272,7 +272,6 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         if not [item for item in items if self.__filterItems(item, url)]:
             if not str(url).strip() in self.__videosEncontrados:
                 self.__videosEncontrados.append(str(url).strip())
-                # FIXME: agregar barra de progreso y cantidad de videos encontrados
                 self.alerta_busqueda.set_data("Encontrado: %s..." % (url))
         else:
             self.alerta_busqueda.set_data("Ya se encuentra listado: %s..." % (url))
@@ -303,6 +302,7 @@ class JAMediaWindow(Gtk.ApplicationWindow):
             ocultar([self.alerta_busqueda])
 
     def __cancel_append_video(self, item, urls):
+        # FIXME: Agregar opciones para cancelados en metadatos
         self.__informe.setInfo('cancelados en metadatos', item._dict["url"])
         item.destroy()
         self.__make_append_update_video(None, urls)
