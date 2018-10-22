@@ -26,23 +26,15 @@ class AudioOutput(Gst.Pipeline):
         
         self.__config = config
 
-        self.__audioqueue = Gst.ElementFactory.make('queue', 'audioqueue')
-        #self.__audioqueue.set_property("min-threshold-buffers", 500)
-        self.__audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
-        self.__audioresample.set_property("quality", 10)
         self.__equalizer = Gst.ElementFactory.make('equalizer-10bands', 'equalizer')
         self.__audiosink = Gst.ElementFactory.make('autoaudiosink', 'audiosink')
         
-        self.add(self.__audioqueue)
-        self.add(self.__audioresample)
         self.add(self.__equalizer)
         self.add(self.__audiosink)
 
-        self.__audioqueue.link(self.__audioresample)
-        self.__audioresample.link(self.__equalizer)
         self.__equalizer.link(self.__audiosink)
 
-        pad = self.__audioqueue.get_static_pad("sink")
+        pad = self.__equalizer.get_static_pad("sink")
         self.add_pad(Gst.GhostPad.new("sink", pad))
 
     def setting(self, config):

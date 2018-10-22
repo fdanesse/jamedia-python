@@ -1,3 +1,28 @@
+Alsharqiya Tv (Irak),rtmp://ns8.indexforce.com/alsharqiyalive/mystream
+Baden TV (Alemania),rtmp://badentv-stream2.siebnich.info/rtplive/vlc.sdp
+Canal 13 (Argentina),rtsp://stream.eltrecetv.com.ar/live13/13tv/13tv1
+Canal 53 UNAL (Mexico),mms://148.234.13.58/canal53bandaancha
+Canal Rural 1 (Argentina),rtsp://streamrural.cmd.com.ar:554/liverural/crural/rural1
+CN5 (Argentina),rtmp://c5n.stweb.tv:1935/c5n/live
+DusonTV (España),mms://antena.fundaciongoldenclover.com/live
+Edad de Oro TV (Rusia),mms://195.62.63.238/tv_zolotoy_vek
+TN (Argentina),rtsp://stream.tn.com.ar/live/tnhd1
+TV Grecia (Grecia),rtmp://82.192.84.30:1935/live/myStream.sdp
+TV Maná (Argentina),rtmp://streamspub.manasat.com/tvar/tvmanaar1
+VIT Channel 1 (España),rtmp://87.106.219.140/live/myStream_2
+FOX,http://stalker.darkuzdev.cf:8080/streamer/85.m3u8
+Air Tv,rtmp://stream.air-tv.tv:1935/live/web2.stream
+In the Redwoods,mmsh://live.camstreams.com/csRacheed?MSWMExt=.asf
+Iwaki (Japón),mmsh://center.ntt-fukushima.com/n-iwaki?MSWMExt=.asf
+Cataratas del Niagara 1 (Canadá),mms://webcams.niagarafallshotels.com/CNH-Stream1
+Cataratas del Niagara 2 (Canadá),mms://webcams.niagarafallshotels.com/CNH-Stream2
+Cataratas del Niagara 3 (Canadá),mms://webcams.niagarafallshotels.com/CNH-Stream3
+West Somerset Railway (Inglaterra),mmsh://live.camstreams.com/cswsrailway?MSWMExt=.asf
+Estación Espacial Internacional 2 (En Órbita sobre la Tierra),mms://a1709.l1856953708.c18569.g.lm.akamaistream.net/D/1709/18569/v0001/reflector:53708
+Fukushima (Japón),mms://center3.ntt-fukushima.com/n-jraizu
+North American Beaver Lodge (USA),mms://stream2.video.state.mn.us/beavercam
+Petra Live Cam 1 (Jordania),rtsp://petra.kitvox.net:1935/live1/cam1.stream
+Petra Live Cam 2 (Jordania),rtsp://petra.kitvox.net:1935/live1/cam2.stream
 ADN 40, http://www.iptv.uy:8000/live/GEN543/UR7792/10.ts
 ADN 40 FHD, http://www.iptv.uy:8000/live/GEN543/UR7792/6756.ts
 AZ CLIC, http://www.iptv.uy:8000/live/GEN543/UR7792/106.ts
