@@ -230,8 +230,8 @@ class JAMediaToolbarList(Gtk.Toolbar):
         self.subtitulos = get_boton(os.path.join(ICONS_PATH, "subtitulo.png"), flip=False, pixels=18, tooltip_text="Cargar Subtítulos")
         self.insert(self.subtitulos, -1)
         '''
-        self.tv = get_boton(os.path.join(ICONS_PATH, "tvicon.png"), flip=False, pixels=18, tooltip_text="Cargar Lista de Tv")
-        self.insert(self.tv, -1)
+        #self.tv = get_boton(os.path.join(ICONS_PATH, "tvicon.png"), flip=False, pixels=18, tooltip_text="Cargar Lista de Tv")
+        #self.insert(self.tv, -1)
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
         self.show_all()
         self.clearlist.set_sensitive(False)

@@ -8,7 +8,6 @@ webmmux:    https://developer.gnome.org/gst-plugins-libs/stable/gst-plugins-good
 Subtitle:   https://gstreamer.freedesktop.org/documentation/design/subtitle-overlays.html
 Raw Video Media Types:  https://gstreamer.freedesktop.org/documentation/design/mediatype-video-raw.html#formats
 
-
 bufferdraw: https://github.com/GStreamer/gst-python/blob/master/old_examples/buffer-draw.py
 python gstreamer tutorial:  http://brettviren.github.io/pygst-tutorial-org/pygst-tutorial.html
 
@@ -28,13 +27,6 @@ ejemplo de streaming en html: https://gist.github.com/vo/a0cc9313861888ad5180f44
 https://stackoverflow.com/questions/33306265/encode-decode-vp8-or-vp9-with-gstreamer
 
 https://github.com/tamaggo/gstreamer-examples/blob/master/test_gst_appsrc_testvideo_mp4mux.py
-
-
-Prueba sobre video de: 02:32 minutos de duración
-    mpg     demora  0:56:51.877362 minutos en trascodearlo con algunos cambios 1:15:03.829964
-    webm    demora  0:20:22.973616
-    Usando uridecodebin:
-    webm    demora  0:12:27.553653
 
 
 Ejemplo para obtener toda la estructura a medida que se agregan los elementos:
@@ -111,3 +103,15 @@ https://markwingerd.wordpress.com/2014/11/19/using-gstreamer-with-python/
 https://gstreamer.freedesktop.org/documentation/tutorials/playback/custom-playbin-sinks.html
 https://gstreamer.freedesktop.org/documentation/design/overview.html#pipeline-clock
 http://gstreamer-devel.966125.n4.nabble.com/master-vs-1-5-1-changing-video-size-on-compositor-input-td4673354.html
+
+
+
+import gi
+gi.require_version('Gst', '1.0')
+from gi.repository import GObject, Gst, Gtk
+
+GObject.threads_init()
+Gst.init(None)
+
+elem = Gst.ElementFactory.make('playbin')
+inspect.getmembers(elem)

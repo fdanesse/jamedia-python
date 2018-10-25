@@ -35,17 +35,13 @@ class VideoOutput(Gst.Pipeline):
         caps = Gst.Caps.from_string('video/x-raw,pixel-aspect-ratio=1/1')  # Corrige un BUG: http://gstreamer-devel.966125.n4.nabble.com/master-vs-1-5-1-changing-video-size-on-compositor-input-td4673354.html
         self.__capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
         self.__capsfilter.set_property("caps", caps)
-        self.__queue2 = Gst.ElementFactory.make('queue', 'queue2')
-        self.__queue2.set_property("min-threshold-buffers", 1000)
 
-        #self.add(self.__videoqueue)
         # FIXME: Subtítulos no funcionan self.add(self.__subtitleoverlay)
         self.add(self.__videoconvert)
         self.add(self.videobalance)
         self.add(self.gamma)
         self.add(self.videoflip)
         self.add(self.__capsfilter)
-        self.add(self.__queue2)
         self.add(self.__gtkSink)
 
         # FIXME: Subtítulos no funcionan self.__videoqueue.link(self.__subtitleoverlay)
@@ -54,8 +50,7 @@ class VideoOutput(Gst.Pipeline):
         self.videobalance.link(self.gamma)
         self.gamma.link(self.videoflip)
         self.videoflip.link(self.__capsfilter)
-        self.__capsfilter.link(self.__queue2)
-        self.__queue2.link(self.__gtkSink)
+        self.__capsfilter.link(self.__gtkSink)
 
         pad = self.__videoconvert.get_static_pad("sink")
         self.add_pad(Gst.GhostPad.new("sink", pad))

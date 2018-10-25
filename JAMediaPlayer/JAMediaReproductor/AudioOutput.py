@@ -43,6 +43,7 @@ class AudioOutput(Gst.Pipeline):
                 self.__config[key] = config[key]
                 self.__equalizer.set_property(key, self.__config[key])
 
+
 '''
 band0               : gain for the frequency band 29 Hz, ranging from -24 dB to +12 dB
                     flags: legible, escribible, controlable

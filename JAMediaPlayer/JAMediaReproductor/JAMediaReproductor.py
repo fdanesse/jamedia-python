@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # https://gstreamer.freedesktop.org/documentation/tools/gst-launch.html
+# Crear Elementos usando python: https://mathieuduponchelle.github.io/2018-02-01-Python-Elements.html?gi-language=undefined
 
 import os
 
@@ -16,8 +17,7 @@ from gi.repository import GstVideo
 from JAMediaPlayer.JAMediaReproductor.VideoOutput import VideoOutput
 from JAMediaPlayer.JAMediaReproductor.AudioOutput import AudioOutput
 from JAMediaPlayer.Globales import MAGIC
-# FIXME: Reconstruir informe para posibles errores en el reproductor
-#from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
+from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
 GObject.threads_init()
@@ -70,9 +70,6 @@ class JAMediaReproductor(GObject.Object):
             'band9': 0}
 
         self.__tipo = None
-        #self.__informeModel = None  # InformeTranscoderModel("PLAYER" + "-" + informeName)
-        # self.__informeModel.connect("info", self.__emit_info)
-
         self.__pipe = None
         self.__videoBin = VideoOutput(self.__gtkSink)
         self.__audioBin = AudioOutput(dict(self.__audioconfig))
@@ -84,14 +81,21 @@ class JAMediaReproductor(GObject.Object):
         self.__status = Gst.State.NULL
         self.__duration = 0
         self.__position = 0
+        self.__tipo = None
 
         if not self.__videoBin: self.__videoBin = VideoOutput(self.__gtkSink)
         if not self.__audioBin: self.__audioBin = AudioOutput(dict(self.__audioconfig))
         self.__pipe = Gst.ElementFactory.make("playbin", "player")
+        #self.__pipe.set_property('buffer-duration', 4294967295/1.5)
+        #self.__pipe.set_property('ring-buffer-max-size', 4294967295)
         self.__pipe.set_property('volume', self.__videoconfig['volumen'])
         self.__pipe.set_property('force-aspect-ratio', True)
         self.__pipe.set_property('video-sink', self.__videoBin)
         self.__pipe.set_property('audio-sink', self.__audioBin)
+        self.__pipe.set_auto_flush_bus(False)
+        self.__pipe.set_latency(0)
+        self.__videoBin.set_latency(0)
+        self.__audioBin.set_latency(0)
 
         # gst-launch-1.0 filesrc location=cartoon.mp4 ! decodebin ! video/x-raw ! videoconvert ! subtitleoverlay name=over ! autovideosink  filesrc location=subs.srt ! subparse ! over.
         # self.__pipe.set_property('text-sink', self.__textBin)
@@ -110,6 +114,7 @@ class JAMediaReproductor(GObject.Object):
         self.emit("info", info)
 
     def __sync_message(self, bus, mensaje):
+        #https://gstreamer.freedesktop.org/documentation/design/messages.html
         if mensaje.type == Gst.MessageType.STATE_CHANGED:
             old, new, pending = mensaje.parse_state_changed()
             if old == Gst.State.PAUSED and new == Gst.State.PLAYING:
@@ -140,29 +145,40 @@ class JAMediaReproductor(GObject.Object):
 
         elif mensaje.type == Gst.MessageType.LATENCY:
             # http://cgit.collabora.com/git/farstream.git/tree/examples/gui/fs-gui.py
+            print('recalculate_latency')
+            '''
+            La latencia es el tiempo que tarda una muestra capturada en la marca de tiempo X para alcanzar el sink
+            '''
             self.__pipe.recalculate_latency()
+            self.__videoBin.recalculate_latency()
+            self.__audioBin.recalculate_latency()
 
         elif mensaje.type == Gst.MessageType.DURATION_CHANGED:
             bool1, self.__duration = self.__pipe.query_duration(Gst.Format.TIME)
             bool2, self.__position = self.__pipe.query_position(Gst.Format.TIME)
 
         elif mensaje.type == Gst.MessageType.EOS:
-            self.__new_handle(False)
-            self.emit("endfile")
+            self.__endProcess()
 
         elif mensaje.type == Gst.MessageType.ERROR:
-            #self.__informeModel.setInfo('errores', str(mensaje.parse_error()))
-            self.__new_handle(False)
+            self.__errorProcess(str(mensaje.parse_error()))
+
+    def __endProcess(self):
+        self.__new_handle(False)
+        self.emit("endfile")
+
+    def __errorProcess(self, error):
+        self.__new_handle(False)
+        self.__informeModel.setInfo('errores', error)
 
     def __informar(self):
         pad = self.__pipe.emit('get-video-pad',0)
         self.emit("video", bool(pad))
-        '''
         if pad:
             currentcaps = pad.get_current_caps().to_string()
             if currentcaps.startswith('video/'):
-                self.__informeModel.setInfo("archivo", self.__source)
-                self.__informeModel.setInfo("formato inicial", self.__tipo)
+                #self.__informeModel.setInfo("archivo", self.__source)
+                #self.__informeModel.setInfo("formato inicial", self.__tipo)
                 self.__informeModel.setInfo("entrada de video", currentcaps)           
                 width, height = getSize(currentcaps)
                 self.__informeModel.setInfo("relacion", float(width)/float(height))
@@ -171,7 +187,7 @@ class JAMediaReproductor(GObject.Object):
             currentcaps = pad.get_current_caps().to_string()
             if currentcaps.startswith('audio/'):
                 self.__informeModel.setInfo("entrada de sonido", currentcaps)
-        '''
+        
     def __new_handle(self, reset):
         if self.__controller:
             GLib.source_remove(self.__controller)
@@ -209,6 +225,8 @@ class JAMediaReproductor(GObject.Object):
     
     def __pause(self):
         if self.__pipe: self.__pipe.set_state(Gst.State.PAUSED)
+        lat = self.__pipe.get_latency()
+        print(lat)
 
     def __play(self):
         if self.__pipe: self.__pipe.set_state(Gst.State.PLAYING)
@@ -305,24 +323,22 @@ class JAMediaReproductor(GObject.Object):
         self.__reset()
         temp = uri
 
+        informeName = uri
         if os.path.exists(temp):
             # FIXME: Implementar limpieza del nombre del archivo
             informeName = os.path.basename(temp)
             if "." in informeName:
                 extension = ".%s" % informeName.split(".")[-1]
                 informeName = informeName.replace(extension, "")
-            #self.__informeModel = InformeTranscoderModel("PLAYER" + "-" + informeName)
-            #self.__informeModel.connect("info", self.__emit_info)
-                
             self.__tipo = MAGIC.file(uri)
             temp = Gst.filename_to_uri(uri)
-        else:
-            #self.__informeModel = InformeTranscoderModel("PLAYER" + "-" + uri)
-            #self.__informeModel.connect("info", self.__emit_info)
-            pass
 
         if Gst.uri_is_valid(temp):
             self.__source = temp
+            self.__informeModel = InformeTranscoderModel("PLAYER" + "-" + informeName)
+            self.__informeModel.connect("info", self.__emit_info)
+            self.__informeModel.setInfo("archivo", self.__source)
+            self.__informeModel.setInfo("formato inicial", self.__tipo)
             self.__pipe.set_property("uri", self.__source)
             self.__play()
         else:
