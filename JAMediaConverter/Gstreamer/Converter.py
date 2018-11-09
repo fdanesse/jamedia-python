@@ -91,8 +91,8 @@ class Converter(GObject.Object):
         #self.__discovered.discover_uri_async(self.__origen)
         self.__pipe.play()
         
-    #def stop(self):
-    #    self.__pipe.stop()
+    def stop(self):
+        self.__pipe.stop()
 
     '''def __succeed(self, discoverer, info, error):
         result=GstPbutils.DiscovererInfo.get_result(info)

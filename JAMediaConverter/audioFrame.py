@@ -46,7 +46,6 @@ class AudioFrame(Gtk.Frame):
         self.set_label(" Elige los formatos de extracción: ")
         self.get_label_widget().get_style_context().add_class("labelcodecs")
 
-        # FIXME: Corregir estilo todos los botones iguales
         table = Gtk.Table(rows=14, columns=9, homogeneous=True)
         table.set_col_spacings(0)
 
@@ -97,6 +96,8 @@ class AudioFrame(Gtk.Frame):
         self.add(table)
         self.show_all()
 
+        self.cancelar.connect("clicked", self.__cancel_all)
+
     def __packProgress(self, table, _codecs, row=0):
         for formato in _codecs:
             # http://python-gtk-3-tutorial.readthedocs.io/en/latest/button_widgets.html
@@ -118,6 +119,13 @@ class AudioFrame(Gtk.Frame):
             self._progress[formato] = progress
         return row
 
+    def __cancel_all(self, widget):
+        self._files = []
+        for codec in self._converters.keys():
+            self._converters[codec].stop()
+            self._converters[codec] = None
+        self.__end_all()
+        
     def set_files(self, _files):
         self._files = []
         for f in _files:
@@ -137,6 +145,7 @@ class AudioFrame(Gtk.Frame):
     def run(self, widget=None):
         # Se ejecuta para iniciar todas las conversiones de cada archivo
         self.emit("running", self._files[0])
+        self.cancelar.set_sensitive(True)
         self._codecsprogress = {}
         for check in self._checks:
             check.set_sensitive(False)
@@ -225,6 +234,7 @@ class AudioFrame(Gtk.Frame):
         for check in self._checks:
             check.set_sensitive(True)
         self.start.set_sensitive(True)
+        self.cancelar.set_sensitive(False)
         self._files = self._inicial_files.copy()
         self.emit('end')
         
