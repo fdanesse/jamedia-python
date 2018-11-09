@@ -2,6 +2,7 @@
 
 # https://gstreamer.freedesktop.org/documentation/tools/gst-launch.html
 # Crear Elementos usando python: https://mathieuduponchelle.github.io/2018-02-01-Python-Elements.html?gi-language=undefined
+# audioplotter: https://mathieuduponchelle.github.io/2018-02-15-Python-Elements-2.html?gi-language=undefined
 
 import os
 
@@ -145,10 +146,7 @@ class JAMediaReproductor(GObject.Object):
 
         elif mensaje.type == Gst.MessageType.LATENCY:
             # http://cgit.collabora.com/git/farstream.git/tree/examples/gui/fs-gui.py
-            print('recalculate_latency')
-            '''
-            La latencia es el tiempo que tarda una muestra capturada en la marca de tiempo X para alcanzar el sink
-            '''
+            #La latencia es el tiempo que tarda una muestra capturada en la marca de tiempo X para alcanzar el sink
             self.__pipe.recalculate_latency()
             self.__videoBin.recalculate_latency()
             self.__audioBin.recalculate_latency()
@@ -225,8 +223,6 @@ class JAMediaReproductor(GObject.Object):
     
     def __pause(self):
         if self.__pipe: self.__pipe.set_state(Gst.State.PAUSED)
-        lat = self.__pipe.get_latency()
-        print(lat)
 
     def __play(self):
         if self.__pipe: self.__pipe.set_state(Gst.State.PLAYING)

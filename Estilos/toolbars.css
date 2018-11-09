@@ -1,5 +1,5 @@
 /* Anuncia lo que se va encontrando */
-#alertabusquedas {
+.alertabusquedas {
     background-image: image(@jamedia1);
     background-color: @jamedia1;
     border: 1px solid @border;
@@ -10,25 +10,32 @@
     animation-duration: 2s;
     animation-iteration-count: infinite;*/
 }
-
-/* Donde se lanzan las busquedas */
-#toolbarbusquedas {
-    background-image: image(@jamedia3);
-    background-color: @jamedia3;
-    border: 1px solid @border;
-}
-#toolbarbusquedas button {
+.alertabusquedas button {
     background-image: image(@green2);
     background-color: @green2;
     padding-left: 15px;
     padding-right: 15px;
     font-weight: bold;
 }
-#toolbarbusquedas button:hover {
+
+/* Donde se lanzan las busquedas */
+.toolbarbusquedas {
+    background-image: image(@jamedia3);
+    background-color: @jamedia3;
+    border: 1px solid @border;
+}
+.toolbarbusquedas button {
+    background-image: image(@green2);
+    background-color: @green2;
+    padding-left: 15px;
+    padding-right: 15px;
+    font-weight: bold;
+}
+.toolbarbusquedas button:hover {
     background-image: image(@green3);
     background-color: @green3;
 }
-#toolbarbusquedas *:disabled {
+.toolbarbusquedas *:disabled {
     color:rgba(0,0,0,0.4);
 }
 .entradasdetexto:focus {
@@ -55,14 +62,14 @@
 }
 
 /* Confirmar salir */
-#toolbarsalir {
+.toolbarsalir {
     background-image: image(@jamedia2);
     background-color: @jamedia2;
     padding: 10px;
     border: 1px solid @border;
     box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.8), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
 }
-#toolbarsalir button {
+.toolbarsalir button {
     background-image: image(@green2);
     background-color: @green2;
     padding-left: 5px;
@@ -71,7 +78,7 @@
     border: 1px solid @border;
     box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
 }
-#toolbarsalir button:hover {
+.toolbarsalir button:hover {
     background-image: image(@green3);
     background-color: @green3;
     padding-left: 5px;

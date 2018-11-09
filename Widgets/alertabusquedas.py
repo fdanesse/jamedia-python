@@ -14,8 +14,7 @@ class AlertaBusqueda(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.set_css_name('alertabusquedas')
-        self.set_name('alertabusquedas')
+        self.get_style_context().add_class('alertabusquedas')
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 

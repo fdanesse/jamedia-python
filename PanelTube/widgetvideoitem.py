@@ -19,7 +19,7 @@ class WidgetVideoItem(Gtk.EventBox):
 
     __gsignals__ = {
         "end-update": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
-        "error-update": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),}
+        "error-update": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),}
 
     def __init__(self, url):
 
@@ -80,7 +80,7 @@ class WidgetVideoItem(Gtk.EventBox):
         # 5 - Busquedas. NOTA: desde PanelTube
         getJsonAndThumbnail(self._dict["url"], self.__endUpdate)
 
-    def __endUpdate(self, _dict):
+    def __endUpdate(self, _dict, tiempo):
         # 6 - Busquedas
         self.__fileimage = _dict.get("thumb", "")
         self.__filejson = _dict["json"]
@@ -94,4 +94,4 @@ class WidgetVideoItem(Gtk.EventBox):
             self.__setLabels()
             self.emit("end-update")
         else:
-            self.emit("error-update")
+            self.emit("error-update", tiempo)

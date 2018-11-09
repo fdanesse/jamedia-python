@@ -19,8 +19,7 @@ class ToolbarBusquedas(Gtk.Toolbar):
 
         Gtk.Toolbar.__init__(self)
 
-        self.set_css_name('toolbarbusquedas')
-        self.set_name('toolbarbusquedas')
+        self.get_style_context().add_class('toolbarbusquedas')
 
         self.insert(get_separador(draw=False, ancho=3, expand=False), -1)
 
