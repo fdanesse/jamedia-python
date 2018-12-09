@@ -140,7 +140,7 @@ def parseOpts(overrideArguments=None):
     general.add_option(
         '-U', '--update',
         action='store_true', dest='update_self',
-        help='Update this program to latest version. Make sure that you have sufficient permissions (run with sudo if needed)')
+        help=optparse.SUPPRESS_HELP)
     general.add_option(
         '-i', '--ignore-errors',
         action='store_true', dest='ignoreerrors', default=False,
@@ -478,6 +478,11 @@ def parseOpts(overrideArguments=None):
         '--no-resize-buffer',
         action='store_true', dest='noresizebuffer', default=False,
         help='Do not automatically adjust the buffer size. By default, the buffer size is automatically resized from an initial value of SIZE.')
+    downloader.add_option(
+        '--http-chunk-size',
+        dest='http_chunk_size', metavar='SIZE', default=None,
+        help='Size of a chunk for chunk-based HTTP downloading (e.g. 10485760 or 10M) (default is disabled). '
+             'May be useful for bypassing bandwidth throttling imposed by a webserver (experimental)')
     downloader.add_option(
         '--test',
         action='store_true', dest='test', default=False,

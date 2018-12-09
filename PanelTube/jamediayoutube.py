@@ -3,6 +3,13 @@
 # https://github.com/rg3/youtube-dl
 # http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
 
+'''
+IMPORTANTE:
+sudo wget https://yt-dl.org/latest/youtube-dl -O /usr/local/bin/youtube-dl
+sudo chmod a+x /usr/local/bin/youtube-dl
+hash -r
+'''
+
 import os
 import time
 import datetime

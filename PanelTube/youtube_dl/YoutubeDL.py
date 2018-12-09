@@ -65,6 +65,7 @@ from .utils import (
     locked_file,
     make_HTTPS_handler,
     MaxDownloadsReached,
+    orderedSet,
     PagedList,
     parse_filesize,
     PerRequestProxyHandler,
@@ -297,13 +298,20 @@ class YoutubeDL(object):
     the downloader (see youtube_dl/downloader/common.py):
     nopart, updatetime, buffersize, ratelimit, min_filesize, max_filesize, test,
     noresizebuffer, retries, continuedl, noprogress, consoletitle,
-    xattr_set_filesize, external_downloader_args, hls_use_mpegts.
+    xattr_set_filesize, external_downloader_args, hls_use_mpegts,
+    http_chunk_size.
 
     The following options are used by the post processors:
     prefer_ffmpeg:     If True, use ffmpeg instead of avconv if both are available,
                        otherwise prefer avconv.
     postprocessor_args: A list of additional command-line arguments for the
                         postprocessor.
+
+    The following options are used by the Youtube extractor:
+    youtube_include_dash_manifest: If True (default), DASH manifests and related
+                        data will be downloaded and processed by extractor.
+                        You can reduce network I/O by disabling it if you don't
+                        care about DASH.
     """
 
     _NUMERIC_FIELDS = set((
@@ -902,15 +910,25 @@ class YoutubeDL(object):
                                 yield int(item)
                         else:
                             yield int(string_segment)
-                playlistitems = iter_playlistitems(playlistitems_str)
+                playlistitems = orderedSet(iter_playlistitems(playlistitems_str))
 
             ie_entries = ie_result['entries']
+
+            def make_playlistitems_entries(list_ie_entries):
+                num_entries = len(list_ie_entries)
+                return [
+                    list_ie_entries[i - 1] for i in playlistitems
+                    if -num_entries <= i - 1 < num_entries]
+
+            def report_download(num_entries):
+                self.to_screen(
+                    '[%s] playlist %s: Downloading %d videos' %
+                    (ie_result['extractor'], playlist, num_entries))
+
             if isinstance(ie_entries, list):
                 n_all_entries = len(ie_entries)
                 if playlistitems:
-                    entries = [
-                        ie_entries[i - 1] for i in playlistitems
-                        if -n_all_entries <= i - 1 < n_all_entries]
+                    entries = make_playlistitems_entries(ie_entries)
                 else:
                     entries = ie_entries[playliststart:playlistend]
                 n_entries = len(entries)
@@ -928,20 +946,16 @@ class YoutubeDL(object):
                     entries = ie_entries.getslice(
                         playliststart, playlistend)
                 n_entries = len(entries)
-                self.to_screen(
-                    '[%s] playlist %s: Downloading %d videos' %
-                    (ie_result['extractor'], playlist, n_entries))
+                report_download(n_entries)
             else:  # iterable
                 if playlistitems:
-                    entry_list = list(ie_entries)
-                    entries = [entry_list[i - 1] for i in playlistitems]
+                    entries = make_playlistitems_entries(list(itertools.islice(
+                        ie_entries, 0, max(playlistitems))))
                 else:
                     entries = list(itertools.islice(
                         ie_entries, playliststart, playlistend))
                 n_entries = len(entries)
-                self.to_screen(
-                    '[%s] playlist %s: Downloading %d videos' %
-                    (ie_result['extractor'], playlist, n_entries))
+                report_download(n_entries)
 
             if self.params.get('playlistreverse', False):
                 entries = entries[::-1]
@@ -962,6 +976,8 @@ class YoutubeDL(object):
                     'playlist': playlist,
                     'playlist_id': ie_result.get('id'),
                     'playlist_title': ie_result.get('title'),
+                    'playlist_uploader': ie_result.get('uploader'),
+                    'playlist_uploader_id': ie_result.get('uploader_id'),
                     'playlist_index': i + playliststart,
                     'extractor': ie_result['extractor'],
                     'webpage_url': ie_result['webpage_url'],
@@ -1017,7 +1033,7 @@ class YoutubeDL(object):
             '!=': operator.ne,
         }
         operator_rex = re.compile(r'''(?x)\s*
-            (?P<key>width|height|tbr|abr|vbr|asr|filesize|fps)
+            (?P<key>width|height|tbr|abr|vbr|asr|filesize|filesize_approx|fps)
             \s*(?P<op>%s)(?P<none_inclusive>\s*\?)?\s*
             (?P<value>[0-9.]+(?:[kKmMgGtTpPeEzZyY]i?[Bb]?)?)
             $
@@ -1066,22 +1082,27 @@ class YoutubeDL(object):
         return _filter
 
     def _default_format_spec(self, info_dict, download=True):
-        req_format_list = []
 
-        def can_have_partial_formats():
-            if self.params.get('simulate', False):
-                return True
-            if not download:
-                return True
-            if self.params.get('outtmpl', DEFAULT_OUTTMPL) == '-':
-                return False
-            if info_dict.get('is_live'):
-                return False
+        def can_merge():
             merger = FFmpegMergerPP(self)
             return merger.available and merger.can_merge()
-        if can_have_partial_formats():
-            req_format_list.append('bestvideo+bestaudio')
-        req_format_list.append('best')
+
+        def prefer_best():
+            if self.params.get('simulate', False):
+                return False
+            if not download:
+                return False
+            if self.params.get('outtmpl', DEFAULT_OUTTMPL) == '-':
+                return True
+            if info_dict.get('is_live'):
+                return True
+            if not can_merge():
+                return True
+            return False
+
+        req_format_list = ['bestvideo+bestaudio', 'best']
+        if prefer_best():
+            req_format_list.reverse()
         return '/'.join(req_format_list)
 
     def build_format_selector(self, format_spec):
@@ -2213,8 +2234,16 @@ class YoutubeDL(object):
                 sys.exc_clear()
             except Exception:
                 pass
-        self._write_string('[debug] Python version %s - %s\n' % (
-            platform.python_version(), platform_name()))
+
+        def python_implementation():
+            impl_name = platform.python_implementation()
+            if impl_name == 'PyPy' and hasattr(sys, 'pypy_version_info'):
+                return impl_name + ' version %d.%d.%d' % sys.pypy_version_info[:3]
+            return impl_name
+
+        self._write_string('[debug] Python version %s (%s) - %s\n' % (
+            platform.python_version(), python_implementation(),
+            platform_name()))
 
         exe_versions = FFmpegPostProcessor.get_versions(self)
         exe_versions['rtmpdump'] = rtmpdump_version()
