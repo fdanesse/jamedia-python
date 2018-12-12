@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import os
 import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 
 from JAMediaPlayer.Globales import YoutubeDir
+
+APP_PATH = os.path.dirname(os.path.dirname(__file__))
 
 
 class FileChooser(Gtk.FileChooserWidget):
@@ -25,8 +28,6 @@ class FileChooser(Gtk.FileChooserWidget):
             filtro.add_mime_type(mi)
         self.add_filter(filtro)
         self.set_select_multiple(True)
-
-        # FIXME: No funciona self.remove_shortcut_folder(APP_PATH)
         
         hbox = Gtk.HBox()
         self.open = Gtk.Button("Abrir")
@@ -50,4 +51,5 @@ class FileChooser(Gtk.FileChooserWidget):
         if not path: path = YoutubeDir
         self.set_current_folder_uri("file://%s" % path)
         self.show_all()
+        self.remove_shortcut_folder(APP_PATH)
         

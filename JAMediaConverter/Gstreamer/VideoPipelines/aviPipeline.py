@@ -124,7 +124,7 @@ class aviPipeline(Gst.Pipeline):
         self.use_clock(None)
 
     def __on_pad_added(self, decodebin, pad):
-        # FIXME: 1279 * 720 **ERROR: [python3] horizontal_size must be a even (4:2:0 / 4:2:2)
+        # NOTA: 1279 * 720 **ERROR: [python3] horizontal_size must be a even (4:2:0 / 4:2:2)
         # https://en.wikipedia.org/wiki/Chroma_subsampling  http://www.cinedigital.tv/que-es-todo-eso-de-444-422-420-o-color-subsampling/
         # Bug en la negociación automática de gstreamer. En el caso analizado, se recibe: width=(int)1279, height=(int)720
         # Pero se corrige al cambiar el ancho por 1280 lo cual es: Maximal output width of 1280 horizontal pixels - De-Interlacing and YUV 4:2:2 to 4:2:0 Conversion Algorithm
