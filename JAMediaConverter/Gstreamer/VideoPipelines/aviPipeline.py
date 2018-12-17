@@ -15,8 +15,8 @@ from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
-GObject.threads_init()
-Gst.init("--opengl-hwdec-interop=vaapi-glx")
+#GObject.threads_init()
+#Gst.init([])
 
 '''
                       / videoscale | capsfilter | x264enc \

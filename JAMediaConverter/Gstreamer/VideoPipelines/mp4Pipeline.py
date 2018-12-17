@@ -16,7 +16,7 @@ from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import Inf
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
 GObject.threads_init()
-Gst.init("--opengl-hwdec-interop=vaapi-glx")
+Gst.init([])
 
 '''
                       / videoscale | capsfilter | x264enc \

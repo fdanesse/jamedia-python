@@ -83,7 +83,7 @@ class WidgetVideoItem(Gtk.EventBox):
     def __endUpdate(self, _dict, tiempo):
         # 6 - Busquedas
         self.__fileimage = _dict.get("thumb", "")
-        self.__filejson = _dict["json"]
+        self.__filejson = _dict.get("json", "")
         # NOTA: si los archivos no existen cuelga la aplicación
         if os.path.exists(self.__fileimage) and os.path.exists(self.__filejson):
             newdict = get_dict(self.__filejson)

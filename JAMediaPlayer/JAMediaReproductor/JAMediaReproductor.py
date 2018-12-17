@@ -4,6 +4,11 @@
 # Crear Elementos usando python: https://mathieuduponchelle.github.io/2018-02-01-Python-Elements.html?gi-language=undefined
 # audioplotter: https://mathieuduponchelle.github.io/2018-02-15-Python-Elements-2.html?gi-language=undefined
 
+# Drivers video ubuntu 18:04
+# sudo add-apt-repository ppa:oibaf/graphics-drivers
+# sudo apt install xserver-xorg-video-amdgpu
+# sudo apt install mesa-vulkan-drivers
+
 import os
 
 import gi
@@ -20,9 +25,6 @@ from JAMediaPlayer.JAMediaReproductor.AudioOutput import AudioOutput
 from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
-
-GObject.threads_init()
-Gst.init("--opengl-hwdec-interop=vaapi-glx")
 
 
 class JAMediaReproductor(GObject.Object):
@@ -340,4 +342,4 @@ class JAMediaReproductor(GObject.Object):
         else:
             print ("Dirección no válida", temp)
 
-GObject.type_register(JAMediaReproductor)
+#GObject.type_register(JAMediaReproductor)

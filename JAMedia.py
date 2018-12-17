@@ -405,9 +405,9 @@ class JAMediaWindow(Gtk.ApplicationWindow):
 
 
 if __name__ == "__main__":
-    GObject.threads_init()
-    Gdk.threads_init()
-    Gst.init("--opengl-hwdec-interop=vaapi-glx")
+    #GObject.threads_init()
+    #Gdk.threads_init()
+    Gst.init([])  # --opengl-hwdec-interop=vaapi-glx  https://github.com/mpv-player/mpv/issues/4873
     jamedia = JAMedia()
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     exit_status = jamedia.run(sys.argv)

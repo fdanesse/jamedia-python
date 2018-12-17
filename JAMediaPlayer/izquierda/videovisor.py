@@ -31,6 +31,7 @@ class VideoVisor(Gtk.EventBox):
         )
 
         self.gtkSink = Gst.ElementFactory.make("gtksink", None)  # glsinkbin
+        
         self.add(self.gtkSink.props.widget)
 
         self.show_all()

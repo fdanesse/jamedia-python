@@ -12,8 +12,7 @@ from gi.repository import GObject
 from gi.repository import Gst
 from gi.repository import GstVideo
 
-GObject.threads_init()
-Gst.init("--opengl-hwdec-interop=vaapi-glx")
+Gst.init([])
 
 
 class VideoOutput(Gst.Pipeline):
