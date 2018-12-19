@@ -12,14 +12,12 @@ from gi.repository import GObject
 from gi.repository import Gst
 from gi.repository import GstVideo
 
-Gst.init([])
 
-
-class VideoOutput(Gst.Pipeline):
+class VideoOutput(Gst.Bin):
 
     def __init__(self, sink):
 
-        Gst.Pipeline.__init__(self, "VideoOutput")
+        Gst.Bin.__init__(self, "VideoOutput")
         
         self.__gtkSink = sink
         

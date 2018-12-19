@@ -24,3 +24,4 @@ def getSize(currentcaps):
                 height = item.split(")")[-1]
         if width and height: continue
     return width, height
+    

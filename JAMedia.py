@@ -12,15 +12,15 @@ import time
 import threading
 import signal
 
+os.putenv('GDK_BACKEND', 'x11')
+
 import gi
-gi.require_version('Gst', '1.0')
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 from gi.repository import GObject
 from gi.repository import Gdk
 from gi.repository import GLib
-from gi.repository import Gst
 from gi.repository import Gio
 
 from Widgets.headerBar import HeaderBar
@@ -405,9 +405,6 @@ class JAMediaWindow(Gtk.ApplicationWindow):
 
 
 if __name__ == "__main__":
-    #GObject.threads_init()
-    #Gdk.threads_init()
-    Gst.init([])  # --opengl-hwdec-interop=vaapi-glx  https://github.com/mpv-player/mpv/issues/4873
     jamedia = JAMedia()
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     exit_status = jamedia.run(sys.argv)

@@ -20,6 +20,8 @@ from gi.repository import GLib
 from gi.repository import Gst
 from gi.repository import GstVideo
 
+Gst.init([])
+
 from JAMediaPlayer.JAMediaReproductor.VideoOutput import VideoOutput
 from JAMediaPlayer.JAMediaReproductor.AudioOutput import AudioOutput
 from JAMediaPlayer.Globales import MAGIC
@@ -89,16 +91,12 @@ class JAMediaReproductor(GObject.Object):
         if not self.__videoBin: self.__videoBin = VideoOutput(self.__gtkSink)
         if not self.__audioBin: self.__audioBin = AudioOutput(dict(self.__audioconfig))
         self.__pipe = Gst.ElementFactory.make("playbin", "player")
-        #self.__pipe.set_property('buffer-duration', 4294967295/1.5)
-        #self.__pipe.set_property('ring-buffer-max-size', 4294967295)
         self.__pipe.set_property('volume', self.__videoconfig['volumen'])
         self.__pipe.set_property('force-aspect-ratio', True)
         self.__pipe.set_property('video-sink', self.__videoBin)
         self.__pipe.set_property('audio-sink', self.__audioBin)
         self.__pipe.set_auto_flush_bus(False)
         self.__pipe.set_latency(0)
-        self.__videoBin.set_latency(0)
-        self.__audioBin.set_latency(0)
 
         # gst-launch-1.0 filesrc location=cartoon.mp4 ! decodebin ! video/x-raw ! videoconvert ! subtitleoverlay name=over ! autovideosink  filesrc location=subs.srt ! subparse ! over.
         # self.__pipe.set_property('text-sink', self.__textBin)
@@ -150,8 +148,6 @@ class JAMediaReproductor(GObject.Object):
             # http://cgit.collabora.com/git/farstream.git/tree/examples/gui/fs-gui.py
             #La latencia es el tiempo que tarda una muestra capturada en la marca de tiempo X para alcanzar el sink
             self.__pipe.recalculate_latency()
-            self.__videoBin.recalculate_latency()
-            self.__audioBin.recalculate_latency()
 
         elif mensaje.type == Gst.MessageType.DURATION_CHANGED:
             bool1, self.__duration = self.__pipe.query_duration(Gst.Format.TIME)
@@ -342,4 +338,3 @@ class JAMediaReproductor(GObject.Object):
         else:
             print ("Dirección no válida", temp)
 
-#GObject.type_register(JAMediaReproductor)

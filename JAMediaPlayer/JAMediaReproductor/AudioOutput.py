@@ -13,11 +13,11 @@ from gi.repository import Gst
 # Equalizer: https://gstreamer.freedesktop.org/documentation/tutorials/playback/custom-playbin-sinks.html#page-description
 
 
-class AudioOutput(Gst.Pipeline):
+class AudioOutput(Gst.Bin):
 
     def __init__(self, config):
 
-        Gst.Pipeline.__init__(self, "AudioOutput")
+        Gst.Bin.__init__(self, "AudioOutput")
         
         self.__config = config
 
