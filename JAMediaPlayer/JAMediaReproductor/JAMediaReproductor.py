@@ -95,8 +95,6 @@ class JAMediaReproductor(GObject.Object):
         self.__pipe.set_property('force-aspect-ratio', True)
         self.__pipe.set_property('video-sink', self.__videoBin)
         self.__pipe.set_property('audio-sink', self.__audioBin)
-        self.__pipe.set_auto_flush_bus(False)
-        self.__pipe.set_latency(0)
 
         # gst-launch-1.0 filesrc location=cartoon.mp4 ! decodebin ! video/x-raw ! videoconvert ! subtitleoverlay name=over ! autovideosink  filesrc location=subs.srt ! subparse ! over.
         # self.__pipe.set_property('text-sink', self.__textBin)
