@@ -15,8 +15,8 @@ from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
-#GObject.threads_init()
-#Gst.init([])
+GObject.threads_init()
+Gst.init(None)
 
 # NOTA: Segun testeo: 100 imagenes x segundo 42.5Mb
 
@@ -50,7 +50,7 @@ class ImagenBin(Gst.Pipeline):
     __gsignals__ = {
     "progress": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
     "error": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
-    "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
+    #"info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)), FIXME: Ver audioFrame
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
     def __init__(self, origen, dirpath_destino):
@@ -77,7 +77,7 @@ class ImagenBin(Gst.Pipeline):
         self.__t2 = None
         self.__timeProcess = None
         self.__informeModel = InformeTranscoderModel(self.__codec + "-" + informeName)
-        self.__informeModel.connect("info", self.__emit_info)
+        #self.__informeModel.connect("info", self.__emit_info) FIXME: Ver audioFrame
 
         self.__videoSink = ImageBin1()
 
@@ -100,8 +100,8 @@ class ImagenBin(Gst.Pipeline):
 
         self.use_clock(None)
 
-    def __emit_info(self, informemodel, info):
-        self.emit("info", info)
+    #def __emit_info(self, informemodel, info):
+    #    self.emit("info", info) FIXME: Ver audioFrame
         
     def busMessageCb(self, bus, mensaje):
         if mensaje.type == Gst.MessageType.STATE_CHANGED:
@@ -122,13 +122,13 @@ class ImagenBin(Gst.Pipeline):
         print("CODEC PIPELINE DESTROY")'''
 
     def __informar(self):
+        self.__informeModel.setInfo("archivo", self.__origen)
+        self.__informeModel.setInfo("codec",self.__codec)
+        self.__informeModel.setInfo("formato inicial", self.__tipo)
         pad = self.__pipe.emit('get-video-pad',0)
         if pad:
             currentcaps = pad.get_current_caps().to_string()
             if currentcaps.startswith('video/'):
-                self.__informeModel.setInfo("archivo", self.__origen)
-                self.__informeModel.setInfo("codec",self.__codec)
-                self.__informeModel.setInfo("formato inicial", self.__tipo)
                 self.__informeModel.setInfo("entrada de video", currentcaps)           
                 width, height = getSize(currentcaps)
                 self.__informeModel.setInfo("relacion", float(width)/float(height))
@@ -137,7 +137,6 @@ class ImagenBin(Gst.Pipeline):
             currentcaps = pad.get_current_caps().to_string()
             if currentcaps.startswith('audio/'):
                 self.__informeModel.setInfo("entrada de sonido", currentcaps)
-                pass
 
     def __endProcess(self):
         self.__t2 = datetime.datetime.now()
@@ -148,7 +147,7 @@ class ImagenBin(Gst.Pipeline):
         
     def __errorProcess(self, error):
         self.__informeModel.setInfo('errores', error)
-        self.emit("error", "ERROR en: " + self.__origen + ' => ' + error)
+        self.emit("error", "ERROR en: " + self.__origen + "No se pudo convertir a:" + self.__codec + ' => ' + progress)
         self.stop()
 
     def stop(self):
@@ -183,4 +182,4 @@ class ImagenBin(Gst.Pipeline):
             self.emit("progress", self.__position, self.__codec)
         return True
 
-GObject.type_register(ImagenBin)
+#GObject.type_register(ImagenBin)

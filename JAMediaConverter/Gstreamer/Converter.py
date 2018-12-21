@@ -14,7 +14,7 @@ class Converter(GObject.Object):
     __gsignals__ = {
     "progress": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
     "error": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
-    "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
+    #"info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)), FIXME: Ver audioFrame
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
     def __init__(self, origen, codec, dirpath_destino):
@@ -32,7 +32,7 @@ class Converter(GObject.Object):
         self.__configPipe(dirpath_destino)
 
     def getInfo(self):
-        return self.__codec, self.__origen
+        return self.__origen, self.__tipo, self.__codec
 
     def __configPipe(self, dirpath_destino):
         
@@ -69,7 +69,7 @@ class Converter(GObject.Object):
 
         self.__pipe.connect('progress', self.__updateProgress)
         self.__pipe.connect('error', self.__error)
-        self.__pipe.connect('info', self.__info)
+        #self.__pipe.connect('info', self.__info) FIXME: Ver audioFrame
         self.__pipe.connect('end', self.__end)
         
     def __updateProgress(self, pipe, val1, codec):
@@ -78,8 +78,8 @@ class Converter(GObject.Object):
     def __error(self, pipe, error):
         self.emit("error", error)
 
-    def __info(self, pipe, info):
-        self.emit('info', info)
+    #def __info(self, pipe, info):
+    #    self.emit('info', info) FIXME: Ver audioFrame
 
     def __end(self, pipe):
         self.emit("end")
@@ -89,6 +89,7 @@ class Converter(GObject.Object):
 
     def play(self):
         #self.__discovered.discover_uri_async(self.__origen)
+        time.sleep(1) # Fuerza espera para que otros converters no sobreescriban esta salida.
         self.__pipe.play()
         
     def stop(self):
@@ -115,4 +116,4 @@ class Converter(GObject.Object):
         else:
             print(error)'''
 
-GObject.type_register(Converter)
+#GObject.type_register(Converter)

@@ -9,7 +9,7 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
 
-from JAMediaConverter.Gstreamer.Converter import Converter
+from JAMediaConverter.Gstreamer.Converter1 import Converter
 from JAMediaPlayer.Globales import MAGIC
 
 HOME = os.environ['HOME']
@@ -122,8 +122,9 @@ class AudioFrame(Gtk.Frame):
     def __cancel_all(self, widget):
         self._files = []
         for codec in self._converters.keys():
-            self._converters[codec].stop()
-            self._converters[codec] = None
+            if self._converters[codec] != None:
+                self._converters[codec].stop()
+                self._converters[codec] = None
         self.__end_all()
         
     def set_files(self, _files):
@@ -145,6 +146,7 @@ class AudioFrame(Gtk.Frame):
     def run(self, widget=None):
         # Se ejecuta para iniciar todas las conversiones de cada archivo
         self.emit("running", self._files[0])
+        tipo = MAGIC.file(self._files[0])
         self.cancelar.set_sensitive(True)
         self._codecsprogress = {}
         for check in self._checks:
@@ -152,10 +154,6 @@ class AudioFrame(Gtk.Frame):
         self.start.set_sensitive(False)
         for codec in self._converters.keys():
             self._codecsprogress[codec] = 0.0
-
-            tipo = MAGIC.file(self._files[0])
-            info = "Contenido del Archivo: %s" % tipo
-            self.emit('info', info)
 
             # Evitar sobreescritura de archivo origen. Directorios de origen y destino deben ser distintos
             if os.path.dirname(self._files[0]) == self._dirOut:
@@ -173,23 +171,21 @@ class AudioFrame(Gtk.Frame):
                 self.emit('warning', warning)
                 continue
 
-            # FIXME: Parece necesarios armar un Convert único, es demasiado reproducir el archivo para cada conversión al mismo tiempo
             self._converters[codec] = Converter(self._files[0], codec, self._dirOut)
             # Cada instancia de Converter estará conectada a estas funciones
             self._converters[codec].connect('progress', self.__updateProgress)
             self._converters[codec].connect('error', self.__error)
-            self._converters[codec].connect('info', self.__info)
+            #self._converters[codec].connect('info', self.__info) FIXME: Distinto a lo que se emite al comenzar a correr el pipe
             self._converters[codec].connect('end', self.__next)
 
         # si no hay converts no hay tareas pendientes porque ahora se pueden saltear los codecs configurados
         if not any(self._converters.values()):
             self.__next(None)
         else:
+            info = "Contenido del Archivo: %s" % tipo
+            self.emit('info', info)
             for convert in self._converters.values():
                 if convert:
-                    #print("CONVERT", convert.getInfo())
-                    # Esto no debiera ser necesario
-                    time.sleep(0.5)
                     convert.play()
         
     def __updateProgress(self, convert, val1, codec):
@@ -208,13 +204,13 @@ class AudioFrame(Gtk.Frame):
         self.emit("error", error)  # FIXME: Agregar codec ?
         self.__next(convert)
 
-    def __info(self, convert, info):
-        self.emit('info', info)
+    #def __info(self, convert, info):
+    #    self.emit('info', info) FIXME: Distinto a lo que se emite al comenzar a correr el pipe
 
     def __next(self, convert):
         # Va quitando los converters a medida que terminan y cuando no quedan más pasa el siguiente archivo
         if convert:
-            codec, origen = convert.getInfo()
+            origen, tipo, codec = convert.getInfo()
             del(self._converters[codec])
             self._converters[codec] = None
             if any(self._converters.values()): return False  # Esperamos que terminen todos los procesos de este archivo
