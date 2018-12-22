@@ -14,7 +14,6 @@ from gi.repository import Gst
 
 from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
-#from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
 GObject.threads_init()
 Gst.init(None)
@@ -25,7 +24,6 @@ class Converter(GObject.Object):
     __gsignals__ = {
     "progress": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
     "error": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
-    #"info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)), FIXME: Ver audioFrame
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])
     }
 
@@ -48,42 +46,22 @@ class Converter(GObject.Object):
         destino = os.path.join(dirout, location.replace(" ", "_"))
 
         self.__tipo = MAGIC.file(origen)
-        #self.__status = Gst.State.NULL
         self.__t1 = None
         self.__t2 = None
         self.__timeProcess = None
         self.__informeModel = InformeTranscoderModel(self.__codec + "-" + informeName)
-        #self.__informeModel.connect("info", self.__emit_info) FIXME: Ver audioFrame
 
-        self.__STDOUT = None #"/tmp/jamediaconverter%d" % time.time()
+        self.__STDOUT = None
         self.__estructura = "gst-transcoder-1.0 %s %s %s" % (Gst.filename_to_uri(origen), Gst.filename_to_uri(destino), codec)
         self.__process = None
         self.__salida = None
         self.__controller = None
         self.__position = 0
 
-    #def __emit_info(self, informemodel, info):
-    #    self.emit("info", info) FIXME: Ver audioFrame
-
     def __informar(self):
         self.__informeModel.setInfo("archivo", self.__origen)
         self.__informeModel.setInfo("codec",self.__codec)
         self.__informeModel.setInfo("formato inicial", self.__tipo)
-        # FIXME: Requiere otro enfoque
-        '''
-        pad = self.__pipe.emit('get-video-pad',0)
-        if pad:
-            currentcaps = pad.get_current_caps().to_string()
-            if currentcaps.startswith('video/'):
-                self.__informeModel.setInfo("entrada de video", currentcaps)           
-                width, height = getSize(currentcaps)
-                self.__informeModel.setInfo("relacion", float(width)/float(height))
-        pad = self.__pipe.emit('get-audio-pad',0) 
-        if pad:
-            currentcaps = pad.get_current_caps().to_string()
-            if currentcaps.startswith('audio/'):
-                self.__informeModel.setInfo("entrada de sonido", currentcaps)
-        '''
 
     def __new_handle(self, reset):
         if self.__controller:
@@ -102,7 +80,7 @@ class Converter(GObject.Object):
         self.__new_handle(True)
         
     def __handler(self):
-        progress = self.__salida.readline().replace("\n", ""))
+        progress = self.__salida.readline().replace("\n", "")
         '''if "Starting transcoding..." in progress:
             self.__informar()
             self.__t1 = datetime.datetime.now()'''
@@ -110,7 +88,7 @@ class Converter(GObject.Object):
             self.stop()
             return False
         elif "FAILURE" in progress:
-            self.__informeModel.setInfo('errores', progress
+            self.__informeModel.setInfo('errores', progress)
             self.stop()
             self.emit("error", "ERROR en: " + self.__origen + "No se pudo convertir a: " + self.__codec + ' => ' + progress)           
             return False

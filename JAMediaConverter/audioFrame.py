@@ -9,7 +9,6 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
 
-from JAMediaConverter.Gstreamer.Converter1 import Converter
 from JAMediaPlayer.Globales import MAGIC
 
 HOME = os.environ['HOME']
@@ -171,11 +170,12 @@ class AudioFrame(Gtk.Frame):
                 self.emit('warning', warning)
                 continue
 
+            from JAMediaConverter.Gstreamer.Converter1 import Converter
+            if codec in ["wav", "mp3", "ogg", "png", "mpg"]: from JAMediaConverter.Gstreamer.Converter2 import Converter
             self._converters[codec] = Converter(self._files[0], codec, self._dirOut)
             # Cada instancia de Converter estará conectada a estas funciones
             self._converters[codec].connect('progress', self.__updateProgress)
             self._converters[codec].connect('error', self.__error)
-            #self._converters[codec].connect('info', self.__info) FIXME: Distinto a lo que se emite al comenzar a correr el pipe
             self._converters[codec].connect('end', self.__next)
 
         # si no hay converts no hay tareas pendientes porque ahora se pueden saltear los codecs configurados
@@ -201,11 +201,8 @@ class AudioFrame(Gtk.Frame):
         self._progressbar.set_fraction(val2)
 
     def __error(self, convert, error):
-        self.emit("error", error)  # FIXME: Agregar codec ?
+        self.emit("error", error)
         self.__next(convert)
-
-    #def __info(self, convert, info):
-    #    self.emit('info', info) FIXME: Distinto a lo que se emite al comenzar a correr el pipe
 
     def __next(self, convert):
         # Va quitando los converters a medida que terminan y cuando no quedan más pasa el siguiente archivo

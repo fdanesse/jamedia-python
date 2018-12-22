@@ -89,7 +89,7 @@ class ScrollTareas(Gtk.ScrolledWindow):
         self.connect('realize', self.setup_init)
         self.show_all()
 
-        self.audioframe.connect("running", self.set_info_file_in_process)
+        self.audioframe.connect("running", self.set_info_running)
         self.audioframe.connect('error', self.set_errors)
         self.audioframe.connect('info', self.set_info)
         self.audioframe.connect('warning', self.set_warning)
@@ -108,7 +108,7 @@ class ScrollTareas(Gtk.ScrolledWindow):
             self.__infoLabel.set_text("")
             self.__infoFrame.hide()
         
-    def set_info_file_in_process(self, widget, path):
+    def set_info_running(self, widget, path):
         text = 'No hay tareas pendientes'
         if path: text = "Procesando: %s" % os.path.basename(path)
         self.__info_file_in_process.set_text(text)

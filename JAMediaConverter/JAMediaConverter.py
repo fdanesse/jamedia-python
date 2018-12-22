@@ -64,11 +64,12 @@ class JAMediaConverter(Gtk.VBox):
         self.__playerList.lista.seleccionar_pista(path)
 
     def __end_all_process(self, widget):
-        self.__scrollTareas.set_info_file_in_process(None, '')
+        self.__scrollTareas.set_info_running(None, '')
         self.__scrollTareas.set_info(None, '')
         self.__scrollTareas.selectFolder.set_sensitive(True)
         self.__playerList.set_sensitive(True)
         self.__playerList.lista.seleccionar_primero()
+        # FIXME: Borrar archivos vacíos de la carpeta destino de las conversiones, tomar encuenta que las imagenes van en un directorio interno
 
     def __run(self, widget):
         self.__scrollTareas.set_warning(None, '')

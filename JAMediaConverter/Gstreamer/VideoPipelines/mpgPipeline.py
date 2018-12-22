@@ -15,8 +15,8 @@ from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
-#GObject.threads_init()
-#Gst.init([])
+GObject.threads_init()
+Gst.init([])
 
 '''
                       / videoscale | capsfilter | mpeg2enc \
@@ -30,7 +30,6 @@ class mpgPipeline(Gst.Pipeline):
     __gsignals__ = {
     "progress": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
     "error": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
-    "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
     def __init__(self, origen, dirpath_destino):
@@ -58,7 +57,6 @@ class mpgPipeline(Gst.Pipeline):
         self.__t2 = None
         self.__timeProcess = None
         self.__informeModel = InformeTranscoderModel(self.__codec + "-" + informeName)
-        self.__informeModel.connect("info", self.__emit_info)
         self.__newpath = os.path.join(dirpath_destino, location)
 
         self.__videoSink = None
@@ -66,9 +64,6 @@ class mpgPipeline(Gst.Pipeline):
         self.__bus = None
 
         self.__Init()
-
-    def __emit_info(self, informemodel, info):
-        self.emit("info", info)
 
     def __Init(self):
         # ORIGEN (Siempre un archivo)
@@ -114,14 +109,15 @@ class mpgPipeline(Gst.Pipeline):
         decodebin.connect('pad-added', self.__on_pad_added)
 
         self.__bus = self.get_bus()
-        #self.__bus.add_signal_watch()
-        #self.__bus.connect("message", self.busMessageCb)
         self.__bus.enable_sync_message_emission()
         self.__bus.connect("sync-message", self.busMessageCb)
 
         self.use_clock(None)
 
     def __on_pad_added(self, decodebin, pad):
+        self.__informeModel.setInfo("archivo", self.__origen)
+        self.__informeModel.setInfo("codec",self.__codec)
+        self.__informeModel.setInfo("formato inicial", self.__tipo)
         # NOTA: 1279 * 720 **ERROR: [python3] horizontal_size must be a even (4:2:0 / 4:2:2)
         # https://en.wikipedia.org/wiki/Chroma_subsampling  http://www.cinedigital.tv/que-es-todo-eso-de-444-422-420-o-color-subsampling/
         # Bug en la negociación automática de gstreamer. En el caso analizado, se recibe: width=(int)1279, height=(int)720
@@ -130,9 +126,6 @@ class mpgPipeline(Gst.Pipeline):
         tpl_property = pad.get_property("template")  # https://lazka.github.io/pgi-docs/Gst-1.0/classes/PadTemplate.html
         currentcaps = pad.get_current_caps().to_string()
         if currentcaps.startswith('video/'):
-            self.__informeModel.setInfo("archivo", self.__origen)
-            self.__informeModel.setInfo("codec",self.__codec)
-            self.__informeModel.setInfo("formato inicial", self.__tipo)
             self.__informeModel.setInfo("entrada de video", currentcaps)           
             width, height = getSize(currentcaps)
             self.__informeModel.setInfo("relacion", float(width)/float(height))
@@ -166,7 +159,7 @@ class mpgPipeline(Gst.Pipeline):
         
     def __errorProcess(self, error):
         self.__informeModel.setInfo('errores', error)
-        self.emit("error", "ERROR en: " + self.__origen + ' => ' + error)
+        self.emit("error", "ERROR en: " + self.__origen + "No se pudo convertir a: " + self.__codec + ' => ' + error)
         self.stop()
 
     def stop(self):
@@ -204,3 +197,7 @@ class mpgPipeline(Gst.Pipeline):
             self.__position = pos
             self.emit("progress", self.__position, self.__codec)
         return True
+
+    def getInfo(self):
+        return self.__origen, self.__tipo, self.__codec
+        

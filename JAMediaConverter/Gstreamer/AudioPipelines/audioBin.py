@@ -15,12 +15,14 @@ from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
-#GObject.threads_init()
-#Gst.init([])
+GObject.threads_init()
+Gst.init([])
 
 
 class audioBin1(Gst.Bin):
+
     def __init__(self, path, codec):
+
         Gst.Bin.__init__(self, "audioBin1")
 
         audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
@@ -50,7 +52,9 @@ class audioBin1(Gst.Bin):
 
 
 class audioBin2(Gst.Bin):
+
     def __init__(self, path):
+
         Gst.Bin.__init__(self, "audioBin2")
 
         audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
@@ -81,10 +85,10 @@ class audioBin(Gst.Pipeline):
     __gsignals__ = {
     "progress": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
     "error": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
-    "info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
     def __init__(self, origen, dirpath_destino, codec):
+
         Gst.Pipeline.__init__(self, "audioBin")
 
         self.__controller = None
@@ -110,7 +114,6 @@ class audioBin(Gst.Pipeline):
         self.__t2 = None
         self.__timeProcess = None
         self.__informeModel = InformeTranscoderModel(self.__codec + "-" + informeName)
-        self.__informeModel.connect("info", self.__emit_info)
         self.__newpath = os.path.join(dirpath_destino, location)
 
         self.__videoSink = Gst.ElementFactory.make('fakesink', 'fakesink')
@@ -127,17 +130,11 @@ class audioBin(Gst.Pipeline):
         self.__pipe.set_property('audio-sink', self.__audioSink)
 
         self.__pipe.set_property("uri", Gst.filename_to_uri(self.__origen))
-        #uridecodebin.connect('pad-added', self.__on_pad_added)
         self.__bus = self.get_bus()
-        #self.__bus.add_signal_watch()
-        #self.__bus.connect("message", self.busMessageCb)
         self.__bus.enable_sync_message_emission()
         self.__bus.connect("sync-message", self.busMessageCb)
 
         self.use_clock(None)
-
-    def __emit_info(self, informemodel, info):
-        self.emit("info", info)
         
     def busMessageCb(self, bus, mensaje):
         if mensaje.type == Gst.MessageType.STATE_CHANGED:
@@ -153,18 +150,15 @@ class audioBin(Gst.Pipeline):
 
         elif mensaje.type == Gst.MessageType.ERROR:
             self.__errorProcess(str(mensaje.parse_error()))
-        
-    '''def __del__(self):
-        print("CODEC PIPELINE DESTROY")'''
 
     def __informar(self):
+        self.__informeModel.setInfo("archivo", self.__origen)
+        self.__informeModel.setInfo("codec",self.__codec)
+        self.__informeModel.setInfo("formato inicial", self.__tipo)
         pad = self.__pipe.emit('get-video-pad',0)
         if pad:
             currentcaps = pad.get_current_caps().to_string()
             if currentcaps.startswith('video/'):
-                self.__informeModel.setInfo("archivo", self.__origen)
-                self.__informeModel.setInfo("codec",self.__codec)
-                self.__informeModel.setInfo("formato inicial", self.__tipo)
                 self.__informeModel.setInfo("entrada de video", currentcaps)           
                 width, height = getSize(currentcaps)
                 self.__informeModel.setInfo("relacion", float(width)/float(height))
@@ -173,7 +167,6 @@ class audioBin(Gst.Pipeline):
             currentcaps = pad.get_current_caps().to_string()
             if currentcaps.startswith('audio/'):
                 self.__informeModel.setInfo("entrada de sonido", currentcaps)
-                pass
 
     def __endProcess(self):
         self.__t2 = datetime.datetime.now()
@@ -184,7 +177,7 @@ class audioBin(Gst.Pipeline):
         
     def __errorProcess(self, error):
         self.__informeModel.setInfo('errores', error)
-        self.emit("error", "ERROR en: " + self.__origen + ' => ' + error)
+        self.emit("error", "ERROR en: " + self.__origen + "No se pudo convertir a: " + self.__codec + ' => ' + error)
         self.stop()
 
     def stop(self):
@@ -223,4 +216,5 @@ class audioBin(Gst.Pipeline):
             self.emit("progress", self.__position, self.__codec)
         return True
 
-GObject.type_register(audioBin)
+    def getInfo(self):
+        return self.__origen, self.__tipo, self.__codec

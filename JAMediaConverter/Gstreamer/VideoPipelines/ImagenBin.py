@@ -50,7 +50,6 @@ class ImagenBin(Gst.Pipeline):
     __gsignals__ = {
     "progress": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_FLOAT, GObject.TYPE_STRING)),
     "error": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
-    #"info": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)), FIXME: Ver audioFrame
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
     def __init__(self, origen, dirpath_destino):
@@ -77,7 +76,6 @@ class ImagenBin(Gst.Pipeline):
         self.__t2 = None
         self.__timeProcess = None
         self.__informeModel = InformeTranscoderModel(self.__codec + "-" + informeName)
-        #self.__informeModel.connect("info", self.__emit_info) FIXME: Ver audioFrame
 
         self.__videoSink = ImageBin1()
 
@@ -86,22 +84,16 @@ class ImagenBin(Gst.Pipeline):
         self.__pipe.set_property('audio-sink', Gst.ElementFactory.make('fakesink', 'fakesink'))
         self.__pipe.set_property('video-sink', self.__videoSink)
         p = os.path.join(dirpath_destino, location)
-        if not os.path.exists(p):
-            os.mkdir(p)
+        if not os.path.exists(p): os.mkdir(p)
         self.__videoSink.get_by_name('multifilesink').set_property('location', "%s/%s/img%s06d.png" % (dirpath_destino, location, "%"))
 
         self.__pipe.set_property("uri", Gst.filename_to_uri(self.__origen))
 
         self.__bus = self.get_bus()
-        #self.__bus.add_signal_watch()
-        #self.__bus.connect("message", self.busMessageCb)
         self.__bus.enable_sync_message_emission()
         self.__bus.connect("sync-message", self.busMessageCb)
 
         self.use_clock(None)
-
-    #def __emit_info(self, informemodel, info):
-    #    self.emit("info", info) FIXME: Ver audioFrame
         
     def busMessageCb(self, bus, mensaje):
         if mensaje.type == Gst.MessageType.STATE_CHANGED:
@@ -117,9 +109,6 @@ class ImagenBin(Gst.Pipeline):
 
         elif mensaje.type == Gst.MessageType.ERROR:
             self.__errorProcess(str(mensaje.parse_error()))
-        
-    '''def __del__(self):
-        print("CODEC PIPELINE DESTROY")'''
 
     def __informar(self):
         self.__informeModel.setInfo("archivo", self.__origen)
@@ -147,7 +136,7 @@ class ImagenBin(Gst.Pipeline):
         
     def __errorProcess(self, error):
         self.__informeModel.setInfo('errores', error)
-        self.emit("error", "ERROR en: " + self.__origen + "No se pudo convertir a:" + self.__codec + ' => ' + progress)
+        self.emit("error", "ERROR en: " + self.__origen + "No se pudo convertir a: " + self.__codec + ' => ' + error)
         self.stop()
 
     def stop(self):
@@ -182,4 +171,5 @@ class ImagenBin(Gst.Pipeline):
             self.emit("progress", self.__position, self.__codec)
         return True
 
-#GObject.type_register(ImagenBin)
+    def getInfo(self):
+        return self.__origen, self.__tipo, self.__codec
