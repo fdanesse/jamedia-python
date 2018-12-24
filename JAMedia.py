@@ -38,6 +38,8 @@ from JAMediaPlayer.Globales import get_dict
 from WebKit.WebViewer import WebViewer
 from JAMediaConverter.JAMediaConverter import JAMediaConverter
 from PanelTube.InformeDescargas import InformeDescargas
+from JAMediaPlayer.Globales import clear_Dir
+from JAMediaPlayer.Globales import YoutubeDir
 
 BASE_PATH = os.path.dirname(__file__)
 
@@ -216,6 +218,8 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         else:
             self.toolbar_descarga.hide()
             # FIXME: Agregar opciones para cancelados en descargas
+            clear_Dir(YoutubeDir, True)
+            print("__run_download clear_Dir")
     
     def __drag_drop(self, destino, drag_context, x, y, n):
         # FIXME: Agregar imagen al drag
@@ -245,6 +249,7 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         items = self.paneltube.descargar.get_children()
         items.extend(self.paneltube.encontrados.get_children())
         if not [item for item in items if self.__filterItems(item, url)]:
+            time.sleep(0.2)
             videowidget = WidgetVideoItem(url)
             videowidget.set_tooltip_text(TipDescargas)
             videowidget.show_all()
@@ -299,6 +304,9 @@ class JAMediaWindow(Gtk.ApplicationWindow):
             self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
         if urls:
             self.alerta_busqueda.set_data("Actualizando: %s... faltan: %s" % (urls[0], len(urls)))
+            # NOTA: Necesario sleep: Unknown sequence number while processing queue [xcb] Most likely this is a multi-threaded client and XInitThreads has not been called
+            # Xlib está en abandono migrando a xcb: https://xcb.freedesktop.org/XcbPythonBinding/
+            time.sleep(0.2)
             videowidget = WidgetVideoItem(urls[0])
             videowidget.set_tooltip_text(TipEncontrados)
             videowidget.show_all()
