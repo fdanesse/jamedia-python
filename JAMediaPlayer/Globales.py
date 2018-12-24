@@ -109,3 +109,24 @@ def get_toggle_boton(archivo, flip=False, rotacion=None, pixels=24, tooltip_text
         boton.TOOLTIP = tooltip_text
     return boton
     
+def clear_Dir(_dir, removedirs):
+    _dirs = []
+    for (archiveDirPath, dirNames, fileNames) in os.walk(_dir):
+        # Directorio padre, directorios hijos, archivos en Directorio padre
+        if removedirs:
+            for _d in dirNames:
+                n = os.path.realpath(os.path.join(archiveDirPath, _d))
+                if not n in _dirs and n != _dir and n != os.path.realpath(os.environ["HOME"]): _dirs.append(n)
+        # Borrando archivos vacíos
+        for fileName in fileNames:
+            file_path = os.path.realpath(os.path.join(archiveDirPath, fileName))
+            try:
+                if not os.stat(file_path).st_size: os.unlink(file_path)
+            except:
+                pass
+    # Borrando directorios vacíos
+    for _d in reversed(_dirs):
+        try:             
+            if _dir != _d and not os.listdir(_d): os.rmdir(_d)
+        except:
+            pass

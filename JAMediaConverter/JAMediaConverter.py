@@ -13,6 +13,7 @@ from JAMediaPlayer.FileChooser import FileChooser
 from JAMediaPlayer.derecha.JAMediaPlayerList import PlayerList
 from JAMediaConverter.FileChooser import FileChooser as FileChooser2
 from JAMediaConverter.scrollTareas import ScrollTareas
+from JAMediaPlayer.Globales import clear_Dir
 
 
 class JAMediaConverter(Gtk.VBox):
@@ -25,6 +26,8 @@ class JAMediaConverter(Gtk.VBox):
 
         self.set_css_name('converterbox')
         self.set_name('converterbox')
+
+        self.__currentDir = ""
 
         self.__base_panel = Gtk.HPaned()
         self.__filechooser = FileChooser()      # Para armar la lista de arcivos a convertir
@@ -69,7 +72,8 @@ class JAMediaConverter(Gtk.VBox):
         self.__scrollTareas.selectFolder.set_sensitive(True)
         self.__playerList.set_sensitive(True)
         self.__playerList.lista.seleccionar_primero()
-        # FIXME: Borrar archivos vacíos de la carpeta destino de las conversiones, tomar encuenta que las imagenes van en un directorio interno
+        if os.path.exists(self.__currentDir) and os.path.isdir(self.__currentDir):
+            clear_Dir(self.__currentDir, True)
 
     def __run(self, widget):
         self.__scrollTareas.set_warning(None, '')
@@ -83,10 +87,10 @@ class JAMediaConverter(Gtk.VBox):
         self.__scrollTareas.audioframe.set_files(list(self.__playerList.lista.getItems()))
 
     def __folder_selected(self, widget):
-        currentDir = self.__filechooser2.get_filename()
-        self.__scrollTareas.currentDir = currentDir
-        self.__scrollTareas.dirLabel.set_text(currentDir)
-        self.__scrollTareas.audioframe._dirOut = currentDir
+        self.__currentDir = self.__filechooser2.get_filename()
+        self.__scrollTareas.currentDir = self.__currentDir
+        self.__scrollTareas.dirLabel.set_text(self.__currentDir)
+        self.__scrollTareas.audioframe._dirOut = self.__currentDir
         self.__setup_init()
         
     def __run_selectFolder(self, widget):
