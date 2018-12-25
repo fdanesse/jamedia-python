@@ -41,7 +41,6 @@ def __get_videos(consulta, limite, callback, callbackend, errorConection):
                 url = "http://www.youtube.com/watch?v=%s" % _id
                 if not _id in urls.keys():
                     urls[_id] = {"url": url}
-                    time.sleep(0.2)
                     callback(url, limite - len(urls.keys()))
                 if len(urls.keys()) >= limite:
                     break

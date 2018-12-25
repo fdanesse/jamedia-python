@@ -219,7 +219,6 @@ class JAMediaWindow(Gtk.ApplicationWindow):
             self.toolbar_descarga.hide()
             # FIXME: Agregar opciones para cancelados en descargas
             clear_Dir(YoutubeDir, True)
-            print("__run_download clear_Dir")
     
     def __drag_drop(self, destino, drag_context, x, y, n):
         # FIXME: Agregar imagen al drag
@@ -249,10 +248,8 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         items = self.paneltube.descargar.get_children()
         items.extend(self.paneltube.encontrados.get_children())
         if not [item for item in items if self.__filterItems(item, url)]:
-            time.sleep(0.2)
             videowidget = WidgetVideoItem(url)
             videowidget.set_tooltip_text(TipDescargas)
-            videowidget.show_all()
             videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
             self.paneltube.descargar.pack_start(videowidget, False, False, 3)
             self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
@@ -278,7 +275,7 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         threading.Thread(target=buscar, args=(palabras, cantidad, self.__add_video_encontrado, self.__busquedasEnd, self.__errorConection)).start()
         
     def __errorConection(self):
-        self.toolbar_alertas.run("No tienes conexión ?")
+        GLib.idle_add(self.toolbar_alertas.run, "No tienes conexión ?")
 
     def __add_video_encontrado(self, url, faltan):
         # 2 - Busquedas
@@ -287,14 +284,14 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         if not [item for item in items if self.__filterItems(item, url)]:
             if not str(url).strip() in self.__videosEncontrados:
                 self.__videosEncontrados.append(str(url).strip())
-                self.alerta_busqueda.set_data("Encontrado: %s... faltan: %s" % (url, faltan))
+                GLib.idle_add(self.alerta_busqueda.set_data, "Encontrado: %s... faltan: %s" % (url, faltan))
         else:
-            self.alerta_busqueda.set_data("Ya se encuentra listado: %s..." % (url))
+            GLib.idle_add(self.alerta_busqueda.set_data, "Ya se encuentra listado: %s..." % (url))
 
     def __busquedasEnd(self):
         # 3 - Busquedas
-        self.toolbar_busqueda.set_sensitive(True)
-        self.__make_append_update_video(None, list(self.__videosEncontrados))
+        GLib.idle_add(self.toolbar_busqueda.set_sensitive, True)
+        GLib.idle_add(self.__make_append_update_video, None, list(self.__videosEncontrados))
         self.__videosEncontrados = []
 
     def __make_append_update_video(self, item, urls):
@@ -303,22 +300,24 @@ class JAMediaWindow(Gtk.ApplicationWindow):
             self.paneltube.encontrados.pack_start(item, False, False, 3)
             self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
         if urls:
-            self.alerta_busqueda.set_data("Actualizando: %s... faltan: %s" % (urls[0], len(urls)))
-            # NOTA: Necesario sleep: Unknown sequence number while processing queue [xcb] Most likely this is a multi-threaded client and XInitThreads has not been called
+            # NOTA: Unknown sequence number while processing queue [xcb] Most likely this is a multi-threaded client and XInitThreads has not been called
             # Xlib está en abandono migrando a xcb: https://xcb.freedesktop.org/XcbPythonBinding/
-            time.sleep(0.2)
-            videowidget = WidgetVideoItem(urls[0])
-            videowidget.set_tooltip_text(TipEncontrados)
-            videowidget.show_all()
-            videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
-            urls.remove(urls[0])
-            videowidget.connect("end-update", self.__make_append_update_video, urls)
-            videowidget.connect("error-update", self.__cancel_append_video, urls)
-            videowidget.update() # 5 - Busquedas
+            GLib.idle_add(self.__create_widget_video, urls)
         else:
             # FIXME: Agregar opciones para cancelados en metadatos
             ocultar([self.alerta_busqueda])
 
+    def __create_widget_video(self, urls):
+        self.alerta_busqueda.set_data("Actualizando: %s... faltan: %s" % (urls[0], len(urls)))
+        videowidget = WidgetVideoItem(urls[0])
+        videowidget.set_tooltip_text(TipEncontrados)
+        videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
+        urls.remove(urls[0])
+        videowidget.connect("end-update", self.__make_append_update_video, urls)
+        videowidget.connect("error-update", self.__cancel_append_video, urls)
+        videowidget.update() # 5 - Busquedas
+        return False
+        
     def __cancel_append_video(self, item, tiempo, urls):
         self.toolbar_alertas.run("Error en Metadatos de: %s T=%s" % (item._dict.get('url', ''), tiempo))
         self.alerta_busqueda.set_data("Salteando: %s... faltan: %s" % (item._dict.get('url', ''), len(urls)))
@@ -413,6 +412,8 @@ class JAMediaWindow(Gtk.ApplicationWindow):
 
 
 if __name__ == "__main__":
+    GObject.threads_init()
+    Gdk.threads_init()
     jamedia = JAMedia()
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     exit_status = jamedia.run(sys.argv)

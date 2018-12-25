@@ -70,7 +70,7 @@ class ToolbarDescargas(Gtk.Toolbar):
                     adj = self.__barra_progreso.escala.get_adjustment()
                     GLib.idle_add(adj.set_value, float(porcentaje[0].replace("%", '')))
         if "100.0%" in progress:
-            self.__cancel_download()
+            GLib.idle_add(self.__cancel_download)
             return False
         return True
 
