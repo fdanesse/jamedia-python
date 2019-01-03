@@ -84,22 +84,24 @@ class JAMediaPlayer(Gtk.VBox):
         if self.__filechooser.tipo == "load": self.base_panel.derecha.lista.lista.limpiar()
         self.base_panel.derecha.lista.lista.agregar_items(items)
 
+    def setFiles(self, files):
+        # Archivos abiertos desde nautilus
+        items = []
+        files.sort()
+        for p in files:
+            path = p.get_path()
+            if not os.path.isfile(path): continue
+            archivo = os.path.basename(path)
+            items.append([archivo, path])
+            self.directorio = os.path.dirname(path)
+        self.__return_to_player(None)
+        self.base_panel.derecha.lista.lista.limpiar()
+        self.base_panel.derecha.lista.lista.agregar_items(items)
+
     def __return_to_player(self, widget):
         self.__filechooser.hide()
         self.toolbar.show()
         self.base_panel.show()
-
-    '''
-    def __openTv(self, widget):
-        self.base_panel.derecha.lista.lista.limpiar()
-        arch = open(os.path.join(BASE_PATH, "lista.txt"), "r")
-        items = arch.readlines()
-        arch.close()
-        tvs = []
-        for item in items:
-            tvs.append(item.replace("\n", "").split(","))
-        self.base_panel.derecha.lista.lista.agregar_items(tvs)
-    '''
     
     def __openfiles(self, widget, tipo):
         self.toolbar.hide()

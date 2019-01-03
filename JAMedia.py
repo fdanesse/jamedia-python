@@ -77,20 +77,13 @@ class JAMedia(Gtk.Application):
 
         self.set_flags(Gio.ApplicationFlags.NON_UNIQUE | Gio.ApplicationFlags.HANDLES_OPEN)
 
-    def do_activate(self):
-        self.win = JAMediaWindow(self)
+    def do_activate(self, files=[]):
+        self.win = JAMediaWindow(self, files)
         self.win.show()
 
     def do_open(self, files, i, hint):
-        print(files, i, hint)
-        '''
-        if len(files) > 1:
-            print("Multiple files not supported, using %s" % files[0].get_path())
-        if not files[0].query_exists(None):
-        print("%s doesn't exist" % files[0].get_path())
-            return
-        '''
-        self.do_activate ()
+        # [__gi__.GLocalFile]  https://docs.python.org/3/library/filesys.html
+        self.do_activate(files)
 
     def do_startup (self):
         Gtk.Application.do_startup(self)
@@ -100,7 +93,7 @@ class JAMediaWindow(Gtk.ApplicationWindow):
 
     __gtype_name__ = 'JAMediaWindow'
 
-    def __init__(self, app):
+    def __init__(self, app, files=[]):
 
         Gtk.Window.__init__(self, title="JAMedia", application=app)
 
@@ -116,7 +109,7 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         self.set_resizable(True)
         self.set_position(Gtk.WindowPosition.CENTER)
 
-        self.archivos = []
+        self.archivos = files
         self.__videosEncontrados = []
 
         self.headerBar = HeaderBar()
@@ -185,9 +178,8 @@ class JAMediaWindow(Gtk.ApplicationWindow):
 
         if self.archivos:
             self.__switch(None, 'jamedia')
-            # FIXME: Abrir la aplicación desde nautilus no está Implementado
-            # self.jamediaplayer.base_panel.derecha.lista.set_nueva_lista(self.archivos)
-            # self.archivos = []
+            self.jamediaplayer.setFiles(self.archivos)
+            self.archivos = []
         else:
             self.__switch(None, 'jamediatube')
             
