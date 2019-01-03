@@ -13,7 +13,8 @@ from gi.repository import GstVideo
 from gi.repository import GLib
 from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
-from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
+from JAMediaConverter.Gstreamer.Globales import format_ns
+from JAMediaConverter.Gstreamer.Globales import getSize
 
 GObject.threads_init()
 Gst.init([])
@@ -32,7 +33,7 @@ class mpgPipeline(Gst.Pipeline):
     "error": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING,)),
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
-    def __init__(self, origen, dirpath_destino):
+    def __init__(self, origen, dirout):
         Gst.Pipeline.__init__(self, "mpgPipeline")
 
         self.__controller = None
@@ -41,23 +42,20 @@ class mpgPipeline(Gst.Pipeline):
         self.__duration = 0
         self.__position = 0
 
-        # FIXME: Implementar limpieza del nombre del archivo
-        location = os.path.basename(self.__origen)
-        informeName = self.__origen
+        informeName = location = os.path.basename(self.__origen)
         if "." in location:
-            extension = ".%s" % self.__origen.split(".")[-1]
-            informeName = location.replace(extension, "")
-            location = location.replace(extension, ".%s" % self.__codec)
-        else:
-            location = "%s.%s" % (location, self.__codec)
+            extension = ".%s" % location.split(".")[-1]
+            informeName = location = location.replace(extension, "")
+        location = "%s.%s" % (location, self.__codec)
+        self.__newpath = os.path.join(dirout, location)
+        informeName = "%s_to_%s" % (informeName, self.__codec)
 
-        self.__tipo = MAGIC.file(origen)
+        self.__tipo = MAGIC.file(self.__origen)
         self.__status = Gst.State.NULL
         self.__t1 = None
         self.__t2 = None
         self.__timeProcess = None
         self.__informeModel = InformeTranscoderModel(self.__codec + "-" + informeName)
-        self.__newpath = os.path.join(dirpath_destino, location)
 
         self.__videoSink = None
         self.__audioSink = None

@@ -62,15 +62,13 @@ class ImagenBin(Gst.Pipeline):
         self.__duration = 0
         self.__position = 0
 
-        # FIXME: Implementar limpieza del nombre del archivo
-        location = os.path.basename(self.__origen)
-        informeName = location
+        informeName = location = os.path.basename(self.__origen)
         if "." in location:
             extension = ".%s" % self.__origen.split(".")[-1]
-            informeName = location.replace(extension, "")
-            location = location.replace(extension, "")
+            informeName = location = location.replace(extension, "")
+        informeName = "%s_to_%s" % (informeName, self.__codec)
 
-        self.__tipo = MAGIC.file(origen)
+        self.__tipo = MAGIC.file(self.__origen)
         self.__status = Gst.State.NULL
         self.__t1 = None
         self.__t2 = None

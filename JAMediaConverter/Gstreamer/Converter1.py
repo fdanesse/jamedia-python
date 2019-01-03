@@ -34,25 +34,22 @@ class Converter(GObject.Object):
         self.__codec = codec
         self.__origen = origen
 
-        # FIXME: Implementar limpieza del nombre del archivo
-        location = os.path.basename(origen)
-        informeName = location
+        informeName = location = os.path.basename(self.__origen)
         if "." in location:
-            extension = ".%s" % origen.split(".")[-1]
-            informeName = location.replace(extension, "")
-            location = location.replace(extension, ".%s" % codec)
-        else:
-            location = "%s.%s" % (location, codec)
-        destino = os.path.join(dirout, location.replace(" ", "_"))
+            extension = ".%s" % location.split(".")[-1]
+            informeName = location = location.replace(extension, "")
+        location = "%s.%s" % (location, self.__codec)
+        destino = os.path.join(dirout, location)
+        informeName = "%s_to_%s" % (informeName, self.__codec)
 
-        self.__tipo = MAGIC.file(origen)
+        self.__tipo = MAGIC.file(self.__origen)
         self.__t1 = None
         self.__t2 = None
         self.__timeProcess = None
         self.__informeModel = InformeTranscoderModel(self.__codec + "-" + informeName)
 
         self.__STDOUT = None
-        self.__estructura = "gst-transcoder-1.0 %s %s %s" % (Gst.filename_to_uri(origen), Gst.filename_to_uri(destino), codec)
+        self.__estructura = "gst-transcoder-1.0 %s %s %s" % (Gst.filename_to_uri(self.__origen), Gst.filename_to_uri(destino), self.__codec)
         self.__process = None
         self.__salida = None
         self.__controller = None
@@ -87,10 +84,10 @@ class Converter(GObject.Object):
         if "DONE." in progress:
             self.stop()
             return False
-        elif "FAILURE" in progress:
+        elif "FAILURE" in progress or "error" in progress:
             self.__informeModel.setInfo('errores', progress)
             self.stop()
-            self.emit("error", "ERROR en: " + self.__origen + "No se pudo convertir a: " + self.__codec + ' => ' + progress)           
+            self.emit("error", "ERROR en: " + self.__origen + " No se pudo convertir a: " + self.__codec + ' => ' + progress)           
             return False
 
         # 0:00:00.0 / 0:26:14.8

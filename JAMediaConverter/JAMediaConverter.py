@@ -14,6 +14,7 @@ from JAMediaPlayer.derecha.JAMediaPlayerList import PlayerList
 from JAMediaConverter.FileChooser import FileChooser as FileChooser2
 from JAMediaConverter.scrollTareas import ScrollTareas
 from JAMediaPlayer.Globales import clear_Dir
+from JAMediaConverter.Gstreamer.Globales import clearFileName
 
 
 class JAMediaConverter(Gtk.VBox):
@@ -105,13 +106,27 @@ class JAMediaConverter(Gtk.VBox):
         return False
 
     def __load_files(self, widget):
+        # NOTA: gst-transcoder-1.0 no funciona con archivos que tienen caracteres extraños en el nombre
+        # por eso renombro los archivos al cargarlos en la lista de JAMediaConverter
         archivos = self.__filechooser.get_filenames()
         items = []
         archivos.sort()
         for path in archivos:
-            if not os.path.isfile(path):continue
+            if not os.path.isfile(path): continue
             archivo = os.path.basename(path)
-            items.append([archivo, path])
+
+            newName = archivo
+            if "." in archivo:
+                extension = ".%s" % newName.split(".")[-1]
+                newName = clearFileName(newName.replace(extension, ""))
+                newName = "%s%s" % (newName, extension)
+            else:
+                newName = clearFileName(archivo)
+
+            newPath = os.path.join(os.path.dirname(path), newName)
+            os.rename(path, newPath)
+
+            items.append([newName, newPath])
             self.__directorio = os.path.dirname(path)
         self.__setup_init(None)
         if self.__filechooser.tipo == "load": self.__playerList.lista.limpiar()

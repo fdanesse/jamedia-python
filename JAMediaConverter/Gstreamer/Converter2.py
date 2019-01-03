@@ -31,7 +31,7 @@ class Converter(GObject.Object):
         # EXTRACCION DE AUDIO
         if self.__codec in ["wav", "mp3", "ogg"]:
             from JAMediaConverter.Gstreamer.AudioPipelines.audioBin import audioBin
-            self.__pipe = audioBin(self.__origen, dirpath_destino, self.__codec)
+            self.__pipe = audioBin(self.__origen, self.__codec, dirpath_destino)
 
         # TRANSCODE AUDIO Y VIDEO
         #elif self.__codec == "ogv":

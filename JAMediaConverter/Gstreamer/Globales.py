@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import string
+# https://docs.python.org/3/library/stdtypes.html#str
+# https://docs.python.org/3/library/string.html?highlight=string#module-string
+# https://platzi.com/blog/expresiones-regulares-python/
+
+
 def format_ns(ns):
     s, ns = divmod(ns, 1000000000)
     m, s = divmod(s, 60)
@@ -25,3 +31,10 @@ def getSize(currentcaps):
         if width and height: continue
     return width, height
     
+
+def clearFileName(text):
+    p = '!\"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~'
+    for x in p:
+        text = text.replace(x, " ")
+    text = string.capwords(text, sep=None).replace(" ", "_").casefold()
+    return text

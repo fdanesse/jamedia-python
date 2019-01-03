@@ -27,6 +27,7 @@ from JAMediaPlayer.JAMediaReproductor.AudioOutput import AudioOutput
 from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
+from JAMediaConverter.Gstreamer.Globales import clearFileName
 
 
 class JAMediaReproductor(GObject.Object):
@@ -110,7 +111,8 @@ class JAMediaReproductor(GObject.Object):
 
     def __emit_info(self, informemodel, info):
         # FIXME: señal actualmente no conectada, Mostrará en la interfaz las características del video
-        self.emit("info", info)
+        # self.emit("info", info)
+        pass
 
     def __sync_message(self, bus, mensaje):
         #https://gstreamer.freedesktop.org/documentation/design/messages.html
@@ -171,8 +173,6 @@ class JAMediaReproductor(GObject.Object):
         if pad:
             currentcaps = pad.get_current_caps().to_string()
             if currentcaps.startswith('video/'):
-                #self.__informeModel.setInfo("archivo", self.__source)
-                #self.__informeModel.setInfo("formato inicial", self.__tipo)
                 self.__informeModel.setInfo("entrada de video", currentcaps)           
                 width, height = getSize(currentcaps)
                 self.__informeModel.setInfo("relacion", float(width)/float(height))
@@ -317,11 +317,7 @@ class JAMediaReproductor(GObject.Object):
 
         informeName = uri
         if os.path.exists(temp):
-            # FIXME: Implementar limpieza del nombre del archivo
-            informeName = os.path.basename(temp)
-            if "." in informeName:
-                extension = ".%s" % informeName.split(".")[-1]
-                informeName = informeName.replace(extension, "")
+            informeName = clearFileName(os.path.basename(temp))
             self.__tipo = MAGIC.file(uri)
             temp = Gst.filename_to_uri(uri)
 
@@ -335,4 +331,3 @@ class JAMediaReproductor(GObject.Object):
             self.__play()
         else:
             print ("Dirección no válida", temp)
-

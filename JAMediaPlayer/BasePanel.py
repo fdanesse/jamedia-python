@@ -27,11 +27,11 @@ class BasePanel(Gtk.HPaned):
         self.pack1(self.izquierda, resize=True, shrink=True)
         self.pack2(self.derecha, resize=False, shrink=False)
 
-        self.player = JAMediaReproductor(self.izquierda.video_visor.gtkSink)
-        self.player.connect("endfile", self.__endfile)
-        self.player.connect("estado", self.__state_changed)
-        self.player.connect("newposicion", self.__update_progress)
-        self.player.connect("video", self.__set_video)
+        self.__player = JAMediaReproductor(self.izquierda.video_visor.gtkSink)
+        self.__player.connect("endfile", self.__endfile)
+        self.__player.connect("estado", self.__state_changed)
+        self.__player.connect("newposicion", self.__update_progress)
+        self.__player.connect("video", self.__set_video)
         
         self.show_all()
 
@@ -46,22 +46,22 @@ class BasePanel(Gtk.HPaned):
         self.izquierda.progress.connect("volumen", self.__set_volumen)
 
     def __len_items(self, widget, items):
-        if items == 0 and self.player: self.player.stop()
+        if items == 0 and self.__player: self.__player.stop()
 
     def __accion_equalizer(self, widget, valor, banda):
-        self.player.set_banda(valor, banda)
+        self.__player.set_banda(valor, banda)
 
     def __accion_balance(self, widget, valor, prop):
         if prop == "saturacion":
-            self.player.set_balance(saturacion=valor)
+            self.__player.set_balance(saturacion=valor)
         elif prop == "contraste":
-            self.player.set_balance(contraste=valor)
+            self.__player.set_balance(contraste=valor)
         elif prop == "brillo":
-            self.player.set_balance(brillo=valor)
+            self.__player.set_balance(brillo=valor)
         elif prop == "matiz":
-            self.player.set_balance(matiz=valor)
+            self.__player.set_balance(matiz=valor)
         elif prop == "gamma":
-            self.player.set_balance(gamma=valor)
+            self.__player.set_balance(gamma=valor)
 
     def __accion_controls(self, widget, accion):
         if accion == "atras":
@@ -69,37 +69,37 @@ class BasePanel(Gtk.HPaned):
         elif accion == "siguiente":
             self.derecha.lista.lista.seleccionar_siguiente()
         elif accion == "stop":
-            if self.player: self.player.stop()
+            if self.__player: self.__player.stop()
         elif accion == "pausa-play":
-            if self.player: self.player.pause_play()
+            if self.__player: self.__player.pause_play()
 
     def __set_volumen(self, widget, valor):
-        if self.player: self.player.set_volumen(valor)
+        if self.__player: self.__player.set_volumen(valor)
 
     def __user_set_progress(self, widget, valor):
-        if self.player: self.player.set_position(valor)
+        if self.__player: self.__player.set_position(valor)
 
     # FIXME: Subtítulos no funcionan
     #def __load_subtitulos(self, widget, path):
-    #    self.player.set_subtitulos(path)
+    #    self.__player.set_subtitulos(path)
 
     def __cargar_reproducir(self, widget, path):
         #volumen = 1.0
         #volumen = float("{:.1f}".format(self.izquierda.progress.get_volumen()))
         self.izquierda.progress.set_sensitive(False)
-        self.player.load(path)
-        #self.player.set_volumen(volumen)
+        self.__player.load(path)
+        #self.__player.set_volumen(volumen)
     
     def __rotar(self, widget, valor):
-        if self.player: self.player.rotar(valor)
+        if self.__player: self.__player.rotar(valor)
 
     def __set_video(self, widget, valor):
-        self.izquierda.toolbar_info.set_video(valor)
+        GLib.idle_add(self.izquierda.toolbar_info.set_video, valor)
         # FIXME: Subtítulos no funcionan self.derecha.lista.toolbar.subtitulos.set_sensitive(valor)
 
     def __update_progress(self, objetoemisor, pos, label):
-        self.izquierda.toolbar_info.label.set_text(label)
-        self.izquierda.progress.set_progress(pos)
+        GLib.idle_add(self.izquierda.toolbar_info.label.set_text, label)
+        GLib.idle_add(self.izquierda.progress.set_progress, pos)
 
     def __state_changed(self, widget=None, valor=None):
         if "playing" in valor:
@@ -115,7 +115,7 @@ class BasePanel(Gtk.HPaned):
     '''
     def __update_balance(self):
         config = {}
-        if self.player: config = self.player.get_balance()
+        if self.__player: config = self.__player.get_balance()
         GLib.idle_add(self.derecha.balance.set_balance, 
             brillo=config.get('brillo', 50.0),
             contraste=config.get('contraste', 50.0),

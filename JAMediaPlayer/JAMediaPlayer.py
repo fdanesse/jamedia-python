@@ -55,7 +55,6 @@ class JAMediaPlayer(Gtk.VBox):
 
         self.toolbar.connect("show_config", self.__show_config)
         
-        #self.base_panel.player.connect("video", self.__set_video)
         self.base_panel.izquierda.video_visor.connect("ocultar_controles", self.__show_controls)
         self.base_panel.izquierda.video_visor.connect("button_press_event", self.__set_fullscreen)
         self.base_panel.derecha.lista.toolbar.openfiles.connect("clicked", self.__openfiles, 'load')
