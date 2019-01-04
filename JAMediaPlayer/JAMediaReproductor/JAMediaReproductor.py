@@ -49,6 +49,7 @@ class JAMediaReproductor(GObject.Object):
         
         self.__gtkSink = sink
 
+        self.__origen = None
         self.__source = None
         self.__controller = False
         self.__status = Gst.State.NULL
@@ -83,6 +84,7 @@ class JAMediaReproductor(GObject.Object):
         self.__bus = None
 
     def __reset(self):
+        self.__origen = None
         self.__source = None
         #self.__controller = False
         self.__status = Gst.State.NULL
@@ -97,12 +99,6 @@ class JAMediaReproductor(GObject.Object):
         self.__pipe.set_property('force-aspect-ratio', True)
         self.__pipe.set_property('video-sink', self.__videoBin)
         self.__pipe.set_property('audio-sink', self.__audioBin)
-
-        # gst-launch-1.0 filesrc location=cartoon.mp4 ! decodebin ! video/x-raw ! videoconvert ! subtitleoverlay name=over ! autovideosink  filesrc location=subs.srt ! subparse ! over.
-        # self.__pipe.set_property('text-sink', self.__textBin)
-        # FIXME: Subtítulos no funcionan
-        # self.__pipe.set_property("subtitle-font-desc", Pango.FontDescription("%s %s" % ("Monospace", 12)))
-        # self.__subtitleoverlay.set_property("silent", False)
 
         self.__bus = self.__pipe.get_bus()
         #self.__bus.enable_sync_message_emission()
@@ -182,10 +178,9 @@ class JAMediaReproductor(GObject.Object):
             currentcaps = pad.get_current_caps().to_string()
             if currentcaps.startswith('audio/'):
                 self.__informeModel.setInfo("entrada de sonido", currentcaps)
-        pad = self.__pipe.emit('get-text-pad',0)
-        if pad:
-            currentcaps = pad.get_current_caps().to_string()
-            print (currentcaps)
+        #pad = self.__pipe.emit('get-text-pad',0)
+        #if pad:
+        #    currentcaps = pad.get_current_caps().to_string()
 
     def __new_handle(self, reset):
         if self.__controller:
@@ -311,13 +306,18 @@ class JAMediaReproductor(GObject.Object):
             Gst.SeekFlags.KEY_UNIT,
             posicion)
 
-    # FIXME: Subtítulos no funcionan
-    #def set_subtitulos(self, path):
-    #    self.__pipe.set_property("suburi", path)
+    def set_subtitulos(self, path):
+        # self.__pipe.set_property("subtitle-font-desc", "Sans, 18")
+        # gst-launch-1.0 filesrc location=cartoon.mp4 ! decodebin ! video/x-raw ! videoconvert ! subtitleoverlay name=over ! autovideosink  filesrc location=subs.srt ! subparse ! over.
+        # self.__pipe.set_property('text-sink', self.__textBin)
+        # self.__pipe.set_property("subtitle-font-desc", Pango.FontDescription("%s %s" % ("Monospace", 12)))
+        # self.__subtitleoverlay.set_property("silent", False)
+        self.load(self.__origen, path)
 
-    def load(self, uri):
+    def load(self, uri, suburi=''):
         self.stop()
         self.__reset()
+        self.__origen = uri
         temp = uri
 
         informeName = uri
@@ -333,6 +333,7 @@ class JAMediaReproductor(GObject.Object):
             self.__informeModel.setInfo("archivo", self.__source)
             self.__informeModel.setInfo("formato inicial", self.__tipo)
             self.__pipe.set_property("uri", self.__source)
+            if suburi: self.__pipe.set_property("suburi", Gst.filename_to_uri(suburi))
             self.__play()
         else:
             print ("Dirección no válida", temp)

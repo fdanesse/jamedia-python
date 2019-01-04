@@ -46,18 +46,17 @@ class PlayerList(Gtk.Frame):
         self.set_size_request(250, -1)
 
         self.toolbar.clearlist.connect("clicked", self.lista.limpiar)
-        # FIXME: Subtítulos no funcionan self.toolbar.subtitulos.connect("clicked", self.__cargar_subtitulos)
+        self.toolbar.subtitulos.connect("clicked", self.__cargar_subtitulos)
         self.lista.connect("len_items", self.__len_items)
 
     def __len_items(self, widget, val):
         self.toolbar.clearlist.set_sensitive(bool(val))
 
-    ''' # FIXME: Subtítulos no funcionan
     def __cargar_subtitulos(self, widget):
         dialog = Gtk.FileChooserDialog(title="Cargar Subtitulos", parent=self.get_toplevel(), action=Gtk.FileChooserAction.OPEN, buttons = (("Cancel"), Gtk.ResponseType.CANCEL, ("Open"), Gtk.ResponseType.ACCEPT))
         dialog.set_resizable(True)
         dialog.set_size_request(320, 240)
-        dialog.set_current_folder_uri("file://%s" % self.directorio)
+        # FIXME: dialog.set_current_folder_uri("file://%s" % self.directorio)
         dialog.set_select_multiple(False)
         filtro = Gtk.FileFilter()
         filtro.set_name("Filtro")
@@ -68,7 +67,6 @@ class PlayerList(Gtk.Frame):
             path = dialog.get_filename()
             if path: self.emit('subtitulos', path)
         if dialog: dialog.destroy()
-    '''
 
 
 class Lista(Gtk.TreeView):
@@ -226,13 +224,11 @@ class JAMediaToolbarList(Gtk.Toolbar):
         self.insert(self.appendfiles, -1)
         self.clearlist = get_boton(os.path.join(ICONS_PATH, "clear.svg"), flip=False, pixels=18, tooltip_text="Limpiar Lista")
         self.insert(self.clearlist, -1)
-        ''' # FIXME: Subtítulos no funcionan
         self.subtitulos = get_boton(os.path.join(ICONS_PATH, "subtitulo.png"), flip=False, pixels=18, tooltip_text="Cargar Subtítulos")
         self.insert(self.subtitulos, -1)
-        '''
         #self.tv = get_boton(os.path.join(ICONS_PATH, "tvicon.png"), flip=False, pixels=18, tooltip_text="Cargar Lista de Tv")
         #self.insert(self.tv, -1)
         self.insert(get_separador(draw=False, ancho=0, expand=True), -1)
         self.show_all()
         self.clearlist.set_sensitive(False)
-        # self.subtitulos.set_sensitive(False)
+        self.subtitulos.set_sensitive(False)

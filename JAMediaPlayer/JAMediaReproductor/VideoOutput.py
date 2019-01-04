@@ -22,9 +22,6 @@ class VideoOutput(Gst.Bin):
         self.__gtkSink = sink
         self.__gtkSink.set_property("pixel-aspect-ratio", Gst.Fraction(1, 1))
         self.__videoqueue = Gst.ElementFactory.make('queue', 'videoqueue')
-        # self.__subparse = Gst.ElementFactory.make('subparse', 'subparse')
-        # FIXME: Subtítulos no funcionan
-        # self.__subtitleoverlay = Gst.ElementFactory.make('subtitleoverlay', 'subtitleoverlay')
         self.__videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
         caps = Gst.Caps.from_string('video/x-raw,pixel-aspect-ratio=1/1')  # Corrige un BUG: http://gstreamer-devel.966125.n4.nabble.com/master-vs-1-5-1-changing-video-size-on-compositor-input-td4673354.html
         self.__capsfilter = Gst.ElementFactory.make("capsfilter", "capsfilter")
@@ -38,7 +35,6 @@ class VideoOutput(Gst.Bin):
         self.videoflip = Gst.ElementFactory.make('videoflip',"videoflip")
 
         self.add(self.__videoqueue)
-        # FIXME: Subtítulos no funcionan self.add(self.__subtitleoverlay)
         self.add(self.__videoconvert)
         self.add(self.__videorate)
         self.add(self.videobalance)
@@ -48,8 +44,6 @@ class VideoOutput(Gst.Bin):
         self.add(self.__gtkSink)
 
         self.__videoqueue.link(self.__videoconvert)
-        # FIXME: Subtítulos no funcionan self.__videoqueue.link(self.__subtitleoverlay)
-        # FIXME: Subtítulos no funcionan self.__subtitleoverlay.link(self.__videoconvert)
         self.__videoconvert.link(self.__capsfilter)
         self.__capsfilter.link(self.__videorate)
         self.__videorate.link(self.videobalance)

@@ -40,7 +40,7 @@ class BasePanel(Gtk.HPaned):
         self.derecha.balance.connect("balance-valor", self.__accion_balance)
         self.derecha.equalizer.connect("equalizer-valor", self.__accion_equalizer)
         self.derecha.lista.lista.connect("len_items", self.__len_items)
-        # FIXME: Subtítulos no funcionan self.derecha.lista.connect("subtitulos", self.__load_subtitulos)
+        self.derecha.lista.connect("subtitulos", self.__load_subtitulos)
         self.izquierda.toolbar_info.connect("rotar", self.__rotar)
         self.izquierda.progress.connect("seek", self.__user_set_progress)
         self.izquierda.progress.connect("volumen", self.__set_volumen)
@@ -79,9 +79,8 @@ class BasePanel(Gtk.HPaned):
     def __user_set_progress(self, widget, valor):
         if self.__player: self.__player.set_position(valor)
 
-    # FIXME: Subtítulos no funcionan
-    #def __load_subtitulos(self, widget, path):
-    #    self.__player.set_subtitulos(path)
+    def __load_subtitulos(self, widget, path):
+        self.__player.set_subtitulos(path)
 
     def __cargar_reproducir(self, widget, path):
         #volumen = 1.0
@@ -95,7 +94,7 @@ class BasePanel(Gtk.HPaned):
 
     def __set_video(self, widget, valor):
         GLib.idle_add(self.izquierda.toolbar_info.set_video, valor)
-        # FIXME: Subtítulos no funcionan self.derecha.lista.toolbar.subtitulos.set_sensitive(valor)
+        self.derecha.lista.toolbar.subtitulos.set_sensitive(valor)
 
     def __update_progress(self, objetoemisor, pos, label):
         GLib.idle_add(self.izquierda.toolbar_info.label.set_text, label)
