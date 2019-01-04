@@ -68,7 +68,10 @@ class ToolbarAddVideo(Gtk.Toolbar):
         GLib.idle_add(self.__emit_ok)
 
     def __emit_ok(self):
-        text = self.__entry.get_text() # FIXME: Validar
+        # FIXME: Validar
+        # ERROR: 'cosas' is not a valid URL. Set --default-search "ytsearch" (or run  youtube-dl "ytsearch:cosas" ) to search YouTube
+        # TIEMPO => Salteando descarga de metadatos: cosas
+        text = self.__entry.get_text() 
         if text: self.emit('ok', text)
 
     def run(self):

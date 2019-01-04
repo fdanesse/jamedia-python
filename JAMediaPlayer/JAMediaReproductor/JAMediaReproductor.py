@@ -26,7 +26,8 @@ from JAMediaPlayer.JAMediaReproductor.VideoOutput import VideoOutput
 from JAMediaPlayer.JAMediaReproductor.AudioOutput import AudioOutput
 from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
-from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
+from JAMediaConverter.Gstreamer.Globales import format_ns
+from JAMediaConverter.Gstreamer.Globales import getSize
 from JAMediaConverter.Gstreamer.Globales import clearFileName
 
 
@@ -181,7 +182,11 @@ class JAMediaReproductor(GObject.Object):
             currentcaps = pad.get_current_caps().to_string()
             if currentcaps.startswith('audio/'):
                 self.__informeModel.setInfo("entrada de sonido", currentcaps)
-        
+        pad = self.__pipe.emit('get-text-pad',0)
+        if pad:
+            currentcaps = pad.get_current_caps().to_string()
+            print (currentcaps)
+
     def __new_handle(self, reset):
         if self.__controller:
             GLib.source_remove(self.__controller)
