@@ -40,7 +40,6 @@ class BasePanel(Gtk.HPaned):
         self.derecha.balance.connect("balance-valor", self.__accion_balance)
         self.derecha.equalizer.connect("equalizer-valor", self.__accion_equalizer)
         self.derecha.lista.lista.connect("len_items", self.__len_items)
-        self.derecha.lista.connect("subtitulos", self.__load_subtitulos)
         self.izquierda.toolbar_info.connect("rotar", self.__rotar)
         self.izquierda.progress.connect("seek", self.__user_set_progress)
         self.izquierda.progress.connect("volumen", self.__set_volumen)
@@ -79,15 +78,9 @@ class BasePanel(Gtk.HPaned):
     def __user_set_progress(self, widget, valor):
         if self.__player: self.__player.set_position(valor)
 
-    def __load_subtitulos(self, widget, path):
-        self.__player.set_subtitulos(path)
-
     def __cargar_reproducir(self, widget, path):
-        #volumen = 1.0
-        #volumen = float("{:.1f}".format(self.izquierda.progress.get_volumen()))
         self.izquierda.progress.set_sensitive(False)
         self.__player.load(path)
-        #self.__player.set_volumen(volumen)
     
     def __rotar(self, widget, valor):
         if self.__player: self.__player.rotar(valor)
@@ -104,26 +97,15 @@ class BasePanel(Gtk.HPaned):
         if "playing" in valor:
             GLib.idle_add(self.derecha.playercontrols.set_playing)
             GLib.idle_add(self.izquierda.progress.set_sensitive, True)
-            #GLib.idle_add(self.__update_balance)
         elif "paused" in valor or "None" in valor:
             GLib.idle_add(self.derecha.playercontrols.set_paused)
-            #GLib.idle_add(self.__update_balance)
         else:
             print ("Estado del Reproductor desconocido:", valor)
-
-    '''
-    def __update_balance(self):
-        config = {}
-        if self.__player: config = self.__player.get_balance()
-        GLib.idle_add(self.derecha.balance.set_balance, 
-            brillo=config.get('brillo', 50.0),
-            contraste=config.get('contraste', 50.0),
-            saturacion=config.get('saturacion', 50.0),
-            hue=config.get('hue', 50.0),
-            gamma=config.get('gamma', 10.0))
-        return False'''
 
     def __endfile(self, widget=None, senial=None):
         GLib.idle_add(self.izquierda.toolbar_info.label.set_text, "00:00 - 00:00")
         GLib.idle_add(self.derecha.playercontrols.set_paused)
         GLib.idle_add(self.derecha.lista.lista.seleccionar_siguiente)
+
+    def set_subtitulos(self, path):
+        self.__player.set_subtitulos(path)

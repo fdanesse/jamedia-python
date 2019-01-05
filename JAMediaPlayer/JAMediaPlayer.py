@@ -60,6 +60,7 @@ class JAMediaPlayer(Gtk.VBox):
         self.base_panel.derecha.lista.toolbar.openfiles.connect("clicked", self.__openfiles, 'load')
         self.base_panel.derecha.lista.toolbar.appendfiles.connect("clicked", self.__openfiles, 'add')
         #self.base_panel.derecha.lista.toolbar.tv.connect("clicked", self.__openTv)
+        self.base_panel.derecha.lista.toolbar.subtitulos.connect("clicked", self.__openfiles, 'suburi')
 
         self.__filechooser.open.connect("clicked", self.__load_files)
         self.__filechooser.connect("file-activated", self.__load_files)
@@ -72,17 +73,21 @@ class JAMediaPlayer(Gtk.VBox):
         GLib.idle_add(self.__setup_init)
 
     def __load_files(self, widget):
-        archivos = self.__filechooser.get_filenames()
-        items = []
-        archivos.sort()
-        for path in archivos:
-            if not os.path.isfile(path):continue
-            archivo = os.path.basename(path)
-            items.append([archivo, path])
-            self.directorio = os.path.dirname(path)
-        self.__return_to_player(None)
-        if self.__filechooser.tipo == "load": self.base_panel.derecha.lista.lista.limpiar()
-        self.base_panel.derecha.lista.lista.agregar_items(items)
+        if self.__filechooser.tipo == 'suburi':
+            self.base_panel.set_subtitulos(self.__filechooser.get_filename())
+            self.__return_to_player(None)
+        else:
+            archivos = self.__filechooser.get_filenames()
+            items = []
+            archivos.sort()
+            for path in archivos:
+                if not os.path.isfile(path): continue
+                archivo = os.path.basename(path)
+                items.append([archivo, path])
+                self.directorio = os.path.dirname(path)
+            self.__return_to_player(None)
+            if self.__filechooser.tipo == "load": self.base_panel.derecha.lista.lista.limpiar()
+            self.base_panel.derecha.lista.lista.agregar_items(items)
 
     def setFiles(self, files):
         # Archivos abiertos desde nautilus
@@ -102,7 +107,7 @@ class JAMediaPlayer(Gtk.VBox):
         self.__filechooser.hide()
         self.toolbar.show()
         self.base_panel.show()
-    
+
     def __openfiles(self, widget, tipo):
         self.toolbar.hide()
         self.base_panel.hide()

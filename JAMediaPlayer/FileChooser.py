@@ -22,12 +22,11 @@ class FileChooser(Gtk.FileChooserWidget):
         self.tipo = 'load'
 
         self.set_action(Gtk.FileChooserAction.OPEN)    
-        filtro = Gtk.FileFilter()
-        filtro.set_name("Audio y Video")
+        self.__filtro = Gtk.FileFilter()
+        self.__filtro.set_name("Audio y Video")
         for mi in ['audio/*', 'video/*', 'application/ogg']:
-            filtro.add_mime_type(mi)
-        self.add_filter(filtro)
-        self.set_select_multiple(True)
+            self.__filtro.add_mime_type(mi)
+        self.add_filter(self.__filtro)
         
         hbox = Gtk.HBox()
         self.open = Gtk.Button("Abrir")
@@ -52,4 +51,23 @@ class FileChooser(Gtk.FileChooserWidget):
         self.set_current_folder_uri("file://%s" % path)
         self.show_all()
         self.remove_shortcut_folder(APP_PATH)
+        if self.tipo == 'suburi':
+            if self.__filtro.get_name() != "Subtítulos":
+                self.remove_filter(self.__filtro)
+                self.__filtro = Gtk.FileFilter()
+                self.__filtro.set_name("Subtítulos")
+                self.__filtro.add_pattern('*.srt')
+                self.add_filter(self.__filtro)
+            self.set_select_multiple(False)
+            self.select_btn.hide()
+        else:
+            if self.__filtro.get_name() != "Audio y Video":
+                self.remove_filter(self.__filtro)
+                self.__filtro = Gtk.FileFilter()
+                self.__filtro.set_name("Audio y Video")
+                for mi in ['audio/*', 'video/*', 'application/ogg']:
+                    self.__filtro.add_mime_type(mi)
+                self.add_filter(self.__filtro)
+            self.set_select_multiple(True)
+            self.select_btn.show()
         

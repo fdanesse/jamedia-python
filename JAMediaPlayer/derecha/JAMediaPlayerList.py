@@ -17,10 +17,6 @@ from JAMediaPlayer.Globales import ICONS_PATH
 
 class PlayerList(Gtk.Frame):
 
-    __gsignals__ = {
-    "subtitulos": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (GObject.TYPE_STRING, ))
-    }
-
     def __init__(self):
 
         Gtk.Frame.__init__(self)
@@ -46,27 +42,10 @@ class PlayerList(Gtk.Frame):
         self.set_size_request(250, -1)
 
         self.toolbar.clearlist.connect("clicked", self.lista.limpiar)
-        self.toolbar.subtitulos.connect("clicked", self.__cargar_subtitulos)
         self.lista.connect("len_items", self.__len_items)
 
     def __len_items(self, widget, val):
         self.toolbar.clearlist.set_sensitive(bool(val))
-
-    def __cargar_subtitulos(self, widget):
-        dialog = Gtk.FileChooserDialog(title="Cargar Subtitulos", parent=self.get_toplevel(), action=Gtk.FileChooserAction.OPEN, buttons = (("Cancel"), Gtk.ResponseType.CANCEL, ("Open"), Gtk.ResponseType.ACCEPT))
-        dialog.set_resizable(True)
-        dialog.set_size_request(320, 240)
-        # FIXME: dialog.set_current_folder_uri("file://%s" % self.directorio)
-        dialog.set_select_multiple(False)
-        filtro = Gtk.FileFilter()
-        filtro.set_name("Filtro")
-        filtro.add_pattern("*.srt")
-        dialog.add_filter(filtro)
-        resp = dialog.run()
-        if resp == Gtk.ResponseType.ACCEPT:
-            path = dialog.get_filename()
-            if path: self.emit('subtitulos', path)
-        if dialog: dialog.destroy()
 
 
 class Lista(Gtk.TreeView):
