@@ -57,15 +57,15 @@ class JAMediaConverter(Gtk.VBox):
         self.__filechooser.connect("file-activated", self.__load_files)
         self.__filechooser.salir.connect("clicked", self.__setup_init)
         self.__scrollTareas.selectFolder.connect('clicked', self.__run_selectFolder)
-        self.__scrollTareas.audioframe.start.connect("clicked", self.__run)
-        self.__scrollTareas.audioframe.connect("running", self.__running)
-        self.__scrollTareas.audioframe.connect('end', self.__end_all_process)
+        self.__scrollTareas.optionsframe.start.connect("clicked", self.__run)
+        self.__scrollTareas.optionsframe.connect("running", self.__running)
+        self.__scrollTareas.optionsframe.connect('end', self.__end_all_process)
         self.__filechooser2.salir.connect("clicked", self.__setup_init)
         self.__filechooser2.open.connect("clicked", self.__folder_selected)
 
         GLib.idle_add(self.__setup_init)
 
-    def __running(self, audioframe, path):
+    def __running(self, optionsframe, path):
         self.__playerList.lista.seleccionar_pista(path)
 
     def __end_all_process(self, widget):
@@ -83,22 +83,22 @@ class JAMediaConverter(Gtk.VBox):
         self.__scrollTareas.selectFolder.set_sensitive(False)
         self.__playerList.lista.seleccionar_primero()
         self.__playerList.set_sensitive(False)  # FIXME: Es necesario ?
-        self.__scrollTareas.audioframe.run()
+        self.__scrollTareas.optionsframe.run()
 
     def __file_list_changed(self, widget, cantidad):
-        self.__scrollTareas.audioframe.set_files(list(self.__playerList.lista.getItems()))
+        self.__scrollTareas.optionsframe.set_files(list(self.__playerList.lista.getItems()))
 
     def __folder_selected(self, widget):
         self.__currentDir = self.__filechooser2.get_filename()
         self.__scrollTareas.currentDir = self.__currentDir
         self.__scrollTareas.dirLabel.set_text(self.__currentDir)
-        self.__scrollTareas.audioframe._dirOut = self.__currentDir
+        self.__scrollTareas.optionsframe._dirOut = self.__currentDir
         self.__setup_init()
         
     def __run_selectFolder(self, widget):
         self.__filechooser.hide()
         self.__base_panel.hide()
-        self.__filechooser2.show()
+        self.__filechooser2.run()
 
     def __setup_init(self, widget=False):
         self.__filechooser.hide()

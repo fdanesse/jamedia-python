@@ -10,7 +10,7 @@ from gi.repository import Gtk
 from JAMediaPlayer.Globales import get_boton
 from JAMediaPlayer.Globales import get_separador
 from JAMediaPlayer.Globales import ICONS_PATH
-from JAMediaConverter.audioFrame import AudioFrame
+from JAMediaConverter.optionsFrame import OptionsFrame
 
 HOME = os.environ['HOME']
 
@@ -56,11 +56,11 @@ class ScrollTareas(Gtk.ScrolledWindow):
         self.__info_file_in_process = Gtk.Label('No hay tareas pendientes')
         self.__info_file_in_process.set_line_wrap(True)
         self.__info_file_in_process.get_style_context().add_class("infolabel")
-        self.audioframe = AudioFrame()
+        self.optionsframe = OptionsFrame()
 
         vbox.pack_start(frame, False, False, 5)
         vbox.pack_start(self.__info_file_in_process, False, False, 5)
-        vbox.pack_start(self.audioframe, False, False, 5)
+        vbox.pack_start(self.optionsframe, False, False, 5)
         
         self.__infoFrame = Gtk.Frame()
         self.__infoFrame.set_label(" Formato de Entrada: ")
@@ -89,10 +89,10 @@ class ScrollTareas(Gtk.ScrolledWindow):
         self.connect('realize', self.setup_init)
         self.show_all()
 
-        self.audioframe.connect("running", self.set_info_running)
-        self.audioframe.connect('error', self.set_errors)
-        self.audioframe.connect('info', self.set_info)
-        self.audioframe.connect('warning', self.set_warning)
+        self.optionsframe.connect("running", self.set_info_running)
+        self.optionsframe.connect('error', self.set_errors)
+        self.optionsframe.connect('info', self.set_info)
+        self.optionsframe.connect('warning', self.set_warning)
 
     def setup_init(self, widget=None):
         self.__errorsFrame.hide()

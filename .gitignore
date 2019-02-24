@@ -2,3 +2,5 @@
 *.bak
 *.gitignore~
 /build
+.vscode
+__pycache__

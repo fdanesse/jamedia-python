@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 import gi
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 
 from JAMediaPlayer.Globales import YoutubeDir
+
+APP_PATH = os.path.dirname(os.path.dirname(__file__))
 
 
 class FileChooser(Gtk.FileChooserWidget):
@@ -30,4 +34,5 @@ class FileChooser(Gtk.FileChooserWidget):
     def run(self, path=YoutubeDir):
         self.set_current_folder_uri("file://%s" % path)
         self.show_all()
+        self.remove_shortcut_folder(APP_PATH)
         

@@ -2,8 +2,6 @@
 
 import os
 import json
-from time import sleep
-from random import random
 
 from libs import magic
 MAGIC = magic.open(magic.MAGIC_MIME)  #MAGIC_NONE
@@ -31,19 +29,6 @@ for _file in os.listdir(Reports):
     arch = os.path.join(Reports, _file)
     os.remove(arch)
 
-
-def json_file(path, data=None, delay=0.1):
-    while True:
-        try:
-            if data == None:
-                with open(path, "r") as f:  #, encoding="utf-8"
-                    return json.loads(f)
-            else:
-                with open(path, "w") as f:  #, encoding="utf-8"
-                    return json.dump(data, f)  #sort_keys=True, separators=(',', ':'), indent=4, skipkeys=False, ensure_ascii=False
-        except:
-            sleep(random()*delay) # concurrency
-
 def ocultar(objetos):
     for objeto in objetos:
         if objeto.get_visible():
@@ -63,6 +48,11 @@ def insensibilizar(objetos):
     for objeto in objetos:
         if objeto.get_sensitive():
             objeto.set_sensitive(False)
+
+def set_dict(path, data):
+    archivo = open(path, "w")
+    json.dump(data, archivo, sort_keys=True, separators=(',', ':'), indent=4, skipkeys=False, ensure_ascii=False)
+    archivo.close()
 
 def get_dict(path):
     import json

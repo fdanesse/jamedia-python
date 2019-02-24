@@ -16,7 +16,6 @@ from JAMediaPlayer.BasePanel import BasePanel
 from JAMediaPlayer.FileChooser import FileChooser
 
 from JAMediaPlayer.Globales import ICONS_PATH
-from JAMediaPlayer.Globales import json_file
 
 BASE_PATH = os.path.dirname(__file__)
 

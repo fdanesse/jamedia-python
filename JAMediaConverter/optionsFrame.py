@@ -14,7 +14,7 @@ from JAMediaPlayer.Globales import MAGIC
 HOME = os.environ['HOME']
 
 
-class AudioFrame(Gtk.Frame):
+class OptionsFrame(Gtk.Frame):
 
     __gsignals__ = {
         "end": (GObject.SIGNAL_RUN_FIRST,GObject.TYPE_NONE, []),

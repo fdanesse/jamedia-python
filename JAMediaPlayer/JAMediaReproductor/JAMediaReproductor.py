@@ -167,6 +167,7 @@ class JAMediaReproductor(GObject.Object):
     def __informar(self):
         pad = self.__pipe.emit('get-video-pad',0)
         self.emit("video", bool(pad))
+        # FIXME: Si no hay video Dibujar el audio ?
         if pad:
             currentcaps = pad.get_current_caps().to_string()
             if currentcaps.startswith('video/'):

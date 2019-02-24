@@ -4,7 +4,7 @@ import os
 from gi.repository import GObject
 
 from JAMediaPlayer.Globales import Reports
-from JAMediaPlayer.Globales import json_file
+from JAMediaPlayer.Globales import set_dict
 
 
 class InformeDescargas(GObject.Object):
@@ -28,6 +28,6 @@ class InformeDescargas(GObject.Object):
             self.emit("info", self.__data)
             try:
                 filepath = os.path.join(Reports, self.__filename)
-                json_file(filepath, data=self.__data, delay=0.1)
+                set_dict(filepath, self.__data)
             except:
                 pass
