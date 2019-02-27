@@ -6,7 +6,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 from JAMediaPlayer.derecha.BalanceWidget import BalanceWidget
-from JAMediaPlayer.derecha.EqualizerWidget import EqualizerWidget
+#from JAMediaPlayer.derecha.EqualizerWidget import EqualizerWidget
 from JAMediaPlayer.derecha.JAMediaPlayerList import PlayerList
 from JAMediaPlayer.derecha.PlayerControls import PlayerControls
 from JAMediaPlayer.Globales import ocultar
@@ -20,7 +20,7 @@ class Derecha(Gtk.VBox):
         Gtk.VBox.__init__(self)
 
         self.balance = BalanceWidget()
-        self.equalizer = EqualizerWidget()
+        #self.equalizer = EqualizerWidget()
         self.lista = PlayerList()
         self.playercontrols = PlayerControls()
 
@@ -29,15 +29,15 @@ class Derecha(Gtk.VBox):
         balanceFrame.get_label_widget().get_style_context().add_class('equalizerlabelframe')
         balanceFrame.add(self.balance)
 
-        equalizerFrame = Gtk.Frame()
-        equalizerFrame.set_label(" Ecualizador: ")
-        equalizerFrame.get_label_widget().get_style_context().add_class('equalizerlabelframe')
-        equalizerFrame.add(self.equalizer)
+        #equalizerFrame = Gtk.Frame()
+        #equalizerFrame.set_label(" Ecualizador: ")
+        #equalizerFrame.get_label_widget().get_style_context().add_class('equalizerlabelframe')
+        #equalizerFrame.add(self.equalizer)
 
         confbox = Gtk.VBox()
         confbox.get_style_context().add_class("equalizerbox")
         confbox.pack_start(balanceFrame, False, False, 0)
-        confbox.pack_start(equalizerFrame, False, False, 10)
+        #confbox.pack_start(equalizerFrame, False, False, 10)
 
         self.__scroll = Gtk.ScrolledWindow()
         self.__scroll.get_style_context().add_class('scrolllist')

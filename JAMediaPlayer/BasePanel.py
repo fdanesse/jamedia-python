@@ -38,7 +38,8 @@ class BasePanel(Gtk.HPaned):
         self.derecha.lista.lista.connect("nueva-seleccion", self.__cargar_reproducir)
         self.derecha.playercontrols.connect("accion-controls", self.__accion_controls)
         self.derecha.balance.connect("balance-valor", self.__accion_balance)
-        self.derecha.equalizer.connect("equalizer-valor", self.__accion_equalizer)
+        # FIXME: El Pipe en la salida de audio enlentece el video
+        #self.derecha.equalizer.connect("equalizer-valor", self.__accion_equalizer)
         self.derecha.lista.lista.connect("len_items", self.__len_items)
         self.izquierda.toolbar_info.connect("rotar", self.__rotar)
         self.izquierda.progress.connect("seek", self.__user_set_progress)
@@ -47,8 +48,8 @@ class BasePanel(Gtk.HPaned):
     def __len_items(self, widget, items):
         if items == 0 and self.__player: self.__player.stop()
 
-    def __accion_equalizer(self, widget, valor, banda):
-        self.__player.set_banda(valor, banda)
+    #def __accion_equalizer(self, widget, valor, banda):
+    #    self.__player.set_banda(valor, banda)
 
     def __accion_balance(self, widget, valor, prop):
         if prop == "saturacion":
