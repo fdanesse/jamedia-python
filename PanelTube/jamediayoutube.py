@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # https://github.com/rg3/youtube-dl
@@ -31,7 +32,7 @@ def __get_videos(consulta, limite, callback, callbackend, errorConection):
     try:
         params = urllib.parse.urlencode({'search_query': consulta})
         urls = {}
-        print ("Comenzando la búsqueda de %i videos sobre %s..." % (limite, consulta))
+        print ("Comenzando la busqueda de %i videos sobre %s..." % (limite, consulta))
         for pag in range(1, 10):
             f = urllib.request.urlopen("http://www.youtube.com/results?%s&filters=video&page=%i" % (params, pag))
             text = str(f.read()).replace("\n", "")
@@ -46,7 +47,7 @@ def __get_videos(consulta, limite, callback, callbackend, errorConection):
                     break
             if len(urls.keys()) >= limite:
                 break
-        print ("Búsqueda finalizada para:", consulta, "- Videos encontrados:", len(urls.keys()))
+        print ("Busqueda finalizada para:", consulta, "- Videos encontrados:", len(urls.keys()))
     except:
         errorConection()
     return callbackend()

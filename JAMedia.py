@@ -97,7 +97,7 @@ class JAMediaWindow(Gtk.ApplicationWindow):
 
         Gtk.Window.__init__(self, title="JAMedia", application=app)
 
-        self.version = get_dict(os.path.join(BASE_PATH, 'proyecto.ide')).get('version', 18)
+        self.version = get_dict(os.path.join(BASE_PATH, 'proyecto.ide')).get('version', 20)
 
         self.__informe = InformeDescargas()
 
