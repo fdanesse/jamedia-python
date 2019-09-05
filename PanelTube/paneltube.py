@@ -18,6 +18,37 @@ TipDescargas = "Arrastra Hacia La Izquierda para Quitarlo de Descargas."
 TipEncontrados = "Arrastra Hacia La Derecha para Agregarlo a Descargas"
 
 
+def get_progress(salida, command, STDOUT):
+    progress = salida.readline().replace("\n", "")
+    if progress:
+       print(progress)
+
+    '''
+        command.kill()
+        if salida: salida.close()
+        if os.path.exists(STDOUT): os.unlink(STDOUT)
+        callback(_dict, t3.seconds)
+        return False
+    '''
+
+    return True
+
+
+def update_youtubedl():
+    import os
+    import time
+    import subprocess
+
+    STDOUT = "/tmp/tmp%d" % time.time()
+
+    estructura = "wget https://yt-dl.org/latest/youtube-dl -O %s/youtube-dl" % (os.path.dirname(__file__))
+
+    command = subprocess.Popen(estructura, shell=True, stdout=open(STDOUT, "w+b"), universal_newlines=True)
+    salida = open(STDOUT, "r")
+
+    GLib.timeout_add(200, get_progress, salida, command, STDOUT)
+
+
 class PanelTube(Gtk.HPaned):
 
     __gtype_name__ = 'PanelTube'
@@ -78,6 +109,8 @@ class PanelTube(Gtk.HPaned):
         self.toolbar_accion_derecha.connect('ok', self.__ejecutar_borrar)
         
         self.toolbars_flotantes = [self.toolbar_accion_izquierda, self.toolbar_add_video, self.toolbar_accion_derecha]
+
+        update_youtubedl()
 
     def __run_add_video(self, widget):
         self.emit("cancel_toolbar")
