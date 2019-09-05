@@ -90,6 +90,9 @@ class WidgetVideoItem(Gtk.EventBox):
             for key in self._dict.keys():
                 if key == "url": continue
                 self._dict[key] = newdict.get(key, None)
+            # Test:
+            # print ("\tDatos del Video:", str(newdict).encode('utf-8'))
+
             self.__setImage()
             self.__setLabels()
             self.emit("end-update")

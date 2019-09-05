@@ -311,7 +311,7 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         return False
         
     def __cancel_append_video(self, item, tiempo, urls):
-        self.toolbar_alertas.run("Error en Metadatos de: %s T=%s" % (item._dict.get('url', ''), tiempo))
+        self.toolbar_alertas.run("Error en Metadatos de: %s" % (item._dict.get('url', '')))
         self.alerta_busqueda.set_data("Salteando: %s... faltan: %s" % (item._dict.get('url', ''), len(urls)))
         self.__informe.setInfo('cancelados en metadatos', item._dict["url"])
         item.destroy()

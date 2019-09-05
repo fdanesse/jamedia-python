@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # https://github.com/rg3/youtube-dl
-# http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
+# https://github.com/ytdl-org/youtube-dl
 
 '''
 IMPORTANTE:
@@ -10,6 +10,8 @@ sudo wget https://yt-dl.org/latest/youtube-dl -O /usr/local/bin/youtube-dl
 sudo chmod a+x /usr/local/bin/youtube-dl
 hash -r
 '''
+
+TEST = False
 
 import os
 import time
@@ -87,9 +89,11 @@ def __timeCalc(youtubedl, salida, STDOUT, limite, url, text, callback):
 # Descarga de info.json y thumbnail
 def __get_progressThumbnail(salida, _dict, callback, youtubedl, STDOUT, url):
     # Devuelve la dirección a los archivos json y thumbnail luego de descargados
-    progress = salida.readline()
+    progress = salida.readline().replace("\n", "")
     global T1
     if progress:
+        #if TEST: print("\t__get_progressThumbnail:", progress)
+
         if "Downloading webpage" in progress:
             ret, T1 = __timeCalc(youtubedl, salida, STDOUT, 13, url, "Downloading webpage", callback)  # Normalmente demora entre 7 y 8 segundos
             return ret
@@ -107,6 +111,8 @@ def __get_progressThumbnail(salida, _dict, callback, youtubedl, STDOUT, url):
     t2 = datetime.datetime.now()
     t3 = t2 - T1
     if all(_dict.values()) or t3.seconds >= 20:  # NOTA: Es necesario un límite de espera para que no bloquee todo el proceso
+        if TEST: print ("\nDatos:", _dict)
+
         if t3.seconds >= 20:
             print("TIEMPO => Salteando descarga de metadatos:", url)
         #else:
@@ -139,6 +145,12 @@ def getJsonAndThumbnail(url, callback):
 
     GLib.timeout_add(200, __get_progressThumbnail, salida, _dict, callback, youtubedl, STDOUT, url)
 
+    if TEST:
+        print ("\ngetJsonAndThumbnail:")
+        print ("\tURL:", url)
+        print ("\tDestino:", destino)
+        print ("\tEstructura:", estructura)
+
 
 # DESCARGAR Videos de youtube
 def __end(salida, youtubedl, STDOUT, callbackEnd):
@@ -150,19 +162,24 @@ def __end(salida, youtubedl, STDOUT, callbackEnd):
     return False
 
 def __get_progressDownload(salida, progressCallback, callbackEnd, youtubedl, STDOUT, url, informe, errorDownload):
-    progress = salida.readline()
+    progress = salida.readline().replace("\n", "")
     global T1
     if progress:
+        #if TEST: print ("__get_progressDownload:", progress)
+    
         T1 = datetime.datetime.now()
         # Downloading webpage
         # Downloading video info webpage
         # Destination
         # download
-        if "100.0%" in progress.split():
+        if "100.0%" in progress.split() or "100%" in progress.split() :
             GLib.timeout_add(1000, __end, salida, youtubedl, STDOUT, callbackEnd)
             #print("END:", datetime.datetime.now() - T2, url)
             return False
-        elif "error" in progress or "ERROR" in progress:
+        elif "has already been downloaded and merged" in progress.lower():
+            GLib.timeout_add(1000, __end, salida, youtubedl, STDOUT, callbackEnd)
+            return False
+        elif "error" in progress.lower():
             print("CONEXION ? => Salteando descarga de video:", url)
             errorDownload("Arror en descarga de: %s" % url)
             informe.setInfo('cancelados en descargas', url)
@@ -174,7 +191,7 @@ def __get_progressDownload(salida, progressCallback, callbackEnd, youtubedl, STD
     t3 = t2 - T1
     if t3.seconds >= 50:
         print("TIEMPO => Salteando descarga de video:", url, t3.seconds)
-        errorDownload("Salteando descarga de: %s T=%s" % (url, t3.seconds))
+        errorDownload("Salteando descarga de: %s" % (url))
         informe.setInfo('cancelados en descargas', url)
         __end(salida, youtubedl, STDOUT, callbackEnd)
         return False
@@ -182,6 +199,14 @@ def __get_progressDownload(salida, progressCallback, callbackEnd, youtubedl, STD
     return True
 
 def runDownload(url, titulo, progressCallback, callbackEnd, informe, errorDownload):
+    # FIXME: Cuando la url hace referencia a una lista dice:
+    # https://youtu.be/0D5EEKH97NA?list=PL55RiY5tL51q4D-B63KBnygU6opNPFk_q
+    # La url del video es:
+    # https://youtu.be/0D5EEKH97NA
+    # https://www.youtube.com/watch?v=0D5EEKH97NA
+    # En este caso, jamedia agregará solo el primer archivo de la lista a la interfaz.
+    # Es necesario ver como obtenemos los videos individuales de esta lista para que se agreguen de a uno a la interfaz.
+
     # Descargar video
     global T2
     T2 = datetime.datetime.now()
@@ -203,3 +228,9 @@ def runDownload(url, titulo, progressCallback, callbackEnd, informe, errorDownlo
     salida = open(STDOUT, "r")
 
     GLib.timeout_add(200, __get_progressDownload, salida, progressCallback, callbackEnd, youtubedl, STDOUT, url, informe, errorDownload)
+
+    if TEST:
+        print ("\nrunDownload:")
+        print ("\tURL:", url)
+        print ("\tDestino:", destino)
+        print ("\tEstructura:", estructura)
