@@ -8,9 +8,9 @@
 
 import os
 import sys
-import time
 import threading
 import signal
+import subprocess
 
 os.putenv('GDK_BACKEND', 'x11')
 
@@ -50,7 +50,7 @@ target = [Gtk.TargetEntry.new('Mover', Gtk.TargetFlags.SAME_APP, 0)]
 
 '''
 NOTA: Activa este código en la función realize para ver la estructura de widgets del programa
-def make_tree_widgets(widget, tab):
+def make_tree_widgets(widget, tab=''):
     try:
         children = widget.get_children()
     except:
@@ -74,7 +74,7 @@ class JAMedia(Gtk.Application):
     def __init__(self):
 
         Gtk.Application.__init__(self)
-
+        
         self.set_flags(Gio.ApplicationFlags.NON_UNIQUE | Gio.ApplicationFlags.HANDLES_OPEN)
 
     def do_activate(self, files=[]):
@@ -85,8 +85,8 @@ class JAMedia(Gtk.Application):
         # [__gi__.GLocalFile]  https://docs.python.org/3/library/filesys.html
         self.do_activate(files)
 
-    def do_startup (self):
-        Gtk.Application.do_startup(self)
+    #def do_startup (self):
+    #    Gtk.Application.do_startup(self)
 
 
 class JAMediaWindow(Gtk.ApplicationWindow):
@@ -404,6 +404,8 @@ class JAMediaWindow(Gtk.ApplicationWindow):
 
 
 if __name__ == "__main__":
+    estructura = "wget https://yt-dl.org/latest/youtube-dl -q --show-progress -O %s" % (os.path.join(BASE_PATH, "PanelTube", "youtube-dl"))
+    subprocess.Popen(estructura, shell=True, universal_newlines=True)
     GObject.threads_init()
     Gdk.threads_init()
     jamedia = JAMedia()
