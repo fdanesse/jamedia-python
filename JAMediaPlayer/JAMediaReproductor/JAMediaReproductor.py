@@ -13,12 +13,10 @@ import os
 
 import gi
 gi.require_version('Gst', '1.0')
-gi.require_version('GstVideo', '1.0')
 
 from gi.repository import GObject
 from gi.repository import GLib
 from gi.repository import Gst
-from gi.repository import GstVideo
 
 Gst.init([])
 

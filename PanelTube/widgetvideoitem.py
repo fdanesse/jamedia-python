@@ -66,10 +66,14 @@ class WidgetVideoItem(Gtk.EventBox):
         if os.path.exists(self.__filejson): os.unlink(self.__filejson)
 
     def __setImage(self, width=200, height=150):
-        if os.path.exists(self.__fileimage):
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(self.__fileimage, width, height)
-            self.__imagen.set_from_pixbuf(pixbuf)
-
+        # FIXME: No se pudo reconocer el formato de imagen del archivo «/tmp/gEPmA3USJdI1593359556.webp»
+        try:
+            if os.path.exists(self.__fileimage):
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(self.__fileimage, width, height)
+                self.__imagen.set_from_pixbuf(pixbuf)
+        except:
+            print("No se puede cargar la imagen:", self.__fileimage)
+            
     def __setLabels(self):
         values = list(self._dict.items())
         labels = self.__vbox.get_children()

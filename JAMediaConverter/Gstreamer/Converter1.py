@@ -15,7 +15,6 @@ from gi.repository import Gst
 from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
 
-GObject.threads_init()
 Gst.init(None)
 
 

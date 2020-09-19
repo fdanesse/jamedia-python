@@ -19,6 +19,7 @@ import datetime
 import urllib.parse
 import urllib.request
 import subprocess
+import json
 
 from gi.repository import GLib
 
@@ -27,38 +28,66 @@ from JAMediaPlayer.Globales import YoutubeDir
 youtubedllauncher = os.path.join(os.path.dirname(__file__), "youtube-dl")  #'/usr/bin/youtube-dl'
 # STDERR = "/dev/null"
 
+
+videoRenders = []
+
+def getVideoRenderKey(_dict):
+    global videoRenders
+
+    for key, val in _dict.items():
+
+        if key == "videoRenderer":
+            videoRenders.append(val)
+            return
+
+        if 'dict' in str(type(val)):
+            getVideoRenderKey(val)
+
+        elif 'list' in str(type(val)):
+            for l in val:
+                if 'dict' in str(type(l)):
+                    getVideoRenderKey(l)
+
+
 # BUSCAR Videos en Youtube
 def __get_videos(consulta, limite, callback, callbackend, errorConection):
-    # Obtener web principal con resultado de busqueda y recorrer todas las pags de la busqueda obtenida hasta conseguir el id de los videos.
+    # Obtener web principal con resultado de busqueda y conseguir el id de los videos.
     # https://www.youtube.com/results?search_query=selena+gomez
-    try:
-        params = urllib.parse.urlencode({'search_query': consulta})
-        urls = {}
+    
+    try:    
         print ("Comenzando la busqueda de %i videos sobre %s..." % (limite, consulta))
-        for pag in range(1, 10):
-            f = urllib.request.urlopen("http://www.youtube.com/results?%s&filters=video&page=%i" % (params, pag))
-            text = str(f.read()).replace("\n", "")
-            f.close()
-            for item in text.split("data-context-item-id=")[1:]:
-                _id = item.split("\"")[1].strip()
-                url = "http://www.youtube.com/watch?v=%s" % _id
-                if not _id in urls.keys():
-                    urls[_id] = {"url": url}
-                    callback(url, limite - len(urls.keys()))
-                if len(urls.keys()) >= limite:
-                    break
+
+        params = urllib.parse.urlencode({'search_query': consulta})
+        url = "https://www.youtube.com/results?%s" % params  #url = "https://www.youtube.com/results?search_query=%s" % consulta
+        with urllib.request.urlopen(url) as f:
+            text = str(f.read().decode('utf-8'))
+
+        text = text.split('window["ytInitialData"] =')[1].strip().split(';')[0].strip()
+        _dict = json.loads(text)
+
+        global videoRenders
+        videoRenders = []
+        getVideoRenderKey(_dict)
+        urls = {}
+        for render in videoRenders:
+            _id = render['videoId'].strip()
+            url = "http://www.youtube.com/watch?v=%s" % _id
+            if not _id in urls.keys():
+                urls[_id] = {"url": url}
+                callback(url, limite - len(urls.keys()))
             if len(urls.keys()) >= limite:
                 break
+
         print ("Busqueda finalizada para:", consulta, "- Videos encontrados:", len(urls.keys()))
     except:
         errorConection()
     return callbackend()
 
+
 def buscar(palabras, cantidad, callback, callbackend, errorConection):
     # Realiza la busqueda de videos en youtube
     buscar = palabras.replace(" ", "+").strip().lower()
     __get_videos(buscar, cantidad, callback, callbackend, errorConection)
-
 
 
 T1 = datetime.datetime.now()

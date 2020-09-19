@@ -6,21 +6,19 @@ import os
 
 import gi
 gi.require_version('Gst', '1.0')
-gi.require_version('GstVideo', '1.0')
 
 from gi.repository import GObject
 from gi.repository import Gst
-from gi.repository import GstVideo
 
 
 class VideoOutput(Gst.Bin):
 
     def __init__(self, sink):
 
-        Gst.Bin.__init__(self, "VideoOutput")
-        
+        Gst.Bin.__init__(self)
+        # "VideoOutput"
         self.__gtkSink = sink
-        self.__gtkSink.set_property("pixel-aspect-ratio", Gst.Fraction(1, 1))
+        #self.__gtkSink.set_property("pixel-aspect-ratio", Gst.Fraction(1, 1))
         self.__videoqueue = Gst.ElementFactory.make('queue', 'videoqueue')
         self.__videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
         caps = Gst.Caps.from_string('video/x-raw,pixel-aspect-ratio=1/1')  # Corrige un BUG: http://gstreamer-devel.966125.n4.nabble.com/master-vs-1-5-1-changing-video-size-on-compositor-input-td4673354.html

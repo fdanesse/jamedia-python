@@ -5,17 +5,14 @@ import datetime
 
 import gi
 gi.require_version("Gst", "1.0")
-gi.require_version("GstVideo", "1.0")
 
 from gi.repository import GObject
 from gi.repository import Gst
-from gi.repository import GstVideo
 from gi.repository import GLib
 from JAMediaPlayer.Globales import MAGIC
 from JAMediaConverter.Gstreamer.VideoPipelines.InformeTranscoderModel import InformeTranscoderModel
 from JAMediaConverter.Gstreamer.Globales import format_ns, getSize
 
-GObject.threads_init()
 Gst.init(None)
 
 # NOTA: Segun testeo: 100 imagenes x segundo 42.5Mb
@@ -25,8 +22,8 @@ class ImageBin1(Gst.Bin):
 
     def __init__(self):
 
-        Gst.Bin.__init__(self, "ImageBin1")
-
+        Gst.Bin.__init__(self) # FIXME: "ImageBin1"
+ 
         videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
         videorate = Gst.ElementFactory.make('videorate', 'videorate')
         videorate.set_property("max-rate", 30)
@@ -53,7 +50,7 @@ class ImagenBin(Gst.Pipeline):
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
     def __init__(self, origen, dirpath_destino):
-        Gst.Pipeline.__init__(self, "ImagenBin")
+        Gst.Pipeline.__init__(self)  # FIXME: "ImagenBin"
 
         self.__controller = None
         self.__codec = "png"
