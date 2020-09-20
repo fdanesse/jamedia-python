@@ -17,7 +17,7 @@ from gi.repository import GdkPixbuf
 
 def downloadthumbnail(id, url):
     import requests
-    filename=str(id)+".jpg"
+    filename = os.path.join("/tmp", str(id) + ".jpg")
     response = requests.get(url)
     if response.status_code == 200:
         with open(filename,'wb') as f:
@@ -38,8 +38,8 @@ class WidgetVideoItem(Gtk.EventBox):
         
         self.set_size_request(200, 100)
 
-        self.__fileimage = ""
-        self.__filejson = ""
+        #self.__fileimage = ""
+        #self.__filejson = ""
 
         self._dict = OrderedDict({
             'id': _dict['id'],
@@ -72,10 +72,11 @@ class WidgetVideoItem(Gtk.EventBox):
 
         self.show_all()
     
+    '''
     def __del__(self):
         if os.path.exists(self.__fileimage): os.unlink(self.__fileimage)
         if os.path.exists(self.__filejson): os.unlink(self.__filejson)
-
+    '''
     '''
     def __setImage(self, width=200, height=150):
         # FIXME: No se pudo reconocer el formato de imagen del archivo «/tmp/gEPmA3USJdI1593359556.webp»
@@ -98,7 +99,7 @@ class WidgetVideoItem(Gtk.EventBox):
         # FIXME:
         # getJsonAndThumbnail(self._dict["url"], self.__endUpdate)
         if downloadthumbnail(self._dict['id'], self._dict['thumbnail']):
-            filename = self._dict['id'] + ".jpg"
+            filename = os.path.join("/tmp", self._dict['id'] + ".jpg")
             pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(filename, 200, 150)
             self.__imagen.set_from_pixbuf(pixbuf)
         self.emit("end-update")

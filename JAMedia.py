@@ -315,17 +315,19 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
         _dicts.remove(_dicts[0])
         videowidget.connect("end-update", self.__make_append_update_video, _dicts)
-        videowidget.connect("error-update", self.__cancel_append_video, _dicts)
+        #videowidget.connect("error-update", self.__cancel_append_video, _dicts)
         videowidget.update() # 5 - Busquedas
         return False
         
+    '''
     def __cancel_append_video(self, item, tiempo, urls):
         self.toolbar_alertas.run("Error en Metadatos de: %s" % (item._dict.get('url', '')))
         self.alerta_busqueda.set_data("Salteando: %s... faltan: %s" % (item._dict.get('url', ''), len(urls)))
         self.__informe.setInfo('cancelados en metadatos', item._dict["url"])
         item.destroy()
         self.__make_append_update_video(None, urls)
-
+    '''
+    
     def __switch(self, widget, valor):
         self.__cancel_toolbars()
         if valor == 'jamediatube':

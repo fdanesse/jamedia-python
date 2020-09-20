@@ -30,23 +30,25 @@ youtubedllauncher = os.path.join(os.path.dirname(__file__), "youtube-dl")  #'/us
 
 
 videoRenders = []
-
-def getVideoRenderKey(_dict):
+def __getVideoRenderKey(_dict):
     global videoRenders
-
     for key, val in _dict.items():
-
         if key == "videoRenderer":
             videoRenders.append(val)
+            # FIXME: Guardar json ?
             return
-
         if 'dict' in str(type(val)):
-            getVideoRenderKey(val)
-
+            __getVideoRenderKey(val)
         elif 'list' in str(type(val)):
-            for l in val:
-                if 'dict' in str(type(l)):
-                    getVideoRenderKey(l)
+            __getDictinList(val)
+
+
+def __getDictinList(_list):
+    for l in _list:
+        if 'dict' in str(type(l)):
+            __getVideoRenderKey(l)
+        elif 'list' in str(type(l)):
+            __getDictinList(l)
 
 
 # BUSCAR Videos en Youtube
@@ -67,14 +69,22 @@ def __get_videos(consulta, limite, callback, callbackend, errorConection):
 
         global videoRenders
         videoRenders = []
-        getVideoRenderKey(_dict)
+        __getVideoRenderKey(_dict)
         urls = {}
         for render in videoRenders:
+            # 'videoId'
+            # 'thumbnail': {'thumbnails':[{'url'},]}
+            # 'title': {'runs':[{'text'}]} 
+
             _id = render['videoId'].strip()
             url = "http://www.youtube.com/watch?v=%s" % _id
+            thumbnail = render['thumbnail']['thumbnails'][0]['url'].split("?")[0]
+            title = render['title']['runs'][0]['text'].strip()
+
             if not _id in urls.keys():
-                urls[_id] = {"url": url}
-                callback(url, limite - len(urls.keys()))
+                urls[_id] = {"id": _id, "title": title, "url": url, "thumbnail": thumbnail}
+                callback(urls[_id], limite - len(urls.keys()))
+
             if len(urls.keys()) >= limite:
                 break
 
@@ -93,6 +103,7 @@ def buscar(palabras, cantidad, callback, callbackend, errorConection):
 T1 = datetime.datetime.now()
 T2 = datetime.datetime.now()
 # DESCARGAR Metadatos del Videos encontrados
+'''
 def __timeCalc(youtubedl, salida, STDOUT, limite, url, text, callback):
     global T1
     t2 = datetime.datetime.now()
@@ -107,13 +118,14 @@ def __timeCalc(youtubedl, salida, STDOUT, limite, url, text, callback):
     else:
         #print(url, text, t3)
         return True, datetime.datetime.now()
-
+'''
 '''
 [youtube] 1DhA69K3fZ4: Downloading webpage
 [youtube] 1DhA69K3fZ4: Downloading video info webpage
 [info] Writing video description metadata as JSON to: /tmp/1DhA69K3fZ4.info.json
 [youtube] 1DhA69K3fZ4: Downloading thumbnail ...
 [youtube] 1DhA69K3fZ4: Writing thumbnail to: /tmp/1DhA69K3fZ4.jpg
+'''
 '''
 # Descarga de info.json y thumbnail
 def __get_progressThumbnail(salida, _dict, callback, youtubedl, STDOUT, url):
@@ -179,7 +191,7 @@ def getJsonAndThumbnail(url, callback):
         print ("\tURL:", url)
         print ("\tDestino:", destino)
         print ("\tEstructura:", estructura)
-
+'''
 
 # DESCARGAR Videos de youtube
 def __end(salida, youtubedl, STDOUT, callbackEnd):
