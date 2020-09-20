@@ -234,12 +234,23 @@ class JAMediaWindow(Gtk.ApplicationWindow):
 
     def __user_add_video(self, widget, url):
         # El usuario agrega manualmente un video a la lista de descargas
+        # Las siguientes direcciones son equivalentes
+        # https://www.youtube.com/watch?v=mf-UJ32PJgU
+        # http://www.youtube.com/watch?v=mf-UJ32PJgU
+        # https://youtu.be/mf-UJ32PJgU
+        url.replace("http:", "https:")
         _dict = {'url': url}
+        if "/watch?v=" in url:
+            _dict['id'] = url.split("/watch?v=")[1].strip()
+        elif "/youtu.be/" in url:
+            _dict['id'] = url.split("/youtu.be/")[1].strip()
+
         items = self.paneltube.descargar.get_children()
         items.extend(self.paneltube.encontrados.get_children())
-        urls = [item._dict.get('url', '') for item in items]
-        if self.__videosEncontrados: urls.extend([item.get('url', '') for item in self.__videosEncontrados])
-        if not url in urls:
+        ids = [item._dict.get('id', '') for item in items]
+        if self.__videosEncontrados: ids.extend([item.get('id', '') for item in self.__videosEncontrados])
+
+        if not _dict.get('id', '') in ids:
             videowidget = WidgetVideoItem(_dict)
             videowidget.set_tooltip_text(TipDescargas)
             videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
@@ -247,7 +258,7 @@ class JAMediaWindow(Gtk.ApplicationWindow):
             self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
             videowidget.update()
         else:
-            self.alerta_busqueda.set_data("Ya se encuentra listado: %s..." % (url))
+            self.alerta_busqueda.set_data("Ya se encuentra listado: %s..." % (_dict.get('id', '')))
         
     def __comenzar_busqueda(self, widget, palabras, cantidad):
         # 1 - Busquedas
