@@ -234,30 +234,21 @@ class JAMediaWindow(Gtk.ApplicationWindow):
 
     def __user_add_video(self, widget, url):
         # El usuario agrega manualmente un video a la lista de descargas
-        print ("FIXME: Hay que corregir esto")
-        '''
-        'id': _dict['id'],
-        'title': _dict['title'],
-        'url': _dict['url'],
-        'thumbnail': _dict['thumbnail']
-        '''
-        '''
+        _dict = {'url': url}
         items = self.paneltube.descargar.get_children()
         items.extend(self.paneltube.encontrados.get_children())
-        ids = [item._dict.get('id', '') for item in items]
-        if self.__videosEncontrados: ids.extend([item.get('id', '') for item in self.__videosEncontrados])
-        
-        if [item for item in items if self.__filterItems(item, url)]:
-            videowidget = WidgetVideoItem(url)
+        urls = [item._dict.get('url', '') for item in items]
+        if self.__videosEncontrados: urls.extend([item.get('url', '') for item in self.__videosEncontrados])
+        if not url in urls:
+            videowidget = WidgetVideoItem(_dict)
             videowidget.set_tooltip_text(TipDescargas)
             videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
             self.paneltube.descargar.pack_start(videowidget, False, False, 3)
             self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
-            #videowidget.connect("end-update", self.__make_append_update_video, urls)
             videowidget.update()
         else:
             self.alerta_busqueda.set_data("Ya se encuentra listado: %s..." % (url))
-        '''
+        
     def __comenzar_busqueda(self, widget, palabras, cantidad):
         # 1 - Busquedas
         self.toolbar_busqueda.set_sensitive(False)
@@ -327,7 +318,7 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         item.destroy()
         self.__make_append_update_video(None, urls)
     '''
-    
+
     def __switch(self, widget, valor):
         self.__cancel_toolbars()
         if valor == 'jamediatube':

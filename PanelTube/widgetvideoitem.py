@@ -16,6 +16,7 @@ from gi.repository import GdkPixbuf
 
 
 def downloadthumbnail(id, url):
+    if not id or not url: return False
     import requests
     filename = os.path.join("/tmp", str(id) + ".jpg")
     response = requests.get(url)
@@ -42,16 +43,16 @@ class WidgetVideoItem(Gtk.EventBox):
         #self.__filejson = ""
 
         self._dict = OrderedDict({
-            'id': _dict['id'],
-            'title': _dict['title'],
+            'id': _dict.get('id', ''),
+            'title': _dict.get('title', ''),
             #'duration': '', 
             #'ext': '',
             #'width': '',
             #'height': '',
             #'format': '',
             #'fps': '',
-            'url': _dict['url'],
-            'thumbnail': _dict['thumbnail']
+            'url': _dict.get('url', ''),
+            'thumbnail': _dict.get('thumbnail', '')
             })
 
         self.get_style_context().add_class("videoitem")
@@ -98,7 +99,7 @@ class WidgetVideoItem(Gtk.EventBox):
         # 5 - Busquedas. NOTA: desde PanelTube
         # FIXME:
         # getJsonAndThumbnail(self._dict["url"], self.__endUpdate)
-        if downloadthumbnail(self._dict['id'], self._dict['thumbnail']):
+        if downloadthumbnail(self._dict.get('id', ''), self._dict.get('thumbnail', '')):
             filename = os.path.join("/tmp", self._dict['id'] + ".jpg")
             pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(filename, 200, 150)
             self.__imagen.set_from_pixbuf(pixbuf)
