@@ -232,14 +232,22 @@ class JAMediaWindow(Gtk.ApplicationWindow):
             self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
             self.paneltube.toolbar_videos_derecha.added_removed(self.paneltube.descargar)
 
-    def __filterItems(self, item, url):
-        return item._dict["url"].split(":")[-1] == url.split(":")[-1]
-
     def __user_add_video(self, widget, url):
-        # El usuario agrega manualmene un video
+        # El usuario agrega manualmente un video a la lista de descargas
+        print ("FIXME: Hay que corregir esto")
+        '''
+        'id': _dict['id'],
+        'title': _dict['title'],
+        'url': _dict['url'],
+        'thumbnail': _dict['thumbnail']
+        '''
+        '''
         items = self.paneltube.descargar.get_children()
         items.extend(self.paneltube.encontrados.get_children())
-        if not [item for item in items if self.__filterItems(item, url)]:
+        ids = [item._dict.get('id', '') for item in items]
+        if self.__videosEncontrados: ids.extend([item.get('id', '') for item in self.__videosEncontrados])
+        
+        if [item for item in items if self.__filterItems(item, url)]:
             videowidget = WidgetVideoItem(url)
             videowidget.set_tooltip_text(TipDescargas)
             videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
@@ -249,7 +257,7 @@ class JAMediaWindow(Gtk.ApplicationWindow):
             videowidget.update()
         else:
             self.alerta_busqueda.set_data("Ya se encuentra listado: %s..." % (url))
-
+        '''
     def __comenzar_busqueda(self, widget, palabras, cantidad):
         # 1 - Busquedas
         self.toolbar_busqueda.set_sensitive(False)
@@ -269,44 +277,45 @@ class JAMediaWindow(Gtk.ApplicationWindow):
     def __errorConection(self):
         GLib.idle_add(self.toolbar_alertas.run, "No tienes conexión ?")
 
-    def __add_video_encontrado(self, url, faltan):
-        # 2 - Busquedas
+    def __add_video_encontrado(self, _dict, faltan):
+        # 2 - Busquedas (Solo se agrega el _dict del video a la lista self.__videosEncontrados)
         items = self.paneltube.descargar.get_children()
         items.extend(self.paneltube.encontrados.get_children())
-        if not [item for item in items if self.__filterItems(item, url)]:
-            if not str(url).strip() in self.__videosEncontrados:
-                self.__videosEncontrados.append(str(url).strip())
-                GLib.idle_add(self.alerta_busqueda.set_data, "Encontrado: %s... faltan: %s" % (url, faltan))
+        ids = [item._dict.get('id', '') for item in items]
+        if self.__videosEncontrados: ids.extend([item.get('id', '') for item in self.__videosEncontrados])
+        if not _dict.get('id', '') in ids:
+            self.__videosEncontrados.append(_dict)
+            GLib.idle_add(self.alerta_busqueda.set_data, "Encontrado: %s... faltan: %s" % (_dict.get('id', ''), faltan))
         else:
-            GLib.idle_add(self.alerta_busqueda.set_data, "Ya se encuentra listado: %s..." % (url))
+            GLib.idle_add(self.alerta_busqueda.set_data, "Ya se encuentra listado: %s..." % (_dict.get('id', '')))
 
     def __busquedasEnd(self):
-        # 3 - Busquedas
+        # 3 - Busquedas (Terminada la busqueda, se manda crear los items de video con self.__make_append_update_video)
         GLib.idle_add(self.toolbar_busqueda.set_sensitive, True)
         GLib.idle_add(self.__make_append_update_video, None, list(self.__videosEncontrados))
         self.__videosEncontrados = []
 
-    def __make_append_update_video(self, item, urls):
-        # 4 - Busquedas. crear, agregar, actualizar
-        if item:
-            self.paneltube.encontrados.pack_start(item, False, False, 3)
+    def __make_append_update_video(self, videowidget, _dicts):
+        # 4 - Busquedas. (crear, agregar, actualizar el item de video)
+        if videowidget:
+            self.paneltube.encontrados.pack_start(videowidget, False, False, 3)
             self.paneltube.toolbar_videos_izquierda.added_removed(self.paneltube.encontrados)
-        if urls:
+        if _dicts:
             # NOTA: Unknown sequence number while processing queue [xcb] Most likely this is a multi-threaded client and XInitThreads has not been called
             # Xlib está en abandono migrando a xcb: https://xcb.freedesktop.org/XcbPythonBinding/
-            GLib.idle_add(self.__create_widget_video, urls)
+            GLib.idle_add(self.__create_widget_video, _dicts)
         else:
             # FIXME: Agregar opciones para cancelados en metadatos
             ocultar([self.alerta_busqueda])
 
-    def __create_widget_video(self, urls):
-        self.alerta_busqueda.set_data("Actualizando: %s... faltan: %s" % (urls[0], len(urls)))
-        videowidget = WidgetVideoItem(urls[0])
+    def __create_widget_video(self, _dicts):
+        self.alerta_busqueda.set_data("Actualizando: %s... faltan: %s" % (_dicts[0].get("id", ""), len(_dicts)))
+        videowidget = WidgetVideoItem(_dicts[0])
         videowidget.set_tooltip_text(TipEncontrados)
         videowidget.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, target, Gdk.DragAction.MOVE)
-        urls.remove(urls[0])
-        videowidget.connect("end-update", self.__make_append_update_video, urls)
-        videowidget.connect("error-update", self.__cancel_append_video, urls)
+        _dicts.remove(_dicts[0])
+        videowidget.connect("end-update", self.__make_append_update_video, _dicts)
+        videowidget.connect("error-update", self.__cancel_append_video, _dicts)
         videowidget.update() # 5 - Busquedas
         return False
         

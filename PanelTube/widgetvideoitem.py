@@ -11,8 +11,19 @@ from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import GdkPixbuf
 
-from PanelTube.jamediayoutube import getJsonAndThumbnail
-from JAMediaPlayer.Globales import get_dict
+#from PanelTube.jamediayoutube import getJsonAndThumbnail
+#from JAMediaPlayer.Globales import get_dict
+
+
+def downloadthumbnail(id, url):
+    import requests
+    filename=str(id)+".jpg"
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(filename,'wb') as f:
+            f.write(response.content)
+        return True
+    return False
 
 
 class WidgetVideoItem(Gtk.EventBox):
@@ -21,7 +32,7 @@ class WidgetVideoItem(Gtk.EventBox):
         "end-update": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
         "error-update": (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,)),}
 
-    def __init__(self, url):
+    def __init__(self, _dict):
 
         Gtk.EventBox.__init__(self)
         
@@ -31,16 +42,16 @@ class WidgetVideoItem(Gtk.EventBox):
         self.__filejson = ""
 
         self._dict = OrderedDict({
-            'id': '',
-            'title': '',
-            'duration': '', 
-            'ext': '',
-            'width': '',
-            'height': '',
-            'format': '',
-            'fps': '',
-            'url': url,
-            'thumbnail': ''
+            'id': _dict['id'],
+            'title': _dict['title'],
+            #'duration': '', 
+            #'ext': '',
+            #'width': '',
+            #'height': '',
+            #'format': '',
+            #'fps': '',
+            'url': _dict['url'],
+            'thumbnail': _dict['thumbnail']
             })
 
         self.get_style_context().add_class("videoitem")
@@ -65,6 +76,7 @@ class WidgetVideoItem(Gtk.EventBox):
         if os.path.exists(self.__fileimage): os.unlink(self.__fileimage)
         if os.path.exists(self.__filejson): os.unlink(self.__filejson)
 
+    '''
     def __setImage(self, width=200, height=150):
         # FIXME: No se pudo reconocer el formato de imagen del archivo «/tmp/gEPmA3USJdI1593359556.webp»
         try:
@@ -79,11 +91,19 @@ class WidgetVideoItem(Gtk.EventBox):
         labels = self.__vbox.get_children()
         for label in labels:
             label.set_text("%s: %s" % (values[labels.index(label)]))
-
+    '''
+    
     def update(self):
         # 5 - Busquedas. NOTA: desde PanelTube
-        getJsonAndThumbnail(self._dict["url"], self.__endUpdate)
+        # FIXME:
+        # getJsonAndThumbnail(self._dict["url"], self.__endUpdate)
+        if downloadthumbnail(self._dict['id'], self._dict['thumbnail']):
+            filename = self._dict['id'] + ".jpg"
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(filename, 200, 150)
+            self.__imagen.set_from_pixbuf(pixbuf)
+        self.emit("end-update")
 
+    '''
     def __endUpdate(self, _dict, tiempo):
         # 6 - Busquedas
         self.__fileimage = _dict.get("thumb", "")
@@ -102,3 +122,4 @@ class WidgetVideoItem(Gtk.EventBox):
             self.emit("end-update")
         else:
             self.emit("error-update", tiempo)
+    '''
