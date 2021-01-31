@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
 # https://github.com/rg3/youtube-dl
 # https://github.com/ytdl-org/youtube-dl
 
@@ -56,41 +53,49 @@ def __get_videos(consulta, limite, callback, callbackend, errorConection):
     # Obtener web principal con resultado de busqueda y conseguir el id de los videos.
     # https://www.youtube.com/results?search_query=selena+gomez
     
-    try:    
-        print ("Comenzando la busqueda de %i videos sobre %s..." % (limite, consulta))
+    # FIXME:
+    '''
+    File "/home/flavio/Documentos/jamedia-python/PanelTube/jamediayoutube.py", line 97, in buscar
+    __get_videos(buscar, cantidad, callback, callbackend, errorConection)
+    File "/home/flavio/Documentos/jamedia-python/PanelTube/jamediayoutube.py", line 64, in __get_videos
+    text = text.split('window["ytInitialData"] =')[1].strip().split(';')[0].strip()
+    IndexError: list index out of range
+    '''
+    #try:    
+    print ("Comenzando la busqueda de %i videos sobre %s..." % (limite, consulta))
 
-        params = urllib.parse.urlencode({'search_query': consulta})
-        url = "https://www.youtube.com/results?%s" % params  #url = "https://www.youtube.com/results?search_query=%s" % consulta
-        with urllib.request.urlopen(url) as f:
-            text = str(f.read().decode('utf-8'))
+    params = urllib.parse.urlencode({'search_query': consulta})
+    url = "https://www.youtube.com/results?%s" % params  #url = "https://www.youtube.com/results?search_query=%s" % consulta
+    with urllib.request.urlopen(url) as f:
+        text = str(f.read().decode('utf-8'))
 
-        text = text.split('window["ytInitialData"] =')[1].strip().split(';')[0].strip()
-        _dict = json.loads(text)
+    text = text.split('window["ytInitialData"] =')[1].strip().split(';')[0].strip()
+    _dict = json.loads(text)
 
-        global videoRenders
-        videoRenders = []
-        __getVideoRenderKey(_dict)
-        urls = {}
-        for render in videoRenders:
-            # 'videoId'
-            # 'thumbnail': {'thumbnails':[{'url'},]}
-            # 'title': {'runs':[{'text'}]} 
+    global videoRenders
+    videoRenders = []
+    __getVideoRenderKey(_dict)
+    urls = {}
+    for render in videoRenders:
+        # 'videoId'
+        # 'thumbnail': {'thumbnails':[{'url'},]}
+        # 'title': {'runs':[{'text'}]} 
 
-            _id = render['videoId'].strip()
-            url = "http://www.youtube.com/watch?v=%s" % _id
-            thumbnail = render['thumbnail']['thumbnails'][0]['url'].split("?")[0]
-            title = render['title']['runs'][0]['text'].strip()
+        _id = render['videoId'].strip()
+        url = "http://www.youtube.com/watch?v=%s" % _id
+        thumbnail = render['thumbnail']['thumbnails'][0]['url'].split("?")[0]
+        title = render['title']['runs'][0]['text'].strip()
 
-            if not _id in urls.keys():
-                urls[_id] = {"id": _id, "title": title, "url": url, "thumbnail": thumbnail}
-                callback(urls[_id], limite - len(urls.keys()))
+        if not _id in urls.keys():
+            urls[_id] = {"id": _id, "title": title, "url": url, "thumbnail": thumbnail}
+            callback(urls[_id], limite - len(urls.keys()))
 
-            if len(urls.keys()) >= limite:
-                break
+        if len(urls.keys()) >= limite:
+            break
 
-        print ("Busqueda finalizada para:", consulta, "- Videos encontrados:", len(urls.keys()))
-    except:
-        errorConection()
+    print ("Busqueda finalizada para:", consulta, "- Videos encontrados:", len(urls.keys()))
+    #except:
+    #    errorConection()
     return callbackend()
 
 
@@ -240,13 +245,12 @@ def __get_progressDownload(salida, progressCallback, callbackEnd, youtubedl, STD
     return True
 
 def runDownload(url, titulo, progressCallback, callbackEnd, informe, errorDownload):
-    # FIXME: Cuando la url hace referencia a una lista dice:
+    # Cuando la url hace referencia a una lista dice:
     # https://youtu.be/0D5EEKH97NA?list=PL55RiY5tL51q4D-B63KBnygU6opNPFk_q
     # La url del video es:
     # https://youtu.be/0D5EEKH97NA
     # https://www.youtube.com/watch?v=0D5EEKH97NA
     # En este caso, jamedia agregará solo el primer archivo de la lista a la interfaz.
-    # Es necesario ver como obtenemos los videos individuales de esta lista para que se agreguen de a uno a la interfaz.
 
     # Descargar video
     global T2
@@ -254,12 +258,9 @@ def runDownload(url, titulo, progressCallback, callbackEnd, informe, errorDownlo
     global T1
     T1 = datetime.datetime.now()  # Solo para ver cuanto demora en hacer todo => 0:00:12.460755
 
-    #url = "http://youtu.be/" + url.split("=")[1]
     STDOUT = "/tmp/jamediatube%d" % time.time()
 
-    #archivo = "%s%s%s" % ("\"", titulo, "\"")
-    destino = "%s/" % YoutubeDir #os.path.join(YoutubeDir, archivo)
-    #python3 youtube-dl -f 'bestvideo+bestaudio' --ignore-config --ignore-errors --no-playlist -R 2 --no-part --no-warnings -o '%(title)s.%(ext)s' https://www.youtube.com/watch?v=1DhA69K3fZ4
+    destino = "%s/" % YoutubeDir
     estructura = "python3 %s -f 'bestvideo+bestaudio' --ignore-config --ignore-errors --no-playlist -R 2 --no-part --no-warnings " % youtubedllauncher
     estructura = estructura + "-o %s" % destino
     estructura = estructura + "'%(title)s.%(ext)s' "

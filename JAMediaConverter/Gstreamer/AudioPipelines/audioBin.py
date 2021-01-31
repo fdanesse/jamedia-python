@@ -22,7 +22,7 @@ class audioBin1(Gst.Bin):
 
     def __init__(self, path, codec):
 
-        Gst.Bin.__init__(self, "audioBin1")
+        Gst.Bin.__init__(self)
 
         audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
         audioresample.set_property("quality", 10)
@@ -54,7 +54,7 @@ class audioBin2(Gst.Bin):
 
     def __init__(self, path):
 
-        Gst.Bin.__init__(self, "audioBin2")
+        Gst.Bin.__init__(self)
 
         audioresample = Gst.ElementFactory.make('audioresample', "audioresample")
         audioresample.set_property("quality", 10)
@@ -88,7 +88,7 @@ class audioBin(Gst.Pipeline):
 
     def __init__(self, origen, codec, dirout):
 
-        Gst.Pipeline.__init__(self, "audioBin")
+        Gst.Pipeline.__init__(self)
 
         self.__controller = None
         self.__codec = codec

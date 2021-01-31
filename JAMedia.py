@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
 # API: https://lazka.github.io/pgi-docs
 # apt-get install libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio pkg-config --cflags --libs gstreamer-1.0
 # python3-magic
@@ -11,6 +8,7 @@ import sys
 import threading
 import signal
 import subprocess
+from datetime import datetime
 
 os.putenv('GDK_BACKEND', 'x11')
 
@@ -23,7 +21,27 @@ from gi.repository import Gdk
 from gi.repository import GLib
 from gi.repository import Gio
 
-from Widgets.headerBar import HeaderBar
+from Widgets.headerBar import HeaderBar 
+''' find . -name "*.pyc" -delete
+Traceback (most recent call last):
+  File "JAMedia.py", line 23, in <module>
+    from Widgets.headerBar import HeaderBar
+ImportError: bad magic number in 'Widgets': b'\x03\xf3\r\n'
+
+Agregue la línea a continuación antes de </policymap> en /etc/ImageMagick-7/policy.xml
+<policy domain="coder" rights="read | write" pattern="PDF" />
+'''
+
+# FIXME:
+'''
+import-im6.q16: attempt to perform an operation not allowed by the security policy `PS' @ error/constitute.c/IsCoderAuthorized/408.
+import-im6.q16: attempt to perform an operation not allowed by the security policy `PS' @ error/constitute.c/IsCoderAuthorized/408.
+import-im6.q16: attempt to perform an operation not allowed by the security policy `PS' @ error/constitute.c/IsCoderAuthorized/408.
+import-im6.q16: attempt to perform an operation not allowed by the security policy `PS' @ error/constitute.c/IsCoderAuthorized/408.
+./JAMedia.py: línea 12: error sintáctico cerca del elemento inesperado `'GDK_BACKEND','
+./JAMedia.py: línea 12: `os.putenv('GDK_BACKEND', 'x11')'
+'''
+
 from Widgets.toolbaralertas import ToolbarAlerta
 from Widgets.toolbarbusquedas import ToolbarBusquedas
 from Widgets.toolbardescargas import ToolbarDescargas
@@ -91,13 +109,11 @@ class JAMedia(Gtk.Application):
 
 class JAMediaWindow(Gtk.ApplicationWindow):
 
-    __gtype_name__ = 'JAMediaWindow'
-
     def __init__(self, app, files=[]):
 
         Gtk.Window.__init__(self, title="JAMedia", application=app)
 
-        self.version = get_dict(os.path.join(BASE_PATH, 'proyecto.ide')).get('version', 20)
+        self.version = get_dict(os.path.join(BASE_PATH, 'proyecto.ide')).get('version', 21)
 
         self.__informe = InformeDescargas()
 
@@ -109,7 +125,7 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         self.set_resizable(True)
         self.set_position(Gtk.WindowPosition.CENTER)
 
-        self.archivos = files
+        self.__archivos = files
         self.__videosEncontrados = []
 
         self.headerBar = HeaderBar()
@@ -176,10 +192,10 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         self.paneltube.connect("cancel_toolbar", self.__cancel_toolbars)
         self.paneltube.toolbar_add_video.connect('ok', self.__user_add_video)
 
-        if self.archivos:
+        if self.__archivos:
             self.__switch(None, 'jamedia')
-            self.jamediaplayer.setFiles(self.archivos)
-            self.archivos = []
+            self.jamediaplayer.setFiles(self.__archivos)
+            self.__archivos = []
         else:
             self.__switch(None, 'jamediatube')
             
@@ -416,10 +432,29 @@ class JAMediaWindow(Gtk.ApplicationWindow):
         sys.exit(0)
 
 
+def __actualizarYoutubedl():
+    '''
+    sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl
+    sudo chmod a+rx /usr/local/bin/youtube-dl
+    hash -r
+    sudo youtube-dl -U
+    '''
+    path = os.path.join(BASE_PATH, "PanelTube", "youtube-dl")
+    t1 = datetime.fromtimestamp(os.stat(path).st_mtime)
+
+    t2 = datetime.timestamp(datetime.now())
+    t2 = datetime.fromtimestamp(t2)
+
+    t = t2 - t1
+    if t.days > 15:
+        estructura = "wget https://yt-dl.org/downloads/latest/youtube-dl -q --show-progress -O %s" % (path)
+        subprocess.Popen(estructura, shell=True, universal_newlines=True)
+
+
 if __name__ == "__main__":
-    # FIXME: Corregir esto:
-    #estructura = "wget https://yt-dl.org/latest/youtube-dl -q --show-progress -O %s" % (os.path.join(BASE_PATH, "PanelTube", "youtube-dl"))
-    #subprocess.Popen(estructura, shell=True, universal_newlines=True)
+    estructura = "find . -name %s -delete" % ("\"*.pyc\"")
+    subprocess.Popen(estructura, shell=True, universal_newlines=True)    
+    __actualizarYoutubedl()
     #GObject.threads_init()
     #Gdk.threads_init()
     jamedia = JAMedia()

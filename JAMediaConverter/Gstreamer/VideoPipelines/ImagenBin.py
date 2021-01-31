@@ -22,7 +22,7 @@ class ImageBin1(Gst.Bin):
 
     def __init__(self):
 
-        Gst.Bin.__init__(self) # FIXME: "ImageBin1"
+        Gst.Bin.__init__(self)
  
         videoconvert = Gst.ElementFactory.make('videoconvert', 'videoconvert')
         videorate = Gst.ElementFactory.make('videorate', 'videorate')
@@ -50,7 +50,7 @@ class ImagenBin(Gst.Pipeline):
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
     def __init__(self, origen, dirpath_destino):
-        Gst.Pipeline.__init__(self)  # FIXME: "ImagenBin"
+        Gst.Pipeline.__init__(self)
 
         self.__controller = None
         self.__codec = "png"

@@ -32,7 +32,7 @@ class mpgPipeline(Gst.Pipeline):
     "end": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])}
 
     def __init__(self, origen, dirout):
-        Gst.Pipeline.__init__(self, "mpgPipeline")
+        Gst.Pipeline.__init__(self)
 
         self.__controller = None
         self.__codec = "mpg"

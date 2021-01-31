@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 from collections import OrderedDict
 
@@ -13,6 +11,8 @@ from gi.repository import GdkPixbuf
 
 #from PanelTube.jamediayoutube import getJsonAndThumbnail
 #from JAMediaPlayer.Globales import get_dict
+
+ICONS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Iconos")
 
 
 def downloadthumbnail(id, url):
@@ -80,7 +80,6 @@ class WidgetVideoItem(Gtk.EventBox):
     '''
     '''
     def __setImage(self, width=200, height=150):
-        # FIXME: No se pudo reconocer el formato de imagen del archivo «/tmp/gEPmA3USJdI1593359556.webp»
         try:
             if os.path.exists(self.__fileimage):
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(self.__fileimage, width, height)
@@ -97,13 +96,18 @@ class WidgetVideoItem(Gtk.EventBox):
     
     def update(self):
         # 5 - Busquedas. NOTA: desde PanelTube
-        # FIXME:
         # getJsonAndThumbnail(self._dict["url"], self.__endUpdate)
         if downloadthumbnail(self._dict.get('id', ''), self._dict.get('thumbnail', '')):
             filename = os.path.join("/tmp", self._dict['id'] + ".jpg")
             pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(filename, 200, 150)
             self.__imagen.set_from_pixbuf(pixbuf)
+        else:
+            filename = os.path.join(ICONS, "jamedia.png")
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(filename, 200, 150)
+            self.__imagen.set_from_pixbuf(pixbuf)
         self.emit("end-update")
+        # FIXME: Que hacer con los datos secundarios que se obtienen con el json.
+        # FIXME: Mejorar estilo
 
     '''
     def __endUpdate(self, _dict, tiempo):

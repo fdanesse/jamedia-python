@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # https://gist.github.com/cristian99garcia/fb3b29094ecdee5a028735f9cd606773
 # https://developer.gnome.org/gtk3/stable/GtkHeaderBar.html
 
