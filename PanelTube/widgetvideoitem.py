@@ -45,7 +45,9 @@ class WidgetVideoItem(Gtk.EventBox):
         self._dict = OrderedDict({
             'id': _dict.get('id', ''),
             'title': _dict.get('title', ''),
-            #'duration': '', 
+            'longitud': _dict.get('longitud', ''), 
+            'publicacion': _dict.get('publicacion', ''), 
+            'reproducciones': _dict.get('reproducciones', ''), 
             #'ext': '',
             #'width': '',
             #'height': '',

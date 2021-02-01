@@ -26,14 +26,55 @@ youtubedllauncher = os.path.join(os.path.dirname(__file__), "youtube-dl")  #'/us
 # STDERR = "/dev/null"
 
 
+def __limpiar(_dict):
+    '''
+    {
+    'thumbnail': 'https://i.ytimg.com/vi/eCna-hsmGUY/hq720.jpg',
+    'title': 'Shakira - Pies Descalzos, Sueños Blancos (Video Oficial)',
+    'id': 'eCna-hsmGUY',
+    'url': 'http://www.youtube.com/watch?v=eCna-hsmGUY',
+    'publicacion': 'hace 8 años',
+    'longitud': '4:00',
+    'reproducciones': '29,436,216 vistas'
+    }
+    '''
+    keys = ['videoId', 'thumbnail', 'title', 'publishedTimeText', 'lengthText', 'viewCountText']
+    remove = []
+    for key in _dict.keys():
+        if not key in keys:
+            remove.append(key)
+    for key in remove: del(_dict[key])
+
+    _dict['id'] = _dict['videoId'].strip()
+    _dict['url'] = "http://www.youtube.com/watch?v=%s" % _dict['id']
+    _dict['thumbnail'] = _dict['thumbnail']['thumbnails'][0]['url'].split("?")[0]
+    _dict['title'] = _dict['title']['runs'][0]['text'].strip()
+    _dict['publicacion'] = _dict['publishedTimeText']['simpleText'].strip()
+    _dict['longitud'] = _dict['lengthText']['simpleText'].strip()
+    _dict['reproducciones'] = _dict['viewCountText']['simpleText'].strip()
+
+    del(_dict['videoId'])
+    del(_dict['publishedTimeText'])
+    del(_dict['lengthText'])
+    del(_dict['viewCountText'])
+
+    return _dict
+
+
 videoRenders = []
+playlist = []
+
 def __getVideoRenderKey(_dict):
     global videoRenders
     for key, val in _dict.items():
         if key == "videoRenderer":
+            val = __limpiar(val)
             videoRenders.append(val)
-            # FIXME: Guardar json ?
-            return
+            
+        # FIXME: Cazamos las listas de reproducción
+        if str(val).startswith("/playlist?list="):
+            playlist.append({key:val})
+
         if 'dict' in str(type(val)):
             __getVideoRenderKey(val)
         elif 'list' in str(type(val)):
@@ -52,50 +93,36 @@ def __getDictinList(_list):
 def __get_videos(consulta, limite, callback, callbackend, errorConection):
     # Obtener web principal con resultado de busqueda y conseguir el id de los videos.
     # https://www.youtube.com/results?search_query=selena+gomez
-    
-    # FIXME:
-    '''
-    File "/home/flavio/Documentos/jamedia-python/PanelTube/jamediayoutube.py", line 97, in buscar
-    __get_videos(buscar, cantidad, callback, callbackend, errorConection)
-    File "/home/flavio/Documentos/jamedia-python/PanelTube/jamediayoutube.py", line 64, in __get_videos
-    text = text.split('window["ytInitialData"] =')[1].strip().split(';')[0].strip()
-    IndexError: list index out of range
-    '''
-    #try:    
-    print ("Comenzando la busqueda de %i videos sobre %s..." % (limite, consulta))
+    try:
+        print ("Comenzando la busqueda de %i videos sobre %s..." % (limite, consulta))
 
-    params = urllib.parse.urlencode({'search_query': consulta})
-    url = "https://www.youtube.com/results?%s" % params  #url = "https://www.youtube.com/results?search_query=%s" % consulta
-    with urllib.request.urlopen(url) as f:
-        text = str(f.read().decode('utf-8'))
+        params = urllib.parse.urlencode({'search_query': consulta})
+        url = "https://www.youtube.com/results?%s" % params  #url = "https://www.youtube.com/results?search_query=%s" % consulta
+        with urllib.request.urlopen(url) as f:
+            text = str(f.read().decode('utf-8'))
 
-    text = text.split('window["ytInitialData"] =')[1].strip().split(';')[0].strip()
-    _dict = json.loads(text)
+        #text = text.split('window["ytInitialData"] =')[1].strip().split(';')[0].strip()
+        text = text.split("var ytInitialData = ")[1].strip().split(";")[0].strip()
+        _dict = json.loads(text)
 
-    global videoRenders
-    videoRenders = []
-    __getVideoRenderKey(_dict)
-    urls = {}
-    for render in videoRenders:
-        # 'videoId'
-        # 'thumbnail': {'thumbnails':[{'url'},]}
-        # 'title': {'runs':[{'text'}]} 
+        global videoRenders
+        __getVideoRenderKey(_dict)
 
-        _id = render['videoId'].strip()
-        url = "http://www.youtube.com/watch?v=%s" % _id
-        thumbnail = render['thumbnail']['thumbnails'][0]['url'].split("?")[0]
-        title = render['title']['runs'][0]['text'].strip()
+        print (playlist)
+        
+        urls = {}
+        for render in videoRenders:
+            if not render['id'] in urls.keys():
+                urls[render['id']] = render
+                callback(urls[render['id']], limite - len(urls.keys()))
 
-        if not _id in urls.keys():
-            urls[_id] = {"id": _id, "title": title, "url": url, "thumbnail": thumbnail}
-            callback(urls[_id], limite - len(urls.keys()))
+            if len(urls.keys()) >= limite:
+                break
 
-        if len(urls.keys()) >= limite:
-            break
+        print ("Busqueda finalizada para:", consulta, "- Videos encontrados:", len(urls.keys()))
 
-    print ("Busqueda finalizada para:", consulta, "- Videos encontrados:", len(urls.keys()))
-    #except:
-    #    errorConection()
+    except:
+        errorConection()
     return callbackend()
 
 

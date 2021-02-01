@@ -24,7 +24,7 @@
         
             <section>
                 <section>
-                <h1><strong>JAMedia 19</strong></h1>
+                <h1><strong>JAMedia 21</strong></h1>
                 <hr>
                 <h5><strong>Reproductor de audio, video y streamings.</strong></h5>
                 </section>
@@ -34,12 +34,6 @@
                 JAMedia fue desarrollado originalmente en python durante los primeros meses de 2010, destinado especialmente a las laptos xo del proyecto olpc en Uruguay.
                 La motivación original de este desarrollo fue dar la oportunidad de ver el mundial de fútbol de Sudáfrica a todos los niños de uruguay en sus nuevas xo.
                 A lo largo de los años la aplicación fue mejorada y reescrita en otros lenguajes como java, vala, c++ y javascript, para adaptarla a diferentes plataformas y sobre todo como medio de aprendizaje personal.
-                A partir de la versión 17, se ha unificado JAMedia con JAMediaTube, por lo cual su principal propósito es ahora la busqueda, descarga y reproducción de videos.
-                La actual versión Nº 19, cuenta con importantes mejoras estéticas y de rendimiento. Se ha refactorizado todo el código y hecho el port de python 2 a python 3, de gtk 2 a gtk 3 y de gstreamer 0.10 a gstreamer 1.0.
-                Se han agregado interfaces gráficas en html, css y javascript y se ha reimplementado todo el estilo sobre css.
-                </p>
-                <p>
-                Se descartaron las características de grabación de streaming y televisión y la interfaz de radios ha sido remplazada por la versión javascript.
                 </p>
                 </section>
             </section>
@@ -55,7 +49,6 @@
                 <li>Descarga masiva de videos desde youtube.</li>
                 <li>Extractor masivo de audio e imágenes desde archivos de videos.</li>
                 <li>Conversor masivo de archivos de audio y video a diversos formatos.</li>
-                <li><s>Grabador de Streamings</s> <i>(Quitado en Versión 18)</i></li>
             </ol>
             <ol>
                 <h6><strong>El panel principal tiene dos áreas:</strong></h6>
@@ -83,7 +76,7 @@
 				<hr>
             </ol>
             <p>Para instalar estos paquetes en ubuntu, copia y pega el siguiente código en la terminal y presiona enter: <br>
-                <li>En la terminal Ejecuta: sudo apt-get install gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gir1.2-webkit2-4.0</li>
+                <li>En la terminal Ejecuta: apt-get install libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio pkg-config --cflags --libs gstreamer-1.0</li>
             </p>
             <ol>
                 <h6><strong>Autor:</strong></h6>
