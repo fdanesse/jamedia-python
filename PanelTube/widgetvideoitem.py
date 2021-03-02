@@ -108,7 +108,6 @@ class WidgetVideoItem(Gtk.EventBox):
             pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(filename, 200, 150)
             self.__imagen.set_from_pixbuf(pixbuf)
         self.emit("end-update")
-        # FIXME: Que hacer con los datos secundarios que se obtienen con el json.
         # FIXME: Mejorar estilo
 
     '''

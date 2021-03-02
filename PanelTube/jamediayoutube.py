@@ -34,7 +34,7 @@ def __limpiar(_dict):
     'id': 'eCna-hsmGUY',
     'url': 'http://www.youtube.com/watch?v=eCna-hsmGUY',
     'publicacion': 'hace 8 años',
-    'longitud': '4:00',
+    'duracion': '4:00',
     'reproducciones': '29,436,216 vistas'
     }
     '''
@@ -49,34 +49,42 @@ def __limpiar(_dict):
     _dict['url'] = "http://www.youtube.com/watch?v=%s" % _dict['id']
     _dict['thumbnail'] = _dict['thumbnail']['thumbnails'][0]['url'].split("?")[0]
     _dict['title'] = _dict['title']['runs'][0]['text'].strip()
-    _dict['publicacion'] = _dict['publishedTimeText']['simpleText'].strip()
-    _dict['longitud'] = _dict['lengthText']['simpleText'].strip()
-    _dict['reproducciones'] = _dict['viewCountText']['simpleText'].strip()
 
-    del(_dict['videoId'])
-    del(_dict['publishedTimeText'])
-    del(_dict['lengthText'])
-    del(_dict['viewCountText'])
+    _dict['publicacion'] = _dict.get('publishedTimeText', '')
+    if 'dict' in str(type(_dict['publicacion'])): _dict['publicacion'] = _dict['publicacion'].get('simpleText', '').strip()
+    
+    _dict['duracion'] = _dict.get('lengthText', '')
+    if 'dict' in str(type(_dict['duracion'])): _dict['duracion'] = _dict['duracion'].get('simpleText', '').strip()
+    
+    _dict['reproducciones'] = _dict.get('viewCountText', '')
+    if 'dict' in str(type(_dict['reproducciones'])): _dict['reproducciones'] = _dict['reproducciones'].get('simpleText', '').strip()
+    
+    for key in ['videoId', 'publishedTimeText', 'lengthText', 'viewCountText']:
+        if key in _dict.keys(): del(_dict[key])
 
     return _dict
 
 
 videoRenders = []
-playlist = []
+playlists = []
 
-def __getVideoRenderKey(_dict):
+def __getVideoRenderKeys(_dict):
     global videoRenders
+    global playlists
+
     for key, val in _dict.items():
-        if key == "videoRenderer":
+        if key == "videoRenderer" or key == "playlistVideoRenderer":
             val = __limpiar(val)
             videoRenders.append(val)
             
-        # FIXME: Cazamos las listas de reproducción
+        # Cazamos las listas de reproducción
         if str(val).startswith("/playlist?list="):
-            playlist.append({key:val})
+            if "&" in str(val): val = val.split("&")[0]
+            lista = "https://www.youtube.com%s" % (val)
+            if not lista in playlists: playlists.append(lista)
 
         if 'dict' in str(type(val)):
-            __getVideoRenderKey(val)
+            __getVideoRenderKeys(val)
         elif 'list' in str(type(val)):
             __getDictinList(val)
 
@@ -84,32 +92,59 @@ def __getVideoRenderKey(_dict):
 def __getDictinList(_list):
     for l in _list:
         if 'dict' in str(type(l)):
-            __getVideoRenderKey(l)
+            __getVideoRenderKeys(l)
         elif 'list' in str(type(l)):
             __getDictinList(l)
+
+
+def __getVideosInPlayLists(lista):
+    print ("Buscando más videos dentro de %s listas de reproducción..." % (len(lista)))
+    try:
+        for url in lista:
+
+            print ("Buscando en: %s" % url)
+
+            with urllib.request.urlopen(url) as f:
+                text = str(f.read().decode('utf-8'))
+
+            # obtener el json inicial de la petición
+            if 'window["ytInitialData"] =' in text:
+                text = text.split('window["ytInitialData"] =')[1].strip().split(';')[0].strip()
+            elif "var ytInitialData = " in text:
+                text = text.split("var ytInitialData = ")[1].strip().split(";")[0].strip()
+
+            __getVideoRenderKeys(json.loads(text))
+
+        print ("Búsqueda de videos en listas de reproducción finalizada.")
+    except:
+        print ("Error en búsqueda de videos dentro de listas de reproducción.")
 
 
 # BUSCAR Videos en Youtube
 def __get_videos(consulta, limite, callback, callbackend, errorConection):
     # Obtener web principal con resultado de busqueda y conseguir el id de los videos.
     # https://www.youtube.com/results?search_query=selena+gomez
-    try:
-        print ("Comenzando la busqueda de %i videos sobre %s..." % (limite, consulta))
 
+    global videoRenders
+    global playlists
+
+    print ("Comenzando la busqueda de %i videos sobre: %s..." % (limite, consulta))
+
+    try:
         params = urllib.parse.urlencode({'search_query': consulta})
         url = "https://www.youtube.com/results?%s" % params  #url = "https://www.youtube.com/results?search_query=%s" % consulta
         with urllib.request.urlopen(url) as f:
             text = str(f.read().decode('utf-8'))
 
-        #text = text.split('window["ytInitialData"] =')[1].strip().split(';')[0].strip()
-        text = text.split("var ytInitialData = ")[1].strip().split(";")[0].strip()
-        _dict = json.loads(text)
+        # obtener el json inicial de la petición
+        if 'window["ytInitialData"] =' in text:
+            text = text.split('window["ytInitialData"] =')[1].strip().split(';')[0].strip()
+        elif "var ytInitialData = " in text:
+            text = text.split("var ytInitialData = ")[1].strip().split(";")[0].strip()
 
-        global videoRenders
-        __getVideoRenderKey(_dict)
+        __getVideoRenderKeys(json.loads(text))
+        __getVideosInPlayLists(list(playlists))
 
-        print (playlist)
-        
         urls = {}
         for render in videoRenders:
             if not render['id'] in urls.keys():
@@ -122,7 +157,12 @@ def __get_videos(consulta, limite, callback, callbackend, errorConection):
         print ("Busqueda finalizada para:", consulta, "- Videos encontrados:", len(urls.keys()))
 
     except:
+        print ("Error en la busqueda de %i videos sobre: %s..." % (limite, consulta))
         errorConection()
+    
+    videoRenders = []
+    playlists = []
+
     return callbackend()
 
 

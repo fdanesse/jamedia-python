@@ -5,10 +5,10 @@
     border: 1px solid @border;
     padding: 5px;
     font-weight: bold;
-    /* FIXME: Animations No funcionan:
+    /* FIXME: Animations No funcionan: */
     animation-name: playing_anim;
     animation-duration: 2s;
-    animation-iteration-count: infinite;*/
+    animation-iteration-count: infinite;
 }
 .alertabusquedas button {
     background-image: image(@green2);

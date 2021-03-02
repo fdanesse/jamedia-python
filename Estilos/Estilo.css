@@ -179,7 +179,7 @@ trough highlight{
 @import url("jamedia.css");
 @import url("converter.css");
 
-/*
+
 @keyframes playing_anim {
     0% {
         background-image: image(@jamedia3);
@@ -187,26 +187,22 @@ trough highlight{
     }
   
     50% {
-        background-image: image(@bg_toolbar1);
-        background-color: @bg_toolbar1;
+        background-image: image(@jamedia1);
+        background-color: @jamedia1;
     }
   
     100% {
         background-image: image(@jamedia3);
         background-color: @jamedia3;
     }
-  }
-*/
+}
+
 
 /*
 FIXME: Mejorar transiciones en botones
 FIXME: Implementar controlador de tabulador para pasar el foco entre widgets (Actualmente no es posible)
-FIXME: buscar como agregar y leer imagen en los tag de videos
-FIXME: agregar terminal con información de rendimiento
 FIXME: en los video items agregar botones para borrar, descargar, convertir, guardar portada, etc ...
 FIXME: en el reproductor copiar, mover, borrar y convertir archivos 
-FIXME: informacion de tamaño y codecs
-FIXME: reparar toolbar encontrados para que muestre el texto mientras se actualizan los metadatos, quizas sea mejor
 FIXME: agregar imagen de arrastre en drag and drop de paneltube
 FIXME: quitarle el borde a jamedia cuando esta fullscreen y con controles ocultos
 FIXME: Corregir emisoras

@@ -32,16 +32,6 @@ Agregue la línea a continuación antes de </policymap> en /etc/ImageMagick-7/po
 <policy domain="coder" rights="read | write" pattern="PDF" />
 '''
 
-# FIXME:
-'''
-import-im6.q16: attempt to perform an operation not allowed by the security policy `PS' @ error/constitute.c/IsCoderAuthorized/408.
-import-im6.q16: attempt to perform an operation not allowed by the security policy `PS' @ error/constitute.c/IsCoderAuthorized/408.
-import-im6.q16: attempt to perform an operation not allowed by the security policy `PS' @ error/constitute.c/IsCoderAuthorized/408.
-import-im6.q16: attempt to perform an operation not allowed by the security policy `PS' @ error/constitute.c/IsCoderAuthorized/408.
-./JAMedia.py: línea 12: error sintáctico cerca del elemento inesperado `'GDK_BACKEND','
-./JAMedia.py: línea 12: `os.putenv('GDK_BACKEND', 'x11')'
-'''
-
 from Widgets.toolbaralertas import ToolbarAlerta
 from Widgets.toolbarbusquedas import ToolbarBusquedas
 from Widgets.toolbardescargas import ToolbarDescargas
