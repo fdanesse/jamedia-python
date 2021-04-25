@@ -38,7 +38,8 @@ button {
     border: 0.1em solid @bg_toolbar1;
     margin: 3px;
     padding: 3px;
-    /*FIXME: No funciona. transition: background-color 500ms ease-in-out;*/
+    transition: 0.4s;
+    transition-timing-function: ease-in-out;
 }
 button:hover {
     background-image: image(@green3);
