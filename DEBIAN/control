@@ -1,6 +1,6 @@
-Package: jamedia
+Package: JAMedia
 Source: JAMedia
-Version: 21
+Version: 22
 Section: GTK;GNOME;AudioVideo;Player;Video;
 Priority: optional
 Architecture: all
