@@ -1,0 +1,117 @@
+
+Gtk.Application:    https://python-gtk-3-tutorial.readthedocs.io/en/latest/application.html
+
+vp8enc:     https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gst-plugins-good/html/gst-plugins-good-plugins-vp8enc.html
+webm:       https://www.webmproject.org/docs/encoder-parameters/
+webmmux:    https://developer.gnome.org/gst-plugins-libs/stable/gst-plugins-good-plugins-webmmux.html
+
+Subtitle:   https://gstreamer.freedesktop.org/documentation/design/subtitle-overlays.html
+Raw Video Media Types:  https://gstreamer.freedesktop.org/documentation/design/mediatype-video-raw.html#formats
+
+bufferdraw: https://github.com/GStreamer/gst-python/blob/master/old_examples/buffer-draw.py
+python gstreamer tutorial:  http://brettviren.github.io/pygst-tutorial-org/pygst-tutorial.html
+
+Gstreamer 1.0:  https://lazka.github.io/pgi-docs/Gst-1.0/
+
+http://z25.org/static/_rd_/videostreaming_intro_plab/
+Audio to hdmi: http://trac.gateworks.com/wiki/Yocto/gstreamer/audio#Encoding
+Manual de gstreamer: https://gstreamer.freedesktop.org/documentation/application-development/
+
+numpy: https://stackoverflow.com/questions/48474308/getting-sum-of-adjacent-elements-of-a-matrix
+
+https://en.wikipedia.org/wiki/Chroma_subsampling
+http://www.cinedigital.tv/que-es-todo-eso-de-444-422-420-o-color-subsampling/
+https://wolfcrow.com/blog/chroma-subsampling-numbers-explained/
+
+ejemplo de streaming en html: https://gist.github.com/vo/a0cc9313861888ad5180f442a4b7bf48
+https://stackoverflow.com/questions/33306265/encode-decode-vp8-or-vp9-with-gstreamer
+
+https://github.com/tamaggo/gstreamer-examples/blob/master/test_gst_appsrc_testvideo_mp4mux.py
+
+
+Ejemplo para obtener toda la estructura a medida que se agregan los elementos:
+self.__playbin = Gst.ElementFactory.make("playbin", "playbin")
+self.__playbin.connect("element-setup", self.__element_setup)
+def __element_setup(self, uno=None, element=None, tres=None):
+    name = ""
+    try:
+        name = element.get_name()
+    except:
+        pass
+    print(name, element)
+
+Obtener las capas actuales:
+def busMessageCb(self, bus, mensaje):
+    if mensaje.type == Gst.MessageType.STATE_CHANGED:
+        old, new, pending = mensaje.parse_state_changed()
+
+        if old == Gst.State.PAUSED and new == Gst.State.PLAYING:
+            if self.__status != new:
+                pad = self.__playbin.emit('get-audio-pad', 0)
+                currentcaps = pad.get_current_caps().to_string()
+                print("*", currentcaps)
+                pad = self.__playbin.emit('get-video-pad', 0)
+                currentcaps = pad.get_current_caps().to_string()
+                print("*", currentcaps)
+
+
+
+from gi.repository import Gst, GstPbutils
+
+def on_discovered(discoverer, ismedia):
+    print("%s -- %s" %( discoverer.tags.get('title', 'Unknown'),
+                        discoverer.tags.get('artist', 'Unknown')))
+
+Gst.init(None)
+location = "file:///srv/Music/molly_hatchet-the_creeper.mp3"
+discoverer = GstPbutils.Discoverer()
+discoverer.discover_uri(location)
+discoverer.connect('discovered', on_discovered)
+
+
+
+gst-launch-1.0 uridecodebin name=dec uri=$(/usr/local/bin/youtube-dl -g -f 18 1DhA69K3fZ4)  ! queue ! autoaudiosink dec. ! queue  ! videoscale ! video/x-raw-yuv,width=1024,height=768 ! autovideosink
+
+
+
+Reproducir un video:
+    mpv --hwdec=vaapi Selena_Gomez_-_Back_To_You 
+
+Playing: Selena_Gomez_-_Back_To_You
+ (+) Video --vid=1 (*) (vp8 640x360 23.976fps)
+ (+) Audio --aid=1 (*) (vorbis 2ch 44100Hz)
+mesa: for the -simplifycfg-sink-common option: may only occur zero or one times!
+[vo/opengl/vaapi-egl] vaDeriveImage(): invalid VASurfaceID
+[vo/opengl/vaapi-egl] vaDeriveImage(): invalid VAImageFormat
+[vo/opengl/vaapi-egl] vaDeriveImage(): invalid VAImageFormat
+AO: [pulse] 44100Hz stereo 2ch float
+VO: [opengl] 640x360 yuv420p
+AV: 00:00:27 / 00:04:27 (10%) A-V:  0.000 Dropped: 15
+
+
+LIBGL_DRI3_DISABLE=1
+Reproducir un video solucionando el bug de gstreamer1.0-vaapi:
+mpv --opengl-hwdec-interop=vaapi-glx Selena_Gomez_-_Back_To_You
+
+
+Ver Para utilizar:
+https://docs.python.org/3/py-modindex.html
+
+https://gstreamer.freedesktop.org/documentation/tutorials/basic/media-information-gathering.html
+https://gstreamer.freedesktop.org/documentation/tutorials/basic/short-cutting-the-pipeline.html
+https://markwingerd.wordpress.com/2014/11/19/using-gstreamer-with-python/
+https://gstreamer.freedesktop.org/documentation/tutorials/playback/custom-playbin-sinks.html
+https://gstreamer.freedesktop.org/documentation/design/overview.html#pipeline-clock
+http://gstreamer-devel.966125.n4.nabble.com/master-vs-1-5-1-changing-video-size-on-compositor-input-td4673354.html
+
+
+
+import gi
+gi.require_version('Gst', '1.0')
+from gi.repository import GObject, Gst, Gtk
+
+GObject.threads_init()
+Gst.init(None)
+
+elem = Gst.ElementFactory.make('playbin')
+inspect.getmembers(elem)

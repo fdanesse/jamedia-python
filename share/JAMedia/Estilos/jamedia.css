@@ -1,0 +1,127 @@
+/* JAMedia */
+#jamediabox {
+    border: 2px @jamedia3 solid;
+}
+
+.progressplayer button {
+    margin: 0;
+    margin-left: 3px;
+    margin-right: 3px;
+    padding: 3px;
+    border-radius: 100%;
+}
+#volumen {
+    padding-left: 6px;
+    padding-right: 6px;
+}
+#jamediaplayerpanel {
+    background-image: image(@bg_toolbar1);
+    background-color: @bg_toolbar1;
+}
+#toolbarinfo button {
+    margin: 0;
+    margin-left: 3px;
+    border-radius: 100%;
+}
+.frameplayerlist {
+    background-image: url('../Iconos/reciclado_arrugado_azul.png');
+    background-size:cover;
+    background-repeat: no-repeat;
+    font-size: 9pt;
+}
+.toolbarcontrols button {
+    margin: 0;
+    margin-left: 3px;
+    border-radius: 100%;
+}
+.treeviewlist {
+    background-image: none;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    padding-left: 3px;
+    padding-top: 3px;
+}
+.treeviewlist:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.treeviewlist:selected {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: @jamedia1;
+}
+.toolbarlist {
+    background-image: image(@bg_toolbar1);
+    background-color: @bg_toolbar1;
+    margin: 0;
+    padding: 3px;
+}
+.toolbarlist button {
+    margin: 0;
+    padding: 1px;
+}
+
+.equalizerlabelframe {
+    font-size: 10pt;
+    font-weight: bold;
+}
+
+.equalizerbox {
+    margin: 5px;
+}
+
+.equalizervalue {
+    margin-left: 10px;
+    margin-right: 35px;
+}
+
+.resetbutton {
+    background-image: image(@green3);
+    background-color: @green3;
+    color: black;
+    border: 1px @border solid;
+    margin: 10px;
+    margin-right: 35px;
+    font-size: 10pt;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.8), 0 2px 2px 0 rgba(0, 0, 0, 0.19);
+}
+.resetbutton:hover {
+    background-image: image(@jamedia3);
+    background-color: @jamedia3;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.8), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
+}
+
+/* Barra de Progreso **/
+.equalizerscale scale {
+    background-image: image(@bg_toolbar1);
+    background-color: @bg_toolbar1;
+    border-radius: 0;
+    border: none;
+    padding: 5px;
+    margin: 0;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+/* El icono de la escala https://developer.gnome.org/gtk3/stable/chap-css-overview.html */
+.equalizerscale slider {
+    background-image: image(white);
+    background-color: white;
+    outline-style: outset;
+    border: 0.1em solid black;
+    border-radius: 100%;
+}
+/* canal sin reproducir */
+.equalizerscale trough {
+    background-image: image(@border);
+    background-color: @border;
+    outline-style: outset;
+    border: 0.1em solid @border;
+    border-radius: 2px;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.3), 0 3px 6px 0 rgba(0, 0, 0, 0);
+}
+/* canal reproducido */
+.equalizerscale trough highlight{
+    background-image: image(white);
+    background-color: white;
+    outline-style: outset;
+    border: 0.1em solid white;
+    border-radius: 2px;
+}

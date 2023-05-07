@@ -1,0 +1,11 @@
+Package: jamedia
+Source: JAMedia
+Version: 21
+Section: GTK;GNOME;AudioVideo;Player;Video;
+Priority: optional
+Architecture: all
+Maintainer: Flavio Danesse <fdanesse@gmail.com>
+Homepage: https://fdanesse-f2b2c.firebaseapp.com/jamedia
+Depends: gstreamer1.0-plugins-base,gstreamer1.0-plugins-good,gstreamer1.0-plugins-ugly,gstreamer1.0-libav,gstreamer1.0-tools,gir1.2-webkit2-4.0 
+Description: Reproductor de audio, video y streamings de radio. Busca descarga y reproduce videos de youtube
+ Reproductor de audio, video y streamings de radio. Busca descarga y reproduce videos de youtube
